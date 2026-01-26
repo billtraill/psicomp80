@@ -2,8 +2,7 @@ PSI COMP80 – MAME skeleton driver (WIP)
 
 Files in this folder:
   - psicomp80.cpp      : MAME driver source (drop into src/mame/homebrew/ or similar)
-  - psicomp80.zip      : ROM set (place in your MAME roms/ folder)
-  - psicomp80.rom      : Raw 3 KiB ROM image (inside the zip)
+  - psicomp80.rom      : Raw 3 KiB ROM image
 
 Quick build/run (macOS):
 
@@ -12,15 +11,25 @@ Quick build/run (macOS):
    cd mame
 
 2) Copy driver file into tree, e.g.:
-   mkdir -p src/mame/homebrew
-   cp /path/to/psicomp80.cpp src/mame/homebrew/psicomp80.cpp
+
+   This is assuming you are in the psicomp80 dir and the mame is one up ...
+
+   cp psicomp80.cpp ../mame/src/mame/drivers/psicomp80.cpp
+  
 
 3) Build ONLY this driver (fast iteration):
-   make SUBTARGET=psicomp80emu SOURCES=src/mame/homebrew/psicomp80.cpp REGENIE=1 -j$(sysctl -n hw.ncpu)
+```
+make DEBUG=1 SYMBOLS=1 OPTIMIZE=0 \
+  SOURCES=src/mame/drivers/psicomp80.cpp \
+  OSD=sdl \
+  USE_LIBSDL=1 \
+  SDL_INSTALL_ROOT=/opt/homebrew \
+  -j$(sysctl -n hw.ncpu)
+```
 
 4) Put the ROM zip where MAME looks for ROMs:
    mkdir -p roms/psicomp80
-   cp /path/to/psicomp80.zip roms/psicomp80/
+   cp psicomp80.rom ../mame/roms/psicomp80/
 
 5) Run with debugger:
    ./psicomp80emu psicomp80 -debug

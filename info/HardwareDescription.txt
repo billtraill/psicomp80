@@ -1,0 +1,630 @@
+Z80 Microprocessor
+
+ROM 3kb for monitor program 0000-0BFF
+
+RAM 5kb for monitor program 0C00-1FFF
+
+RAM 2kB for video RAM 8000-87FF
+
+Display 32 lines of 64 characters, 6x10 pixels per character
+
+Coprocessor MM57109 
+
+The block diagram of the computer in
+Fig. 1 follows standard microcomputer
+techniques, with a n eight wire data bus,
+a sixteen wire address bus and a four
+wire control bus which interconnect the
+various elements of the computer. The
+majority of lines i n this design are active
+low, ie, for an i.c. output, they g o to the
+low state when the particular output
+label is occurring, e.g. HALT on the Z80
+goes low when it is in the HALT condi-
+tion, WR goes low whenever the Z80
+wants to write some information into
+the memory. With a n input, that input
+must g o low for the input label to occur,
+e.g. INT needs to go low for the Z80 to
+be interrupted. An active low label is
+identified b y a bar over it.
+To describe the operation o f the c.p.u.
+shown in Fig. 2, it will be helpful if some
+aspects o f microprocessor operation are
+discussed. The Z80 can execute a reper-
+toire of 158 groups of instructions, of
+which there are about 600 in total, and
+these instructions are read in through
+the data bus o f the system as 8-bit words
+or bytes. The reading in, or writing out
+of bytes from or t o memory locations o r
+input/output devices is controlled b y
+the four processor output lines RD, WR
+MREQ, IORQ. For example, a low R D
+and a low MREQ output from the Z80
+indicates that it wants to read in a byte
+from a memory location, whereas a low
+WR and IORQ means that i t i s writing a
+byte out along the data bus t o a n output
+device, such as a teleprinter. The ad-
+dress of the memory location, which is
+stored in a 16-bit register within the Z80,
+known as the program counter, or
+code number of the input/output de-
+vice, i s simultaneously sent out onto a
+second 16-line bus by the Z80. External
+circuitry selects which memory location
+o r device i s coupled to the data bus for
+that particular Z80 operation. When pin
+26 RESET, o f the Z80 is taken t o 0V, the
+program counter is cleared, and when
+pin 2 6 returns to 5V, the Z80 begins by
+reading in the data byte in memory
+location 0, executing it as a n instruc-
+tion, increasing the program counter b y
+one, and reading in the next byte from
+memory and so on. Thus, the memory
+will contain lists of instructions to b e
+executed sequentially, interspersed
+with bytes of data which are required by
+some of them. The Z80 will then work
+its way through these lists or programs.
+The instructions cover such opera-
+tions as LOADS, which move bytes 
+between registers within the Z80 or the
+memory. Logical and arithmetic func-
+tions, usually on the contents of the A
+register of the Z80. JUMPS, which, by
+feeding two new 8-bit bytes into the
+program counter register, cause the
+sequence of instruction execution to
+jump t o a different point in the program.
+And CALLS, which are similar to jumps
+except that the old program counter
+contents are kept in a last-in first-out
+store in the read/write memory of the
+system, to be restored to the program
+counter on execution of the Z80 in-
+struction RETURN. Calls are particu-
+larly useful whenever a certain block of
+instructions need to be used at several
+points in a program. If the instructions
+are written once in a program with a
+return instruction at the end, the block
+may b e called at any point during the
+rest of the program. Such blocks are
+known a s subroutines.
+One feature o f most microprocessors,
+including the Z80, is that CALL in-
+structions may also be forced into the
+instruction sequence by activating
+either of the pins NMI or INT. The
+subroutines called by these interrupts
+are executed immediately after the in-
+struction in progress, and, a s with most
+CALLS, once the subroutine has been
+completed, instruction execution
+recommences at the point where the
+sequence was originally interrupted
+These interrupts are generally used b y
+other devices that want to com-
+municate with the Z80 and, in this case,
+the NI interrupt is initiated by the
+strobe pulse from the keyboard and
+hence by the depression o f any key. The
+keyboard subroutine reads in and acts
+upon the keyboard data before retur-
+ning control to the main program as
+shown in Fig. 3 . This is just one method
+of using the keyboard and another
+common approach i s the polling system
+where, a s part o f the main program, the
+Z80 reads i n the strobe pulse as part o f a
+byte, then tests to see if the strobe i s
+active and jumps back to the read
+operation if it is not. When it i s active,
+the Z80 reads in the keyboard data byte.
+This method requires six bytes of in-
+structions and memory locations, o r at
+least a three byte CALL instruction to a
+read-the-keyboard subroutine when-
+ever a byte o f keyboard data is required.
+In contrast, an interrupt driven sys-
+tem only requires the one-byte HALT
+instruction t o be executed whenever a
+byte o f keyboard data is needed. The
+only method for the processor to get out
+of the HALT state, once the instruction
+has been executed, is b y operation of
+the reset button or by an interrupt,
+the Z80 waits for the interrupt
+which directs it into the subroutine
+for the keyboard. The interrupt system
+which was chosen, saves on memory
+space and the subroutine contains a n
+extra section which will reset the entire
+system if the processor is not in the
+HALT state. If it is necessary to inter-
+rupt, for example, a program under
+development which has a fault, this can
+be achieved by pressing any key. The
+HALT command is also available in the
+high level language where it will also
+stop program execution until a key is
+pressed.
+The NMI input (non-maskable inter-
+rupt) operates under all conditions and
+just calls to a fixed address in the
+memory. The other interrupt input,
+INT, can be enabled or disabled by
+instructions within the program being
+executed. This particular interrupt line
+comes from the MM57109 R/W output
+and indicates that the 57109 wants to
+send b.c.d. data to the Z80. This output
+can d o some peculiar things during the
+initial reset of the processor; therefore,
+during this period, it i s essential that the
+INT input i s disabled. This i s automati-
+cally done by the Z80 whenever it
+receives the reset signal. The interrupt
+can be programmed t o respond in one of
+three ways, but in this system its res-
+ponse i s similar t o that o f the NMI input,
+i.e., a CALL to a particular memory
+address.
+Operation of the MM57109 is most
+easily understood by reference to the
+simplified diagram in Fig. 4. The device
+has open drain outputs which require
+external pull-down resistors, and some
+non-t.t.l. compatible inputs, but these
+have been left out o f the diagram. The
+57109 has a 6-bit input word into which
+70 instructions, mostly of single bytes,
+have been encoded. The two relevant
+control lines are the RDY output and
+the HOLD input. RDY indicates that the
+device i s ready t o receive an instruction.
+I f the HOLD input i s low, RDY will g o
+low after 16 us, and the current in-
+struction on the input lines will be
+executed. If the HOLD is high, RDY
+remains high and the operation of the
+57109 is suspended until HOLD goes
+low. In this system, RDY is sensed, and
+HOLD is controlled by the Z80. The
+HOLD input is normally high, and the
+typical sequence used by the Z80 when
+it wants the 57109 to execute an in-
+struction i s shown in Fig. 5.
+Although this sequence is adequate
+for the execution of most instructions,
+the 57109 has been designed to operate
+as a separate microprocessor and will
+therefore sometimes produce RDY
+pulses during the execution of certain
+instructions. These pulses are intended
+to cue memory counters etc. As the
+HOLD is on during the execution of
+instructions, these RDY pulses must b e
+supressed otherwise the Z80 may think
+that it's time for another instruction t o
+be sent t o the 57109 latch. Fortunately,
+in such cases the output ISEL a t pin 12
+goes low, and this is used to gate the
+RDY signal to, and the HOLD signals
+from, the Z80 via IC,.
+The data read in by the Z80 via the
+tri-state buffer, IC, consists of the
+modified RDY signal together with the
+four DO (digit output) lines which
+carry the b.c.d. data from the 57109 X
+register, and the B R line on pin 23. This
+line pulses low whenever one of the
+seven tests that the 57109 can perform
+proves to be true. Pin 10, R/W, goes low
+whenever b.c.d. data bytes are waiting
+to be read in by the Z80. During the
+execution o f an OUT instruction, twelve
+such pulses occur which signal the two
+xponent digits, a byte representing the
+signs, one byte for the decimal point
+position, and the eight mantissa digits'
+readiness to be sent to the Z80. The
+interrupt caused by this line has already
+The HOLD and POR (power on reset)
+lines on pins 9 and 11 respectively, are
+not t.t.l. compatible and Tr, Tra i n Fig.2
+act as level shifters. Operation of POR
+occurs under the control of the Z80
+whenever a reset is applied, and during
+the operation internal registers are
+cleared and various conditions within
+the 57109 initialised. It is during this
+operation that the R/W line goes low,
+but, as previously described, this is
+prevented from causing interrupts to
+the Z80. For further information on the
+MM57109, National Semiconductor
+produce a data booklet which gives full
+operational details of each instruction
+and pin function.
+The clocks for the microprocessors
+are derived from ICo and IC in the
+visual display circuitry. To meet the
+specified swing and rise times required
+b y the Z80, a rise time o f 30ns to a level
+o f 4.4V, Tr, and the associated circuitry
+form an active pull-up on the output of
+the Schottky inverter in IC,4. The clock
+for the 57109 is obtained from pin 12 of
+IC16. With the link from pin 1 of IC46 to
+pin 12 of IC, the frequency of this clock
+is 400kHz, which is the maximum
+specified in the data sheet. The other
+position of the link, to pin 14 of IC29,
+doubles this frequency and, if the 57109
+will operate at 800kHz as tested ones
+have, a worthwhile increase in com-
+puting speed can b e achieved.
+Tri-state buffers IC, to IC, are con-
+nected to form an eight-line bus
+transceiver, and buffer the system con-
+trol lines. These buffers also provide the
+extra drive required for the heavily
+loaded data bus, IC, is a 3 to 8-line
+decoder, activated by the control lines
+IORQ and WR. This allows eight
+different output devices to be addressed
+from the codes that the lower eight bits
+of the address bus holds during output
+operations. One of these output devices
+is the latch IC4,5. A similar job is done by
+IC for input devices, and it is enabled
+b y IORQ and RD. The three input lines
+to these devices are different, which
+spreads the load on the address bus. The
+input devices shown are tristate buffers
+ICg and IC,3, which buffer data from the
+57109 and the keyboard respectively. 
+
+
+THE STANDARD COMPUTER holds
+up to 8 kilobytes of memory, but this
+can be expanded up to 32 kilobytes if
+necessary. O f this memory, 3K are 2708
+r.o.ms which are mapped, or located, at
+the hexadecimal addresses 0000 to
+OBFF. The first 2708 contains a monitor
+program using hexadecimal data, and
+responds to commands entered in Eng-
+lish. The remaining two r.o.ms hold
+the more complex BURP monitor and
+Addresses OC00 to 1FFF accom-
+modate up to 5K of 21L02 read/write
+memory and these ics are grouped in
+eights, each one being the store for one
+bit in an 8-bit byte as shown in Fig. 6 .
+The computer will operate with only 2K
+o f r/w.m., these being IC, and IC, but,
+for greater program storage,
+blocks starting with IC23 should be ad-
+ded. Pin 12 of IC,, should be wired to pin
+13 o f IC2 and the position for IC21 left
+blank. This has been provided for any
+future development which may require
+more r.o.m. space.
+The data outputs of IC18 to IC26 are
+wired to an eight-line bus which feeds
+into the main data bus through the
+tri-state buffer ICz7. Parallel wiring of
+the outputs is possible because the
+memory devices also have tri-state out-
+puts. The chip-enable, CE, inputs are
+enabled by the outputs of a 3 to 8-line
+decoder, IC17, which is, itself, only
+selected when MREQ and address line
+15 are low, i.e. the Z80 must be reques-
+ting a memory operation in the lower
+only enabled when both MREO and RI
+are low, i.e. a memory read i s requested.
+A link has been placed i n the MREQ line
+so that the system may be expanded as
+shown in Fig. 7. The MREQ is connected
+t o a 74LS139 2 t o 4-line decoder which is
+fed b y Ai, A14 and the original MREQ
+This modification generates four new
+MREQ signals, one for each quarter o f a
+32K memory. If the expanded memory
+is used, MREQ, will take the place of
+MREQ on the original board
+As there are many devices to be
+riven from A0, to A9, these lines are
+buffered b y ICis and IC16, which are
+permanently enabled. Although adding
+buffering increases the time delay bet-
+ween a memory request, and the data
+being ready for the Z80 to read in, the
+most critical 'reads' have 750ns to
+access the memory, therefore 21L02s
+with a 450ns access time are quite
+adequate.
+
+Visual Display
+The visual display circuitry in Fig. 8 is
+constructed using standard t.t.l. i.cs
+instead of one of the recent l.s.i. con-
+trollers. This approach was chosen be-
+cause the only suitable I.s.i. device is
+rather expensive, and, more important,
+the t.t.l. design gives maximum
+flexibility and allows an optional
+graphics system to be easily imple-
+mented.
+
+Each line scan takes 64us and is thus
+compatible with standard 625 signals
+and, with 320 instead of 312.5 lines per
+picture frame, the frame scan, although
+slightly longer, will easily be within the
+range of a television set to be used as a
+In Fig. 8., IC28 generates a signal at
+8MHz from which all of the clocks
+within the computer are obtained. Part
+of IC divides the clock to-4MHz, and
+either the input or output of this i.c. is
+fed t o IC46 which produces a true square
+wave at either 800 or 400kHz for the
+MM57109. The 4MHz is further divided
+by IC30 to provide a 2MHz clock for the
+Z80, and an output a t 250kHz for IC48,
+which produces 16 states of 4us each.
+State 0001 is decoded and used as the
+line synchronizing pulse. The output at
+pin 1 1 of this i.c. is at 15.625kHz, and
+clocks IC34 at the standard 625-line rate.
+Part of the line sync. decoder, ICзib,
+provides a signal which is active low
+during states 0100 to 1111 inclusive.
+This produces a 48us burst during which
+ICg3 and IC37 to IC3g are enabled, and
+allows a video display to occur, see Fig
+9. Division of the 64us line scan into a
+4us sync. pulse, an 8us pause, a 48us
+display, and then a 4us pause, allows for
+the overscan that occurs in commercial
+televisions. If the displayed video runs
+off the end o f the screen, even with the
+width and shift controls adjusted cor-
+rectly, omitting the inverter on pin 12 of
+IC48 will shift the displayed video 4us to
+the left which corresponds to about five
+characters.
+
+The dividers described so far are
+free-running with their reset inputs
+taken low. The decade counter IC34 is
+fed with pulses at the line frequency and
+divides these to provide 10 row ad-
+dresses for each line of displayed cha-
+racters. Outputs Q , to Q3 go directly to
+the character generator, IC47, but Q, is
+connected to IC and is high during the
+ninth and tenth lines, i.e. the two lines to
+be blanked between character rows. A
+divide-by-32 counter, formed by IC29
+and IC35. provides an address for each
+line o f characters o n the screen. At the
+end of a display page, monostable IC 36 i s
+triggered by this counter t o provide a
+reset pulse for IC34- This holds the
+divider chain, IC3, to ICg, at the first
+row of the first character of the first
+character row until frame flyback has
+occurred and line sync. has been
+regained. The monostable pulse is also
+used to blank the video during the
+flyback via IC, and through a dif-
+ferentiator, t o provide a field synchron-
+ising pulse t o IC32-
+A third divider chain remains reset
+except during the 48us display time
+defined by IC4g and its associated gates.
+IC37 i s clocked at 8MHz, and divides-
+by-6 to provide a character-rate pulse,
+which, when gated with the 8MHz
+clock, is used to load data from the
+character generator into the shift reg
+ister IC4s5. This gated pulse is also used
+t o clock a character counter divide by
+6 4 circuit, comprising IC38 and IC39-
+Data loaded into IC16 Comprises five bits
+o f the row of the character which the
+character generator is being asked t o
+supply, together with one blank bit on
+pin 6 to complete the 10 × 6 character
+format. These bits are loaded in parallel
+and clocked out serially, via pin 7, t o the
+video gate, IC33. The three lower ad
+dress bits for the character generator,
+IC47, are supplied b y IC34 a s previously
+explained. The upper six come from the
+r/w.m. comprising IC43 and ICy. Ad-
+dresses for this block of r/w.m. are
+supplied b y the 2 to 1-line multiplexers
+ICo to IC42, which are switched bet-
+ween addresses supplied by the main
+address bus of the Z80 and those being
+generated by the v.d.u. dividers by
+the decoded MREQ, WR and A15 signals.
+Because this signal also switches the
+R/W inputs of the memory, the conditions are either; multiplexer connects
+Z80 address bus to r/w.m., Z80 writes
+into r/w.m., or multiplexer connects
+v.d.u. circuitry t o r/w.m., data inputs t o
+r/w.m. disabled
+Each i.c. block in the r/w.m. consists
+of seven 21L02A4 devices, six of which
+are used a s stores for ASCIl character
+codes. The seventh is for a n extension of
+the v.d.u. to graphical displays and may
+b e omitted. The 2 kilobytes of memory
+contained i n the v.d.u. i s mapped a t the
+addresses 8000 to 87FF, but, due t o the
+simple decoding used to address the
+v.d.u., i t may also be "found" a t 8800 t o
+8FFF, 9000 to 97FF etc., up to F800 to
+FFFF, i.e. 16 blocks in all. This provides
+a simple method o f extending the v.d.u.
+display so that, after printing out a full
+screen of results, the next line will
+automatically start at 8800, i.e. the top
+of the screen, and so on, which effec-
+tively gives over 500 lines of display.
+
+
+Graphics, Graph plotting
+
+THE SET OF CHARACTERS chosen for
+the graphics option was selected to
+augment the standard ASCIl set and
+also provide various shapes for con-
+structing diagrams and pictorial dis-
+plays, see Fig. 20. The characters are
+programmed into a 2708 e.p.r.o.m. so the
+set may be easily altered to suit in-
+dividual constructor's requirements. To
+make the shapes continuous, a full 10 X
+6 dot structure is used for each cha-
+racter cell. This is achieved by loading
+bit 6 of IC4s. which was wired to 0 and
+thus inserted a one dot gap in between
+adjacent characters, and by disabling
+the line from ICa pin 11 to the video
+gate IC33b. The function o f the gate was
+to blank the ninth and tenth line scan in
+each row of displayed characters to
+provide line spacing between those
+rows.
+The 2708 i s connected in parallel with
+the 2513 ASCII generator while bit 6 of
+the v.d.u. r./w.m. i s fed directly to pin 1 1
+of IC and through a n inverter to IC10c
+pin 20. This bit selects which one of
+the character generators i s enabled a s
+shown in Fig. 21. The pulse at IC, pin 1,
+whose trailing edge loads the shift reg-
+ister ICs with the character dot pattern,
+is inverted so that its leading edge
+clocks the r/w.m. bit 6 into latch IC 102-
+The latch output feeds the video gate
+and sets an input which, on lines 1 to 8
+of the character scan, is held low by the
+signal from pin 11 of IC, applied to the
+S input. On the ninth and tenth scan
+when the S input is high, the video gate
+input will reflect the D input t o the latch
+and thus the nature of the character
+being displayed, ie. ASCIl or graphic.
+Note that the latch must be loaded
+ahead of ICs otherwise time delays in
+the system will cause the bottom left-
+hand corner of any graphic following a
+non-graphic to be blanked. When IC10o
+is disabled, the inverter on its D, output
+provides a low to IC,s pin 6 which then
+retains the original character spacing
+o n ASCIl.
+Using graphics
+As mentioned in part 3, ASCII may be
+directly loaded in low level language by
+opening a [ and then typing the cha-
+racters required. To enter graphics from
+this mode, open another [ and then type
+i n the graphic characters required. After
+typing the first character, which
+replaces the [ on the screen, a cursor
+appears in the next screen position (a
+cursor is essential for picture construc-
+tion) and the / key becomes a "rub-out
+and backstep" key for correcting errors.
+Typing a ] reverts the computer to the
+ASCIl mode of loading. With the high
+level language the computer is already
+in the ASCIl mode and so the first [
+mentioned above need not be typed in.
+When loading ASCIl or graphics in the
+low level, the computer includes ] , ID in
+hexadecimal, in the string of characters
+loaded into the program. This is recog-
+nised as the end-of-string marker by the
+low level subroutine at 03CEg, men-
+tioned in part 4 , and for this reason a ]
+can not be included in an ASCIl string.
+In graphics, the [ key stands for a shape
+and so this restriction does not apply,
+also, RETURN does not function so for
+a new line type ], RETURN, [. All of the
+instructions for graphics are alréady
+in the monitor r.o.ms so no re-pro-
+gramming is required for this optional
+facility. A selection of computer dis-
+plays is shown i n Fig. 22.
+
+Graph plotting
+In part 4, a program was described
+which analyses the frequency response
+of an RIAA equalised pre-amplifier. Fig.
+22(d) shows a version of this program
+which displays a graph of gain and
+frequency. Both quantities are logged
+before they are plotted to produce the
+standard dB versus log. of frequency
+format. The frequency is stepped
+logarithmically at line 52 at four in-
+creases per decade, and for each point
+plotted the frequency i s displayed a t the
+top of the screen. The original reason
+for developing this program was to
+examine the low-frequency gain of my
+hi-fi and so, after reaching 20kHz, the
+program branches to line 200 where it
+inputs a new value for F, the 25uF
+capacitor, and then replots a curve
+super-imposed upon the original.
+When the graphics option is installed,
+the demonstration programs at the
+third end of the third e.p.r.o.m. in the
+computer can be replaced with firm-
+ware which enables it to accept two
+extra high level commands;
+
+AXIS a,b
+
+which declares the maximum values of
+the vertical and horizontal axes of a
+graph plot, and
+which plots the point (ba) on a graph
+defined by the last AXIS statement. The
+terms a and b may be either variables or
+numbers. The plotted graph is of the
+first quadrant, i.e. both a and b positive
+and is realised by dividing the screen
+into 8192(128 by 64) cells which are
+selectively illuminated using graphic
+shapes at screen addresses obtained by
+scaling actual results to be plotted
+against the limits declared in the AXIS
+statement. The graph appears as dis-
+crete points, the spacing of which is
+usually determined by a FOR loop con-
+taining the GRAPH statement. The
+firmware controlling these processes
+ignores the sign of the variables (hence
+the first quadrant only) and will plot all
+results as positive. It also uses the vari-
+ables P and Q for the scaling factors,
+thus only the remaining 2 4 are available
+in graph plotting programs.
+

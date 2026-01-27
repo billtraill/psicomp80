@@ -293,6 +293,18 @@ void psicomp80_state::mm_set_data_ready(u8 code)
 
 void psicomp80_state::kbd_put(u8 data)
 {
+	// The COMP80 keyboard interface is a latched ASCII byte with a single strobe to NMI.
+	// The monitor's NMI routine will reset if NMI arrives while the CPU is not in HALT,
+	// so we must avoid generating extra strobes (e.g. key-up events / auto-repeat bursts).
+	// Treat 0x00 as "no character" and ignore it.
+	if (data == 0x00)
+		return;
+
+	// Debounce / one-shot strobe: ignore further key events until the monitor reads port 0x01
+	// (port01_r clears m_key_latch back to 0xFF).
+	if (m_key_latch != 0xff)
+		return;
+
 	m_key_latch = ~data;
 
 	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -402,7 +414,7 @@ void psicomp80_state::psicomp80(machine_config &config)
 
 ROM_START(psicomp80)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(2ac0d55a) SHA1(6bc17608f5b5740d5e020ef02c125decf86277dd))
+        ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(9905fa59) SHA1(edb764dcc488893e198b6b1011a726f3a9992c63))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,

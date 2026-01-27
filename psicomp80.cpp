@@ -293,6 +293,17 @@ void psicomp80_state::mm_set_data_ready(u8 code)
 
 void psicomp80_state::kbd_put(u8 data)
 {
+	// The real COMP80 has a dedicated RESET key. For convenience in the emulation,
+	// bind that to the host ESC key.
+	//
+	// Note: generic_keyboard_device delivers character codes (not raw key-up/down
+	// events). ESC comes through as 0x1B.
+	if (data == 0x1b)
+	{
+		machine().schedule_soft_reset();
+		return;
+	}
+
 	// The COMP80 keyboard interface is a latched ASCII byte with a single strobe to NMI.
 	// The monitor's NMI routine will reset if NMI arrives while the CPU is not in HALT,
 	// so we must avoid generating extra strobes (e.g. key-up events / auto-repeat bursts).

@@ -414,7 +414,7 @@ void psicomp80_state::psicomp80(machine_config &config)
 
 ROM_START(psicomp80)
 	ROM_REGION(0x10000, "maincpu", 0)
-        ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(9905fa59) SHA1(edb764dcc488893e198b6b1011a726f3a9992c63))
+        ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(97854074) SHA1(e55177c02771ae7a41fea6a783d2b792713af25e))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,

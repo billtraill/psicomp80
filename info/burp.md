@@ -1,3 +1,5 @@
+To switch to BURP make sure in READY state (press ESC to do a RESET), then type the RS character (on mac shift CMD ^).
+
 Table 5 lists the BURP statements, and
 able 6 gives the mathematical expres-
 sions for LET statements. With the

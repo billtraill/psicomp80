@@ -2,7 +2,7 @@
 |---------|-------------|
 | ALPH | Produces an alphanumeric test pattern on the v.d.u. |
 | ALT XXXXYY | Changes the contents of location XXXX to YY. Having accepted the alteration, the computer lists out from the previous LIST command starting address. Normally, a LIST of the area in which the alteration is to take place will have beencarried out immediately prior to using ALT. and so the altered byte will change to its correct contents on the v.d.u. screen as well as in the memory. After an alteration, the computer does not return to the commandstate, but waits for any further alterations, typed in as XXXXYY and so on. To return to the commands tate, type FS or press RESET. |
-| COR XXXX YYYY AA BB | Scans XXXX to YYYY-1 inclusive and alters any AA to BB |
+| COR XXXXYYYYAABB | Scans XXXX to YYYY-1 inclusive and alters any AA to BB |
 | FILL XXXX | If less than 256 bytes are to be programmed into an e.p.r.o.m. sector, and the other must be left blank for later additions to the e.p.r.o.ms contents, or, if you wish to add this later bit to an already partly filled e.p.r.o.m., FFs must be present at the byteswhich are not to beprogrammed. This can be achieved by using the extra command FIL.. XXXX, which will fill from XXXX to the next YY00 with FFs. either before toadlng Into the p.r.o.m. area. or. after loading, to maskoff the other unused bytes up to 1CFF. This command also makes programs easier to study on the v.d.u. as it can be used to mask off the rubbish following a program.|
 | FIND XX YY | Finds the consecutive bytes XX YY and lists the addresses at which they occur |
 | LIST XXXX | Lists the contents of the memory from address XXXX upto a full v.d.u. screen. |

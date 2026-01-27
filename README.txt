@@ -1,7 +1,7 @@
 PSI COMP80 – MAME skeleton driver (WIP)
 
 Files in this folder:
-  - psicomp80.cpp      : MAME driver source (drop into src/mame/homebrew/ or similar)
+  - psicomp80.cpp      : MAME driver source (drop into src/mame/drivers/psicomp80.cpp or similar)
   - psicomp80.rom      : Raw 3 KiB ROM image
 
 Quick build/run (macOS):
@@ -67,10 +67,18 @@ mame/src/mame/drivers/psicomp80.cpp
 
 There is a mame/build.sh and mame/run.sh files to run the emulator.
 
+/h2 Things to Try
 
-Things to do:
+/h3 Guessing game
+At address 01B6 in the ROM is a guessing game. It can be run by
+```
+RUN 01B6
+```
 
-- Implement a reset button e.g. ESC that will do a reset without modifying any programs in memory (just the normal reset)
+/h3 
+
+/h2 TODO
+
 - Since `RUN 01B6` does something but `LIST 1000` just resets. Debug from where it reads 01B6 to see where it came from, so that I can figure out how the command line is parsed.
 - Return key seems a bit funny as it can take several attempts to do `RUN 01B6` which is odd and the program does not seem to work properly.
 - Check out the other Monitor commands.

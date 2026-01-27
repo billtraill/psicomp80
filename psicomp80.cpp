@@ -53,6 +53,8 @@ public:
 	void psicomp80(machine_config &config);
 
 private:
+	DECLARE_INPUT_CHANGED_MEMBER(rs_key_changed);
+
 	// -------- VDU geometry --------
 	static constexpr int kCols  = 64;
 	static constexpr int kCharW = 6;   // 5 pixels + 1 spacer
@@ -212,6 +214,14 @@ void psicomp80_state::machine_reset()
 	m_mm_one_shot_clear = false;
 }
 
+INPUT_CHANGED_MEMBER(psicomp80_state::rs_key_changed)
+{
+	// Generate the same code the real RS key produces: ASCII 0x1E.
+	// The monitor ROM uses this as a shortcut to jump into BURP at 0x0800.
+	if (newval && !oldval)
+		kbd_put(0x1e);
+}
+
 // ------------------ memory & I/O ------------------
 
 void psicomp80_state::mem_map(address_map &map)
@@ -293,11 +303,8 @@ void psicomp80_state::mm_set_data_ready(u8 code)
 
 void psicomp80_state::kbd_put(u8 data)
 {
-	// The real COMP80 has a dedicated RESET key. For convenience in the emulation,
-	// bind that to the host ESC key.
-	//
-	// Note: generic_keyboard_device delivers character codes (not raw key-up/down
-	// events). ESC comes through as 0x1B.
+	// Convenience: map host ESC to the COMP80's physical RESET key.
+	// Don't forward ESC as a character into the emulated machine.
 	if (data == 0x1b)
 	{
 		machine().schedule_soft_reset();
@@ -400,6 +407,15 @@ u32 psicomp80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 // ------------------ machine config ------------------
 
 static INPUT_PORTS_START(psicomp80)
+	PORT_START("SPECIAL")
+	// The original COMP80 keyboard has a dedicated "RS" key. In the monitor ROM
+	// this is tested as ASCII control code 0x1E (Record Separator):
+	//   CP 1Eh / JP Z,0800h
+	// which jumps into the BURP high-level system.
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)
+		PORT_NAME("RS (enter BURP)")
+		PORT_CODE(KEYCODE_F2)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, psicomp80_state, rs_key_changed, 0)
 INPUT_PORTS_END
 
 void psicomp80_state::psicomp80(machine_config &config)

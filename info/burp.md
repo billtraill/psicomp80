@@ -5,7 +5,7 @@ able 6 gives the mathematical expres-
 sions for LET statements. With the
 computer in the READYstate, type
 ```
-MOV 0BB5 OCOO OCOO
+MOV 0BB5OCOOOCOO
 ```
 and then change to the high level
 language by pressing RS on the key-

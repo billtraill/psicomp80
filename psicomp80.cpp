@@ -76,9 +76,12 @@ private:
 
 	// MM57109-ish "data ready" latch for port 03h (and IRQ0 generation)
 	bool m_mm_ready = false;
+	u8 m_mm_do = 0x00; // DO[3:0] digit output (BCD nibble)
 	u8   m_mm_code  = 0x1f;
 	bool m_mm_one_shot_clear = false;
 
+	bool m_mm_rw = true;  // R/W line (1=idle/no bytes pending)
+	bool m_mm_br = true;  // BR line (1=idle)
 	// -------- character generator tables --------
 	// Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
 	// Table is indexed as ASCII 0x20..0x5F mapped to 0..63.
@@ -95,7 +98,9 @@ private:
 	u8 port01_r();
 	u8 port03_r();
 
-	// keyboard -> strobe (NMI) + MM data ready (IRQ0)
+	
+	void port60_w(u8 data);
+// keyboard -> strobe (NMI) only (do not generate IRQ0 here)
 	void kbd_put(u8 data);
 	// display
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -225,7 +230,8 @@ void psicomp80_state::io_map(address_map &map)
 
 	map(0x01, 0x01).r(FUNC(psicomp80_state::port01_r));
 	map(0x03, 0x03).r(FUNC(psicomp80_state::port03_r));
-}
+
+	map(0x60, 0x60).w(FUNC(psicomp80_state::port60_w));}
 
 u8 psicomp80_state::port01_r()
 {
@@ -236,8 +242,18 @@ u8 psicomp80_state::port01_r()
 
 u8 psicomp80_state::port03_r()
 {
-	u8 v = (m_mm_ready ? 0x20 : 0x00) | (m_mm_code & 0x1f);
+	// Port 0x03 returns MM57109-related status bits mixed with digit outputs:
+	//  bits 0-3: DO[3:0] (BCD digit output from X register)
+	//  bit 4   : BR (active-low pulse on true test; keep high when idle)
+	//  bit 5   : RDY (handshake; BURP polls this)
+	//  bit 6   : R/W (goes low when bytes waiting; keep high when idle)
+	//  bit 7   : unused
+	u8 v = (m_mm_do & 0x0f)
+		| (m_mm_br ? 0x10 : 0x00)
+		| (m_mm_ready ? 0x20 : 0x00)
+		| (m_mm_rw ? 0x40 : 0x00);
 
+	// The BURP init handshake expects RDY to be a one-shot after an OUT to port 0x60.
 	if (m_mm_ready)
 	{
 		if (m_mm_one_shot_clear)
@@ -253,6 +269,35 @@ u8 psicomp80_state::port03_r()
 
 	return v;
 }
+
+void psicomp80_state::port60_w(u8 data)
+{
+	// MM57109 instruction latch / HOLD control.
+	// The BURP ROM uses a simple handshake:
+	//  - wait for RDY=0
+	//  - OUT (60),A with bit7=0
+	//  - wait for RDY=1
+	//  - OUT (60),A|0x80
+	//
+	// We model just enough to satisfy this handshake.
+	m_mm_one_shot_clear = false;
+
+	if ((data & 0x80) == 0)
+	{
+		// Start / hold asserted -> set RDY
+		m_mm_ready = true;
+	}
+	else
+	{
+		// Release -> clear RDY
+		m_mm_ready = false;
+	}
+
+	// Keep outputs idle by default (no pending bytes/tests)
+	m_mm_rw = true;
+	m_mm_br = true;
+}
+
 
 // ------------------ keyboard / interrupts ------------------
 
@@ -314,9 +359,13 @@ void psicomp80_state::kbd_put(u8 data)
 
 	m_key_latch = ~data;
 
+	// Keyboard strobe:
+	// Real hardware: keyboard strobe drives NMI.
+	// Keep keyboard wakeups on NMI only; IRQ0 is reserved for MM57109 "data ready".
 	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
-	mm_set_data_ready(ascii_to_mm_code(data));
+	// NOTE: We do not assert MM57109 "data ready" from keyboard input.
+
 }
 
 // ------------------ character mapping / display ------------------
@@ -421,7 +470,7 @@ void psicomp80_state::psicomp80(machine_config &config)
 
 ROM_START(psicomp80)
 	ROM_REGION(0x10000, "maincpu", 0)
-        ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(97854074) SHA1(e55177c02771ae7a41fea6a783d2b792713af25e))
+        ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00, CRC(0f771e8e) SHA1(c4521d3234124a73f5e49d17ebe7bfa198a41e2c))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,

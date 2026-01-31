@@ -37,6 +37,22 @@
 #include "emupal.h"
 
 #include <array>
+#include <vector>
+// ---------------------------------------------------------------------------
+// MM57109 tracing
+//
+// MAME uses logmacro.h. Define VERBOSE before including it to avoid redefinition
+// warnings promoted to errors (-Werror,-Wmacro-redefined).
+// ---------------------------------------------------------------------------
+#define LOG_MM57109   (1U << 0)   // MM57109 byte stream + handshake
+#define LOG_MM_STATUS (1U << 1)   // port $03 reads (noisy)
+#define LOG_MM_ACK    (1U << 2)   // $3F ACK handling
+
+#define VERBOSE (LOG_MM57109 | LOG_MM_ACK)
+// #define VERBOSE (LOG_MM57109 | LOG_MM_ACK | LOG_MM_STATUS)
+
+#include "logmacro.h"
+
 
 namespace {
 
@@ -76,12 +92,18 @@ private:
 
 	// MM57109-ish "data ready" latch for port 03h (and IRQ0 generation)
 	bool m_mm_ready = false;
-	u8 m_mm_do = 0x00; // DO[3:0] digit output (BCD nibble)
 	u8   m_mm_code  = 0x1f;
 	bool m_mm_one_shot_clear = false;
 
-	bool m_mm_rw = true;  // R/W line (1=idle/no bytes pending)
-	bool m_mm_br = true;  // BR line (1=idle)
+	// --- MM57109 port $60 write / port $03 status modelling (BURP relies on this) ---
+	bool m_mm_hs_rdy = false;      // handshake RDY (bit5) for $042E busy/ack loops
+	bool m_mm_status_rdy = false;  // status RDY (bit5) for $058A wait loop
+	bool m_mm_status_b6 = false;   // status bit6 ($40) returned by $058A
+	u8   m_mm_latch = 0x00;        // phase-1 latched byte (bit7 clear)
+	bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
+	std::vector<u8> m_mm_stream;   // committed byte stream (bit7 stripped)
+	u64  m_mm_tx_seq = 0;          // transaction counter
+
 	// -------- character generator tables --------
 	// Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
 	// Table is indexed as ASCII 0x20..0x5F mapped to 0..63.
@@ -97,10 +119,10 @@ private:
 	// I/O handlers
 	u8 port01_r();
 	u8 port03_r();
-
-	
 	void port60_w(u8 data);
-// keyboard -> strobe (NMI) only (do not generate IRQ0 here)
+	void mm57109_dump_stream(const char *tag, u8 cmd);
+
+	// keyboard -> strobe (NMI) + MM data ready (IRQ0)
 	void kbd_put(u8 data);
 	// display
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -199,6 +221,7 @@ std::array<std::array<u8, 8>, 64> psicomp80_state::gfx_font_64x8x5 = []{
 
 void psicomp80_state::machine_start()
 {
+	m_mm_stream.reserve(256);
 
 	save_item(NAME(m_key_latch));
 	save_item(NAME(m_mm_ready));
@@ -230,8 +253,8 @@ void psicomp80_state::io_map(address_map &map)
 
 	map(0x01, 0x01).r(FUNC(psicomp80_state::port01_r));
 	map(0x03, 0x03).r(FUNC(psicomp80_state::port03_r));
-
-	map(0x60, 0x60).w(FUNC(psicomp80_state::port60_w));}
+	map(0x60, 0x60).w(FUNC(psicomp80_state::port60_w));
+}
 
 u8 psicomp80_state::port01_r()
 {
@@ -242,60 +265,88 @@ u8 psicomp80_state::port01_r()
 
 u8 psicomp80_state::port03_r()
 {
-	// Port 0x03 returns MM57109-related status bits mixed with digit outputs:
-	//  bits 0-3: DO[3:0] (BCD digit output from X register)
-	//  bit 4   : BR (active-low pulse on true test; keep high when idle)
-	//  bit 5   : RDY (handshake; BURP polls this)
-	//  bit 6   : R/W (goes low when bytes waiting; keep high when idle)
-	//  bit 7   : unused
-	u8 v = (m_mm_do & 0x0f)
-		| (m_mm_br ? 0x10 : 0x00)
-		| (m_mm_ready ? 0x20 : 0x00)
-		| (m_mm_rw ? 0x40 : 0x00);
+	// Port $03: ROM polls bit5 (mask $20) for MM57109 handshake/status.
+	// BURP also uses bit6 (mask $40) via $058A wait routine.
+	const bool rdy = m_mm_hs_rdy || m_mm_status_rdy;
+	u8 v = (rdy ? 0x20 : 0x00) | (m_mm_status_b6 ? 0x40 : 0x00) | (m_mm_code & 0x1f);
 
-	// The BURP init handshake expects RDY to be a one-shot after an OUT to port 0x60.
-	if (m_mm_ready)
-	{
-		if (m_mm_one_shot_clear)
-		{
-			m_mm_ready = false;
-			m_mm_one_shot_clear = false;
-		}
-		else
-		{
-			m_mm_one_shot_clear = true;
-		}
-	}
+	LOGMASKED(LOG_MM_STATUS, "MM57109: port03_r -> %02X (hs_rdy=%d status_rdy=%d b6=%d code=%02X)\n",
+		v, m_mm_hs_rdy, m_mm_status_rdy, m_mm_status_b6, m_mm_code);
 
 	return v;
 }
 
+
+
+
+void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd)
+{
+	LOGMASKED(LOG_MM57109, "MM57109[%s] #%llu cmd=%02X stream_len=%zu: ",
+		tag, (unsigned long long)m_mm_tx_seq, cmd, m_mm_stream.size());
+	for (u8 b : m_mm_stream)
+		LOGMASKED(LOG_MM57109, "%02X ", b);
+	LOGMASKED(LOG_MM57109, "\n");
+
+	m_mm_stream.clear();
+	++m_mm_tx_seq;
+}
+
 void psicomp80_state::port60_w(u8 data)
 {
-	// MM57109 instruction latch / HOLD control.
-	// The BURP ROM uses a simple handshake:
-	//  - wait for RDY=0
-	//  - OUT (60),A with bit7=0
-	//  - wait for RDY=1
-	//  - OUT (60),A|0x80
-	//
-	// We model just enough to satisfy this handshake.
-	m_mm_one_shot_clear = false;
+	LOGMASKED(LOG_MM57109, "MM57109: port60_w data=%02X (bit7=%d)\n", data, (data >> 7) & 1);
 
-	if ((data & 0x80) == 0)
+	// Special-case: $058A uses OUT ($60),$3F as an ACK/continue strobe when RDY($20) wins.
+	// Treat this as "clear status-ready" and do not fold it into the normal two-phase send.
+	if (((data & 0x80) == 0) && data == 0x3f && m_mm_status_rdy)
 	{
-		// Start / hold asserted -> set RDY
-		m_mm_ready = true;
-	}
-	else
-	{
-		// Release -> clear RDY
-		m_mm_ready = false;
+		LOGMASKED(LOG_MM_ACK, "MM57109: ACK ($3F) received (status_rdy=1) -> clear status_rdy\n");
+		m_mm_status_rdy = false;
+		m_mm_hs_rdy = false;
+		
+		return;
 	}
 
-	// Keep outputs idle by default (no pending bytes/tests)
-	m_mm_rw = true;
-	m_mm_br = true;
+
+// Two-phase HOLD/RDY handshake as used by BURP routine $042E.
+//
+// NOTE: The byte passed into $042E can legitimately have bit7 set (it is BURP "bytecode"),
+// and $042E itself generates the phase2 write by OR'ing bit7. Real hardware uses the
+// handshake semantics rather than treating bit7 as part of the payload, so model this as
+// a simple two-step state machine:
+//   1) first OUT -> latch payload (data&0x7f), assert RDY (bit5) so $0439 loop can exit
+//   2) second OUT -> commit latched payload, drop RDY so $0430 loop can exit next time
+//
+// This prevents hangs at $0439 if the *first* write happens to have bit7=1.
+if (m_mm_expect_latch)
+{
+	m_mm_latch = data & 0x7f;
+	LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X (raw=%02X)\n", m_mm_latch, data);
+
+	m_mm_hs_rdy = true;
+	m_mm_expect_latch = false;
+	return;
+}
+
+// Commit phase
+const u8 committed = m_mm_latch;
+LOGMASKED(LOG_MM57109, "MM57109: commit byte=%02X (raw=%02X)\n", committed, data);
+m_mm_stream.push_back(committed);
+
+m_mm_hs_rdy = false;
+m_mm_expect_latch = true;
+
+// Minimal behaviour for BURP:
+//   When BURP sends $11 or $12 (via $058A), it expects status polling on port $03 to
+//   settle to exactly one of {RDY($20), BR($40)}. We model "success" as RDY asserted.
+if (committed == 0x11 || committed == 0x12)
+{
+	m_mm_status_b6 = false;     // "no error"
+	m_mm_status_rdy = true;     // RDY wins ($20)
+	LOGMASKED(LOG_MM57109, "MM57109: status_rdy asserted for cmd=%02X (b6=%d)\n", committed, m_mm_status_b6);
+
+	// Dump the full stream leading up to the exec cmd for reverse engineering.
+	mm57109_dump_stream("exec", committed);
+}
 }
 
 
@@ -359,13 +410,9 @@ void psicomp80_state::kbd_put(u8 data)
 
 	m_key_latch = ~data;
 
-	// Keyboard strobe:
-	// Real hardware: keyboard strobe drives NMI.
-	// Keep keyboard wakeups on NMI only; IRQ0 is reserved for MM57109 "data ready".
 	m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
-	// NOTE: We do not assert MM57109 "data ready" from keyboard input.
-
+	mm_set_data_ready(ascii_to_mm_code(data));
 }
 
 // ------------------ character mapping / display ------------------

@@ -179,7 +179,6 @@ Page 1
 0AE0 20 2d cd 46  04 1d FF 3e  13 cd 8A 05  28 ee 23 7E
 0AF0 F5 cd 7b 05  3e 1b cd 7b  05 cd 46 04  39 FF F1 cd 
 
-here
 0B00 60 04 cd 46  04 01 20 3A  FF 3A e3 1f  4F 18 95 fe
 0B10 24 20 01 76  18 c6 11 40  80 21 e4 1F  d5 e5 06 02
 0B20 ed 5F cd ab  0b 10 f9 eb  e1 01 04 00  ed b0 eb D1

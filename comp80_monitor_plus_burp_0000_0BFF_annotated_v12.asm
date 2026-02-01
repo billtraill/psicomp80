@@ -2160,10 +2160,11 @@ PRINT_HEX_WORD_HL:
 097F: C1          POP BC
 0980: 0C          INC C
 0981: C5          PUSH BC
-
+; -----------------------------------------------------------------------------
 ;
 ; Main parse  loop 
 ; 
+; -----------------------------------------------------------------------------
 0982: 21 00 0C    LD HL,$0C00 ;  Looks like the main parse of the program. 0C00 is where BURP programs are loaded into.
 0985: 7E          LD A,(HL)   ; Get next char in program... Look for end of program of start of line markers
 0986: FE C0       CP $C0      ; C0 is the end of program marker 
@@ -2193,7 +2194,7 @@ PRINT_HEX_WORD_HL:
 09AA: 20 F2       JR NZ,$099E
 09AC: 18 D1       JR $097F
 ;
-; Parse token 34
+; Parse token 34 - PRINT Statement.
 ;
 09AE: FE 34       CP $34
 09B0: 20 22       JR NZ,$09D4
@@ -2459,7 +2460,7 @@ PRINT_HEX_WORD_HL:
 
 0ADC: 18 9F        JR  $0A7D             ; back to main statement dispatch loop
 ;
-; Parse token 30
+; Parse token 30 - NEXT statement
 ;
 0ADE: FE 30       CP $30
 0AE0: 20 2D       JR NZ,$0B0F

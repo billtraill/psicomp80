@@ -51,6 +51,99 @@
 #define VERBOSE (LOG_MM57109 | LOG_MM_ACK)
 // #define VERBOSE (LOG_MM57109 | LOG_MM_ACK | LOG_MM_STATUS)
 
+// ---------------------------------------------------------------------------
+// MM57109 opcode → mnemonic helpers (derived from MM57109_cmds_data_with_regs_and_burp.md)
+// These are for LOGGING ONLY. They do not change emulation behaviour.
+// Note: BURP may use some opcode bytes as interface control/separators.
+// ---------------------------------------------------------------------------
+static const char *mm57109_opcode_name(u8 op)
+{
+	switch (op)
+	{
+		case 0x00: return "0";
+		case 0x01: return "1";
+		case 0x02: return "2";
+		case 0x03: return "3";
+		case 0x04: return "4";
+		case 0x05: return "5";
+		case 0x06: return "6";
+		case 0x07: return "7";
+		case 0x08: return "8";
+		case 0x09: return "9";
+		case 0x0A: return "DP";
+		case 0x0B: return "EE";
+		case 0x0C: return "CS";
+		case 0x0D: return "PI";
+		case 0x0E: return "AIN";
+		case 0x0F: return "HALT";
+		case 0x10: return "TJC*";
+		case 0x11: return "TX=0*";
+		case 0x12: return "TXLTO*";
+		case 0x13: return "TXF*";
+		case 0x14: return "TERR*";
+		case 0x15: return "JMP*";
+		case 0x16: return "OUT*";
+		case 0x17: return "IN*";
+		case 0x18: return "SMDC";
+		case 0x19: return "IBNZ*";
+		case 0x1A: return "DBNZ*";
+		case 0x1B: return "XEM";
+		case 0x1C: return "MS";
+		case 0x1D: return "MR";
+		case 0x1E: return "LSH";
+		case 0x1F: return "RSH";
+		case 0x20: return "INV*/SPACE?";
+		case 0x21: return "EN";
+		case 0x22: return "TOGM";
+		case 0x23: return "ROLL";
+		case 0x24: return "SIN";
+		case 0x25: return "COS";
+		case 0x26: return "TAN";
+		case 0x27: return "SF1";
+		case 0x28: return "PF1";
+		case 0x29: return "SF2";
+		case 0x2A: return "PF2";
+		case 0x2B: return "ECLR";
+		case 0x2C: return "RTD";
+		case 0x2D: return "DTR";
+		case 0x2E: return "POP";
+		case 0x2F: return "MCLR";
+		case 0x30: return "XEY";
+		case 0x31: return "EX";
+		case 0x32: return "10X";
+		case 0x33: return "SQ";
+		case 0x34: return "SQRT";
+		case 0x35: return "LN";
+		case 0x36: return "LOG";
+		case 0x37: return "1/X";
+		case 0x38: return "YX";
+		case 0x39: return "+";
+		case 0x3A: return "-";
+		case 0x3B: return "x";
+		case 0x3C: return "/";
+		case 0x3D: return "PRW1";
+		case 0x3E: return "PRW2";
+		case 0x3F: return "NOP/ACK";
+		default: return "UNK";
+	}
+}
+
+static const char *mm57109_inv_second_name(u8 op)
+{
+	switch (op)
+	{
+		case 0x24: return "SIN-1*";
+		case 0x25: return "COS-1*";
+		case 0x26: return "TAN-1*";
+		case 0x39: return "M+*";
+		case 0x3A: return "M-*";
+		case 0x3B: return "MX*";
+		case 0x3C: return "M/*";
+		default: return "UNK";
+	}
+}
+
+
 #include "logmacro.h"
 
 
@@ -101,6 +194,7 @@ private:
 	bool m_mm_status_b6 = false;   // status bit6 ($40) returned by $058A
 	u8   m_mm_latch = 0x00;        // phase-1 latched byte (bit7 clear)
 	bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
+	bool m_mm_inv_pending = false; // last committed opcode was INV (0x20); next selects INV function
 	std::vector<u8> m_mm_stream;   // committed byte stream (bit7 stripped)
 	u64  m_mm_tx_seq = 0;          // transaction counter
 
@@ -270,8 +364,8 @@ u8 psicomp80_state::port03_r()
 	const bool rdy = m_mm_hs_rdy || m_mm_status_rdy;
 	u8 v = (rdy ? 0x20 : 0x00) | (m_mm_status_b6 ? 0x40 : 0x00) | (m_mm_code & 0x1f);
 
-	LOGMASKED(LOG_MM_STATUS, "MM57109: port03_r -> %02X (hs_rdy=%d status_rdy=%d b6=%d code=%02X)\n",
-		v, m_mm_hs_rdy, m_mm_status_rdy, m_mm_status_b6, m_mm_code);
+	LOGMASKED(LOG_MM_STATUS, "MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d status_rdy=%d b6=%d code=%02X(%03o))\n",
+		(u16)m_cpu->pc(), v, unsigned(v), m_mm_hs_rdy, m_mm_status_rdy, m_mm_status_b6, m_mm_code, unsigned(m_mm_code));
 
 	return v;
 }
@@ -281,10 +375,10 @@ u8 psicomp80_state::port03_r()
 
 void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd)
 {
-	LOGMASKED(LOG_MM57109, "MM57109[%s] #%llu cmd=%02X stream_len=%zu: ",
-		tag, (unsigned long long)m_mm_tx_seq, cmd, m_mm_stream.size());
+	LOGMASKED(LOG_MM57109, "MM57109[%s] #%llu cmd=%02X(%03o) %-10s stream_len=%zu: ",
+		tag, (unsigned long long)m_mm_tx_seq, cmd, unsigned(cmd), mm57109_opcode_name(cmd), m_mm_stream.size());
 	for (u8 b : m_mm_stream)
-		LOGMASKED(LOG_MM57109, "%02X ", b);
+		LOGMASKED(LOG_MM57109, "%02X(%03o) ", b, unsigned(b));
 	LOGMASKED(LOG_MM57109, "\n");
 
 	m_mm_stream.clear();
@@ -293,13 +387,16 @@ void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd)
 
 void psicomp80_state::port60_w(u8 data)
 {
-	LOGMASKED(LOG_MM57109, "MM57109: port60_w data=%02X (bit7=%d)\n", data, (data >> 7) & 1);
+	const u8 op = data & 0x7f;
+	const char *opname = mm57109_opcode_name(op);
+	LOGMASKED(LOG_MM57109, "MM57109 W: OUT ($60),%02X(%03o) %-10s @PC=%04X (bit7=%d)\n",
+		data, unsigned(data), opname, (u16)m_cpu->pc(), (data >> 7) & 1);
 
 	// Special-case: $058A uses OUT ($60),$3F as an ACK/continue strobe when RDY($20) wins.
 	// Treat this as "clear status-ready" and do not fold it into the normal two-phase send.
 	if (((data & 0x80) == 0) && data == 0x3f && m_mm_status_rdy)
 	{
-		LOGMASKED(LOG_MM_ACK, "MM57109: ACK ($3F) received (status_rdy=1) -> clear status_rdy\n");
+		LOGMASKED(LOG_MM_ACK, "MM57109 W: OUT ($60),3F @PC=%04X ACK received (status_rdy=1) -> clear status_rdy\n", (u16)m_cpu->pc());
 		m_mm_status_rdy = false;
 		m_mm_hs_rdy = false;
 		
@@ -320,7 +417,8 @@ void psicomp80_state::port60_w(u8 data)
 if (m_mm_expect_latch)
 {
 	m_mm_latch = data & 0x7f;
-	LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X (raw=%02X)\n", m_mm_latch, data);
+	LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s (raw=%02X(%03o))\n",
+		m_mm_latch, unsigned(m_mm_latch), mm57109_opcode_name(m_mm_latch), data, unsigned(data));
 
 	m_mm_hs_rdy = true;
 	m_mm_expect_latch = false;
@@ -329,7 +427,14 @@ if (m_mm_expect_latch)
 
 // Commit phase
 const u8 committed = m_mm_latch;
-LOGMASKED(LOG_MM57109, "MM57109: commit byte=%02X (raw=%02X)\n", committed, data);
+const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed) : mm57109_opcode_name(committed);
+	LOGMASKED(LOG_MM57109, "MM57109: commit byte=%02X(%03o) %-10s (raw=%02X(%03o))\n",
+		committed, unsigned(committed), mn, data, unsigned(data));
+	// Track INV prefix (0x20) as a one-instruction mode affecting the following committed opcode.
+	if (!m_mm_inv_pending && committed == 0x20)
+		m_mm_inv_pending = true;
+	else if (m_mm_inv_pending)
+		m_mm_inv_pending = false;
 m_mm_stream.push_back(committed);
 
 m_mm_hs_rdy = false;

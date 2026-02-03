@@ -1,5 +1,6 @@
 ; ---------------------------------------------------------------------------
 ; PSI COMP-80 ROM DISASSEMBLY (Combined)
+; Updated: 2026-02-03  (added annotations for $06BB/token $26; notes on $054B/$065F/$06AB)
 ;
 ; 0000-03FF: Monitor (from comp80_monitor_0000_03FF_annotated.asm)
 ; 0400-0BFF: BURP (derived from ROM_listing_fixedup.txt + trace annotations)
@@ -1049,33 +1050,19 @@ PRINT_HEX_WORD_HL:
 ;      busy/ack loops here or mis-sequence the coprocessor stream.
 ; -----------------------------------------------------------------------------
 042E: C5          PUSH BC — Z80 polls port 0x03 bit5 (RDY), OUT to 0x60, waits RDY=1 then sets bit7 and OUT again (MM57109 hold/handshake).  ; PUSH BC (preserve caller's BC)
-
 042F: 47          LD B,A  ; B := A (save byte to send)
-
-0430: DB 03       IN A,($03)  ; poll status: IN A,($03)
-
+0430: DB 03       IN A,($03)  ; poll status: IN A,($03), is the MM57109 Ready?
 0432: E6 20       AND $20  ; mask RDY bit (bit5)
-
 0434: 20 FA       JR NZ,$0430  ; wait while RDY==1 (until it goes low)
-
 0436: 78          LD A,B  ; restore byte to send
-
 0437: D3 60       OUT ($60),A  ; phase 1: OUT ($60),A
-
 0439: DB 03       IN A,($03)  ; poll for acknowledge: IN A,($03)
-
 043B: E6 20       AND $20  ; mask RDY bit (bit5)
-
 043D: 28 FA       JR Z,$0439  ; wait while RDY==0 (until it goes high)
-
 043F: 78          LD A,B  ; restore byte to send
-
 0440: F6 80       OR $80  ; set strobe/hold bit7
-
 0442: D3 60       OUT ($60),A  ; phase 2: OUT ($60),A|$80
-
 0444: C1          POP BC  ; POP BC (restore)
-
 0445: C9          RET  ; RET
 
 
@@ -1113,7 +1100,7 @@ PRINT_HEX_WORD_HL:
 ;
 ; Move to next token and BURP_EXPR_GET_TOKEN_AND_EMIT
 ;
-0459: 23          INC HL
+0459: 23          INC HL       ; Move to the next char in the input
 045A: C5          PUSH BC
 045B: CD E6 04    CALL $04E6   ; BURP_EXPR_GET_TOKEN_AND_EMIT
 045E: C1          POP BC
@@ -1145,9 +1132,8 @@ PRINT_HEX_WORD_HL:
 0465: ED 56       IM 1
 0467: FB          EI
 0468: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
-
 ; Inline data for CALL $0446: bytes 046B-046D terminated by $FF
-046B:              DB  $16,$2B,$FF  ; "V<2B>"
+046B:              DB  $16,$2B,$FF  ; MM57109 instructions OUT*,ECLR
 046E: F3          DI
 046F: F1          POP AF
 0470: CD 14 07    CALL $0714
@@ -1199,6 +1185,10 @@ PRINT_HEX_WORD_HL:
 04B6: ED B0       LDIR
 04B8: D9          EXX
 04B9: C9          RET
+
+;
+; Need to annotate this
+;
 04BA: E6 0F       AND $0F
 04BC: 4F          LD C,A
 04BD: 23          INC HL
@@ -1220,9 +1210,8 @@ PRINT_HEX_WORD_HL:
 04D3: FF          RST $38
 04D4: CD 7B 05    CALL $057B
 04D7: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
-
 ; Inline data for CALL $0446: bytes 04DA-04DF terminated by $FF
-04DA:              DB  $3C,$01,$02,$06,$3B,$FF  ; "<3C>ABF;"
+04DA:              DB  $3C,$01,$02,$06,$3B,$FF  ;   MM57109 instructions  /,1,2,3,*            
 04E0: 3E 00       LD A,$00
 04E2: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
 
@@ -1249,7 +1238,7 @@ PRINT_HEX_WORD_HL:
 ; -----------------------------------------------------------------------------
 04E6: 7E          LD  A,(HL)        ; read next byte from source line
 04E7: 23          INC HL
-04E8: 0E 0F       LD  C,$0F         ; set up a constant (likely used by other branches)
+04E8: 0E 0F       LD  C,$0F         ; set up a format code 0F for 050F formatting (and possibly other routines)...
 04EA: FE 20       CP  $20           ; space?
 04EC: 28 F8       JR  Z,$04E6       ; yes -> skip spaces and keep scanning
 
@@ -1311,6 +1300,9 @@ PRINT_HEX_WORD_HL:
 
 050D: 7E          LD A,(HL)
 050E: 23          INC HL
+
+; This is the entry point from the expression parser for literal numbers (A >= x30)
+; C should have the mode in it...
 050F: 08          EX AF,AF'  ; save A in AF' (token/char), switch to alternate accumulator
 
 0510: D5          PUSH DE  ; preserve DE (input pointer)
@@ -1370,7 +1362,7 @@ PRINT_HEX_WORD_HL:
 0548: BE          CP (HL)  ; peek next source byte: space ($20) means single-token form
 
 0549: 20 03       JR NZ,$054E
-054B: 08          EX AF,AF'
+054B: 08          EX AF,AF'  ; NOTE in the original scan this byte was ambiguious but it is def 08 NOTE: $08 (EX AF,AF') is far more plausible here than $0B (DEC BC) given control-flow/AF' usage.
 054C: 18 2D       JR $057B  ; if single-token form, branch to $057B (build/emit fixed-width value)
 
 054E: 2B          DEC HL
@@ -1407,8 +1399,6 @@ PRINT_HEX_WORD_HL:
 0571: E6 3F       AND $3F  ; opcode := descriptor & 3F (low 6 bits)
 
 0573: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte) ; emit opcode byte to math-coprocessor interface ($042E)
-
-
 
 0576: C9          RET
 
@@ -1516,62 +1506,94 @@ PRINT_HEX_WORD_HL:
 
 05A8: C9          RET  ; RET with A=$00 or $40 (Z/NZ)
 
+; -----------------------------------------------------------------------------
+; BURP_FORMAT_AND_EMIT_NUMERIC_FIELD
+;
+; Inputs:
+;   A  = operand-block selector for $07AC
+;   DE = output pointer (destination buffer)
+;
+; Effects:
+;   - Prepares operand record, normalises decimal point/spacing
+;   - Performs rounding and fixed-width padding
+;   - Copies formatted field to (DE)
+;   - Optionally appends 3-byte suffix if record[+2A] == 05
+;
+; Calls:
+;   $07AC  select/prepare 16-byte operand block (HL)
+;   $07B7  transfer primitive (direction inferred: see notes)
+; -----------------------------------------------------------------------------
+
 05A9: E5          PUSH HL
 05AA: D5          PUSH DE
-05AB: CD AC 07    CALL $07AC  ; BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
+05AB: CD AC 07    CALL $07AC      ; HL <- base of selected 16-byte operand block, BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
+05AE: E5          PUSH HL         ; save base pointer
 
-
-05AE: E5          PUSH HL
-05AF: 11 00 1E    LD DE,$1E00
+05AF: 11 00 1E    LD DE,$1E00     ; DE = numeric formatting workspace
 05B2: 7D          LD A,L
 05B3: C6 09       ADD A,$09
-05B5: 6F          LD L,A
-05B6: CD B7 07    CALL $07B7
-05B9: E1          POP HL
+05B5: 6F          LD L,A          ; HL = block + 9
+05B6: CD B7 07    CALL $07B7      ; transfer workspace<->block at offset +9
+
+05B9: E1          POP HL          ; restore block base
 05BA: 06 09       LD B,$09
-05BC: CD B7 07    CALL $07B7
+05BC: CD B7 07    CALL $07B7      ; transfer 9 bytes (loop)
 05BF: 10 FB       DJNZ $05BC
-05C1: 23          INC HL
+
+05C1: 23          INC HL          ; skip (field boundary)
 05C2: 06 06       LD B,$06
-05C4: CD B7 07    CALL $07B7
+05C4: CD B7 07    CALL $07B7      ; transfer 6 bytes (loop)
 05C7: 10 FB       DJNZ $05C4
-05C9: EB          EX DE,HL
+
+05C9: EB          EX DE,HL        ; HL now indexes workspace record, DE holds block pointer
+
+; --- normalise decimal point / leading digit structure ---
+
 05CA: 2E 0C       LD L,$0C
 05CC: 7E          LD A,(HL)
-05CD: FE 30       CP $30
-05CF: 20 56       JR NZ,$0627
-05D1: 2D          DEC L
+05CD: FE 30       CP $30          ; ASCII '0'?
+05CF: 20 56       JR NZ,$0627     ; if not '0', skip leading-zero fixups
+
+05D1: 2D          DEC L           ; L=0B
 05D2: 7E          LD A,(HL)
-05D3: FE A0       CP $A0
+05D3: FE A0       CP $A0          ; A0 = filler/blank marker?
 05D5: 23          INC HL
-05D6: 23          INC HL
+05D6: 23          INC HL          ; advance to L=0D
 05D7: 7E          LD A,(HL)
-05D8: 20 17       JR NZ,$05F1
-05DA: FE 38       CP $38
-05DC: 30 49       JR NC,$0627
+05D8: 20 17       JR NZ,$05F1     ; branch based on field content pattern
+
+05DA: FE 38       CP $38          ; ASCII '8' boundary check (digit range test)
+05DC: 30 49       JR NC,$0627     ; if >= '8', bail to decimal scan
+
+; Case A: shift digits left and insert decimal point near front
 05DE: 2E 03       LD L,$03
-05E0: E6 0F       AND $0F
-05E2: 28 3A       JR Z,$061E
+05E0: E6 0F       AND $0F         ; digit count nibble?
+05E2: 28 3A       JR Z,$061E      ; if 0, skip to A0-fill
+
 05E4: 47          LD B,A
 05E5: 7E          LD A,(HL)
 05E6: 2B          DEC HL
-05E7: 77          LD (HL),A
+05E7: 77          LD (HL),A       ; shift bytes left by one
 05E8: 23          INC HL
 05E9: 23          INC HL
 05EA: 10 F9       DJNZ $05E5
 05EC: 2B          DEC HL
-05ED: 36 2E       LD (HL),$2E
-05EF: 18 2D       JR $061E
-05F1: FE 34       CP $34
+05ED: 36 2E       LD (HL),$2E     ; write '.' (decimal point)
+05EF: 18 2D       JR $061E        ; continue with A0-fill
+
+; Case B: alternative shift/decimal arrangement
+05F1: FE 34       CP $34          ; ASCII '4' boundary
 05F3: 30 32       JR NC,$0627
 05F5: E6 0F       AND $0F
 05F7: 28 25       JR Z,$061E
+
 05F9: 47          LD B,A
 05FA: 2E 01       LD L,$01
 05FC: 7E          LD A,(HL)
-05FD: 36 2E       LD (HL),$2E
+05FD: 36 2E       LD (HL),$2E     ; place '.'
 05FF: 23          INC HL
-0600: 77          LD (HL),A
+0600: 77          LD (HL),A       ; shift digit right
+
 0601: 2E 08       LD L,$08
 0603: 7E          LD A,(HL)
 0604: 23          INC HL
@@ -1582,24 +1604,31 @@ PRINT_HEX_WORD_HL:
 0609: FE 00       CP $00
 060B: 20 F6       JR NZ,$0603
 060D: 10 F2       DJNZ $0601
+
 060F: 2E 01       LD L,$01
-0611: 36 30       LD (HL),$30
+0611: 36 30       LD (HL),$30     ; force leading '0'
 0613: 23          INC HL
 0614: 23          INC HL
 0615: 7E          LD A,(HL)
 0616: FE 2E       CP $2E
 0618: 20 04       JR NZ,$061E
-061A: 36 30       LD (HL),$30
+061A: 36 30       LD (HL),$30     ; replace '.' adjacency with '0'
 061C: 18 F6       JR $0614
+
+; Fill a region with A0 (blank marker)
 061E: 2E 0A       LD L,$0A
 0620: 06 05       LD B,$05
 0622: 36 A0       LD (HL),$A0
 0624: 23          INC HL
 0625: 10 FB       DJNZ $0622
+
+; --- scan backward to decimal point '.' ---
 0627: 3E 2E       LD A,$2E
 0629: 2D          DEC L
 062A: BE          CP (HL)
-062B: 20 FC       JR NZ,$0629
+062B: 20 FC       JR NZ,$0629     ; loop until '.' found
+
+; restore DE and recover an index nibble from next char
 062D: D1          POP DE
 062E: E3          EX (SP),HL
 062F: 23          INC HL
@@ -1609,33 +1638,42 @@ PRINT_HEX_WORD_HL:
 0635: 2B          DEC HL
 0636: 18 05       JR $063D
 0638: E6 0F       AND $0F
-063A: 32 E0 1F    LD ($1FE0),A
+063A: 32 E0 1F    LD ($1FE0),A    ; store digit nibble
 063D: E3          EX (SP),HL
+
+; compute placement / rounding target index based on $1FE0 + L
 063E: 3A E0 1F    LD A,($1FE0)
 0641: 85          ADD A,L
 0642: FE 09       CP $09
-0644: 30 3C       JR NC,$0682
+0644: 30 3C       JR NC,$0682     ; if too large, skip rounding/pad path
+
 0646: 6F          LD L,A
 0647: 23          INC HL
-0648: E5          PUSH HL
+0648: E5          PUSH HL         ; save rounding position
 0649: 7E          LD A,(HL)
-064A: FE 35       CP $35
-064C: 38 2A       JR C,$0678
+064A: FE 35       CP $35          ; >= '5' ?
+064C: 38 2A       JR C,$0678      ; if < '5', no rounding increment
+
+; rounding: walk left, skip '.', increment digit with carry
 064E: 2D          DEC L
 064F: 7D          LD A,L
 0650: FE 01       CP $01
 0652: 7E          LD A,(HL)
 0653: 28 11       JR Z,$0666
 0655: FE 2E       CP $2E
-0657: 28 F5       JR Z,$064E
+0657: 28 F5       JR Z,$064E      ; skip '.' while carrying
+
 0659: 7E          LD A,(HL)
 065A: FE 39       CP $39
-065C: 28 03       JR Z,$0661
-065E: 34          INC (HL)
-065F: 18 17       JR $0678
+065C: 28 03       JR Z,$0661      ; if '9', wrap to '0' and keep carrying
+065E: 34          INC (HL)         ; increment digit
+065F: 18 17       JR $0678         ; **(byte here should be 18, not 1B)** NOTE: $18 (JR) is strongly preferred over $1B; this is a forward jump over the carry/rounding block.
+
 0661: 36 30       LD (HL),$30
 0663: 7E          LD A,(HL)
 0664: 18 E8       JR $064E
+
+; carry reached left boundary: create leading '1' and shift decimal right
 0666: FE 39       CP $39
 0668: 20 F4       JR NZ,$065E
 066A: 36 31       LD (HL),$31
@@ -1648,13 +1686,17 @@ PRINT_HEX_WORD_HL:
 0674: 2B          DEC HL
 0675: 36 30       LD (HL),$30
 0677: 00          NOP
+
+; pad with spaces to fixed width
 0678: E1          POP HL
 0679: 3E 0A       LD A,$0A
 067B: 95          SUB L
 067C: 47          LD B,A
-067D: 36 20       LD (HL),$20
+067D: 36 20       LD (HL),$20      ; ASCII space
 067F: 23          INC HL
 0680: 10 FB       DJNZ $067D
+
+; emit up to 10 chars to output buffer (DE), stop on space
 0682: 2E 00       LD L,$00
 0684: 06 0A       LD B,$0A
 0686: 7E          LD A,(HL)
@@ -1664,18 +1706,22 @@ PRINT_HEX_WORD_HL:
 068C: 13          INC DE
 068D: 23          INC HL
 068E: 10 F6       DJNZ $0686
+
+; output padding/separators depending on next source character and remaining width
 0690: E3          EX (SP),HL
 0691: 23          INC HL
 0692: 7E          LD A,(HL)
-0693: FE 2C       CP $2C
+0693: FE 2C       CP $2C          ; comma?
 0695: 00          NOP
 0696: E3          EX (SP),HL
 0697: 28 11       JR Z,$06AA
+
 0699: AF          XOR A
 069A: B8          CP B
 069B: 28 03       JR Z,$06A0
-069D: E7          RST $20
+069D: E7          RST $20         ; emit filler (likely space)
 069E: 10 FD       DJNZ $069D
+
 06A0: 2E 0A       LD L,$0A
 06A2: 7E          LD A,(HL)
 06A3: FE 05       CP $05
@@ -1683,7 +1729,9 @@ PRINT_HEX_WORD_HL:
 06A7: E7          RST $20
 06A8: E7          RST $20
 06A9: E7          RST $20
-06AA: 2E 2A       LD L,$2A
+
+; optional 3-byte suffix if record[+2A] == 05
+06AA: 2E 2A       LD L,$2A         ; **(byte here should be 2A, not xA)**
 06AC: 7E          LD A,(HL)
 06AD: FE 05       CP $05
 06AF: 20 08       JR NZ,$06B9
@@ -1693,8 +1741,62 @@ PRINT_HEX_WORD_HL:
 06B5: 12          LD (DE),A
 06B6: 13          INC DE
 06B7: 10 FA       DJNZ $06B3
+
 06B9: E1          POP HL
 06BA: C9          RET
+
+
+
+
+; -----------------------------------------------------------------------------
+; BURP_TOKEN26_PARSE_FORMAT_SPECIFIER (inferred)
+;
+; Called from the statement parser when it encounters token $26:
+;   0996: CP $26
+;   099F: CALL $06BB   ; with A = (HL)  (selector / format subtype)
+;
+; High-level purpose (best-fit inference):
+;   Parse a *numeric formatting specifier* (field/precision/flags) from the
+;   token stream and build a normalised 10-character ASCII field (plus metadata)
+;   into a 16-byte workspace block selected by A (via $0714/$07AC).
+;
+; What makes this routine "odd" is the repeated opcode $76 (HALT).  In the
+; context of BURP parsing, these behave like "consume next token/char into A"
+; checkpoints.  On real hardware the system is interrupt-driven, so HALT is used
+; as a cheap synchronisation point while an interrupt service routine supplies
+; the next input token/character.  If your ROM listing has any ambiguity around
+; $76 bytes, these are the *first* ones to re-check on the original printout.
+;
+; Data layout (inferred within the selected 16-byte block):
+;   Offsets are relative to the base address produced by $07AC / initialised by $0714.
+;   - $+00..$+09 : 10-char ASCII field being built (right-justified), padded with ' '
+;   - $+0A..$+0E : padding/flags area (initialised to $A0 later)
+;   - $+2A..$+2D : optional extra 3-byte suffix copied out if block+$2A == 05
+;     (Note: this implies the "block" can be a larger structure than 16 bytes;
+;      $07AC seems to return a base inside a wider workspace region.)
+;
+; Behaviour summary:
+;   1) Initialises the operand/format workspace (CALL $0714).
+;   2) Parses an optional leading '-' and/or '.' and a run of digit-like tokens
+;      (>= $28, digit encoded in low nibble) into the field buffer.
+;   3) Normalises / shifts digits to insert a decimal point '.' (0x2E) when needed:
+;      - If it detects an exponent or specific prefix pattern, it shifts right/left
+;        and inserts '.' at a fixed position.
+;   4) Pads the tail of the field with spaces to a fixed width.
+;   5) Copies the resulting 10-char field to the output buffer at DE.
+;   6) Handles separators/terminators:
+;      - If next input is ',' then it may emit additional items
+;      - It expects $1F as an end-of-line/statement sentinel (via RST $20 checks)
+;   7) Optionally appends a 3-byte suffix from offset $2B..$2D when offset $2A == 05.
+;
+; Side-effects:
+;   - Writes a small "digit count"/index nibble to $1FE0 during normalisation.
+;   - On exit, DE points just past the copied output bytes.
+;
+; Open questions / likely dump ambiguities:
+;   - The many $76 bytes are semantically "wait/consume next token"; confirm against scan.
+;   - 06AA: 'LD L,$2A' looks intentional (offset $2A), but scan quality could confuse '2A' with 'xA'.
+; -----------------------------------------------------------------------------
 06BB: E5          PUSH HL
 06BC: CD 14 07    CALL $0714
 06BF: 01 0A 09    LD BC,$090A
@@ -1752,6 +1854,7 @@ PRINT_HEX_WORD_HL:
 0711: E7          RST $20
 0712: E1          POP HL
 0713: C9          RET
+
 0714: CD AC 07    CALL $07AC  ; BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
 
 
@@ -1982,9 +2085,8 @@ PRINT_HEX_WORD_HL:
 082E: 3E BF       LD A,$BF
 0830: D3 60       OUT ($60),A
 0832: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
-
 ; Inline data for CALL $0446: bytes 0835-0837 terminated by $FF
-0835:              DB  $2F,$22,$FF  ; "/""
+0835:              DB  $2F,$22,$FF  ; MM57109 instructions MCLR,TOGM,
 0839: 29 07 FE    ADD HL,None
 083C: 14          INC D
 083D: 20 7F       JR NZ,$08BE
@@ -2180,7 +2282,7 @@ PRINT_HEX_WORD_HL:
 ;
 ; Parse token 26
 ;
-0996: FE 26       CP $26    ; ???? don;t know yet
+0996: FE 26       CP $26    ; token $26: parse numeric format specifier (CALL $06BB on following selector byte)
 0998: 20 14       JR NZ,$09AE
 099A: CD C4 03    CALL $03C4
 099D: 23          INC HL
@@ -2419,6 +2521,9 @@ PRINT_HEX_WORD_HL:
 ; ------------------------------------------------------------
 ; Parse token 1E  -- FOR
 ; FOR X=... STEP ... UNTIL ...
+; Note the Return line number is stored in 1FE3 
+; BURP does not support embedded FOR loops, only a single loop
+; can be active at a time.
 ; ------------------------------------------------------------
 0AAE: FE 1E        CP  $1E
 0AB0: 20 2C        JR  NZ,$0ADE          ; not FOR -> try next statement type
@@ -2428,7 +2533,7 @@ PRINT_HEX_WORD_HL:
 
 0AB4: 0C           INC C                 ; C = current line number -> line after FOR
 0AB5: 79           LD  A,C
-0AB6: 32 E3 1F     LD  ($1FE3),A         ; save "loop body start line" for NEXT
+0AB6: 32 E3 1F     LD  ($1FE3),A         ; save "loop body start line" for NEXT 1FE3 is the global address used for this.
 
 0AB9: 23           INC HL
 0ABA: 46           LD  B,(HL)            ; B = loop variable token/id (e.g. 'A')
@@ -2449,19 +2554,17 @@ PRINT_HEX_WORD_HL:
 
 
 0ACB: CD 46 04     CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
-
-0ACE: DB  $30,$FF                        ; probably "STEP default/parse marker" or part of store op
+0ACE: DB  $30,$FF                        ; MM57109 instructions  XEY
 
 0AD0: CD 52 04     CALL $0452            ; skip ahead again (toward UNTIL clause)
 
 0AD3: CD 46 04     CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
-
-0AD6: DB  $30,$3A,$30,$3C,$1C,$FF        ; likely compiles UNTIL value + compare/jump micro-sequence
+0AD6: DB  $30,$3A,$30,$3C,$1C,$FF        ; likely compiles UNTIL value + compare/jump micro-sequence,  MM57109 instructions  XEY,-,XEY,/,MS
 
 0ADC: 18 9F        JR  $0A7D             ; back to main statement dispatch loop
-;
+; ------------------------------------------------------------
 ; Parse token 30 - NEXT statement
-;
+; ------------------------------------------------------------
 0ADE: FE 30       CP $30
 0AE0: 20 2D       JR NZ,$0B0F
 0AE2: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
@@ -2488,7 +2591,9 @@ PRINT_HEX_WORD_HL:
 
 ; Inline data for CALL $0446: bytes 0B05-0B08 terminated by $FF
 0B05:              DB  $01,$20,$3A,$FF  ; "A :"
-0B09: 3A E3 1F    LD A,($1FE3)
+0B09: 3A E3 1F    LD A,($1FE3) ; Get the line to loop back to, this was saved by the FOR handler. 
+                               ; It holds the next line after the FOR line was on. 
+                               ; NOTE only a single FOR loop can be active at a time (no embedded loops using FOR statements)
 0B0C: 4F          LD C,A
 0B0D: 18 95       JR $0AA4
 ;
@@ -2742,4 +2847,3 @@ PRINT_HEX_WORD_HL:
 ;   → tells us if the MM57109 “R/W → INT” path is being exercised/expected during RUN
 
 ; If you’d like, I can extend this section with a follow-up trace (“from 0x0AC3 onward”) and integrate it into the disassembly as a step-by-step narrative.
-

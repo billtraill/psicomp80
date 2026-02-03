@@ -194,11 +194,14 @@ The program
 009 END
 ```
 
-So it looks like start of line marker is ED followed by the line number... and the line terminates with 1F.
+So it looks like 
+- C9 Start of program
+- ED start of line marker, followed by the line number... and the line terminates with 1F.
+- C0 program terminator
 
 So RUN 5 will probably look for line 5?
 ```
-     0C00  ED 05 06 0F 12 20 01 3D 31 20 13 14 05 10 20 31 20 15 0E 14 09 0C 20 32 35 20 1F   - FOR A=1 STEP 1 UNTIL 25
+     0C01  ED 05 06 0F 12 20 01 3D 31 20 13 14 05 10 20 31 20 15 0E 14 09 0C 20 32 35 20 1F   - FOR A=1 STEP 1 UNTIL 25
      0C1B  ED 06 0C 05 14 20 0C 3D 01 20 0C 0F 07 20 1F                                       - LET L=A LOG
      0C2A  ED 07 10 12 09 0E 14 20 01 30 20 0C 38 20 1F                                       - PRINT A0L8
      0C39  ED 08 0E 05 18 14 20 01 20 1F                                                      - NEXT A
@@ -206,4 +209,37 @@ So RUN 5 will probably look for line 5?
      0C4A  C0 
 ```
 
-a = ED 
+So the entry point looks for the line we are interested in running from
+```
+0982: 21 00 0C    LD HL,$0C00 ;  Looks like the main parse of the program. 0C00 is where BURP programs are loaded into.
+0985: 7E          LD A,(HL)   ; Get next char in program... Look for end of program of start of line markers
+0986: FE C0       CP $C0      ; C0 is the end of program marker 
+0988: 28 F5       JR Z,$097F  ; Jump here if its all over 
+098A: FE ED       CP $ED      ; is it the start of line marker
+098C: 23          INC HL      ; move onto next char
+098D: 20 F6       JR NZ,$0985 ; if not start of line marker or end of program, loop 
+098F: 7E          LD A,(HL)   ; Get the line number
+0990: B9          CP C        ; C holds the line we are interested in
+0991: 20 F7       JR NZ,$098A ; if its not loop until we find the right line.
+0993: CD 94 07    CALL $0794  ; We are at the right line, parse the line?
+```
+
+And in Parse tokens in line ,
+Looks like the first 2 tokens identify the command. Then it skips spaces
+
+```
+0794: 23          INC HL    ; move past the line number byte
+0795: 46          LD B,(HL) ; load next token into B
+0796: 23          INC HL    ; move to next token on line
+0797: 4E          LD C,(HL) ; move token into C
+0798: 23          INC HL    ; move to next token
+0799: 7E          LD A,(HL) ; move token into A
+079A: FE 20       CP $20    ; is it a space 
+079C: 20 F9       JR NZ,$0797 ; loop if it is?
+079E: 79          LD A,C    ; 
+079F: 80          ADD A,B
+07A0: 80          ADD A,B
+07A1: C9          RET
+
+So first token returned is 1E - which identifies the FOR statement...
+

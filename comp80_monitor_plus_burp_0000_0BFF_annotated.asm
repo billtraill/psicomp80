@@ -1070,7 +1070,7 @@ PRINT_HEX_WORD_HL:
 ; ## INLINE_DATA_DISPATCH ($0446)
 
 ; -----------------------------------------------------------------------------
-; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND ($0446)
+; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF ($0446)
 ;  Reads a byte stream located immediately after the CALL instruction that invoked
 ;  this routine (i.e., inline data at the return address).
 ;
@@ -1110,9 +1110,9 @@ PRINT_HEX_WORD_HL:
 ; ## BURP_CTRL_SEQ ($0460)
 
 ; -----------------------------------------------------------------------------
-; BURP_EMIT_MM57109_ITEM_AND_WAIT ($0460)
-;  High-level wrapper used by statement handlers (e.g., FOR) to emit an item into the
-;  MM57109 command/data stream.
+; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT ($0460)
+;  High-level wrapper used by statement handlers (e.g., FOR) to emit an MM57109 OUT* instruction 
+;  This basically reads the MM57109 X register in engineerig format.
 ;
 ;  Observed behaviour:
 ;    - Enables interrupts (IM 1 / EI) briefly around emitting an inline stream via $0446
@@ -1122,20 +1122,17 @@ PRINT_HEX_WORD_HL:
 ;    - Interacts with workspace around $1FF4/$1FF6 and uses small formatting logic.
 ;
 ;  Calling convention (inferred):
-;    IN : A = selector/opcode for item type (var id, operator, clause marker, etc.)
-;    OUT: side effects: MM57109 stream extended; workspace updated
 ;
-;  NOTE: exact semantics of A are still being reverse-engineered.
 ; -----------------------------------------------------------------------------
 0460: D9          EXX
 0461: F5          PUSH AF
 0462: 21 F4 1F    LD HL,$1FF4
 0465: ED 56       IM 1
-0467: FB          EI
-0468: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0467: FB          EI  ; Enable interupts from MM57109 to results (if any from instruction can be sent)
+0468: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 ; Inline data for CALL $0446: bytes 046B-046D terminated by $FF
-046B:              DB  $16,$2B,$FF  ; MM57109 instructions OUT*,ECLR
-046E: F3          DI
+046B:              DB  $16,$2B,$FF  ; MM57109 instructions OUT*($2B)
+046E: F3          DI  ; Disable the interrupts again, the results if should now be at $1FF4
 046F: F1          POP AF
 0470: CD 14 07    CALL $0714
 0473: 7D          LD A,L
@@ -1210,11 +1207,11 @@ PRINT_HEX_WORD_HL:
 04D2: FF          RST $38
 04D3: FF          RST $38
 04D4: CD 7B 05    CALL $057B
-04D7: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+04D7: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 ; Inline data for CALL $0446: bytes 04DA-04DF terminated by $FF
 04DA:              DB  $3C,$01,$02,$06,$3B,$FF  ;   MM57109 instructions  /,1,2,3,*            
 04E0: 3E 00       LD A,$00
-04E2: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
+04E2: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
 
 04E5: C9          RET
 ;---------------------------------------------------
@@ -2115,7 +2112,7 @@ PRINT_HEX_WORD_HL:
 082D: 90          SUB B
 082E: 3E BF       LD A,$BF
 0830: D3 60       OUT ($60),A
-0832: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0832: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 ; Inline data for CALL $0446: bytes 0835-0837 terminated by $FF
 0835:              DB  $2F,$22,$FF  ; MM57109 instructions MCLR,TOGM,
 0839: 29 07 FE    ADD HL,None
@@ -2380,7 +2377,7 @@ PRINT_HEX_WORD_HL:
 09F1: FE 1F       CP $1F
 09F3: 20 06       JR NZ,$09FB
 09F5: F1          POP AF
-09F6: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
+09F6: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
 
 09F9: 18 84       JR $097F
 09FB: CD E6 04    CALL $04E6
@@ -2574,22 +2571,22 @@ PRINT_HEX_WORD_HL:
                                          ; (calls into expression parser at 04E6)
 
 0ABF: 78           LD  A,B
-0AC0: CD 60 04     CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
+0AC0: CD 60 04     CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
 
                                          ; (very likely MM57109-side "store into var B")
 
 0AC3: CD 52 04     CALL $0452            ; skip ahead to next clause delimiter (space scanning)
 
 0AC6: 3E 1B        LD  A,$1B
-0AC8: CD 60 04     CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
+0AC8: CD 60 04     CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
 
 
-0ACB: CD 46 04     CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0ACB: CD 46 04     CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 0ACE: DB  $30,$FF                        ; MM57109 instructions  XEY
 
 0AD0: CD 52 04     CALL $0452            ; skip ahead again (toward UNTIL clause)
 
-0AD3: CD 46 04     CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0AD3: CD 46 04     CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 0AD6: DB  $30,$3A,$30,$3C,$1C,$FF        ; likely compiles UNTIL value + compare/jump micro-sequence,  MM57109 instructions  XEY,-,XEY,/,MS
 
 0ADC: 18 9F        JR  $0A7D             ; back to main statement dispatch loop
@@ -2598,7 +2595,7 @@ PRINT_HEX_WORD_HL:
 ; ------------------------------------------------------------
 0ADE: FE 30       CP $30
 0AE0: 20 2D       JR NZ,$0B0F
-0AE2: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0AE2: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 
 ; Inline data for CALL $0446: bytes 0AE5-0AE6 terminated by $FF
 0AE5:              DB  $1D,$FF  ; "<1D>"
@@ -2612,13 +2609,13 @@ PRINT_HEX_WORD_HL:
 0AF1: CD 7B 05    CALL $057B
 0AF4: 3E 1B       LD A,$1B
 0AF6: CD 7B 05    CALL $057B
-0AF9: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0AF9: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 
 ; Inline data for CALL $0446: bytes 0AFC-0AFD terminated by $FF
 0AFC:              DB  $39,$FF  ; "<39>"
-0AFF: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_ITEM_AND_WAIT(A=selector)
+0AFF: CD 60 04    CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
 
-0B02: CD 46 04    CALL $0446  ; BURP_READ_INLINE_BYTES_UNTIL_FF_AND_SEND(inline @ retaddr)
+0B02: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 
 ; Inline data for CALL $0446: bytes 0B05-0B08 terminated by $FF
 0B05:              DB  $01,$20,$3A,$FF  ; "A :"

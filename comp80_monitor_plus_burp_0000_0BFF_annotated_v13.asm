@@ -128,6 +128,7 @@ READY_PROMPT_STR:
 0034: 2C           INC L
 0035: 20 FB        JR NZ,$0032
 0037: C7           RST 00H
+
 0038: F5           PUSH AF
 0039: DB 03        IN A,($03)
 003B: E6 0F        AND A,$0F
@@ -1855,20 +1856,59 @@ PRINT_HEX_WORD_HL:
 0712: E1          POP HL
 0713: C9          RET
 
-0714: CD AC 07    CALL $07AC  ; BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
+; -----------------------------------------------------------------------------
+; BURP_INIT_16BYTE_OPERAND_BLOCK  ($0714)
+;
+; Purpose:
+;   Initialise a selected 16-byte operand/descriptor block in BURP workspace
+;   memory ($1E00–$1EFF or $1F00–$1FFF). This sets a known baseline before
+;   callers pack digits, punctuation markers, and control bytes into the block.
+;
+; Block selection:
+;   Uses $07AC with selector A:
+;     - Low nibble (A & $0F) selects which 16-byte slot
+;     - Bit4 selects page:
+;         bit4=0 -> base $1E00
+;         bit4=1 -> base $1F00
+;   Returns HL = base + (A & $0F)*16.
+;
+; Initialised layout (relative to returned HL base):
+;   [00..08] = 00 00 00 00 00 00 00 00 00    ; 9 bytes cleared
+;   [09..0E] = 0F 0F 0F 0F 0F 0F              ; 6 bytes set to 0F (nibble filler)
+;   [0F]     = 3F                             ; final control/terminator byte
+;
+; Interpretation (inferred from usage):
+;   - The [09..0E]=0F region looks like “unset digit/nibble placeholders”.
+;   - The final byte 3F is a common “all ones / terminator / default control”
+;     value in this ROM (and also appears in MM57109 handshake-related logic),
+;     so this likely marks the record as “initialised / empty / default”.
+;
+; Inputs:
+;   A = operand block selector (passed through to $07AC)
+;
+; Outputs:
+;   The 16-byte block is initialised in RAM.
+;   HL is left pointing at the final byte (offset +0F).
+;
+; Called from:
+;   - $06BB (token $26 path) before building a packed numeric/format operand
+;   - Other operand/format preparation paths that fill these 16 bytes
+; -----------------------------------------------------------------------------
+0714: CD AC 07    CALL $07AC      ; HL <- base of selected 16-byte block ($1Exx/$1Fxx),BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
 
-
-0717: 06 09       LD B,$09
-0719: AF          XOR A
-071A: 77          LD (HL),A
+0717: 06 09       LD  B,$09       ; clear first 9 bytes
+0719: AF          XOR A           ; A=00
+071A: 77          LD  (HL),A
 071B: 23          INC HL
 071C: 10 FC       DJNZ $071A
-071E: 06 06       LD B,$06
-0720: 3E 0F       LD A,$0F
-0722: 77          LD (HL),A
+
+071E: 06 06       LD  B,$06       ; fill next 6 bytes with 0F
+0720: 3E 0F       LD  A,$0F
+0722: 77          LD  (HL),A
 0723: 23          INC HL
 0724: 10 FC       DJNZ $0722
-0726: 36 3F       LD (HL),$3F
+
+0726: 36 3F       LD  (HL),$3F    ; record[+0F] = 3F (terminator/default)
 0728: C9          RET
 
 ; ## BURP_WAIT_KEY ($0729)
@@ -1987,23 +2027,14 @@ PRINT_HEX_WORD_HL:
 ;    If carry set (original bit4=1) H is incremented to select page $1Fxx.
 ; -----------------------------------------------------------------------------
 07AC: A7          AND A  ; clear carry; set flags from A (selector)
-
 07AD: 26 1E       LD H,$1E  ; H := $1E (base page $1E00)
-
 07AF: 17          RLA  ; shift selector left 1 (1/4): builds offset*16; carry tracks original bit4 after 4 shifts
-
 07B0: 17          RLA  ; shift left (2/4)
-
 07B1: 17          RLA  ; shift left (3/4)
-
 07B2: 17          RLA  ; shift left (4/4)
-
 07B3: 6F          LD L,A  ; L := A (low byte = (selector<<4) & $F0)
-
 07B4: D0          RET NC  ; if carry==0 (original bit4=0), return with HL in $1E00 page
-
 07B5: 24          INC H  ; else select $1F00 page
-
 07B6: C9          RET  ; return
 
 07B7: 7E          LD A,(HL)

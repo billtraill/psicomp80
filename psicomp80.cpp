@@ -38,6 +38,9 @@
 
 #include <array>
 #include <vector>
+#include <string>
+#include <cmath>
+#include <cstdlib>
 // ---------------------------------------------------------------------------
 // MM57109 tracing
 //
@@ -198,6 +201,25 @@ private:
 	std::vector<u8> m_mm_stream;   // committed byte stream (bit7 stripped)
 	u64  m_mm_tx_seq = 0;          // transaction counter
 
+	// --- MM57109 register/state model (WIP) ---
+	// These fields model the MM57109 internal state at a coarse level so we can
+	// progressively implement the instruction set that BURP uses.
+	double m_mm_x = 0.0;  // X register (top of stack)
+	double m_mm_y = 0.0;  // Y register
+	double m_mm_z = 0.0;  // Z register
+	double m_mm_t = 0.0;  // T register
+	double m_mm_m = 0.0;  // Memory register M
+	bool   m_mm_deg_mode = false; // angular mode (false=radians, true=degrees) - rough model
+	u8     m_mm_mant_digits = 8;  // mantissa digit count (SMDC*)
+	bool   m_mm_digit_entry = false; // currently collecting digits into X
+	std::string m_mm_digit_buf;      // digit-entry buffer (ASCII, e.g. "-12.34E+5")
+	bool   m_mm_two_word_pending = false;
+	u8     m_mm_two_word_op = 0x00;
+	bool   m_mm_error = false;
+
+	// queue for IM1 nibble delivery (port $03 low nibble + IRQ0 pulses)
+	std::vector<u8> m_mm_nibble_q;
+
 	// -------- character generator tables --------
 	// Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
 	// Table is indexed as ASCII 0x20..0x5F mapped to 0..63.
@@ -224,6 +246,17 @@ private:
 	// helpers
 	static u8 ascii_to_mm_code(u8 data);
 	void mm_set_data_ready(u8 code);
+	// MM57109 model helpers
+	void mm57109_reset();
+	void mm57109_commit(u8 op);
+	void mm57109_execute_single(u8 op);
+	bool mm57109_is_two_word(u8 op) const;
+	const char *mm57109_opcode_mn(u8 op) const;
+	void mm57109_push(double v);
+	double mm57109_pop();
+	void mm57109_set_x(double v);
+	void mm57109_queue_nibble(u8 nib);
+	void mm57109_log_state(const char *reason);
 
 	static u8 glyph_row(u8 vram_byte, int row); // returns 5-bit pattern
 
@@ -321,6 +354,26 @@ void psicomp80_state::machine_start()
 	save_item(NAME(m_mm_ready));
 	save_item(NAME(m_mm_code));
 	save_item(NAME(m_mm_one_shot_clear));
+
+	save_item(NAME(m_mm_hs_rdy));
+	save_item(NAME(m_mm_status_rdy));
+	save_item(NAME(m_mm_status_b6));
+	save_item(NAME(m_mm_latch));
+	save_item(NAME(m_mm_expect_latch));
+	save_item(NAME(m_mm_inv_pending));
+	save_item(NAME(m_mm_tx_seq));
+
+	save_item(NAME(m_mm_x));
+	save_item(NAME(m_mm_y));
+	save_item(NAME(m_mm_z));
+	save_item(NAME(m_mm_t));
+	save_item(NAME(m_mm_m));
+	save_item(NAME(m_mm_deg_mode));
+	save_item(NAME(m_mm_mant_digits));
+	save_item(NAME(m_mm_digit_entry));
+	save_item(NAME(m_mm_two_word_pending));
+	save_item(NAME(m_mm_two_word_op));
+	save_item(NAME(m_mm_error));
 }
 
 void psicomp80_state::machine_reset()
@@ -329,6 +382,7 @@ void psicomp80_state::machine_reset()
 	m_mm_ready = false;
 	m_mm_code  = 0x1f;
 	m_mm_one_shot_clear = false;
+	mm57109_reset();
 }
 
 // ------------------ memory & I/O ------------------
@@ -359,18 +413,295 @@ u8 psicomp80_state::port01_r()
 
 u8 psicomp80_state::port03_r()
 {
-	// Port $03: ROM polls bit5 (mask $20) for MM57109 handshake/status.
-	// BURP also uses bit6 (mask $40) via $058A wait routine.
-	const bool rdy = m_mm_hs_rdy || m_mm_status_rdy;
-	u8 v = (rdy ? 0x20 : 0x00) | (m_mm_status_b6 ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+	// Port $03: combined MM57109 status + 4-bit data.
+	//
+	// BURP uses bit5 ($20) as the READY line for the two-phase handshake in $042E:
+	//   - it waits for READY=0 before phase1 OUT, then waits for READY=1 before phase2 OUT.
+	//
+	// BURP also uses bit6 ($40) as a secondary "result/status" indicator via $058A (mask $60).
+	// To avoid deadlocking $042E, we model:
+	//   - bit5 as the *handshake* READY only (m_mm_hs_rdy)
+	//   - bit6 as the *status/result* READY (m_mm_status_rdy)
+	//
+	// Low bits contain the current 4-bit (or 5-bit) code sample; only the low nibble is
+	// meaningful for IM1 capture (A & $0F).
+	const bool hs_rdy = m_mm_hs_rdy;
+	const bool st_rdy = m_mm_status_rdy;
 
-	LOGMASKED(LOG_MM_STATUS, "MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d status_rdy=%d b6=%d code=%02X(%03o))\n",
-		(u16)m_cpu->pc(), v, unsigned(v), m_mm_hs_rdy, m_mm_status_rdy, m_mm_status_b6, m_mm_code, unsigned(m_mm_code));
+	u8 v = (hs_rdy ? 0x20 : 0x00) | (st_rdy ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+
+	LOGMASKED(LOG_MM_STATUS,
+		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d code=%02X(%03o))\n",
+		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, st_rdy, m_mm_code, unsigned(m_mm_code));
 
 	return v;
 }
 
 
+
+
+
+// ---------------------------------------------------------------------------
+// MM57109 coarse state model (registers + instruction dispatcher)
+// ---------------------------------------------------------------------------
+
+void psicomp80_state::mm57109_reset()
+{
+	m_mm_hs_rdy = false;
+	m_mm_status_rdy = false;
+	m_mm_status_b6 = false;
+	m_mm_latch = 0x00;
+	m_mm_expect_latch = true;
+	m_mm_inv_pending = false;
+	m_mm_stream.clear();
+	m_mm_tx_seq = 0;
+
+	m_mm_x = m_mm_y = m_mm_z = m_mm_t = 0.0;
+	m_mm_m = 0.0;
+	m_mm_deg_mode = false;
+	m_mm_mant_digits = 8;
+	m_mm_digit_entry = false;
+	m_mm_digit_buf.clear();
+	m_mm_two_word_pending = false;
+	m_mm_two_word_op = 0x00;
+	m_mm_error = false;
+	m_mm_nibble_q.clear();
+}
+
+bool psicomp80_state::mm57109_is_two_word(u8 op) const
+{
+	// Per MM57109 datasheet: several instructions are 2-word (opcode + parameter/addr).
+	// We don't implement their behaviour yet, but we track the second word so we can
+	// correlate BURP byte streams with required functionality.
+	switch (op & 0x3f)
+	{
+	case 0x10: // TJC*
+	case 0x11: // TX=0*
+	case 0x12: // TX<0*
+	case 0x15: // JMP*
+	case 0x17: // IN*
+	case 0x18: // SMDC*
+	case 0x19: // IBNZ*
+	case 0x1a: // DBNZ*
+	case 0x16: // OUT* (note: also appears as 0x16)
+		return true;
+	default:
+		return false;
+	}
+}
+
+const char *psicomp80_state::mm57109_opcode_mn(u8 op) const
+{
+	// Prefer the existing mnemonic mapping (already used for logging).
+	return mm57109_opcode_name(op & 0x3f);
+}
+
+void psicomp80_state::mm57109_push(double v)
+{
+	m_mm_t = m_mm_z;
+	m_mm_z = m_mm_y;
+	m_mm_y = m_mm_x;
+	m_mm_x = v;
+}
+
+double psicomp80_state::mm57109_pop()
+{
+	double v = m_mm_x;
+	m_mm_x = m_mm_y;
+	m_mm_y = m_mm_z;
+	m_mm_z = m_mm_t;
+	// m_mm_t holds last T; keep as-is
+	return v;
+}
+
+void psicomp80_state::mm57109_set_x(double v)
+{
+	m_mm_x = v;
+}
+
+void psicomp80_state::mm57109_queue_nibble(u8 nib)
+{
+	m_mm_nibble_q.push_back(nib & 0x0f);
+
+	// Present the nibble on the low bits of port $03 and raise IRQ0 so BURP IM1 handler
+	// ($0038) captures it into RAM.
+	mm_set_data_ready(nib & 0x0f);
+}
+
+void psicomp80_state::mm57109_log_state(const char *reason)
+{
+	LOGMASKED(LOG_MM57109, "MM57109: state(%s) X=%g Y=%g Z=%g T=%g M=%g deg=%d mant=%u err=%d digit='%s' inv=%d\n",
+		reason, m_mm_x, m_mm_y, m_mm_z, m_mm_t, m_mm_m,
+		m_mm_deg_mode ? 1 : 0, unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0,
+		m_mm_digit_buf.c_str(), m_mm_inv_pending ? 1 : 0);
+}
+
+void psicomp80_state::mm57109_execute_single(u8 op)
+{
+	const u8 opcode = op & 0x3f;
+
+	// Digit-entry class (0..9, DP, EE, CS, PI, EN)
+	if (opcode <= 0x09)
+	{
+		m_mm_digit_entry = true;
+		m_mm_digit_buf.push_back(char('0' + opcode));
+		return;
+	}
+	switch (opcode)
+	{
+	case 0x0a: // DP
+		m_mm_digit_entry = true;
+		if (m_mm_digit_buf.find('.') == std::string::npos)
+			m_mm_digit_buf.push_back('.');
+		return;
+
+	case 0x0b: // EE
+		m_mm_digit_entry = true;
+		if (m_mm_digit_buf.find('E') == std::string::npos)
+			m_mm_digit_buf.push_back('E');
+		return;
+
+	case 0x0c: // CS (change sign)
+		m_mm_digit_entry = true;
+		if (!m_mm_digit_buf.empty() && m_mm_digit_buf[0] == '-')
+			m_mm_digit_buf.erase(0, 1);
+		else
+			m_mm_digit_buf.insert(0, 1, '-');
+		return;
+
+	case 0x0d: // PI
+		m_mm_digit_entry = false;
+		m_mm_digit_buf.clear();
+		mm57109_set_x(3.14159265358979323846);
+		return;
+
+	case 0x21: // EN (end digit entry / push)
+		if (m_mm_digit_entry)
+		{
+			// Very rough parse; this is just to have a meaningful register model.
+			char *endp = nullptr;
+			double v = std::strtod(m_mm_digit_buf.c_str(), &endp);
+			if (endp && endp != m_mm_digit_buf.c_str())
+				mm57109_set_x(v);
+			m_mm_digit_entry = false;
+			m_mm_digit_buf.clear();
+		}
+		// EN pushes stack (X becomes new entry)
+		mm57109_push(m_mm_x);
+		return;
+
+	case 0x1c: // MS
+		m_mm_m = m_mm_x;
+		return;
+
+	case 0x1d: // MR
+		mm57109_push(m_mm_m);
+		return;
+
+	case 0x39: // +
+	{
+		double x = mm57109_pop();
+		double y = mm57109_pop();
+		mm57109_push(y + x);
+		return;
+	}
+	case 0x3a: // -
+	{
+		double x = mm57109_pop();
+		double y = mm57109_pop();
+		mm57109_push(y - x);
+		return;
+	}
+	case 0x3b: // *
+	{
+		double x = mm57109_pop();
+		double y = mm57109_pop();
+		mm57109_push(y * x);
+		return;
+	}
+	case 0x3c: // /
+	{
+		double x = mm57109_pop();
+		double y = mm57109_pop();
+		if (x == 0.0)
+		{
+			m_mm_error = true;
+			mm57109_push(0.0);
+		}
+		else
+		{
+			mm57109_push(y / x);
+		}
+		return;
+	}
+
+	case 0x22: // TOGM
+		m_mm_deg_mode = !m_mm_deg_mode;
+		return;
+	case 0x3F: // NOP 
+	    // No operation, do nothing
+	    return;
+
+	default:
+		break;
+	}
+
+	LOGMASKED(LOG_MM57109, "MM57109: UNIMPLEMENTED op=%02X(%03o) %-10s @PC=%04X (inv_pending=%d)\n",
+		opcode, unsigned(opcode), mm57109_opcode_mn(opcode), (u16)m_cpu->pc(), m_mm_inv_pending ? 1 : 0);
+}
+
+void psicomp80_state::mm57109_commit(u8 op)
+{
+	const u8 opcode = op & 0x3f;
+
+	// Handle pending 2nd word for prior 2-word op
+	if (m_mm_two_word_pending)
+	{
+		LOGMASKED(LOG_MM57109, "MM57109: 2ndword for %02X(%03o) %-10s = %02X(%03o) @PC=%04X (NOT IMPLEMENTED)\n",
+			m_mm_two_word_op, unsigned(m_mm_two_word_op), mm57109_opcode_mn(m_mm_two_word_op),
+			opcode, unsigned(opcode), (u16)m_cpu->pc());
+		m_mm_two_word_pending = false;
+		m_mm_two_word_op = 0x00;
+		// status: treat as complete
+		m_mm_status_b6 = false;
+		m_mm_status_rdy = true;
+		return;
+	}
+
+	// INV prefix affects interpretation of the next opcode; keep tracking for logging.
+	if (!m_mm_inv_pending && opcode == 0x20)
+	{
+		m_mm_inv_pending = true;
+		LOGMASKED(LOG_MM57109, "MM57109: INV prefix armed\n");
+		m_mm_status_b6 = false;
+		m_mm_status_rdy = true;
+		return;
+	}
+
+	if (m_mm_inv_pending)
+	{
+		// INV consumed by this opcode
+		m_mm_inv_pending = false;
+	}
+
+	if (mm57109_is_two_word(opcode))
+	{
+		m_mm_two_word_pending = true;
+		m_mm_two_word_op = opcode;
+		LOGMASKED(LOG_MM57109, "MM57109: 2-word op %02X(%03o) %-10s awaiting param\n",
+			opcode, unsigned(opcode), mm57109_opcode_mn(opcode));
+		m_mm_status_b6 = false;
+		m_mm_status_rdy = true;
+		return;
+	}
+
+	mm57109_execute_single(opcode);
+
+	// For now, assert "RDY wins" status after each committed opcode so ROM wait loops
+	// can proceed. We will refine this once instruction behaviour is implemented.
+	m_mm_status_b6 = m_mm_error ? true : false;
+	m_mm_status_rdy = true;
+}
 
 
 void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd)
@@ -392,16 +723,16 @@ void psicomp80_state::port60_w(u8 data)
 	LOGMASKED(LOG_MM57109, "MM57109 W: OUT ($60),%02X(%03o) %-10s @PC=%04X (bit7=%d)\n",
 		data, unsigned(data), opname, (u16)m_cpu->pc(), (data >> 7) & 1);
 
-	// Special-case: $058A uses OUT ($60),$3F as an ACK/continue strobe when RDY($20) wins.
-	// Treat this as "clear status-ready" and do not fold it into the normal two-phase send.
-	if (((data & 0x80) == 0) && data == 0x3f && m_mm_status_rdy)
-	{
-		LOGMASKED(LOG_MM_ACK, "MM57109 W: OUT ($60),3F @PC=%04X ACK received (status_rdy=1) -> clear status_rdy\n", (u16)m_cpu->pc());
-		m_mm_status_rdy = false;
-		m_mm_hs_rdy = false;
+	// // Special-case: $058A uses OUT ($60),$3F as an ACK/continue strobe when RDY($20) wins.
+	// // Treat this as "clear status-ready" and do not fold it into the normal two-phase send.
+	// if (((data & 0x80) == 0) && data == 0x3f && m_mm_status_rdy)
+	// {
+	// 	LOGMASKED(LOG_MM_ACK, "MM57109 W: OUT ($60),3F @PC=%04X ACK received (status_rdy=1) -> clear status_rdy\n", (u16)m_cpu->pc());
+	// 	m_mm_status_rdy = false;
+	// 	m_mm_hs_rdy = false;
 		
-		return;
-	}
+	// 	return;
+	// }
 
 
 // Two-phase HOLD/RDY handshake as used by BURP routine $042E.
@@ -436,23 +767,14 @@ const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed) : mm57109
 	else if (m_mm_inv_pending)
 		m_mm_inv_pending = false;
 m_mm_stream.push_back(committed);
+	mm57109_commit(committed);
 
 m_mm_hs_rdy = false;
 m_mm_expect_latch = true;
 
-// Minimal behaviour for BURP:
-//   When BURP sends $11 or $12 (via $058A), it expects status polling on port $03 to
-//   settle to exactly one of {RDY($20), BR($40)}. We model "success" as RDY asserted.
-if (committed == 0x11 || committed == 0x12)
-{
-	m_mm_status_b6 = false;     // "no error"
-	m_mm_status_rdy = true;     // RDY wins ($20)
-	LOGMASKED(LOG_MM57109, "MM57109: status_rdy asserted for cmd=%02X (b6=%d)\n", committed, m_mm_status_b6);
+	// Status bits are handled by mm57109_commit() for now.
+}
 
-	// Dump the full stream leading up to the exec cmd for reverse engineering.
-	mm57109_dump_stream("exec", committed);
-}
-}
 
 
 // ------------------ keyboard / interrupts ------------------

@@ -129,6 +129,11 @@ READY_PROMPT_STR:
 0035: 20 FB        JR NZ,$0032
 0037: C7           RST 00H
 
+; ---------------------------------------------------------------------------
+; Interrupt handler for the MM57109 stores values in the address pointed to 
+; via the HL register, which should have been setup prior to interrups being 
+; enabled.
+; ---------------------------------------------------------------------------
 0038: F5           PUSH AF
 0039: DB 03        IN A,($03)
 003B: E6 0F        AND A,$0F
@@ -137,6 +142,8 @@ READY_PROMPT_STR:
 003F: F1           POP AF
 0040: FB           EI
 0041: C9           RET
+
+
 0042: CD 93 03     CALL $0393     ; clear screen/work area before showing READY / accepting command
 0045: CD DE 03     CALL $03DE ; RUN: read target address XXXX -> HL (then JP (HL))
 0048: E9           JP (HL)
@@ -1112,7 +1119,7 @@ PRINT_HEX_WORD_HL:
 ; -----------------------------------------------------------------------------
 ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT ($0460)
 ;  High-level wrapper used by statement handlers (e.g., FOR) to emit an MM57109 OUT* instruction 
-;  This basically reads the MM57109 X register in engineerig format.
+;  This basically reads the MM57109 X register in scientific notation.
 ;
 ;  Observed behaviour:
 ;    - Enables interrupts (IM 1 / EI) briefly around emitting an inline stream via $0446
@@ -1306,18 +1313,14 @@ PRINT_HEX_WORD_HL:
 0510: D5          PUSH DE  ; preserve DE (input pointer)
 
 0511: EB          EX DE,HL  ; DE <- HL (input ptr), HL will become destination buffer
-
 0512: 21 00 1E    LD HL,$1E00  ; HL = $1E00 (numeric literal workspace)
-
 0515: 06 0F       LD B,$0F  ; B = $0F (size/count for init routine)
-
 0517: CD 20 07    CALL $0720  ; init/clear workspace region (likely 0x0F bytes)
 
 051A: 2E 09       LD L,$09  ; HL = $1E09
-
 051C: 71          LD (HL),C  ; store mode/flag C at $1E09
 
-051D: 2E 00       LD L,$00
+051D: 2E 00       LD L,$00  ; HL = $1E00
 051F: 08          EX AF,AF'
 0520: E6 0F       AND $0F  ; extract low nibble (digit code)
 
@@ -1428,32 +1431,19 @@ PRINT_HEX_WORD_HL:
 ;    - Emits exactly 16 bytes via MM57109_SEND_BYTE_HANDSHAKE(A=byte) / $042E in a DJNZ loop
 ; -----------------------------------------------------------------------------
 0577: 1B          DEC DE  ; step DE back one (caller had advanced past delimiter)
-
 0578: EB          EX DE,HL  ; restore HL from DE (input pointer back to HL)
-
 0579: D1          POP DE  ; restore DE saved earlier (POP)
-
 057A: AF          XOR A  ; A := 0 (select default mode for $07AC)
-
 057B: E5          PUSH HL  ; save HL, then call $07AC to prepare 16-byte emit source
-
 057C: CD AC 07    CALL $07AC  ; BURP_PREPARE_16BYTE_OPERAND_BLOCK(A=selector)
-
-
-
-
 057F: 06 10       LD B,$10  ; emit 16 bytes to coprocessor stream
-
 0581: 7E          LD A,(HL)
 0582: 23          INC HL
 0583: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=(HL)) ; emit operand byte
-
-
-
 0586: 10 F9       DJNZ $0581
 0588: E1          POP HL  ; restore HL and return
-
 0589: C9          RET
+
 ; -----------------------------------------------------------------------------
 ; MM57109_SEND_AND_WAIT_RDDY_BR ($058A)
 ;  Send a byte to the MM57109, then wait for a status condition on port $03.
@@ -1900,6 +1890,10 @@ PRINT_HEX_WORD_HL:
 071C: 10 FC       DJNZ $071A
 
 071E: 06 06       LD  B,$06       ; fill next 6 bytes with 0F
+
+;
+; Fill region with count stored in B, with 0F, terminate with 3F
+;
 0720: 3E 0F       LD  A,$0F
 0722: 77          LD  (HL),A
 0723: 23          INC HL
@@ -2569,11 +2563,12 @@ PRINT_HEX_WORD_HL:
 
 0ABC: CD 59 04     CALL $0459            ; parse/eval the "= <expr>" part
                                          ; (calls into expression parser at 04E6)
+                                         ; Stores the value in the MM57109 X register.
 
 0ABF: 78           LD  A,B
-0AC0: CD 60 04     CALL $0460  ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
-
+0AC0: CD 60 04     CALL $0460            ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT(A=selector)
                                          ; (very likely MM57109-side "store into var B")
+                                         ; Reads the value from the MM57109 X register 
 
 0AC3: CD 52 04     CALL $0452            ; skip ahead to next clause delimiter (space scanning)
 

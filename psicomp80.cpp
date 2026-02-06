@@ -214,11 +214,13 @@ private:
 	bool   m_mm_digit_entry = false; // currently collecting digits into X
 	std::string m_mm_digit_buf;      // digit-entry buffer (ASCII, e.g. "-12.34E+5")
 	bool   m_mm_two_word_pending = false;
+	bool   m_mm_irq0_asserted = false;
 	u8     m_mm_two_word_op = 0x00;
 	bool   m_mm_error = false;
 
 	// queue for IM1 nibble delivery (port $03 low nibble + IRQ0 pulses)
 	std::vector<u8> m_mm_nibble_q;
+	emu_timer *m_mm_nibble_timer = nullptr;
 
 	// -------- character generator tables --------
 	// Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
@@ -256,6 +258,8 @@ private:
 	double mm57109_pop();
 	void mm57109_set_x(double v);
 	void mm57109_queue_nibble(u8 nib);
+	void mm57109_emit_out_scientific_stream_from_x();
+	TIMER_CALLBACK_MEMBER(mm57109_nibble_tick);
 	void mm57109_log_state(const char *reason);
 
 	static u8 glyph_row(u8 vram_byte, int row); // returns 5-bit pattern
@@ -349,6 +353,7 @@ std::array<std::array<u8, 8>, 64> psicomp80_state::gfx_font_64x8x5 = []{
 void psicomp80_state::machine_start()
 {
 	m_mm_stream.reserve(256);
+	m_mm_nibble_timer = timer_alloc(FUNC(psicomp80_state::mm57109_nibble_tick), this);
 
 	save_item(NAME(m_key_latch));
 	save_item(NAME(m_mm_ready));
@@ -372,6 +377,7 @@ void psicomp80_state::machine_start()
 	save_item(NAME(m_mm_mant_digits));
 	save_item(NAME(m_mm_digit_entry));
 	save_item(NAME(m_mm_two_word_pending));
+	save_item(NAME(m_mm_irq0_asserted));
 	save_item(NAME(m_mm_two_word_op));
 	save_item(NAME(m_mm_error));
 }
@@ -434,6 +440,17 @@ u8 psicomp80_state::port03_r()
 		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d code=%02X(%03o))\n",
 		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, st_rdy, m_mm_code, unsigned(m_mm_code));
 
+
+// If we're currently presenting a queued digit nibble via IRQ0, the ROM IM1 handler
+// will read port $03 to sample it. Model this as a handshake: the read acknowledges
+// the current nibble, so we deassert IRQ0 and (if more digits are queued) arm the next.
+if (m_mm_irq0_asserted)
+{
+	m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_mm_irq0_asserted = false;
+	if (m_mm_nibble_timer && !m_mm_nibble_q.empty())
+		m_mm_nibble_timer->adjust(attotime::zero);
+}
 	return v;
 }
 
@@ -453,6 +470,7 @@ void psicomp80_state::mm57109_reset()
 	m_mm_latch = 0x00;
 	m_mm_expect_latch = true;
 	m_mm_inv_pending = false;
+	m_mm_irq0_asserted = false;
 	m_mm_stream.clear();
 	m_mm_tx_seq = 0;
 
@@ -523,9 +541,95 @@ void psicomp80_state::mm57109_queue_nibble(u8 nib)
 {
 	m_mm_nibble_q.push_back(nib & 0x0f);
 
-	// Present the nibble on the low bits of port $03 and raise IRQ0 so BURP IM1 handler
-	// ($0038) captures it into RAM.
-	mm_set_data_ready(nib & 0x0f);
+	// Start (or restart) the paced nibble delivery timer. Delivering multiple IRQ0 pulses
+	// in a single timeslice can collapse into a single interrupt edge; BURP expects a
+	// distinct interrupt per digit.
+	if (m_mm_nibble_timer && !m_mm_nibble_timer->enabled())
+		m_mm_nibble_timer->adjust(attotime::zero);
+}
+
+
+TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick)
+{
+	if (m_mm_nibble_q.empty())
+		return;
+
+	const u8 nib = m_mm_nibble_q.front();
+	m_mm_nibble_q.erase(m_mm_nibble_q.begin());
+
+	// Present nibble on port $03 and pulse IRQ0 so the ROM IM 1 handler at $0038 stores it.
+	m_mm_code = nib & 0x0f;
+	m_mm_ready = true;
+	m_mm_one_shot_clear = false;
+	if (!m_mm_irq0_asserted)
+	{
+		m_cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_mm_irq0_asserted = true;
+	}
+
+}
+
+void psicomp80_state::mm57109_emit_out_scientific_stream_from_x()
+{
+	double x = m_mm_x;
+
+	// MDC=8 is the default on COMP80 (SMDC*). BURP/ROM assumes 8-digit mantissa formatting.
+	const int mdc = int(m_mm_mant_digits ? m_mm_mant_digits : 8);
+
+	// Scientific OUT format digit order (DA0..DA(MDC+3)):
+	//  DA0 exponent MSD, DA1 exponent LSD, DA2 signbits (Sm bit3, Se bit0),
+	//  DA3 decimal-point position indicator, DA4..DA(MDC+3) mantissa digits.
+	//
+	// First attempt at DA3: choose 0x0B so ROM routine at $0460 computes n=1 (decimal after 1 digit):
+	//   n = ((~DA3)&0x0F) - 3  => n=1 when (~DA3)&0x0F == 4  => DA3 == 0x0B.
+	const u8 dp_pos = 0x0B;
+
+	if (x == 0.0)
+	{
+		mm57109_queue_nibble(0);     // exp MSD
+		mm57109_queue_nibble(0);     // exp LSD
+		mm57109_queue_nibble(0);     // signbits
+		mm57109_queue_nibble(dp_pos);// dp position
+		for (int i = 0; i < mdc; i++)
+			mm57109_queue_nibble(0);
+		return;
+	}
+
+	const bool mant_neg = (x < 0.0);
+	double ax = std::fabs(x);
+
+	int exp10 = int(std::floor(std::log10(ax)));
+	double norm = ax / std::pow(10.0, exp10); // 1..10
+
+	// Clamp against rounding drift
+	if (norm >= 10.0) { norm /= 10.0; exp10++; }
+	if (norm < 1.0)   { norm *= 10.0; exp10--; }
+
+	const bool exp_neg = (exp10 < 0);
+	int aexp = std::abs(exp10);
+	if (aexp > 99) aexp = 99;
+
+	const int exp_msd = (aexp / 10) % 10;
+	const int exp_lsd = (aexp / 1) % 10;
+
+	u8 signbits = 0;
+	if (mant_neg) signbits |= 0x08; // Sm
+	if (exp_neg)  signbits |= 0x01; // Se
+
+	mm57109_queue_nibble(u8(exp_msd));
+	mm57109_queue_nibble(u8(exp_lsd));
+	mm57109_queue_nibble(signbits);
+	mm57109_queue_nibble(dp_pos);
+
+	double t = norm;
+	for (int i = 0; i < mdc; i++)
+	{
+		int d = int(std::floor(t));
+		if (d < 0) d = 0;
+		if (d > 9) d = 9;
+		mm57109_queue_nibble(u8(d));
+		t = (t - double(d)) * 10.0;
+	}
 }
 
 void psicomp80_state::mm57109_log_state(const char *reason)
@@ -657,12 +761,25 @@ void psicomp80_state::mm57109_commit(u8 op)
 	// Handle pending 2nd word for prior 2-word op
 	if (m_mm_two_word_pending)
 	{
-		LOGMASKED(LOG_MM57109, "MM57109: 2ndword for %02X(%03o) %-10s = %02X(%03o) @PC=%04X (NOT IMPLEMENTED)\n",
-			m_mm_two_word_op, unsigned(m_mm_two_word_op), mm57109_opcode_mn(m_mm_two_word_op),
+		const u8 twoop = m_mm_two_word_op;
+		LOGMASKED(LOG_MM57109, "MM57109: 2ndword for %02X(%03o) %-10s = %02X(%03o) @PC=%04X\n",
+			twoop, unsigned(twoop), mm57109_opcode_mn(twoop),
 			opcode, unsigned(opcode), (u16)m_cpu->pc());
+
 		m_mm_two_word_pending = false;
 		m_mm_two_word_op = 0x00;
-		// status: treat as complete
+
+		// OUT* (0x16) is used by BURP to read X in scientific notation. Treat the param word
+		// as the completion trigger and emit the digit stream via paced IM 1 interrupts.
+		if (twoop == 0x16)
+		{
+			mm57109_emit_out_scientific_stream_from_x();
+			m_mm_status_b6 = false;
+			m_mm_status_rdy = true;
+			return;
+		}
+
+		// Default: treat as complete but no further behaviour yet.
 		m_mm_status_b6 = false;
 		m_mm_status_rdy = true;
 		return;
@@ -682,6 +799,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 	{
 		// INV consumed by this opcode
 		m_mm_inv_pending = false;
+	m_mm_irq0_asserted = false;
 	}
 
 	if (mm57109_is_two_word(opcode))
@@ -766,6 +884,7 @@ const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed) : mm57109
 		m_mm_inv_pending = true;
 	else if (m_mm_inv_pending)
 		m_mm_inv_pending = false;
+	m_mm_irq0_asserted = false;
 m_mm_stream.push_back(committed);
 	mm57109_commit(committed);
 
@@ -804,11 +923,12 @@ u8 psicomp80_state::ascii_to_mm_code(u8 data)
 
 void psicomp80_state::mm_set_data_ready(u8 code)
 {
-	m_mm_code = code & 0x1f;
+	m_mm_code = code & 0x0f;
 	m_mm_ready = true;
 	m_mm_one_shot_clear = false;
 
-	m_cpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	// Pulse IRQ0 so each delivered nibble becomes a distinct IM 1 interrupt.
+	m_cpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(1));
 }
 
 void psicomp80_state::kbd_put(u8 data)

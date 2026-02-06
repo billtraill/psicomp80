@@ -260,7 +260,7 @@ private:
 	void mm57109_queue_nibble(u8 nib);
 	void mm57109_emit_out_scientific_stream_from_x();
 	TIMER_CALLBACK_MEMBER(mm57109_nibble_tick);
-	void mm57109_log_state(const char *reason);
+	void mm57109_log_regs(const char *phase, u8 op);
 
 	static u8 glyph_row(u8 vram_byte, int row); // returns 5-bit pattern
 
@@ -632,13 +632,18 @@ void psicomp80_state::mm57109_emit_out_scientific_stream_from_x()
 	}
 }
 
-void psicomp80_state::mm57109_log_state(const char *reason)
+void psicomp80_state::mm57109_log_regs(const char *phase, u8 op)
 {
-	LOGMASKED(LOG_MM57109, "MM57109: state(%s) X=%g Y=%g Z=%g T=%g M=%g deg=%d mant=%u err=%d digit='%s' inv=%d\n",
-		reason, m_mm_x, m_mm_y, m_mm_z, m_mm_t, m_mm_m,
-		m_mm_deg_mode ? 1 : 0, unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0,
-		m_mm_digit_buf.c_str(), m_mm_inv_pending ? 1 : 0);
+	const u8 opcode = op & 0x3f;
+	LOGMASKED(LOG_MM57109,
+		"MM57109: regs(%s) op=%02X(%03o) %-10s X=%g Y=%g Z=%g T=%g M=%g deg=%d mant=%u err=%d\n",
+		phase,
+		opcode, unsigned(opcode), mm57109_opcode_mn(opcode),
+		m_mm_x, m_mm_y, m_mm_z, m_mm_t, m_mm_m,
+		m_mm_deg_mode ? 1 : 0, unsigned(m_mm_mant_digits),
+		m_mm_error ? 1 : 0);
 }
+
 
 void psicomp80_state::mm57109_execute_single(u8 op)
 {
@@ -774,6 +779,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 		if (twoop == 0x16)
 		{
 			mm57109_emit_out_scientific_stream_from_x();
+			mm57109_log_regs("after OUT*", twoop);
 			m_mm_status_b6 = false;
 			m_mm_status_rdy = true;
 			return;
@@ -814,6 +820,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 	}
 
 	mm57109_execute_single(opcode);
+	mm57109_log_regs("after", opcode);
 
 	// For now, assert "RDY wins" status after each committed opcode so ROM wait loops
 	// can proceed. We will refine this once instruction behaviour is implemented.

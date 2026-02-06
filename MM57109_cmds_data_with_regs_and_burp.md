@@ -133,18 +133,17 @@ position indicator, and mantissa and exponent sign bits.
 Instructions operate on these registers. The instructions
 IN and OUT input and 'output numbers to and from the
 X register. There are two possible modes of operation for
-I N and OUT instructions. Floati ng point mode transfers
+IN and OUT instructions. Floating point mode transfers
 mantissa digits, a mantissa sign digit, and a decimal point
-position digit. Scientific notation mode transfers man·
-tissa digits, 2 exponent digits, a digit containing mantissa
+position digit. Scientific notation mode transfers mantissa digits, 2 exponent digits, a digit containing mantissa
 and exponent sign bits, and a decimal point position
-indicator. Initially the MM571'09 is in the floating point
+indicator. Initially the MM57109 is in the floating point
 mode. The TOGM instruction toggles to the opposite
 mode. The number of mantissa digits input or output
 by an IN or OUT instruction is'equal to the mantissa
 digit count (MDC). The MDC is initially 8 and can be set
 to any value from 1 to 8 using the SMDC instruction.
-When an I N or OUT instruction is executed, the four
+When an IN or OUT instruction is executed, the four
 DA outputs will sequence through values indicating
 which digit is to be input or output. The section of this
 manual entitled DATA FORMATS gives the values of the
@@ -184,7 +183,7 @@ vide a digit address from 0 to 7 for multiple AIN instruc·
 tions. The ADR input (shared with 16) is a data hold
 signal for AIN.lf ADR is high during an AIN instruction,
 the processor will wait till it goes low, and then read the
-digit on D4-Dl. Finally, the F2 output of the MM571 09
+digit on D4-Dl. Finally, the F2 output of the MM57109
 will be pulsed active low as a read acknowledge signal.
 Note that only mantissa digits, not exponents or signs,
 can be entered with AIN.

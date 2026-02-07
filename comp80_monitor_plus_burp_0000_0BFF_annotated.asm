@@ -1446,7 +1446,7 @@ PRINT_HEX_WORD_HL:
 
 ; -----------------------------------------------------------------------------
 ; MM57109_SEND_AND_WAIT_RDDY_BR ($058A)
-;  Send a byte to the MM57109, then wait for a status condition on port $03.
+;  Send a byte in A reg to the MM57109, then wait for a status condition on port $03.
 ;
 ;  Sequence (inferred from hardware description + code):
 ;    1) Calls MM57109_SEND_BYTE_HANDSHAKE(A=byte) to output the command/data.
@@ -1464,34 +1464,21 @@ PRINT_HEX_WORD_HL:
 ;    Preserves: BC (push/pop), restores DE/HL unchanged
 ; -----------------------------------------------------------------------------
 058A: C5          PUSH BC  ; PUSH BC (preserve)
-
 058B: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte) ; send command/data
-
-
 058E: DB 03       IN A,($03)  ; poll port $03 (status + DO bits)
-
 0590: 47          LD B,A  ; B := raw port sample (latched for return)
-
 0591: E6 60       AND $60  ; mask status bits RDY($20) and BR($40)
-
 0593: EA 8E 05    JP PE,$058E  ; loop while parity-even => 0 or 2 bits set ($00 or $60); exit when $20 or $40
-
 0596: FE 30       CP $30  ; if masked value >= $30, it's $40 (BR) (since $60 would not exit)
-
 0598: 30 04       JR NC,$059E
 059A: 3E 3F       LD A,$3F  ; else it is $20 (RDY): send $3F strobe/ack to port $60
-
 059C: D3 60       OUT ($60),A
 059E: DB 03       IN A,($03)  ; wait for RDY to deassert (bit5==0)
-
 05A0: E6 20       AND $20
 05A2: 20 FA       JR NZ,$059E
 05A4: 78          LD A,B  ; A := latched raw port value
-
 05A5: E6 40       AND $40  ; keep only bit6 (BR/test/status)
-
 05A7: C1          POP BC  ; POP BC
-
 05A8: C9          RET  ; RET with A=$00 or $40 (Z/NZ)
 
 ; -----------------------------------------------------------------------------
@@ -2358,7 +2345,7 @@ PRINT_HEX_WORD_HL:
 09E4: E1          POP HL
 09E5: 18 9A       JR $0981
 ;
-; Parse token 2C 
+; Parse token 2C - LET statement.
 ;
 09E7: FE 2C       CP $2C
 09E9: 20 15       JR NZ,$0A00
@@ -2445,7 +2432,7 @@ PRINT_HEX_WORD_HL:
 0A28: 3E 11       LD A,$11  ; if B == $3D use $11 else use $12
 
 0A2A: 18 02       JR $0A2E
-0A2C: 3E 12       LD A,$12
+0A2C: 3E 12       LD A,$12    ; Send MM57109 TXLTO* 
 0A2E: CD 8A 05    CALL $058A  ; send $11/$12 and wait for RDY/BR status; returns A&$40 (Z/NZ)
 
 
@@ -2594,7 +2581,7 @@ PRINT_HEX_WORD_HL:
 
 ; Inline data for CALL $0446: bytes 0AE5-0AE6 terminated by $FF
 0AE5:              DB  $1D,$FF  ; "<1D>"
-0AE7: 3E 13       LD A,$13
+0AE7: 3E 13       LD A,$13    ; Load the TXF* instruction into A, Branch if X < 0 MM57109 instruction
 0AE9: CD 8A 05    CALL $058A  ; MM57109_SEND_AND_WAIT_RDDY_BR(A=byte) -> A&$40, Z/NZ indicates bit6
 
 0AEC: 28 EE       JR Z,$0ADC

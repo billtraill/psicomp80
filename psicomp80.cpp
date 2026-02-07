@@ -881,6 +881,62 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 		return;
 	}
 
+// If INV prefix was seen, interpret the next opcode as an inverse/memory variant.
+// This is required for BURP/monitor math functions.
+if (m_mm_inv_pending)
+{
+	m_mm_inv_pending = false;
+	switch (opcode)
+	{
+	case 0x24: // INV SIN  -> ASIN
+	{
+		double v = m_mm_x;
+		if (v < -1.0 || v > 1.0)
+		{ m_mm_error = true; mm57109_set_x(0.0); }
+		else
+		{
+			double r = std::asin(v);
+			if (m_mm_deg_mode) r = r * 180.0 / 3.14159265358979323846;
+			mm57109_set_x(r);
+		}
+		return;
+	}
+	case 0x25: // INV COS  -> ACOS
+	{
+		double v = m_mm_x;
+		if (v < -1.0 || v > 1.0)
+		{ m_mm_error = true; mm57109_set_x(0.0); }
+		else
+		{
+			double r = std::acos(v);
+			if (m_mm_deg_mode) r = r * 180.0 / 3.14159265358979323846;
+			mm57109_set_x(r);
+		}
+		return;
+	}
+	case 0x26: // INV TAN  -> ATAN
+	{
+		double r = std::atan(m_mm_x);
+		if (m_mm_deg_mode) r = r * 180.0 / 3.14159265358979323846;
+		mm57109_set_x(r);
+		return;
+	}
+	case 0x39: // INV + -> M+
+		m_mm_m += m_mm_x; return;
+	case 0x3a: // INV - -> M-
+		m_mm_m -= m_mm_x; return;
+	case 0x3b: // INV * -> MX
+		m_mm_m *= m_mm_x; return;
+	case 0x3c: // INV / -> M/
+		if (m_mm_x == 0.0) { m_mm_error = true; }
+		else m_mm_m /= m_mm_x;
+		return;
+	default:
+		break;
+	}
+	// If we get here, the INV variant isn't implemented yet; fall through to normal decode.
+}
+
 	// Non-entry operations
 	switch (opcode)
 	{
@@ -928,6 +984,98 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 		}
 		return;
 	}
+
+
+case 0x2b: // ECLR
+	m_mm_error = false;
+	m_mm_status_b6 = false;
+	return;
+
+case 0x2f: // MCLR
+	m_mm_m = 0.0;
+	return;
+
+case 0x2c: // RTD (radians to degrees)
+	mm57109_set_x(m_mm_x * 180.0 / 3.14159265358979323846);
+	return;
+
+case 0x2d: // DTR (degrees to radians)
+	mm57109_set_x(m_mm_x * 3.14159265358979323846 / 180.0);
+	return;
+
+case 0x2e: // POP (drop X)
+	mm57109_pop();
+	return;
+
+case 0x30: // XEY (swap X and Y)
+{
+	double t = m_mm_x;
+	m_mm_x = m_mm_y;
+	m_mm_y = t;
+	return;
+}
+
+case 0x31: // EX (e^x)
+	mm57109_set_x(std::exp(m_mm_x));
+	return;
+
+case 0x32: // 10X
+	mm57109_set_x(std::pow(10.0, m_mm_x));
+	return;
+
+case 0x33: // SQ
+	mm57109_set_x(m_mm_x * m_mm_x);
+	return;
+
+case 0x34: // SQRT
+	if (m_mm_x < 0.0) { m_mm_error = true; mm57109_set_x(0.0); }
+	else mm57109_set_x(std::sqrt(m_mm_x));
+	return;
+
+case 0x35: // LN (natural log)
+	if (m_mm_x <= 0.0) { m_mm_error = true; mm57109_set_x(0.0); }
+	else mm57109_set_x(std::log(m_mm_x));
+	return;
+
+case 0x36: // LOG (common log, base 10)
+	if (m_mm_x <= 0.0) { m_mm_error = true; mm57109_set_x(0.0); }
+	else mm57109_set_x(std::log10(m_mm_x));
+	return;
+
+case 0x37: // 1/X
+	if (m_mm_x == 0.0) { m_mm_error = true; mm57109_set_x(0.0); }
+	else mm57109_set_x(1.0 / m_mm_x);
+	return;
+
+case 0x38: // YX (Y^X)
+{
+	double x = mm57109_pop();
+	double y = mm57109_pop();
+	mm57109_push(std::pow(y, x));
+	return;
+}
+
+case 0x24: // SIN
+{
+	double a = m_mm_x;
+	if (m_mm_deg_mode) a = a * 3.14159265358979323846 / 180.0;
+	mm57109_set_x(std::sin(a));
+	return;
+}
+case 0x25: // COS
+{
+	double a = m_mm_x;
+	if (m_mm_deg_mode) a = a * 3.14159265358979323846 / 180.0;
+	mm57109_set_x(std::cos(a));
+	return;
+}
+case 0x26: // TAN
+{
+	double a = m_mm_x;
+	if (m_mm_deg_mode) a = a * 3.14159265358979323846 / 180.0;
+	mm57109_set_x(std::tan(a));
+	return;
+}
 
 	case 0x22: // TOGM
 		m_mm_deg_mode = !m_mm_deg_mode;
@@ -1028,21 +1176,13 @@ void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd)
 
 void psicomp80_state::port60_w(u8 data)
 {
-	const u8 op = data & 0x7f;
-	const char *opname = mm57109_opcode_name(op);
-	LOGMASKED(LOG_MM57109, "MM57109 W: OUT ($60),%02X(%03o) %-10s @PC=%04X (bit7=%d)\n",
-		data, unsigned(data), opname, (u16)m_cpu->pc(), (data >> 7) & 1);
+	// const u8 op = data & 0x7f;
 
-	// // Special-case: $058A uses OUT ($60),$3F as an ACK/continue strobe when RDY($20) wins.
-	// // Treat this as "clear status-ready" and do not fold it into the normal two-phase send.
-	// if (((data & 0x80) == 0) && data == 0x3f && m_mm_status_rdy)
-	// {
-	// 	LOGMASKED(LOG_MM_ACK, "MM57109 W: OUT ($60),3F @PC=%04X ACK received (status_rdy=1) -> clear status_rdy\n", (u16)m_cpu->pc());
-	// 	m_mm_status_rdy = false;
-	// 	m_mm_hs_rdy = false;
-		
-	// 	return;
-	// }
+	// const char *opname = mm57109_opcode_name(op);
+	// LOGMASKED(LOG_MM57109, "MM57109 W: OUT ($60),%02X(%03o) %-10s @PC=%04X (bit7=%d)\n",
+	// 	data, unsigned(data), opname, (u16)m_cpu->pc(), (data >> 7) & 1);
+
+
 
 
 // Two-phase HOLD/RDY handshake as used by BURP routine $042E.
@@ -1058,8 +1198,8 @@ void psicomp80_state::port60_w(u8 data)
 if (m_mm_expect_latch)
 {
 	m_mm_latch = data & 0x7f;
-	LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s (raw=%02X(%03o))\n",
-		m_mm_latch, unsigned(m_mm_latch), mm57109_opcode_name(m_mm_latch), data, unsigned(data));
+	// LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s (raw=%02X(%03o))\n",
+	// 	m_mm_latch, unsigned(m_mm_latch), mm57109_opcode_name(m_mm_latch), data, unsigned(data));
 
 	m_mm_hs_rdy = true;
 	m_mm_expect_latch = false;
@@ -1261,3 +1401,4 @@ ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
      "PSI/Powertran", "COMP80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+

@@ -213,6 +213,16 @@ private:
 	u8     m_mm_mant_digits = 8;  // mantissa digit count (SMDC*)
 	bool   m_mm_digit_entry = false; // currently collecting digits into X
 	std::string m_mm_digit_buf;      // digit-entry buffer (ASCII, e.g. "-12.34E+5")
+	// MM57109 number-entry state (digits/DP/EE/CS)
+	bool   m_mm_entry_exp_mode = false;
+	bool   m_mm_entry_dp_set = false;
+	int    m_mm_entry_dp_index = 0;      // number of mantissa digits before decimal point
+	int    m_mm_entry_mant_count = 0;    // digits entered into mantissa (0..8)
+	int    m_mm_entry_exp_count = 0;     // digits entered into exponent (0..2)
+	int    m_mm_entry_mant_sign = 1;
+	int    m_mm_entry_exp_sign = 1;
+	std::array<u8, 8> m_mm_entry_mant{};
+	std::array<u8, 2> m_mm_entry_exp{};
 	bool   m_mm_two_word_pending = false;
 	bool   m_mm_irq0_asserted = false;
 	u8     m_mm_two_word_op = 0x00;
@@ -649,56 +659,231 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 {
 	const u8 opcode = op & 0x3f;
 
-	// Digit-entry class (0..9, DP, EE, CS, PI, EN)
-	if (opcode <= 0x09)
+	// Digit-entry class per MM57109 docs: 0-9, DP, EE, CS, PI, AIN, HALT
+	const bool is_digit = (opcode <= 0x09);
+	const bool is_dp    = (opcode == 0x0a);
+	const bool is_ee    = (opcode == 0x0b);
+	const bool is_cs    = (opcode == 0x0c);
+	const bool is_pi    = (opcode == 0x0d);
+	const bool is_ain   = (opcode == 0x0e);
+	const bool is_halt  = (opcode == 0x0f);
+	const bool is_en    = (opcode == 0x21);
+
+	const bool is_entry_class = is_digit || is_dp || is_ee || is_cs || is_pi || is_ain || is_halt;
+
+	// If we're in number-entry and a non-entry instruction arrives, terminate number-entry now.
+	// (HALT is explicitly "does not terminate number entry".)
+	if (m_mm_digit_entry && !is_entry_class && !is_en)
 	{
-		m_mm_digit_entry = true;
-		m_mm_digit_buf.push_back(char('0' + opcode));
+		// Build X from entered digits.
+		// Mantissa integer from entered digits
+		long long mant_int = 0;
+		for (int i = 0; i < m_mm_entry_mant_count; i++)
+			mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
+
+		const int dp_index = m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
+		const int frac_pow = dp_index - m_mm_entry_mant_count; // negative if there are fraction digits
+
+		double v = double(mant_int);
+		if (frac_pow != 0)
+			v *= std::pow(10.0, double(frac_pow));
+		v *= double(m_mm_entry_mant_sign);
+
+		// Apply exponent if any digits were entered after EE
+		if (m_mm_entry_exp_count > 0)
+		{
+			int expv = 0;
+			if (m_mm_entry_exp_count == 1)
+				expv = (m_mm_entry_exp[0] % 10);
+			else
+				expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
+
+			expv *= m_mm_entry_exp_sign;
+			v *= std::pow(10.0, double(expv));
+		}
+
+		mm57109_set_x(v);
+
+		// Reset entry state
+		m_mm_digit_entry = false;
+		m_mm_digit_buf.clear();
+		m_mm_entry_exp_mode = false;
+		m_mm_entry_dp_set = false;
+		m_mm_entry_dp_index = 0;
+		m_mm_entry_mant_count = 0;
+		m_mm_entry_exp_count = 0;
+		m_mm_entry_mant_sign = 1;
+		m_mm_entry_exp_sign = 1;
+		m_mm_entry_mant.fill(0);
+		m_mm_entry_exp.fill(0);
+	}
+
+	// Handle EN (ENTER). If number-entry active, finalize as above (by falling through the termination path).
+	// EN itself typically ends number entry; treat it as "finalize if needed" without extra stack motion here.
+	if (is_en)
+	{
+		if (m_mm_digit_entry)
+		{
+			// Force termination by re-invoking this function's termination logic using a fake non-entry op:
+			// easiest is to reuse the code above by temporarily clearing the entry-class condition.
+			// We'll just finalize inline (duplicate small block).
+			long long mant_int = 0;
+			for (int i = 0; i < m_mm_entry_mant_count; i++)
+				mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
+
+			const int dp_index = m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
+			const int frac_pow = dp_index - m_mm_entry_mant_count;
+
+			double v = double(mant_int);
+			if (frac_pow != 0)
+				v *= std::pow(10.0, double(frac_pow));
+			v *= double(m_mm_entry_mant_sign);
+
+			if (m_mm_entry_exp_count > 0)
+			{
+				int expv = 0;
+				if (m_mm_entry_exp_count == 1)
+					expv = (m_mm_entry_exp[0] % 10);
+				else
+					expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
+
+				expv *= m_mm_entry_exp_sign;
+				v *= std::pow(10.0, double(expv));
+			}
+
+			mm57109_set_x(v);
+
+			m_mm_digit_entry = false;
+			m_mm_digit_buf.clear();
+			m_mm_entry_exp_mode = false;
+			m_mm_entry_dp_set = false;
+			m_mm_entry_dp_index = 0;
+			m_mm_entry_mant_count = 0;
+			m_mm_entry_exp_count = 0;
+			m_mm_entry_mant_sign = 1;
+			m_mm_entry_exp_sign = 1;
+			m_mm_entry_mant.fill(0);
+			m_mm_entry_exp.fill(0);
+		}
 		return;
 	}
-	switch (opcode)
-	{
-	case 0x0a: // DP
-		m_mm_digit_entry = true;
-		if (m_mm_digit_buf.find('.') == std::string::npos)
-			m_mm_digit_buf.push_back('.');
-		return;
 
-	case 0x0b: // EE
-		m_mm_digit_entry = true;
+	// Helper: start number-entry if needed (push stack, clear X, reset state)
+	auto start_entry_if_needed = [&]()
+	{
+		if (!m_mm_digit_entry)
+		{
+			// Initiate number entry: Z->T, Y->Z, X->Y, 0->X
+			m_mm_t = m_mm_z;
+			m_mm_z = m_mm_y;
+			m_mm_y = m_mm_x;
+			mm57109_set_x(0.0);
+
+			m_mm_digit_entry = true;
+			m_mm_digit_buf.clear();
+
+			m_mm_entry_exp_mode = false;
+			m_mm_entry_dp_set = false;
+			m_mm_entry_dp_index = 0;
+			m_mm_entry_mant_count = 0;
+			m_mm_entry_exp_count = 0;
+			m_mm_entry_mant_sign = 1;
+			m_mm_entry_exp_sign = 1;
+			m_mm_entry_mant.fill(0);
+			m_mm_entry_exp.fill(0);
+		}
+	};
+
+	// Number-entry opcodes
+	if (is_digit)
+	{
+		start_entry_if_needed();
+
+		const int d = int(opcode);
+		if (!m_mm_entry_exp_mode)
+		{
+			// Mantissa digit
+			if (m_mm_entry_mant_count < int(m_mm_entry_mant.size()))
+			{
+				m_mm_entry_mant[m_mm_entry_mant_count++] = u8(d);
+				m_mm_digit_buf.push_back(char('0' + d));
+			}
+		}
+		else
+		{
+			// Exponent digit (2 digits max)
+			if (m_mm_entry_exp_count < int(m_mm_entry_exp.size()))
+			{
+				m_mm_entry_exp[m_mm_entry_exp_count++] = u8(d);
+				m_mm_digit_buf.push_back(char('0' + d));
+			}
+		}
+		return;
+	}
+
+	if (is_dp)
+	{
+		start_entry_if_needed();
+		if (!m_mm_entry_dp_set)
+		{
+			m_mm_entry_dp_set = true;
+			m_mm_entry_dp_index = m_mm_entry_mant_count;
+			if (m_mm_digit_buf.find('.') == std::string::npos)
+				m_mm_digit_buf.push_back('.');
+		}
+		return;
+	}
+
+	if (is_ee)
+	{
+		start_entry_if_needed();
+		m_mm_entry_exp_mode = true;
 		if (m_mm_digit_buf.find('E') == std::string::npos)
 			m_mm_digit_buf.push_back('E');
 		return;
+	}
 
-	case 0x0c: // CS (change sign)
-		m_mm_digit_entry = true;
+	if (is_cs)
+	{
+		start_entry_if_needed();
+		if (m_mm_entry_exp_mode)
+			m_mm_entry_exp_sign = -m_mm_entry_exp_sign;
+		else
+			m_mm_entry_mant_sign = -m_mm_entry_mant_sign;
+
+		// Keep digit_buf vaguely readable for debugging
 		if (!m_mm_digit_buf.empty() && m_mm_digit_buf[0] == '-')
 			m_mm_digit_buf.erase(0, 1);
 		else
 			m_mm_digit_buf.insert(0, 1, '-');
 		return;
+	}
 
-	case 0x0d: // PI
-		m_mm_digit_entry = false;
-		m_mm_digit_buf.clear();
+	if (is_pi)
+	{
+		// PI is in the entry-class set, but behaves like "push stack then load pi"
+		start_entry_if_needed();
 		mm57109_set_x(3.14159265358979323846);
 		return;
+	}
 
-	case 0x21: // EN (end digit entry / push)
-		if (m_mm_digit_entry)
-		{
-			// Very rough parse; this is just to have a meaningful register model.
-			char *endp = nullptr;
-			double v = std::strtod(m_mm_digit_buf.c_str(), &endp);
-			if (endp && endp != m_mm_digit_buf.c_str())
-				mm57109_set_x(v);
-			m_mm_digit_entry = false;
-			m_mm_digit_buf.clear();
-		}
-		// EN pushes stack (X becomes new entry)
-		mm57109_push(m_mm_x);
+	if (is_ain)
+	{
+		// Not used for COMP-80 monitor yet; treat as no-op placeholder.
+		start_entry_if_needed();
 		return;
+	}
 
+	if (is_halt)
+	{
+		// HALT behaves like NOP and does not terminate number entry.
+		// Leave entry_active unchanged.
+		return;
+	}
+
+	// Non-entry operations
+	switch (opcode)
+	{
 	case 0x1c: // MS
 		m_mm_m = m_mm_x;
 		return;
@@ -747,16 +932,16 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 	case 0x22: // TOGM
 		m_mm_deg_mode = !m_mm_deg_mode;
 		return;
-	case 0x3F: // NOP 
-	    // No operation, do nothing
-	    return;
+
+	case 0x3f: // NOP
+		return;
 
 	default:
 		break;
 	}
 
 	LOGMASKED(LOG_MM57109, "MM57109: UNIMPLEMENTED op=%02X(%03o) %-10s @PC=%04X (inv_pending=%d)\n",
-		opcode, unsigned(opcode), mm57109_opcode_mn(opcode), (u16)m_cpu->pc(), m_mm_inv_pending ? 1 : 0);
+	opcode, unsigned(opcode), mm57109_opcode_mn(opcode), (u16)m_cpu->pc(), m_mm_inv_pending ? 1 : 0);
 }
 
 void psicomp80_state::mm57109_commit(u8 op)

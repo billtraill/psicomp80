@@ -671,7 +671,35 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 
 	const bool is_entry_class = is_digit || is_dp || is_ee || is_cs || is_pi || is_ain || is_halt;
 
-	// If we're in number-entry and a non-entry instruction arrives, terminate number-entry now.
+	auto update_x_from_entry = [&]()
+	{
+	   long long mant_int = 0;
+	   for (int i = 0; i < m_mm_entry_mant_count; i++)
+	       mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
+
+	   const int dp_index = m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
+	   const int frac_pow = dp_index - m_mm_entry_mant_count;
+
+	   double v = double(mant_int);
+	   if (frac_pow != 0)
+	       v *= std::pow(10.0, double(frac_pow));
+	   v *= double(m_mm_entry_mant_sign);
+
+	   if (m_mm_entry_exp_count > 0)
+	   {
+	       int expv = 0;
+	       if (m_mm_entry_exp_count == 1)
+	           expv = (m_mm_entry_exp[0] % 10);
+	       else
+	           expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
+
+	       expv *= m_mm_entry_exp_sign;
+	       v *= std::pow(10.0, double(expv));
+	   }
+
+	   mm57109_set_x(v);
+	};
+		// If we're in number-entry and a non-entry instruction arrives, terminate number-entry now.
 	// (HALT is explicitly "does not terminate number entry".)
 	if (m_mm_digit_entry && !is_entry_class && !is_en)
 	{
@@ -818,6 +846,7 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 				m_mm_digit_buf.push_back(char('0' + d));
 			}
 		}
+		update_x_from_entry();
 		return;
 	}
 
@@ -885,6 +914,8 @@ void psicomp80_state::mm57109_execute_single(u8 op)
 // This is required for BURP/monitor math functions.
 if (m_mm_inv_pending)
 {
+
+	LOGMASKED(LOG_MM57109, "MM57109: m_mm_inv_pending is true, opcode is %02X(%03o)\n", opcode, unsigned(opcode));
 	m_mm_inv_pending = false;
 	switch (opcode)
 	{
@@ -924,6 +955,7 @@ if (m_mm_inv_pending)
 	case 0x39: // INV + -> M+
 		m_mm_m += m_mm_x; return;
 	case 0x3a: // INV - -> M-
+	    LOGMASKED(LOG_MM57109, "MM57109: INV - -> M- (m_mm_x=%f)\n", m_mm_x);
 		m_mm_m -= m_mm_x; return;
 	case 0x3b: // INV * -> MX
 		m_mm_m *= m_mm_x; return;
@@ -1145,13 +1177,6 @@ void psicomp80_state::mm57109_commit(u8 op)
 		return;
 	}
 
-	if (m_mm_inv_pending)
-	{
-		// INV consumed by this opcode
-		m_mm_inv_pending = false;
-	m_mm_irq0_asserted = false;
-	}
-
 	if (mm57109_is_two_word(opcode))
 	{
 		m_mm_two_word_pending = true;
@@ -1219,17 +1244,13 @@ if (m_mm_expect_latch)
 
 // Commit phase
 const u8 committed = m_mm_latch;
-const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed) : mm57109_opcode_name(committed);
-	LOGMASKED(LOG_MM57109, "MM57109: commit byte=%02X(%03o) %-10s (raw=%02X(%03o))\n",
+const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed)
+                                  : mm57109_opcode_name(committed);
+LOGMASKED(LOG_MM57109, "MM57109: commit byte=%02X(%03o) %-10s (raw=%02X(%03o))\n",
 		committed, unsigned(committed), mn, data, unsigned(data));
-	// Track INV prefix (0x20) as a one-instruction mode affecting the following committed opcode.
-	if (!m_mm_inv_pending && committed == 0x20)
-		m_mm_inv_pending = true;
-	else if (m_mm_inv_pending)
-		m_mm_inv_pending = false;
-	m_mm_irq0_asserted = false;
+m_mm_irq0_asserted = false;
 m_mm_stream.push_back(committed);
-	mm57109_commit(committed);
+mm57109_commit(committed);
 
 m_mm_hs_rdy = false;
 m_mm_expect_latch = true;

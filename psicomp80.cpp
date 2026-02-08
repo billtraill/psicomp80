@@ -1077,6 +1077,15 @@ case 0x26: // TAN
 	return;
 }
 
+case 0x13: // TXF*  (test X < 0 -> expose BR/RDY for BURP $058A)
+	{
+const bool xneg = (m_mm_x < 0.0);
+m_mm_hs_rdy = false;          // don't interfere with $042E handshake READY
+m_mm_status_b6 = xneg;        // BR bit for $058A (bit6)
+m_mm_status_rdy = !xneg;      // RDY bit for $058A (bit5)
+return;
+	}
+
 	case 0x22: // TOGM
 		m_mm_deg_mode = !m_mm_deg_mode;
 		return;
@@ -1117,6 +1126,8 @@ void psicomp80_state::mm57109_commit(u8 op)
 			m_mm_status_rdy = true;
 			return;
 		}
+
+		
 
 		// Default: treat as complete but no further behaviour yet.
 		m_mm_status_b6 = false;

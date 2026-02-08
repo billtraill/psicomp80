@@ -1115,6 +1115,7 @@ const bool xneg = (m_mm_x < 0.0);
 m_mm_hs_rdy = false;          // don't interfere with $042E handshake READY
 m_mm_status_b6 = xneg;        // BR bit for $058A (bit6)
 m_mm_status_rdy = !xneg;      // RDY bit for $058A (bit5)
+LOGMASKED(LOG_MM57109, "MM57109: TXF* (xneg=%d) m_mm_x=%f @PC=%04X\n", xneg, m_mm_x, (u16)m_cpu->pc());
 return;
 	}
 

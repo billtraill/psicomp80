@@ -2580,7 +2580,7 @@ PRINT_HEX_WORD_HL:
 0AE2: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 
 ; Inline data for CALL $0446: bytes 0AE5-0AE6 terminated by $FF
-0AE5:              DB  $1D,$FF  ; "<1D>"
+0AE5:              DB  $1D,$FF  ; MR (M <-> X) Loop counter is held in memory register M
 0AE7: 3E 13       LD A,$13    ; Load the TXF* instruction into A, Branch if X < 0 MM57109 instruction
 0AE9: CD 8A 05    CALL $058A  ; MM57109_SEND_AND_WAIT_RDDY_BR(A=byte) -> A&$40, Z/NZ indicates bit6
 

@@ -193,8 +193,7 @@ private:
 
 	// --- MM57109 port $60 write / port $03 status modelling (BURP relies on this) ---
 	bool m_mm_hs_rdy = false;      // handshake RDY (bit5) for $042E busy/ack loops
-	bool m_mm_status_rdy = false;  // status RDY (bit5) for $058A wait loop
-	bool m_mm_status_b6 = false;   // status bit6 ($40) returned by $058A
+	bool m_mm_status = false;  // status RDY (bit5) for $058A wait loop - rename this ...
 	u8   m_mm_latch = 0x00;        // phase-1 latched byte (bit7 clear)
 	bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
 	bool m_mm_inv_pending = false; // last committed opcode was INV (0x20); next selects INV function
@@ -371,8 +370,7 @@ void psicomp80_state::machine_start()
 	save_item(NAME(m_mm_one_shot_clear));
 
 	save_item(NAME(m_mm_hs_rdy));
-	save_item(NAME(m_mm_status_rdy));
-	save_item(NAME(m_mm_status_b6));
+	save_item(NAME(m_mm_status));
 	save_item(NAME(m_mm_latch));
 	save_item(NAME(m_mm_expect_latch));
 	save_item(NAME(m_mm_inv_pending));
@@ -437,18 +435,18 @@ u8 psicomp80_state::port03_r()
 	// BURP also uses bit6 ($40) as a secondary "result/status" indicator via $058A (mask $60).
 	// To avoid deadlocking $042E, we model:
 	//   - bit5 as the *handshake* READY only (m_mm_hs_rdy)
-	//   - bit6 as the *status/result* READY (m_mm_status_rdy)
+	//   - bit6 as the *status/result* READY (m_mm_status)
 	//
 	// Low bits contain the current 4-bit (or 5-bit) code sample; only the low nibble is
 	// meaningful for IM1 capture (A & $0F).
 	const bool hs_rdy = m_mm_hs_rdy;
-	const bool st_rdy = m_mm_status_rdy;
+	const bool status = m_mm_status;
 
-	u8 v = (hs_rdy ? 0x20 : 0x00) | (st_rdy ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+	u8 v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
 
 	LOGMASKED(LOG_MM_STATUS,
 		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d code=%02X(%03o))\n",
-		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, st_rdy, m_mm_code, unsigned(m_mm_code));
+		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code, unsigned(m_mm_code));
 
 
 // If we're currently presenting a queued digit nibble via IRQ0, the ROM IM1 handler
@@ -475,8 +473,7 @@ if (m_mm_irq0_asserted)
 void psicomp80_state::mm57109_reset()
 {
 	m_mm_hs_rdy = false;
-	m_mm_status_rdy = false;
-	m_mm_status_b6 = false;
+	m_mm_status = false;
 	m_mm_latch = 0x00;
 	m_mm_expect_latch = true;
 	m_mm_inv_pending = false;
@@ -1020,7 +1017,6 @@ if (m_mm_inv_pending)
 
 case 0x2b: // ECLR
 	m_mm_error = false;
-	m_mm_status_b6 = false;
 	return;
 
 case 0x2f: // MCLR
@@ -1112,9 +1108,8 @@ case 0x26: // TAN
 case 0x13: // TXF*  (test X < 0 -> expose BR/RDY for BURP $058A)
 	{
 const bool xneg = (m_mm_x < 0.0);
-m_mm_hs_rdy = false;          // don't interfere with $042E handshake READY
-m_mm_status_b6 = xneg;        // BR bit for $058A (bit6)
-m_mm_status_rdy = !xneg;      // RDY bit for $058A (bit5)
+m_mm_hs_rdy = !xneg;          // don't interfere with $042E handshake READY
+m_mm_status = xneg;      // RDY bit for $058A (bit5)
 LOGMASKED(LOG_MM57109, "MM57109: TXF* (xneg=%d) m_mm_x=%f @PC=%04X\n", xneg, m_mm_x, (u16)m_cpu->pc());
 return;
 	}
@@ -1155,16 +1150,14 @@ void psicomp80_state::mm57109_commit(u8 op)
 		{
 			mm57109_emit_out_scientific_stream_from_x();
 			mm57109_log_regs("after OUT*", twoop);
-			m_mm_status_b6 = false;
-			m_mm_status_rdy = true;
+			m_mm_status = true;
 			return;
 		}
 
 		
 
 		// Default: treat as complete but no further behaviour yet.
-		m_mm_status_b6 = false;
-		m_mm_status_rdy = true;
+		m_mm_status = true;
 		return;
 	}
 
@@ -1173,8 +1166,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 	{
 		m_mm_inv_pending = true;
 		LOGMASKED(LOG_MM57109, "MM57109: INV prefix armed\n");
-		m_mm_status_b6 = false;
-		m_mm_status_rdy = true;
+		m_mm_status = true;
 		return;
 	}
 
@@ -1184,8 +1176,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 		m_mm_two_word_op = opcode;
 		LOGMASKED(LOG_MM57109, "MM57109: 2-word op %02X(%03o) %-10s awaiting param\n",
 			opcode, unsigned(opcode), mm57109_opcode_mn(opcode));
-		m_mm_status_b6 = false;
-		m_mm_status_rdy = true;
+		m_mm_status = true;
 		return;
 	}
 
@@ -1194,8 +1185,7 @@ void psicomp80_state::mm57109_commit(u8 op)
 
 	// For now, assert "RDY wins" status after each committed opcode so ROM wait loops
 	// can proceed. We will refine this once instruction behaviour is implemented.
-	m_mm_status_b6 = m_mm_error ? true : false;
-	m_mm_status_rdy = true;
+	m_mm_status = true;
 }
 
 

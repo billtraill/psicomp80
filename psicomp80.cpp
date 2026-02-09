@@ -260,6 +260,8 @@ private:
   // --- MM57109 port $60 write / port $03 status modelling (BURP relies on
   // this) ---
   bool m_mm_hs_rdy = false; // handshake RDY (bit5) for $042E busy/ack loops
+  bool m_mm_was_branch_instruction = false; // Used to indicate that the last instruction was a branch instruction
+  bool m_mm_branch_status = false; // Used to store the status of the branch instruction
   bool m_mm_status =
       false; // status RDY (bit5) for $058A wait loop - rename this ...
   u8 m_mm_latch = 0x00; // phase-1 latched byte (bit7 clear)
@@ -445,6 +447,8 @@ void psicomp80_state::machine_start() {
   save_item(NAME(m_mm_hs_rdy));
   save_item(NAME(m_mm_status));
   save_item(NAME(m_mm_latch));
+  save_item(NAME(m_mm_was_branch_instruction));
+  save_item(NAME(m_mm_branch_status));
   save_item(NAME(m_mm_expect_latch));
   save_item(NAME(m_mm_inv_pending));
   save_item(NAME(m_mm_tx_seq));
@@ -466,6 +470,7 @@ void psicomp80_state::machine_start() {
 void psicomp80_state::machine_reset() {
   m_key_latch = 0xff;
   m_mm_ready = false;
+  m_mm_was_branch_instruction = false;
   m_mm_code = 0x1f;
   m_mm_one_shot_clear = false;
   mm57109_reset();
@@ -512,7 +517,13 @@ u8 psicomp80_state::port03_r() {
   const bool hs_rdy = m_mm_hs_rdy;
   const bool status = m_mm_status;
 
-  u8 v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+  u8 v = 0x00;
+  if (m_mm_was_branch_instruction) { // First status read after a branch instuction returns result via bits 5&6
+	v = (m_mm_branch_status ? 0x20 : 0x00) | (!m_mm_branch_status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+	m_mm_was_branch_instruction = false;
+  } else {
+	v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+  }
 
   LOGMASKED(LOG_MM_STATUS,
             "MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
@@ -1172,12 +1183,14 @@ void psicomp80_state::mm57109_execute_single(u8 op) {
     return;
   }
 
-  case 0x13: // TXF*  (test X < 0 -> expose BR/RDY for BURP $058A)
+  case 0x13: // TXF*  (test |X| < 1 -> expose BR/RDY for BURP $058A)
   {
-    const bool xneg = (m_mm_x < 0.0);
-    m_mm_hs_rdy = !xneg; // don't interfere with $042E handshake READY
-    m_mm_status = xneg;  // RDY bit for $058A (bit5)
-    LOGMASKED(LOG_MM57109, "MM57109: TXF* (xneg=%d) m_mm_x=%f @PC=%04X\n", xneg,
+    const bool abs_x_lt_1 = (std::fabs(m_mm_x) < 1.0);
+    // m_mm_hs_rdy = !abs_x_lt_1; // don't interfere with $042E handshake READY
+    // m_mm_status = abs_x_lt_1;  // RDY bit for $058A (bit5)
+	m_mm_was_branch_instruction = true;
+	m_mm_branch_status = abs_x_lt_1;
+    LOGMASKED(LOG_MM57109, "MM57109: TXF* (|X|<1=%d) m_mm_x=%f @PC=%04X\n", abs_x_lt_1,
               m_mm_x, (u16)m_cpu->pc());
     return;
   }

@@ -1033,9 +1033,8 @@ PRINT_HEX_WORD_HL:
 ;
 ;  Purpose:
 ;    Executes the MM57109 instruction in register A. The sequence checks that the MM57109 is ready, outputs 
-;    the instruction with hold off, waits for READY to go off and then puts the hold on again.
-;    Send one command/data byte to the MM57109 math coprocessor interface using
-;    the COMP-80 two-phase HOLD/RDY handshake.
+;    the instruction with hold off, waits for READY to go off (to indicate instruction is being execited) and then puts the hold on again, 
+;    this stops the MM57109 after the current instuction has been completed.
 ;
 ;  Calling convention (inferred from ROM usage):
 ;    IN : A  = byte to send (command/data)
@@ -1058,8 +1057,8 @@ PRINT_HEX_WORD_HL:
 ;    - If port $03 bit5 behaviour is wrong in emulation, BURP can hang in the
 ;      busy/ack loops here or mis-sequence the coprocessor stream.
 ; -----------------------------------------------------------------------------
-; — Z80 polls port 0x03 bit5 (RDY), OUT to 0x60, waits RDY=1 then sets bit7 and OUT again (MM57109 hold/handshake).  ; PUSH BC (preserve caller's BC)
-042E: C5          PUSH BC 
+; — Z80 polls port 0x03 bit5 (RDY), OUT to 0x60, waits RDY=1 then sets bit7 and OUT again (MM57109 hold).
+042E: C5          PUSH BC ; preserve caller's BC
 042F: 47          LD B,A  ; B := A (save byte to send)
 ; Is MM57109 Ready?
 0430: DB 03       IN A,($03)  ; poll status: IN A,($03), is the MM57109 Ready?
@@ -1068,19 +1067,19 @@ PRINT_HEX_WORD_HL:
 ; Send instruction to MM57109
 0436: 78          LD A,B  ; restore byte to send
 0437: D3 60       OUT ($60),A  ; phase 1: OUT ($60),A
-; Wait for MM57109 to become READY again
+; Wait for MM57109 to show it is executing the instruction (RDY=1 when it is busy executing, ie not ready)
 0439: DB 03       IN A,($03)  ; poll for acknowledge: IN A,($03)
 043B: E6 20       AND $20  ; mask RDY bit (bit5)
-043D: 28 FA       JR Z,$0439  ; wait while RDY==0 (until it goes high)
-; Set the hold bit. 
+043D: 28 FA       JR Z,$0439  ; wait for RDY==1 (indication that the instruction is being executed)
+; Set the hold bit. This holds the MM57109 when it has completed the current instruction (ie when RDY=0)
 043F: 78          LD A,B  ; restore byte to send
-0440: F6 80       OR $80  ; set strobe/hold bit7
-0442: D3 60       OUT ($60),A  ; phase 2: OUT ($60),A|$80
-0444: C1          POP BC  ; POP BC (restore)
+0440: F6 80       OR $80  ; set hold bit7
+0442: D3 60       OUT ($60),A  ; Sets HOLD
+0444: C1          POP BC  ; Restore BC
 0445: C9          RET  ; RET
 
 
-; ## INLINE_DATA_DISPATCH ($0446)
+; ## BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF ($0446)
 
 ; -----------------------------------------------------------------------------
 ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF ($0446)
@@ -1139,6 +1138,7 @@ PRINT_HEX_WORD_HL:
 ;      (likely to allow MM57109 to signal completion / data-ready via INT).
 ;    - Calls $0446 to read & send inline bytes until $FF (therefore repeatedly calling
 ;      MM57109_SEND_INSTRUCTION_IN_A(A=byte) at $042E).
+;    - The OUT instruction results in 12 interrupts, which is outputing the value of X reg 
 ;    - Interacts with workspace around $1FF4/$1FF6 and uses small formatting logic.
 ;
 ;  Calling convention (inferred):
@@ -1152,9 +1152,9 @@ PRINT_HEX_WORD_HL:
 0468: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 ; Inline data for CALL $0446: bytes 046B-046D terminated by $FF
 046B:              DB  $16,$2B,$FF  ; MM57109 instructions OUT*($2B)
-046E: F3          DI  ; Disable the interrupts again, the results if should now be at $1FF4
+046E: F3          DI  ; Disable the interrupts again, the results should now be at $1FF4 (all 12 interrupts should have happened)
 046F: F1          POP AF
-0470: CD 14 07    CALL $0714
+0470: CD 14 07    CALL $0714 ; by the time this is called the OUT instuction should have completed and the results will have been put in $1FF4
 0473: 7D          LD A,L
 0474: E6 F0       AND $F0
 0476: 6F          LD L,A
@@ -2853,7 +2853,7 @@ PRINT_HEX_WORD_HL:
 ; Inside this control/helper path we hit:
 
 ; 0x044D: CALL 0x042E
-; 0x042E–0x0445: MM57109_LATCH_HANDSHAKE
+; 0x042E–0x0445: MM57109_SEND_INSTRUCTION_IN_A
 ;   - Wait for RDY bit (port 0x03 bit5) to be low
 ;   - `OUT (0x60),A` (bit7 clear)
 ;   - Wait for RDY bit to go high

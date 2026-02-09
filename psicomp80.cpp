@@ -261,6 +261,7 @@ private:
   // this) ---
   bool m_mm_hs_rdy = false; // handshake RDY (bit5) for $042E busy/ack loops
   bool m_mm_was_branch_instruction = false; // Used to indicate that the last instruction was a branch instruction
+  bool m_mm_instuction_after_branch = false; // Used to indicate that the next instruction is after a branch ... so it should clear ready flag...
   bool m_mm_branch_status = false; // Used to store the status of the branch instruction
   bool m_mm_status =
       false; // status RDY (bit5) for $058A wait loop - rename this ...
@@ -448,6 +449,7 @@ void psicomp80_state::machine_start() {
   save_item(NAME(m_mm_status));
   save_item(NAME(m_mm_latch));
   save_item(NAME(m_mm_was_branch_instruction));
+  save_item(NAME(m_mm_instuction_after_branch));
   save_item(NAME(m_mm_branch_status));
   save_item(NAME(m_mm_expect_latch));
   save_item(NAME(m_mm_inv_pending));
@@ -471,6 +473,7 @@ void psicomp80_state::machine_reset() {
   m_key_latch = 0xff;
   m_mm_ready = false;
   m_mm_was_branch_instruction = false;
+  m_mm_instuction_after_branch = false;
   m_mm_code = 0x1f;
   m_mm_one_shot_clear = false;
   mm57109_reset();
@@ -514,16 +517,35 @@ u8 psicomp80_state::port03_r() {
   //
   // Low bits contain the current 4-bit (or 5-bit) code sample; only the low
   // nibble is meaningful for IM1 capture (A & $0F).
-  const bool hs_rdy = m_mm_hs_rdy;
-  const bool status = m_mm_status;
+  bool hs_rdy = m_mm_hs_rdy;
+  bool status = m_mm_status;
 
   u8 v = 0x00;
   if (m_mm_was_branch_instruction) { // First status read after a branch instuction returns result via bits 5&6
+	LOGMASKED(LOG_MM57109,"Last instruction was a branch instruction %d\n",m_mm_branch_status);
 	v = (m_mm_branch_status ? 0x20 : 0x00) | (!m_mm_branch_status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+	LOGMASKED(LOG_MM57109,
+		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
+		"code=%02X(%03o))\n",
+		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code,
+		unsigned(m_mm_code));
 	m_mm_was_branch_instruction = false;
+	m_mm_instuction_after_branch = true;
+	
+  } else if (m_mm_instuction_after_branch){
+	m_mm_instuction_after_branch = false;
+	hs_rdy = false;
+	LOGMASKED(LOG_MM57109,"Instruction after branch instruction @PC=%04X\n",(u16)m_cpu->pc());
+	v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+	LOGMASKED(LOG_MM57109,
+		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
+		"code=%02X(%03o))\n",
+		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code,
+		unsigned(m_mm_code));
+	m_mm_hs_rdy = false;
   } else {
 	v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-  }
+  } 
 
   LOGMASKED(LOG_MM_STATUS,
             "MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "

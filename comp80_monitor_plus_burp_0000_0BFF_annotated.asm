@@ -1027,12 +1027,13 @@ PRINT_HEX_WORD_HL:
 042C: D9          EXX
 042D: C9          RET
 
-; ## MM57109_HANDSHAKE ($042E)
 
 ; -----------------------------------------------------------------------------
-; MM57109_SEND_BYTE_HANDSHAKE ($042E)
+; MM57109_SEND_INSTRUCTION_IN_A ($042E)
 ;
 ;  Purpose:
+;    Executes the MM57109 instruction in register A. The sequence checks that the MM57109 is ready, outputs 
+;    the instruction with hold off, waits for READY to go off and then puts the hold on again.
 ;    Send one command/data byte to the MM57109 math coprocessor interface using
 ;    the COMP-80 two-phase HOLD/RDY handshake.
 ;
@@ -1057,16 +1058,21 @@ PRINT_HEX_WORD_HL:
 ;    - If port $03 bit5 behaviour is wrong in emulation, BURP can hang in the
 ;      busy/ack loops here or mis-sequence the coprocessor stream.
 ; -----------------------------------------------------------------------------
-042E: C5          PUSH BC — Z80 polls port 0x03 bit5 (RDY), OUT to 0x60, waits RDY=1 then sets bit7 and OUT again (MM57109 hold/handshake).  ; PUSH BC (preserve caller's BC)
+; — Z80 polls port 0x03 bit5 (RDY), OUT to 0x60, waits RDY=1 then sets bit7 and OUT again (MM57109 hold/handshake).  ; PUSH BC (preserve caller's BC)
+042E: C5          PUSH BC 
 042F: 47          LD B,A  ; B := A (save byte to send)
+; Is MM57109 Ready?
 0430: DB 03       IN A,($03)  ; poll status: IN A,($03), is the MM57109 Ready?
 0432: E6 20       AND $20  ; mask RDY bit (bit5)
 0434: 20 FA       JR NZ,$0430  ; wait while RDY==1 (until it goes low)
+; Send instruction to MM57109
 0436: 78          LD A,B  ; restore byte to send
 0437: D3 60       OUT ($60),A  ; phase 1: OUT ($60),A
+; Wait for MM57109 to become READY again
 0439: DB 03       IN A,($03)  ; poll for acknowledge: IN A,($03)
 043B: E6 20       AND $20  ; mask RDY bit (bit5)
 043D: 28 FA       JR Z,$0439  ; wait while RDY==0 (until it goes high)
+; Set the hold bit. 
 043F: 78          LD A,B  ; restore byte to send
 0440: F6 80       OR $80  ; set strobe/hold bit7
 0442: D3 60       OUT ($60),A  ; phase 2: OUT ($60),A|$80
@@ -1078,12 +1084,13 @@ PRINT_HEX_WORD_HL:
 
 ; -----------------------------------------------------------------------------
 ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF ($0446)
+;  Repeats 042E for sequence of MM57109 instructions terminated with an FF.
 ;  Reads a byte stream located immediately after the CALL instruction that invoked
 ;  this routine (i.e., inline data at the return address).
 ;
 ;  For each byte read:
 ;    - If byte == $FF: stop and return to caller with HL advanced past the terminator
-;    - Else: send it to the MM57109 interface via MM57109_SEND_BYTE_HANDSHAKE(A=byte) at $042E
+;    - Else: send it to the MM57109 interface via MM57109_SEND_INSTRUCTION_IN_A(A=byte) at $042E
 ;
 ;  Calling convention:
 ;    IN : return address points to inline byte stream
@@ -1097,9 +1104,12 @@ PRINT_HEX_WORD_HL:
 0449: E3          EX (SP),HL
 044A: FE FF       CP $FF
 044C: C8          RET Z
-044D: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte)
+044D: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=byte)
 
 0450: 18 F4       JR $0446
+;
+; Jumps over next work in the program line. Used in FOR statements to miss STEP and UNTIL
+;
 0452: 23          INC HL
 0453: 23          INC HL
 0454: 7E          LD A,(HL)
@@ -1109,6 +1119,9 @@ PRINT_HEX_WORD_HL:
 ; Move to next token and BURP_EXPR_GET_TOKEN_AND_EMIT
 ;
 0459: 23          INC HL       ; Move to the next char in the input
+; 
+; 04E6 with BC protected. Repeats 042E for sequence of MM57109 instructions terminated with an FF
+;
 045A: C5          PUSH BC
 045B: CD E6 04    CALL $04E6   ; BURP_EXPR_GET_TOKEN_AND_EMIT
 045E: C1          POP BC
@@ -1125,7 +1138,7 @@ PRINT_HEX_WORD_HL:
 ;    - Enables interrupts (IM 1 / EI) briefly around emitting an inline stream via $0446
 ;      (likely to allow MM57109 to signal completion / data-ready via INT).
 ;    - Calls $0446 to read & send inline bytes until $FF (therefore repeatedly calling
-;      MM57109_SEND_BYTE_HANDSHAKE(A=byte) at $042E).
+;      MM57109_SEND_INSTRUCTION_IN_A(A=byte) at $042E).
 ;    - Interacts with workspace around $1FF4/$1FF6 and uses small formatting logic.
 ;
 ;  Calling convention (inferred):
@@ -1234,7 +1247,7 @@ PRINT_HEX_WORD_HL:
 ; BURP_EXPR_GET_TOKEN_AND_EMIT ($04E6)
 ;  Expression compiler primitive: reads the next non-space token from the source line
 ;  (HL), classifies it by value range, and either:
-;    - emits one or more MM57109 bytes (via MM57109_SEND_BYTE_HANDSHAKE(A=byte) / $042E), or
+;    - emits one or more MM57109 bytes (via MM57109_SEND_INSTRUCTION_IN_A(A=byte) / $042E), or
 ;    - jumps to helpers for small tokens ($0545) or numeric literals ($050B/$050F).
 ;
 ;  Inputs/Outputs:
@@ -1273,7 +1286,7 @@ PRINT_HEX_WORD_HL:
 0503: F6 09       OR  $09           ; otherwise tweak bits...
 0505: E6 FB       AND $FB           ; ...force bit2 clear, bits0+3 set (see below)
 
-0507: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte) ; emit the resulting byte to MM57109 interface
+0507: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=byte) ; emit the resulting byte to MM57109 interface
 
 050A: C9          RET
 
@@ -1394,12 +1407,12 @@ PRINT_HEX_WORD_HL:
 
 056A: 08          EX AF,AF'
 056B: 3E 20       LD A,$20
-056D: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte)
+056D: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=byte)
 
 0570: 08          EX AF,AF'
 0571: E6 3F       AND $3F  ; opcode := descriptor & 3F (low 6 bits)
 
-0573: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte) ; emit opcode byte to math-coprocessor interface ($042E)
+0573: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=byte) ; emit opcode byte to math-coprocessor interface ($042E)
 
 0576: C9          RET
 
@@ -1428,7 +1441,7 @@ PRINT_HEX_WORD_HL:
 ;  Behaviour (observed):
 ;    - Restores HL/DE after lookahead parsing
 ;    - Sets A=0 and calls $07AC to prepare HL to a 16-byte buffer
-;    - Emits exactly 16 bytes via MM57109_SEND_BYTE_HANDSHAKE(A=byte) / $042E in a DJNZ loop
+;    - Emits exactly 16 bytes via MM57109_SEND_INSTRUCTION_IN_A(A=byte) / $042E in a DJNZ loop
 ; -----------------------------------------------------------------------------
 0577: 1B          DEC DE  ; step DE back one (caller had advanced past delimiter)
 0578: EB          EX DE,HL  ; restore HL from DE (input pointer back to HL)
@@ -1439,17 +1452,39 @@ PRINT_HEX_WORD_HL:
 057F: 06 10       LD B,$10  ; emit 16 bytes to coprocessor stream
 0581: 7E          LD A,(HL)
 0582: 23          INC HL
-0583: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=(HL)) ; emit operand byte
+0583: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=(HL)) ; emit operand byte
 0586: 10 F9       DJNZ $0581
 0588: E1          POP HL  ; restore HL and return
 0589: C9          RET
 
 ; -----------------------------------------------------------------------------
 ; MM57109_SEND_AND_WAIT_RDDY_BR ($058A)
-;  Send a byte in A reg to the MM57109, then wait for a status condition on port $03.
+;  Handles the MM57109 BR (branch) output which pulses low whenever one of the MM57109
+;  branch instructions proves to be true.
+;  Example instuctions are (passed in register A) are
+;
+;      TJC*   0x10(o20) - Test Jump Conditional
+;      TX=0*  0x11(o21) - Test X=0
+;      TXLTO* 0x12(o22) - Test X < 0 
+;      TXF*   0x13(o23) - Test |X| < 1 i.e. test if x is a fraction
+;      TERR*  0x14(o24) - Test error flag    
+;
+;  The subroutine starts the execution of the instruction in resgister A and then reads in
+;  the 6 bit data word from the MM57109. The 4 digit out lines are blanked odd so that
+;  only the READY and BR lines both initally high get through (0591). By continually reading
+;  and jumping back on even parity the Z80 is effectively waiting for one of these two lines to become active.
+;  If it is the BR line the Z80 outputs a NOP to the 57109 (because when tests prove true the 57109 
+;  immediately looks for a new instruction and waits for its completion). 
+;  If READY became active to indicate a failed test the last procedure is jumped. 
+;  Finally the read in and masked byte which caused the exit from the parity check loop stored in register B 
+;  as part of that loop is read into A and masked for bit 6 so that the state of the line and hence the zero flag in the F register is 
+;  set on a successfil test.
+;
+;  Send a byte in A reg to the MM57109, then wait for a status condition on port $03, returns 
+;  
 ;
 ;  Sequence (inferred from hardware description + code):
-;    1) Calls MM57109_SEND_BYTE_HANDSHAKE(A=byte) to output the command/data.
+;    1) Calls MM57109_SEND_INSTRUCTION_IN_A(A=byte) to output the command/data.
 ;    2) Polls port $03 and examines bits $20 (RDY) and $40 (BR/test).
 ;       Uses a parity trick on (A & $60) to wait until exactly ONE of the two
 ;       status bits is asserted (i.e., value is $20 or $40; not $00 or $60).
@@ -1464,15 +1499,15 @@ PRINT_HEX_WORD_HL:
 ;    Preserves: BC (push/pop), restores DE/HL unchanged
 ; -----------------------------------------------------------------------------
 058A: C5          PUSH BC  ; PUSH BC (preserve)
-058B: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=byte) ; send command/data
+058B: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=byte) ; send command/data
 058E: DB 03       IN A,($03)  ; poll port $03 (status + DO bits)
 0590: 47          LD B,A  ; B := raw port sample (latched for return)
 0591: E6 60       AND $60  ; mask status bits RDY($20) and BR($40)
 0593: EA 8E 05    JP PE,$058E  ; loop while parity-even => 0 or 2 bits set ($00 or $60); exit when $20 or $40
 0596: FE 30       CP $30  ; if masked value >= $30, it's $40 (BR) (since $60 would not exit)
 0598: 30 04       JR NC,$059E
-059A: 3E 3F       LD A,$3F  ; else it is $20 (RDY): send $3F strobe/ack to port $60
-059C: D3 60       OUT ($60),A
+059A: 3E 3F       LD A,$3F  ; else it is $20 (RDY): Output a NOP instruction
+059C: D3 60       OUT ($60),A  ; Output a NOP instruction ...
 059E: DB 03       IN A,($03)  ; wait for RDY to deassert (bit5==0)
 05A0: E6 20       AND $20
 05A2: 20 FA       JR NZ,$059E
@@ -2385,7 +2420,7 @@ PRINT_HEX_WORD_HL:
 ;
 ;  Calling convention:
 ;    IN : HL -> token stream positioned just before/at token $18 operands
-;    Uses: B as lookahead token, emits multiple bytes via MM57109_SEND_BYTE_HANDSHAKE.
+;    Uses: B as lookahead token, emits multiple bytes via MM57109_SEND_INSTRUCTION_IN_A.
 ; -----------------------------------------------------------------------------
 0A00: FE 18       CP $18  ; dispatch: token == $18 ?
 
@@ -2416,12 +2451,12 @@ PRINT_HEX_WORD_HL:
 0A16: 20 05       JR NZ,$0A1D  ; if B == $3E then also emit marker $30
 
 0A18: 3E 30       LD A,$30
-0A1A: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=$30) ; optional marker
+0A1A: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=$30) ; optional marker
 
 
 0A1D: 3E 3A       LD A,$3A  ; emit separator/marker $3A to MM57109 stream
 
-0A1F: CD 2E 04    CALL $042E  ; MM57109_SEND_BYTE_HANDSHAKE(A=$3A)
+0A1F: CD 2E 04    CALL $042E  ; MM57109_SEND_INSTRUCTION_IN_A(A=$3A)
 
 
 0A22: 78          LD A,B  ; choose command byte based on B ($3D ?)

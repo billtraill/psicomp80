@@ -265,7 +265,7 @@ private:
   bool m_mm_RDY = true; // RDY (bit5) for $042E busy/ack loops, RDY=0 means its READY (ie true), RDY=1 means its BUSY (ie false) . BURP waits for RDY=1 after each instruction. Except for BR instuctions which use BR and RDY to indicate branch or not.
   bool m_mm_was_branch_instruction = false; // Used to indicate that the last instruction was a branch instruction
   bool m_mm_instuction_after_branch = false; // Used to indicate that the next instruction is after a branch ... so it should clear ready flag...
-  bool m_mm_BR_state = false; // status RDY (bit5) for $058A wait loop - rename this ...
+  bool m_mm_BR_state = false; // BR (bit6) for $058A; true=branch taken, false=not taken. BR bit = 0 when true, 1 when false (same convention as RDY).
   bool m_mm_HOLD = false; // HOLD (bit 7) Reading a hold bit means the MM57109 is to be put on hold no interrupts, 0 its good to go... 
 //   u8 m_mm_latch = 0x00; // phase-1 latched byte (bit7 clear)
 //   bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
@@ -313,6 +313,10 @@ private:
   // loop at 0439 sees RDY=1 (busy) on first poll after OUT $60.
   u32 m_mm_default_exec_cycles = 40;
   u32 m_mm_branch_clear_cycles = 20;
+  // When branch result leaves RDY false, delay this many cycles before setting RDY true (for $058A 059E loop).
+  u32 m_mm_branch_rdy_delay_cycles = 100;
+  // Branch "executing" period: hold m_mm_RDY=0 + m_mm_BR_state=1 (port 0x60) this long so $058A loop at 058E sees it.
+  u32 m_mm_branch_exec_cycles = 150;
   // After OUT* last nibble: delay before m_mm_RDY=true so Z80 can finish the
   // last IRQ handler (~65 cy) and run IN at 0439.
   u32 m_mm_out_stream_complete_cycles = 300;
@@ -539,43 +543,26 @@ u8 psicomp80_state::port03_r() {
   // $042E:
   //   - it waits for RDY=0 before (its ready for an instuction), then waits for RDY=1  (its busy executing the instuction) before putting it in HOLD.
   //
-  // BURP also uses bit6 ($40) BR (branch) 
-  // $058A (mask $60). To avoid deadlocking $042E, we model:
-  //   - bit5 as the  RDY only (m_mm_RDY)
-  //   - bit6 as the BR (m_mm_BR_state)
+  // BURP also uses bit6 ($40) BR (branch). Same convention as RDY: state true -> bit 0, state false -> bit 1.
+  //   - bit5 RDY: m_mm_RDY=true -> 0, m_mm_RDY=false -> 1
+  //   - bit6 BR:  m_mm_BR_state=true -> 0, m_mm_BR_state=false -> 1
   //
   // Low bits contain the current 4-bit (or 5-bit) code sample; only the low
   // nibble is meaningful for IM1 capture (A & $0F).
   bool RDY = m_mm_RDY;
   bool BR_state = m_mm_BR_state;
 
-  u8 v = 0x00;
-//   if (m_mm_was_branch_instruction) { // First status read after a branch instuction returns result via bits 5&6
-// 	LOGMASKED(LOG_MM57109,"Last instruction was a branch instruction %d\n",m_mm_BR_state);
-// 	v = (BR_state ? 0x20 : 0x00) | (!BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-// 	LOGMASKED(LOG_MM57109,
-// 		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (RDY=%d st_rdy=%d "
-// 		"code=%02X(%03o))\n",
-// 		(u16)m_cpu->pc(), v, unsigned(v), RDY, BR_state, m_mm_code,
-// 		unsigned(m_mm_code));
-// 	m_mm_was_branch_instruction = false;
-
-//   } else {
-// 	v = (RDY ? 0x00 : 0x20 ) | (BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-//   } 
-  v = (RDY ? 0x00 : 0x20 ) | (BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+  u8 v = (RDY ? 0x00 : 0x20) | (BR_state ? 0x00 : 0x40) | (m_mm_code & 0x1f);
 
   // Log when value changed, or always when PC=003B (IRQ handler IN) to see every interrupt.
   const bool log_read = (v != m_mm_last_port03) || ((u16)m_cpu->pc() == 0x003B);
   if (log_read) {
+    const int rdy_bit = (v >> 5) & 1;
+    const int br_bit = (v >> 6) & 1;
     LOGMASKED(LOG_MM_STATUS,
-              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (RDY=%d BR_state=%d "
-              "code=%02X(%03o))\n",
-              MM_TS(), (u16)m_cpu->pc(), v, unsigned(v), RDY, BR_state, m_mm_code,
-              unsigned(m_mm_code));
-    LOGMASKED(LOG_MM57109,
-              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X (RDY=%d BR_state=%d)\n",
-              MM_TS(), (u16)m_cpu->pc(), v, RDY, BR_state);
+              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X (m_mm_RDY=%s m_mm_BR_state=%s RDY bit=%d BR bit=%d code=%02X)\n",
+              MM_TS(), (u16)m_cpu->pc(), v,
+              RDY ? "true" : "false", BR_state ? "true" : "false", rdy_bit, br_bit, m_mm_code);
     if (v != m_mm_last_port03)
       m_mm_last_port03 = v;
   }
@@ -700,12 +687,12 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick) {
       const u32 cycles = m_mm_out_stream_complete_cycles;
       m_mm_ready_timer->adjust(attotime::from_ticks(cycles, m_cpu->clock()));
       LOGMASKED(LOG_MM57109,
-                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%d -> 1, timer set for %u cycles\n",
-                MM_TS(), m_mm_RDY ? 1 : 0, cycles);
+                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%s -> true, timer set for %u cycles\n",
+                MM_TS(), m_mm_RDY ? "true" : "false", cycles);
     } else {
       LOGMASKED(LOG_MM57109,
-                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%d -> 1 (no timer)\n",
-                MM_TS(), m_mm_RDY ? 1 : 0);
+                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%s -> true (no timer)\n",
+                MM_TS(), m_mm_RDY ? "true" : "false");
       m_mm_RDY = true;
     }
   } else if (!m_mm_ready_timer || !m_mm_ready_timer->enabled()) {
@@ -726,16 +713,14 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_ready_tick)
     // Present branch result (ROM samples it via bits 5/6 on the next status read).
     m_mm_was_branch_instruction = true;
     m_mm_BR_state = m_mm_pending_branch_state;
-
-    // The device is now done processing; mark ready.
     m_mm_RDY = !m_mm_pending_branch_state;
 
-    // Clear BR after a short window and leave RDY asserted.
+    // Clear BR and set RDY true after a window. If result left RDY false, use longer delay so $058A completes.
     if (m_mm_branch_clear_timer) {
-      const attotime dt = attotime::from_ticks(m_mm_branch_clear_cycles, m_cpu->clock());
-      m_mm_branch_clear_timer->adjust(dt);
+      const u32 cy = m_mm_RDY ? m_mm_branch_clear_cycles : m_mm_branch_rdy_delay_cycles;
+      m_mm_branch_clear_timer->adjust(attotime::from_ticks(cy, m_cpu->clock()));
     }
-	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished (branch), m_mm_RDY=%d BR_state=%d\n", MM_TS(), m_mm_RDY, m_mm_BR_state);
+	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished (branch), m_mm_RDY=%s m_mm_BR_state=%s\n", MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false");
   } else {
 	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished, m_mm_RDY=true\n", MM_TS());
     m_mm_RDY = true;
@@ -752,7 +737,7 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_branch_clear_tick)
 
 void psicomp80_state::mm57109_begin_processing(u8 opcode, bool is_branch, bool branch_state)
 {
-  // "Start of execution": not ready, clear BR, cancel any pending completion.
+  // "Start of execution": not ready. Both port bits 1 during execution => m_mm_RDY=false, m_mm_BR_state=false.
   m_mm_RDY = false;
   m_mm_BR_state = false;
 
@@ -766,13 +751,21 @@ void psicomp80_state::mm57109_begin_processing(u8 opcode, bool is_branch, bool b
   if (m_mm_branch_clear_timer)
     m_mm_branch_clear_timer->adjust(attotime::never);
 
-  const u32 cycles = m_mm_op_exec_cycles[m_mm_pending_opcode] ? m_mm_op_exec_cycles[m_mm_pending_opcode] : m_mm_default_exec_cycles;
+  const u32 cycles = is_branch ? m_mm_branch_exec_cycles
+                               : (m_mm_op_exec_cycles[m_mm_pending_opcode] ? m_mm_op_exec_cycles[m_mm_pending_opcode] : m_mm_default_exec_cycles);
   const attotime dt = attotime::from_ticks(cycles, m_cpu->clock());
   if (m_mm_ready_timer)
     m_mm_ready_timer->adjust(dt);
   LOGMASKED(LOG_MM57109,
-            "[t=%.6f] MM57109: [timer] set for %u cycles (op %02X), m_mm_RDY=0\n",
-            MM_TS(), cycles, m_mm_pending_opcode);
+            "[t=%.6f] MM57109: [executing] m_mm_RDY=%s m_mm_BR_state=%s (RDY bit=%d BR bit=%d port 0x%02X), timer %u cycles (op %02X)\n",
+            MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false",
+            m_mm_RDY ? 0 : 1, m_mm_BR_state ? 0 : 1,
+            (m_mm_RDY ? 0x00 : 0x20) | (m_mm_BR_state ? 0x00 : 0x40), cycles, m_mm_pending_opcode);
+  if (is_branch)
+    LOGMASKED(LOG_MM57109,
+              "[t=%.6f] MM57109: [timer] branch started: m_mm_RDY=%s m_mm_BR_state=%s, timer %u cycles, then m_mm_RDY=%s m_mm_BR_state=%s\n",
+              MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false", cycles,
+              (!branch_state) ? "true" : "false", branch_state ? "true" : "false");
 }
 
 void psicomp80_state::mm57109_emit_out_scientific_stream_from_x() {
@@ -780,7 +773,7 @@ void psicomp80_state::mm57109_emit_out_scientific_stream_from_x() {
   // RDY when queue becomes empty). Cancel the per-instruction timer so we don't
   // go ready early.
   LOGMASKED(LOG_MM57109,
-            "[t=%.6f] MM57109: [OUT*] stream start, RDY=0, timer cancelled, queueing nibbles\n",
+            "[t=%.6f] MM57109: [OUT*] stream start, m_mm_RDY=false (RDY bit=1), timer cancelled, queueing nibbles\n",
             MM_TS());
   if (m_mm_ready_timer)
     m_mm_ready_timer->adjust(attotime::never);
@@ -1364,10 +1357,11 @@ void psicomp80_state::mm57109_execute(u8 op) {
 
   LOGMASKED(LOG_MM57109,
 	"MM57109: execute regs op=%02X(%03o) %-10s X=%g Y=%g Z=%g T=%g M=%g "
-	"deg=%d mant=%u err=%d RDY=%d BR_state=%d\n",
+	"deg=%d mant=%u err=%d m_mm_RDY=%s m_mm_BR_state=%s\n",
     op, unsigned(op), mm57109_opcode_mn(op), m_mm_x,
 	m_mm_y, m_mm_z, m_mm_t, m_mm_m, m_mm_deg_mode ? 1 : 0,
-	unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0, m_mm_RDY, m_mm_BR_state);
+	unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0,
+	m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false");
 
 
   

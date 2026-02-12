@@ -1063,7 +1063,7 @@ PRINT_HEX_WORD_HL:
 ; Is MM57109 Ready?
 0430: DB 03       IN A,($03)  ; poll status: IN A,($03), is the MM57109 Ready?
 0432: E6 20       AND $20  ; mask RDY bit (bit5)
-0434: 20 FA       JR NZ,$0430  ; wait while RDY==1 (until it goes low)
+0434: 20 FA       JR NZ,$0430  ; wait for READY state, busy is indicated by RDY==1, and ready is indicated by RDY=0
 ; Send instruction to MM57109
 0436: 78          LD A,B  ; restore byte to send
 0437: D3 60       OUT ($60),A  ; phase 1: OUT ($60),A
@@ -1126,7 +1126,7 @@ PRINT_HEX_WORD_HL:
 045E: C1          POP BC
 045F: C9          RET
 
-; ## BURP_CTRL_SEQ ($0460)
+; ## BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT ($0460)
 
 ; -----------------------------------------------------------------------------
 ; BURP_EMIT_MM57109_OUT_INSTRUCTION_AND_WAIT ($0460)

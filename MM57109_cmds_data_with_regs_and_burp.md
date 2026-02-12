@@ -335,3 +335,79 @@ locations are skipped over upon reset (POR) as can be
 seen in the initialization and instruction fetch flowcharts.
 The program shown in Table VIII shows typical error
 recovery coding.
+
+
+/h2 Instuction Times
+
+Times are in microcycle. A microcyle is 12.5 microseconds.
+
+
+| Mnemonic | Class | Octal opcode | Hex byte(s) | 2-word format | Observed in BURP | Description | Registers modified |
+|---|---|---:|---:|---|---|---|---|
+| INSTRUCTION MNEMONIC | EXECUTION TIME (MICROCYCLES) (AVERAGE) | EXECUTION TIME (MICROCYCLES) (WORST·CASE VALUES) |
+|---|---|---|
+|0-9 | | 238 |
+|OP | | 152 |
+EE 151 
+CS 166 
+PI 1312 
+HALT 134 
+AIN 284 
+TJC 208 
+TX=O 278 
+TXLTO 197 
+, TXF 271 
+TERR 191 
+JMP 186 
+IBNZ 2314 
+OBNZ 2314 
+SMOC 163 
+XEM 812 
+MS 839 
+MR 1385 
+LSH 168 
+RSH 173 
+INV ' . 166 x' 3200 22700
+EN 552 
+TOGM 157 
+ROLL 905 
+ECLR 163 
+POP 448 
+MCLR 734 
+XEY 652 
+NOP 122 
+
+
+
+
+
+OUT 583
+IN 395
+SFI 163
+PFI 185
+SF2 163
+PF2 185
+PRWI 130
+PRW2 130
+SIN 56200 95900
+COS 56200 95900
+TAN 35000 97600
+INVSIN 54000 93900
+INV COS 54000 93900
+INVTAN 30200 92900
+LN 24800 92000
+LOG 30700 ,92600
+EX 30800 93900
+lOX 27400 96500
++.- 2200 6600
+INV+.INV- 1700 5000
+(M+.M-)
+ x' 3200 22700
+INVx (MX) 2700 21400
+I 7800 22300
+INV I (M/) 7300 21100
+l/X 4500 22800
+YX 55400 95500
+SQRT ·7000 30200
+ SQ 3000. 21900
+OTR.RTO 9600 41700

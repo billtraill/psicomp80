@@ -51,8 +51,11 @@ graphics set selected by VRAM bit 6.
 #define LOG_MM_STATUS (1U << 1) // port $03 reads (noisy)
 #define LOG_MM_ACK (1U << 2)    // $3F ACK handling
 
-#define VERBOSE (LOG_MM57109 | LOG_MM_ACK)
-// #define VERBOSE (LOG_MM57109 | LOG_MM_ACK | LOG_MM_STATUS)
+// #define VERBOSE (LOG_MM57109 | LOG_MM_ACK)
+#define VERBOSE (LOG_MM57109 | LOG_MM_ACK | LOG_MM_STATUS)
+
+// Timestamp for MM57109 logs (seconds since start)
+#define MM_TS() (machine().time().as_double())
 
 // ---------------------------------------------------------------------------
 // MM57109 opcode → mnemonic helpers (derived from
@@ -252,24 +255,21 @@ private:
   // keyboard latch returned by port 01h (ROM does IN then CPL)
   u8 m_key_latch = 0xff;
 
-  // MM57109-ish "data ready" latch for port 03h (and IRQ0 generation)
-  bool m_mm_ready = false;
+
   u8 m_mm_code = 0x1f;
   bool m_mm_one_shot_clear = false;
 
   // --- MM57109 port $60 write / port $03 status modelling (BURP relies on
   // this) ---
-  bool m_mm_hs_rdy = false; // handshake RDY (bit5) for $042E busy/ack loops
+  u8 m_mm_last_port03 = 0xff; // last value read from port $03 (for change-only logging)
+  bool m_mm_RDY = true; // RDY (bit5) for $042E busy/ack loops, RDY=0 means its READY (ie true), RDY=1 means its BUSY (ie false) . BURP waits for RDY=1 after each instruction. Except for BR instuctions which use BR and RDY to indicate branch or not.
   bool m_mm_was_branch_instruction = false; // Used to indicate that the last instruction was a branch instruction
   bool m_mm_instuction_after_branch = false; // Used to indicate that the next instruction is after a branch ... so it should clear ready flag...
-  bool m_mm_branch_status = false; // Used to store the status of the branch instruction
-  bool m_mm_status =
-      false; // status RDY (bit5) for $058A wait loop - rename this ...
-  u8 m_mm_latch = 0x00; // phase-1 latched byte (bit7 clear)
-  bool m_mm_expect_latch =
-      true; // handshake phase tracker for $042E (ignore data bit7)
-  bool m_mm_inv_pending =
-      false; // last committed opcode was INV (0x20); next selects INV function
+  bool m_mm_BR_state = false; // status RDY (bit5) for $058A wait loop - rename this ...
+  bool m_mm_HOLD = false; // HOLD (bit 7) Reading a hold bit means the MM57109 is to be put on hold no interrupts, 0 its good to go... 
+//   u8 m_mm_latch = 0x00; // phase-1 latched byte (bit7 clear)
+//   bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
+  bool m_mm_inv_pending = false; // last executed opcode was INV (0x20); next selects INV function
   std::vector<u8> m_mm_stream; // committed byte stream (bit7 stripped)
   u64 m_mm_tx_seq = 0;         // transaction counter
 
@@ -304,6 +304,27 @@ private:
   // queue for IM1 nibble delivery (port $03 low nibble + IRQ0 pulses)
   std::vector<u8> m_mm_nibble_q;
   emu_timer *m_mm_nibble_timer = nullptr;
+  // Timed RDY/BR modelling: each committed MM57109 byte makes the device "busy"
+  // for a programmable number of Z80 clock cycles, then becomes ready and (for
+  // branch-type ops) presents the branch result for a short window.
+  emu_timer *m_mm_ready_timer = nullptr;
+  emu_timer *m_mm_branch_clear_timer = nullptr;
+  // Default delays (in Z80 clock cycles). Must be > OUT(11)+IN(10) so $042E
+  // loop at 0439 sees RDY=1 (busy) on first poll after OUT $60.
+  u32 m_mm_default_exec_cycles = 40;
+  u32 m_mm_branch_clear_cycles = 20;
+  // After OUT* last nibble: delay before m_mm_RDY=true so Z80 can finish the
+  // last IRQ handler (~65 cy) and run IN at 0439.
+  u32 m_mm_out_stream_complete_cycles = 300;
+  // Per-opcode execution delay table (index = opcode & 0x3f). Defaults to
+  // m_mm_default_exec_cycles; can be tuned per instruction later.
+  std::array<u32, 64> m_mm_op_exec_cycles{};
+
+  // State latched at "instruction start" for the ready timer callback.
+  bool m_mm_pending_is_branch = false;
+  bool m_mm_pending_branch_state = false;
+  u8 m_mm_pending_opcode = 0x00;
+
 
   // -------- character generator tables --------
   // Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
@@ -334,7 +355,7 @@ private:
   void mm_set_data_ready(u8 code);
   // MM57109 model helpers
   void mm57109_reset();
-  void mm57109_commit(u8 op);
+  void mm57109_execute(u8 op);
   void mm57109_execute_single(u8 op);
   bool mm57109_is_two_word(u8 op) const;
   const char *mm57109_opcode_mn(u8 op) const;
@@ -344,6 +365,10 @@ private:
   void mm57109_queue_nibble(u8 nib);
   void mm57109_emit_out_scientific_stream_from_x();
   TIMER_CALLBACK_MEMBER(mm57109_nibble_tick);
+  TIMER_CALLBACK_MEMBER(mm57109_ready_tick);
+  TIMER_CALLBACK_MEMBER(mm57109_branch_clear_tick);
+  void mm57109_begin_processing(u8 opcode, bool is_branch, bool branch_state);
+
   void mm57109_log_regs(const char *phase, u8 op);
 
   static u8 glyph_row(u8 vram_byte, int row); // returns 5-bit pattern
@@ -439,19 +464,28 @@ void psicomp80_state::machine_start() {
   m_mm_stream.reserve(256);
   m_mm_nibble_timer =
       timer_alloc(FUNC(psicomp80_state::mm57109_nibble_tick), this);
+  m_mm_ready_timer =
+      timer_alloc(FUNC(psicomp80_state::mm57109_ready_tick), this);
+  m_mm_branch_clear_timer =
+      timer_alloc(FUNC(psicomp80_state::mm57109_branch_clear_tick), this);
+
+  // Default all opcodes to the same execution time for now; tweak per opcode
+  // later as we learn the real MM57109 timing.
+  m_mm_op_exec_cycles.fill(m_mm_default_exec_cycles);
+
 
   save_item(NAME(m_key_latch));
-  save_item(NAME(m_mm_ready));
   save_item(NAME(m_mm_code));
   save_item(NAME(m_mm_one_shot_clear));
+  save_item(NAME(m_mm_last_port03));
 
-  save_item(NAME(m_mm_hs_rdy));
-  save_item(NAME(m_mm_status));
-  save_item(NAME(m_mm_latch));
+  save_item(NAME(m_mm_RDY));
+  save_item(NAME(m_mm_BR_state));
+  save_item(NAME(m_mm_HOLD));
+//   save_item(NAME(m_mm_latch));
   save_item(NAME(m_mm_was_branch_instruction));
   save_item(NAME(m_mm_instuction_after_branch));
-  save_item(NAME(m_mm_branch_status));
-  save_item(NAME(m_mm_expect_latch));
+  //save_item(NAME(m_mm_expect_latch));
   save_item(NAME(m_mm_inv_pending));
   save_item(NAME(m_mm_tx_seq));
 
@@ -471,11 +505,7 @@ void psicomp80_state::machine_start() {
 
 void psicomp80_state::machine_reset() {
   m_key_latch = 0xff;
-  m_mm_ready = false;
-  m_mm_was_branch_instruction = false;
-  m_mm_instuction_after_branch = false;
-  m_mm_code = 0x1f;
-  m_mm_one_shot_clear = false;
+  
   mm57109_reset();
 }
 
@@ -505,53 +535,50 @@ u8 psicomp80_state::port01_r() {
 u8 psicomp80_state::port03_r() {
   // Port $03: combined MM57109 status + 4-bit data.
   //
-  // BURP uses bit5 ($20) as the READY line for the two-phase handshake in
+  // BURP uses bit5 ($20) as the RDY line, it needs to see RDY go high to indicate its busy, the RDY to low 
   // $042E:
-  //   - it waits for READY=0 before phase1 OUT, then waits for READY=1 before
-  //   phase2 OUT.
+  //   - it waits for RDY=0 before (its ready for an instuction), then waits for RDY=1  (its busy executing the instuction) before putting it in HOLD.
   //
-  // BURP also uses bit6 ($40) as a secondary "result/status" indicator via
+  // BURP also uses bit6 ($40) BR (branch) 
   // $058A (mask $60). To avoid deadlocking $042E, we model:
-  //   - bit5 as the *handshake* READY only (m_mm_hs_rdy)
-  //   - bit6 as the *status/result* READY (m_mm_status)
+  //   - bit5 as the  RDY only (m_mm_RDY)
+  //   - bit6 as the BR (m_mm_BR_state)
   //
   // Low bits contain the current 4-bit (or 5-bit) code sample; only the low
   // nibble is meaningful for IM1 capture (A & $0F).
-  bool hs_rdy = m_mm_hs_rdy;
-  bool status = m_mm_status;
+  bool RDY = m_mm_RDY;
+  bool BR_state = m_mm_BR_state;
 
   u8 v = 0x00;
-  if (m_mm_was_branch_instruction) { // First status read after a branch instuction returns result via bits 5&6
-	LOGMASKED(LOG_MM57109,"Last instruction was a branch instruction %d\n",m_mm_branch_status);
-	v = (m_mm_branch_status ? 0x20 : 0x00) | (!m_mm_branch_status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-	LOGMASKED(LOG_MM57109,
-		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
-		"code=%02X(%03o))\n",
-		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code,
-		unsigned(m_mm_code));
-	m_mm_was_branch_instruction = false;
-	m_mm_instuction_after_branch = true;
-	
-  } else if (m_mm_instuction_after_branch){
-	m_mm_instuction_after_branch = false;
-	hs_rdy = false;
-	LOGMASKED(LOG_MM57109,"Instruction after branch instruction @PC=%04X\n",(u16)m_cpu->pc());
-	v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-	LOGMASKED(LOG_MM57109,
-		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
-		"code=%02X(%03o))\n",
-		(u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code,
-		unsigned(m_mm_code));
-	m_mm_hs_rdy = false;
-  } else {
-	v = (hs_rdy ? 0x20 : 0x00) | (status ? 0x40 : 0x00) | (m_mm_code & 0x1f);
-  } 
+//   if (m_mm_was_branch_instruction) { // First status read after a branch instuction returns result via bits 5&6
+// 	LOGMASKED(LOG_MM57109,"Last instruction was a branch instruction %d\n",m_mm_BR_state);
+// 	v = (BR_state ? 0x20 : 0x00) | (!BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+// 	LOGMASKED(LOG_MM57109,
+// 		"MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (RDY=%d st_rdy=%d "
+// 		"code=%02X(%03o))\n",
+// 		(u16)m_cpu->pc(), v, unsigned(v), RDY, BR_state, m_mm_code,
+// 		unsigned(m_mm_code));
+// 	m_mm_was_branch_instruction = false;
 
-  LOGMASKED(LOG_MM_STATUS,
-            "MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (hs_rdy=%d st_rdy=%d "
-            "code=%02X(%03o))\n",
-            (u16)m_cpu->pc(), v, unsigned(v), hs_rdy, status, m_mm_code,
-            unsigned(m_mm_code));
+//   } else {
+// 	v = (RDY ? 0x00 : 0x20 ) | (BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+//   } 
+  v = (RDY ? 0x00 : 0x20 ) | (BR_state ? 0x40 : 0x00) | (m_mm_code & 0x1f);
+
+  // Log when value changed, or always when PC=003B (IRQ handler IN) to see every interrupt.
+  const bool log_read = (v != m_mm_last_port03) || ((u16)m_cpu->pc() == 0x003B);
+  if (log_read) {
+    LOGMASKED(LOG_MM_STATUS,
+              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X(%03o) (RDY=%d BR_state=%d "
+              "code=%02X(%03o))\n",
+              MM_TS(), (u16)m_cpu->pc(), v, unsigned(v), RDY, BR_state, m_mm_code,
+              unsigned(m_mm_code));
+    LOGMASKED(LOG_MM57109,
+              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X (RDY=%d BR_state=%d)\n",
+              MM_TS(), (u16)m_cpu->pc(), v, RDY, BR_state);
+    if (v != m_mm_last_port03)
+      m_mm_last_port03 = v;
+  }
 
   // If we're currently presenting a queued digit nibble via IRQ0, the ROM IM1
   // handler will read port $03 to sample it. Model this as a handshake: the
@@ -563,6 +590,7 @@ u8 psicomp80_state::port03_r() {
     if (m_mm_nibble_timer && !m_mm_nibble_q.empty())
       m_mm_nibble_timer->adjust(attotime::zero);
   }
+
   return v;
 }
 
@@ -571,10 +599,18 @@ u8 psicomp80_state::port03_r() {
 // ---------------------------------------------------------------------------
 
 void psicomp80_state::mm57109_reset() {
-  m_mm_hs_rdy = false;
-  m_mm_status = false;
-  m_mm_latch = 0x00;
-  m_mm_expect_latch = true;
+
+  m_mm_was_branch_instruction = false;
+  m_mm_instuction_after_branch = false;
+  m_mm_code = 0x1f;
+  m_mm_one_shot_clear = false;
+  m_mm_last_port03 = 0xff;
+
+  m_mm_HOLD = false;
+  m_mm_RDY = true;
+  m_mm_BR_state = false;
+//   m_mm_latch = 0x00;
+  // m_mm_expect_latch = true;
   m_mm_inv_pending = false;
   m_mm_irq0_asserted = false;
   m_mm_stream.clear();
@@ -656,7 +692,25 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick) {
   // Present nibble on port $03 and pulse IRQ0 so the ROM IM 1 handler at $0038
   // stores it.
   m_mm_code = nib & 0x0f;
-  m_mm_ready = true;
+  // OUT*: when last nibble delivered, start 40-cycle timer then go ready so the
+  // Z80 (which may still be in/returning from IRQ storm) sees RDY=1 (busy) at 0439.
+  // Other nibble sources: only set RDY when not in instruction busy window.
+  if (m_mm_nibble_q.empty()) {
+    if (m_mm_ready_timer) {
+      const u32 cycles = m_mm_out_stream_complete_cycles;
+      m_mm_ready_timer->adjust(attotime::from_ticks(cycles, m_cpu->clock()));
+      LOGMASKED(LOG_MM57109,
+                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%d -> 1, timer set for %u cycles\n",
+                MM_TS(), m_mm_RDY ? 1 : 0, cycles);
+    } else {
+      LOGMASKED(LOG_MM57109,
+                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%d -> 1 (no timer)\n",
+                MM_TS(), m_mm_RDY ? 1 : 0);
+      m_mm_RDY = true;
+    }
+  } else if (!m_mm_ready_timer || !m_mm_ready_timer->enabled()) {
+    m_mm_RDY = true;
+  }
   m_mm_one_shot_clear = false;
   if (!m_mm_irq0_asserted) {
     m_cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -664,7 +718,73 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick) {
   }
 }
 
+
+TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_ready_tick)
+{
+  // End of "busy" window for the last committed byte.
+  if (m_mm_pending_is_branch) {
+    // Present branch result (ROM samples it via bits 5/6 on the next status read).
+    m_mm_was_branch_instruction = true;
+    m_mm_BR_state = m_mm_pending_branch_state;
+
+    // The device is now done processing; mark ready.
+    m_mm_RDY = !m_mm_pending_branch_state;
+
+    // Clear BR after a short window and leave RDY asserted.
+    if (m_mm_branch_clear_timer) {
+      const attotime dt = attotime::from_ticks(m_mm_branch_clear_cycles, m_cpu->clock());
+      m_mm_branch_clear_timer->adjust(dt);
+    }
+	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished (branch), m_mm_RDY=%d BR_state=%d\n", MM_TS(), m_mm_RDY, m_mm_BR_state);
+  } else {
+	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished, m_mm_RDY=true\n", MM_TS());
+    m_mm_RDY = true;
+  }
+}
+
+TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_branch_clear_tick)
+{
+  // After the branch-result window, drop BR and leave the device ready.
+  m_mm_BR_state = false;
+  m_mm_RDY = true;
+  LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] branch_clear finished, m_mm_RDY=true\n", MM_TS());
+}
+
+void psicomp80_state::mm57109_begin_processing(u8 opcode, bool is_branch, bool branch_state)
+{
+  // "Start of execution": not ready, clear BR, cancel any pending completion.
+  m_mm_RDY = false;
+  m_mm_BR_state = false;
+
+  m_mm_pending_opcode = opcode & 0x3f;
+  m_mm_pending_is_branch = is_branch;
+  m_mm_pending_branch_state = branch_state;
+
+  if (m_mm_ready_timer)
+    m_mm_ready_timer->adjust(attotime::never);
+
+  if (m_mm_branch_clear_timer)
+    m_mm_branch_clear_timer->adjust(attotime::never);
+
+  const u32 cycles = m_mm_op_exec_cycles[m_mm_pending_opcode] ? m_mm_op_exec_cycles[m_mm_pending_opcode] : m_mm_default_exec_cycles;
+  const attotime dt = attotime::from_ticks(cycles, m_cpu->clock());
+  if (m_mm_ready_timer)
+    m_mm_ready_timer->adjust(dt);
+  LOGMASKED(LOG_MM57109,
+            "[t=%.6f] MM57109: [timer] set for %u cycles (op %02X), m_mm_RDY=0\n",
+            MM_TS(), cycles, m_mm_pending_opcode);
+}
+
 void psicomp80_state::mm57109_emit_out_scientific_stream_from_x() {
+  // OUT*: keep RDY=1 (busy) until all nibbles are delivered (nibble_tick sets
+  // RDY when queue becomes empty). Cancel the per-instruction timer so we don't
+  // go ready early.
+  LOGMASKED(LOG_MM57109,
+            "[t=%.6f] MM57109: [OUT*] stream start, RDY=0, timer cancelled, queueing nibbles\n",
+            MM_TS());
+  if (m_mm_ready_timer)
+    m_mm_ready_timer->adjust(attotime::never);
+
   double x = m_mm_x;
 
   // MDC=8 is the default on COMP80 (SMDC*). BURP/ROM assumes 8-digit mantissa
@@ -748,6 +868,8 @@ void psicomp80_state::mm57109_log_regs(const char *phase, u8 op) {
 }
 
 void psicomp80_state::mm57109_execute_single(u8 op) {
+  m_mm_BR_state = false; 
+ 
   const u8 opcode = op & 0x3f;
 
   // Digit-entry class per MM57109 docs: 0-9, DP, EE, CS, PI, AIN, HALT
@@ -993,8 +1115,7 @@ void psicomp80_state::mm57109_execute_single(u8 op) {
   if (m_mm_inv_pending) {
 
     LOGMASKED(LOG_MM57109,
-              "MM57109: m_mm_inv_pending is true, opcode is %02X(%03o)\n",
-              opcode, unsigned(opcode));
+              "MM57109: m_mm_inv_pending is true, opcode is %02X(%03o)\n", opcode, unsigned(opcode));
     m_mm_inv_pending = false;
     switch (opcode) {
     case 0x24: // INV SIN  -> ASIN
@@ -1208,10 +1329,8 @@ void psicomp80_state::mm57109_execute_single(u8 op) {
   case 0x13: // TXF*  (test |X| < 1 -> expose BR/RDY for BURP $058A)
   {
     const bool abs_x_lt_1 = (std::fabs(m_mm_x) < 1.0);
-    // m_mm_hs_rdy = !abs_x_lt_1; // don't interfere with $042E handshake READY
-    // m_mm_status = abs_x_lt_1;  // RDY bit for $058A (bit5)
-	m_mm_was_branch_instruction = true;
-	m_mm_branch_status = abs_x_lt_1;
+    // m_mm_RDY = !abs_x_lt_1; // don't interfere with $042E handshake READY
+    // m_mm_BR_state = abs_x_lt_1;  // RDY bit for $058A (bit5)
     LOGMASKED(LOG_MM57109, "MM57109: TXF* (|X|<1=%d) m_mm_x=%f @PC=%04X\n", abs_x_lt_1,
               m_mm_x, (u16)m_cpu->pc());
     return;
@@ -1235,8 +1354,23 @@ void psicomp80_state::mm57109_execute_single(u8 op) {
       m_mm_inv_pending ? 1 : 0);
 }
 
-void psicomp80_state::mm57109_commit(u8 op) {
+void psicomp80_state::mm57109_execute(u8 op) {
+
   const u8 opcode = op & 0x3f;
+  const bool is_branch = (opcode == 0x13); // TXF*
+  const bool branch_state = is_branch ? (std::fabs(m_mm_x) < 1.0) : false;
+  mm57109_begin_processing(opcode, is_branch, branch_state);
+
+
+  LOGMASKED(LOG_MM57109,
+	"MM57109: execute regs op=%02X(%03o) %-10s X=%g Y=%g Z=%g T=%g M=%g "
+	"deg=%d mant=%u err=%d RDY=%d BR_state=%d\n",
+    op, unsigned(op), mm57109_opcode_mn(op), m_mm_x,
+	m_mm_y, m_mm_z, m_mm_t, m_mm_m, m_mm_deg_mode ? 1 : 0,
+	unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0, m_mm_RDY, m_mm_BR_state);
+
+
+  
 
   // Handle pending 2nd word for prior 2-word op
   if (m_mm_two_word_pending) {
@@ -1255,12 +1389,10 @@ void psicomp80_state::mm57109_commit(u8 op) {
     if (twoop == 0x16) {
       mm57109_emit_out_scientific_stream_from_x();
       mm57109_log_regs("after OUT*", twoop);
-      m_mm_status = true;
+     
       return;
     }
 
-    // Default: treat as complete but no further behaviour yet.
-    m_mm_status = true;
     return;
   }
 
@@ -1269,7 +1401,6 @@ void psicomp80_state::mm57109_commit(u8 op) {
   if (!m_mm_inv_pending && opcode == 0x20) {
     m_mm_inv_pending = true;
     LOGMASKED(LOG_MM57109, "MM57109: INV prefix armed\n");
-    m_mm_status = true;
     return;
   }
 
@@ -1279,17 +1410,12 @@ void psicomp80_state::mm57109_commit(u8 op) {
     LOGMASKED(LOG_MM57109,
               "MM57109: 2-word op %02X(%03o) %-10s awaiting param\n", opcode,
               unsigned(opcode), mm57109_opcode_mn(opcode));
-    m_mm_status = true;
     return;
   }
 
   mm57109_execute_single(opcode);
   mm57109_log_regs("after", opcode);
 
-  // For now, assert "RDY wins" status after each committed opcode so ROM wait
-  // loops can proceed. We will refine this once instruction behaviour is
-  // implemented.
-  m_mm_status = true;
 }
 
 void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd) {
@@ -1324,32 +1450,39 @@ void psicomp80_state::port60_w(u8 data) {
   //   loop can exit next time
   //
   // This prevents hangs at $0439 if the *first* write happens to have bit7=1.
-  if (m_mm_expect_latch) {
-    m_mm_latch = data & 0x7f;
-    // LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s
-    // (raw=%02X(%03o))\n", 	m_mm_latch, unsigned(m_mm_latch),
-    // mm57109_opcode_name(m_mm_latch), data, unsigned(data));
+//   if (m_mm_expect_latch) {
+//     m_mm_latch = data & 0x7f;
+//     // LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s
+//     // (raw=%02X(%03o))\n", 	m_mm_latch, unsigned(m_mm_latch),
+//     // mm57109_opcode_name(m_mm_latch), data, unsigned(data));
 
-    m_mm_hs_rdy = true;
-    m_mm_expect_latch = false;
-    return;
-  }
+//     m_mm_RDY = true;
+//     m_mm_expect_latch = false;
+//     return;
+//   }
 
-  // Commit phase
-  const u8 committed = m_mm_latch;
-  const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(committed)
-                                    : mm57109_opcode_name(committed);
+if (BIT(data, 7)) {
+  m_mm_HOLD = true;
+  return;
+} else {
+	m_mm_HOLD = false;
+}
+
+  // Execute phase
+  //const u8 committed = m_mm_latch;
+  const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(data)
+                                    : mm57109_opcode_name(data);
   LOGMASKED(LOG_MM57109,
-            "MM57109: commit byte=%02X(%03o) %-10s (raw=%02X(%03o))\n",
-            committed, unsigned(committed), mn, data, unsigned(data));
+            "[t=%.6f] MM57109: [OUT] instruction executed byte=%02X %-10s @PC=%04X\n",
+            MM_TS(), data & 0x7f, mn, (u16)m_cpu->pc());
   m_mm_irq0_asserted = false;
-  m_mm_stream.push_back(committed);
-  mm57109_commit(committed);
+  m_mm_stream.push_back(data);
+  mm57109_execute(data);
 
-  m_mm_hs_rdy = false;
-  m_mm_expect_latch = true;
+//   m_mm_RDY = false;
+//   m_mm_expect_latch = true;
 
-  // Status bits are handled by mm57109_commit() for now.
+  // Status bits are handled by mm57109_execute() for now.
 }
 
 // ------------------ keyboard / interrupts ------------------
@@ -1378,7 +1511,6 @@ u8 psicomp80_state::ascii_to_mm_code(u8 data) {
 
 void psicomp80_state::mm_set_data_ready(u8 code) {
   m_mm_code = code & 0x0f;
-  m_mm_ready = true;
   m_mm_one_shot_clear = false;
 
   // Pulse IRQ0 so each delivered nibble becomes a distinct IM 1 interrupt.

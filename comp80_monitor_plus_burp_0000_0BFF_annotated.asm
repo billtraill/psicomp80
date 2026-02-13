@@ -1941,6 +1941,9 @@ PRINT_HEX_WORD_HL:
 0737: E6 0F       AND $0F
 0739: 4F          LD C,A
 073A: 76          HALT
+
+
+
 073B: FE 20       CP $20
 073D: C8          RET Z
 073E: E6 0F       AND $0F
@@ -1953,30 +1956,49 @@ PRINT_HEX_WORD_HL:
 0746: 81          ADD A,C
 0747: 80          ADD A,B
 0748: 18 EF       JR $0739
+
+;
+;
+;
+; ------------------------------------------------------------
+; $074A  MON:PUT_U8_AS_DEC3_AT_DE
+; Convert A (0..255) to 3 ASCII decimal digits (hundreds,tens,ones)
+; and store at (DE)..(DE+2). Always emits leading zeros.
+; Advances DE by 3. Preserves BC.
+;
 074A: C5          PUSH BC
-074B: 06 30       LD B,$30
-074D: FE 64       CP $64
-074F: 38 05       JR C,$0756
-0751: 04          INC B
-0752: D6 64       SUB $64
-0754: 18 F7       JR $074D
-0756: 0E 30       LD C,$30
-0758: FE 0A       CP $0A
-075A: 38 05       JR C,$0761
-075C: 0C          INC C
-075D: D6 0A       SUB $0A
-075F: 18 F7       JR $0758
-0761: C6 30       ADD A,$30
-0763: EB          EX DE,HL
-0764: 70          LD (HL),B
-0765: 23          INC HL
-0766: 71          LD (HL),C
-0767: 23          INC HL
-0768: 77          LD (HL),A
-0769: 23          INC HL
-076A: EB          EX DE,HL
-076B: C1          POP BC
+; Hundreds digit accumulator starts at '0'
+074B: 06 30       LD   B,$30          ; B = '0' (hundreds)
+; while A >= 100: A -= 100, B++
+074D: FE 64       CP   $64            ; compare A with 100
+074F: 38 05       JR   C,$0756         ; if A < 100, done hundreds loop
+0751: 04          INC  B               ; hundreds++
+0752: D6 64       SUB  $64            ; A -= 100
+0754: 18 F7       JR   $074D
+; Tens digit accumulator starts at '0'
+0756: 0E 30       LD   C,$30          ; C = '0' (tens)
+; while A >= 10: A -= 10, C++
+0758: FE 0A       CP   $0A            ; compare A with 10
+075A: 38 05       JR   C,$0761         ; if A < 10, done tens loop
+075C: 0C          INC  C               ; tens++
+075D: D6 0A       SUB  $0A            ; A -= 10
+075F: 18 F7       JR   $0758
+; Ones digit: convert 0..9 to '0'..'9'
+0761: C6 30       ADD  A,$30          ; A = ones ASCII
+; Store "B C A" to *(DE), using HL as the store pointer
+0763: EB          EX   DE,HL          ; HL = DE (dest), DE = old HL
+0764: 70          LD   (HL),B         ; write hundreds
+0765: 23          INC  HL
+0766: 71          LD   (HL),C         ; write tens
+0767: 23          INC  HL
+0768: 77          LD   (HL),A         ; write ones
+0769: 23          INC  HL
+076A: EB          EX   DE,HL          ; DE = DE+3 (advanced), HL restored
+076B: C1          POP  BC
 076C: C9          RET
+; ------------------------------------------------------------
+
+
 076D: C5          PUSH BC
 076E: 01 30 30    LD BC,$3030
 0771: FE 64       CP $64
@@ -2135,11 +2157,11 @@ PRINT_HEX_WORD_HL:
 083C: 14          INC D
 083D: 20 7F       JR NZ,$08BE
 083F: E7          RST $20
-0840: CD 36 07    CALL $0736
-0843: 21 00 0C    LD HL,$0C00
+0840: CD 36 07    CALL $0736  ; wait for a key 
+0843: 21 00 0C    LD HL,$0C00 ; 
 0846: 7E          LD A,(HL)
-0847: FE C0       CP $C0
-0849: 28 B5       JR Z,$0800
+0847: FE C0       CP $C0  
+0849: 28 B5       JR Z,$0800  ; Back to entry point ..
 084B: 23          INC HL
 084C: FE ED       CP $ED
 084E: 20 F6       JR NZ,$0846
@@ -2160,10 +2182,10 @@ PRINT_HEX_WORD_HL:
 0861: 13          INC DE
 0862: 7A          LD A,D
 0863: FE 1E       CP $1E
-0865: 2B          DEC HL
-0866: F7          RST $30
-0867: 0E 01       LD C,$01
-0869: CD 93 03    CALL $0393 — MON: PUSH DE ; [MON:CLEAR_SCREEN_8040_87FF]
+0865: 28 F7       JR   Z,$085E      ; if D == 1E, loop back and copy another byte
+0867: 0E 01       LD   C,$01
+0869: CD 93 03    CALL $0393        ; CLEAR_SCREEN_8040_87FF
+
 086C: 11 40 80    LD DE,$8040
 086F: 0D          DEC C
 0870: 0C          INC C
@@ -2180,7 +2202,7 @@ PRINT_HEX_WORD_HL:
 0885: 7E          LD A,(HL)
 0886: B9          CP C
 0887: 20 F7       JR NZ,$0880
-0889: CD 4A 07    CALL $074A
+0889: CD 4A 07    CALL $074A  ; PUT_U8_AS_DEC3_AT_DE - Convert A (0..255) to 3 ASCII decimal digits (hundreds,tens,ones), outputs the line number in LIST command.
 088C: E7          RST $20
 088D: 7A          LD A,D
 088E: FE 88       CP $88
@@ -2190,6 +2212,7 @@ PRINT_HEX_WORD_HL:
 0895:              DB  $0C,$09,$13,$14,$20,$09,$0E,$03,$0F,$0D,$10,$0C,$05,$14,$05,$1D  ; "LIST INCOMPLETE"
 08A5: 76          HALT
 08A6: 18 C1       JR $0869
+
 08A8: 23          INC HL
 08A9: 7E          LD A,(HL)
 08AA: FE C0       CP $C0

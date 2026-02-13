@@ -136,7 +136,7 @@ Page 1
 0830 D3 60 cd 46  04 2F 22 FF  cd 29 07 Fe  14 20 7F e7 
 0840 cd 36 07 21  00 0c 7e Fe  c0 28 b5 23  Fe ed 20 F6
 0850 7e b9 20 F3  2b 2b e5 d1  13 1A Fe 1F  20 FA 1A 77
-0860 23 13 7A Fe  1e 2b F7 0e  01 cd 93 03  11 40 80 0d
+0860 23 13 7A Fe  1e 28 F7 0e  01 cd 93 03  11 40 80 0d
 0870 0c 20 05 cd  9F 03 18 88  21 00 0c 7e  Fe c0 28 f0
 0880 Fe ed 23 20  F6 7e b9 20  F7 cd 4A 07  e7 7A Fe 88
 0890 20 16 cd ce  03 0c 09 13  14 20 09 0e  03 0F 0d 10

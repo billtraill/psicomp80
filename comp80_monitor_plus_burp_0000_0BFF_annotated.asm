@@ -1948,15 +1948,26 @@ PRINT_HEX_WORD_HL:
 0735: C9          RET        ; 
 
 ;
-; Read a Number from input terminated by a space. 
-; Then convert the number to 3 digits
+; ------------------------------------------------------------
+; MON:PARSE_DECIMAL_BYTE  ($0736)
 ;
+; Reads decimal digits from keyboard until SPACE.
+; Returns value (0–255) in A.
+;
+; Behaviour:
+;   - First digit becomes initial value
+;   - Subsequent digits: value = value * 10 + digit
+;   - Terminates on SPACE
+;
+; Uses:  A, B, C
+; Preserves: none
+; ------------------------------------------------------------
 0736: 76          HALT
 0737: E6 0F       AND $0F
 0739: 4F          LD C,A
 073A: 76          HALT
 073B: FE 20       CP $20
-073D: C8          RET Z
+073D: C8          RET Z     ; Return on SPACE being pressed..
 073E: E6 0F       AND $0F
 0740: 47          LD B,A
 0741: 79          LD A,C
@@ -1966,7 +1977,7 @@ PRINT_HEX_WORD_HL:
 0745: 07          RLCA
 0746: 81          ADD A,C
 0747: 80          ADD A,B
-0748: 18 EF       JR $0739
+0748: 18 EF       JR $0739  ; loop for next keypress
 
 ;
 ;
@@ -2163,40 +2174,46 @@ PRINT_HEX_WORD_HL:
 0830: D3 60       OUT ($60),A
 0832: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 0835:              DB  $2F,$22,$FF  ; MM57109 instructions MCLR,TOGM,  Inline data for CALL $0446: bytes 0835-0837 terminated by $FF
-0838: CD 29 07    CALL $0729  ; BURP_WAIT_COMMAND , LIST=2C,RUN=32, DEL=14, ADD=06
+;
+; Main BURP wait for command and process loop!
+;
+0838: CD 29 07    CALL $0729  ; BURP_WAIT_COMMAND , DEL(14),MOD(1E),ADD(06),LOAD(1C),LIST(2C),DUMP(18),RUN(32)
 083B: FE 14       CP $14      ; DEL command?
 083D: 20 7F       JR NZ,$08BE ; check 
 ;
 ; DEL command
 ;
 083F: E7          RST $20     
-0840: CD 36 07    CALL $0736  ; wait for a key 
-0843: 21 00 0C    LD HL,$0C00 ; 
+0840: CD 36 07    CALL $0736    ; PARSE_DECIMAL_BYTE from input
+0843: 21 00 0C    LD HL,$0C00 ;  Start of program space is at 0C00
 0846: 7E          LD A,(HL)
-0847: FE C0       CP $C0  
+0847: FE C0       CP $C0      ; is it end of program marker
 0849: 28 B5       JR Z,$0800  ; Back to entry point ..
-084B: 23          INC HL
-084C: FE ED       CP $ED
-084E: 20 F6       JR NZ,$0846
-0850: 7E          LD A,(HL)
-0851: B9          CP C
-0852: 20 F3       JR NZ,$0847
-0854: 2B          DEC HL
+084B: 23          INC HL      ; move forward a byte
+084C: FE ED       CP $ED      ; is it start of line marker
+084E: 20 F6       JR NZ,$0846 ; loop until it is a start of line
+0850: 7E          LD A,(HL)   ; get the line number
+0851: B9          CP C        ; is it the line number we want to delete
+0852: 20 F3       JR NZ,$0847 ; no, loop again
+0854: 2B          DEC HL      ; Yes we are at the line to delete - backup to start of line marker.
 0855: 2B          DEC HL
-0856: E5          PUSH HL
-0857: D1          POP DE
-0858: 13          INC DE
-0859: 1A          LD A,(DE)
-085A: FE 1F       CP $1F
-085C: 20 FA       JR NZ,$0858
-085E: 1A          LD A,(DE)
+0856: E5          PUSH HL     ; save the position on the stack
+0857: D1          POP DE      ; Move it into DE 
+0858: 13          INC DE      ; DE now points to line number of line to be deleted.
+0859: 1A          LD A,(DE)   ; 
+085A: FE 1F       CP $1F      ; Is End of Line marker
+085C: 20 FA       JR NZ,$0858 ; Loop until it is
+085E: 1A          LD A,(DE)   ; Load end of line marker into A? 
 085F: 77          LD (HL),A
 0860: 23          INC HL
 0861: 13          INC DE
 0862: 7A          LD A,D
-0863: FE 1E       CP $1E
+0863: FE 1E       CP $1E            ; ?? 
 0865: 28 F7       JR   Z,$085E      ; if D == 1E, loop back and copy another byte
 0867: 0E 01       LD   C,$01
+;
+; Clear the screen and LIST the program ??
+;
 0869: CD 93 03    CALL $0393        ; CLEAR_SCREEN_8040_87FF
 
 086C: 11 40 80    LD DE,$8040
@@ -2245,15 +2262,16 @@ PRINT_HEX_WORD_HL:
 08BA: 20 B4       JR NZ,$0870
 08BC: 18 B8       JR $0876
 ;
-; ????
+; Clear screen, and then check for MOD,ADD,LOAD,LIST,DUMP,RUN commands each in turn. 
+; If no matching command, it just loops forever until user presses a key causing it to back to monitor
 ;
 08BE: F5          PUSH AF
 08BF: CD 93 03    CALL $0393 — MON: PUSH DE ; [MON:CLEAR_SCREEN_8040_87FF]
 08C2: F1          POP AF
-08C3: FE 1E       CP $1E   ; is command == 1E
-08C5: 20 2C       JR NZ,$08F3
+08C3: FE 1E       CP $1E         ; is  MOD command (1E)
+08C5: 20 2C       JR NZ,$08F3    ; jumop if not
 ;
-; Command 1E ?? 
+; MOD Command (1E)
 ;
 08C7: 21 FF 0B    LD HL,$0BFF
 08CA: 23          INC HL
@@ -2277,7 +2295,10 @@ PRINT_HEX_WORD_HL:
 08EB: 20 DD       JR NZ,$08CA
 08ED: 11 AB 07    LD DE,$07AB
 08F0: 18 ED       JR $08DF
-08F2: 0E 
+08F2: 0E             ; TODO sort out disassembly here, 
+;
+;  Test if ADD command
+;
 08F3: FE 06       CP $06 ; is it the ADD command
 08F5: 20 30       JR NZ, $0927
 :
@@ -2289,11 +2310,14 @@ PRINT_HEX_WORD_HL:
 08FC: FE C0       CP $C0
 08FE: 20 FA       JR NZ,$08FA
 0900: 18 03       JR $0905
+;
+; LOAD Command
+;
 0902: 21 00 0C    LD HL,$0C00
 0905: 11 40 80    LD DE,$8040
 0908: 36 ED       LD (HL),$ED
 090A: 23          INC HL
-090B: CD 36 07    CALL $0736
+090B: CD 36 07    CALL $0736   ; PARSE_DECIMAL_BYTE from input
 090E: 71          LD (HL),C
 090F: 23          INC HL
 0910: 76          HALT
@@ -2310,26 +2334,29 @@ PRINT_HEX_WORD_HL:
 0923: 36 C0       LD (HL),$C0
 0925: 18 95       JR $08BC
 ;
-; Command 1C ????
+; Test if LOAD Command (1C)
 ;
 0927: FE 1C       CP $1C
 0929: 28 D7       JR Z,$0902
 ;
-; check for LIST command
+; Test if LIST command
 ;
 092B: FE 2C       CP $2C
 092D: 20 06       JR NZ,$0935
 ;
 ; LIST command
 ;
-092F: CD 36 07    CALL $0736
+092F: CD 36 07    CALL $0736    ; PARSE_DECIMAL_BYTE from input
 0932: C3 69 08    JP $0869
 ;
-;
+; Test if DUMP command (18)
 ;
 0935: FE 18       CP $18
 0937: 20 3A       JR NZ,$0973
-0939: CD 36 07    CALL $0736
+;
+; DUMP command
+;
+0939: CD 36 07    CALL $0736    ; PARSE_DECIMAL_BYTE from input
 093C: CD F0 02    CALL $02F0 — MON: LD A,$1D ;
 093F: 0D          DEC C
 0940: 0C          INC C
@@ -2358,9 +2385,17 @@ PRINT_HEX_WORD_HL:
 096C: 18 F1       JR $095F
 096E: CD F0 02    CALL $02F0 — MON: LD A,$1D ;
 0971: 18 CD       JR $0940
+;
+; Test if RUN Command (32)
+;
 0973: FE 32       CP $32
-0975: 20 BE       JR NZ,$0935
-0977: CD 36 07    CALL $0736
+0975: 20 BE       JR NZ,$0935    ; This just loops round to test if LOAD command, possibly not right as this causes infinite loop 
+                                 ; but original scan checks out. So Wrong command hangs the system. And the logic on press a key
+                                 ; will reset us back into the monitor at this point.
+;
+; RUN Command
+;
+0977: CD 36 07    CALL $0736    ; PARSE_DECIMAL_BYTE from input
 097A: 11 40 80    LD DE,$8040
 097D: 0D          DEC C
 097E: C5          PUSH BC

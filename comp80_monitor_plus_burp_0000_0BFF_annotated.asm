@@ -2201,7 +2201,7 @@ PRINT_HEX_WORD_HL:
 0857: D1          POP DE      ; Move it into DE 
 0858: 13          INC DE      ; DE now points to line number of line to be deleted.
 0859: 1A          LD A,(DE)   ; 
-085A: FE 1F       CP $1F      ; Is End of Line marker
+085A: FE 1F       CP $1F      ; Is End of Line marker (1st time through should be start of line marker ED)
 085C: 20 FA       JR NZ,$0858 ; Loop until it is
 085E: 1A          LD A,(DE)   ; Load end of line marker into A? 
 085F: 77          LD (HL),A
@@ -2209,7 +2209,7 @@ PRINT_HEX_WORD_HL:
 0861: 13          INC DE
 0862: 7A          LD A,D
 0863: FE 1E       CP $1E            ; ?? 
-0865: 28 F7       JR   Z,$085E      ; if D == 1E, loop back and copy another byte
+0865: 20 F7       JR   NZ,$085E      ; if D != 1E, loop back and copy another byte, this is just copying up to an upper addr limit of 1E00 which may or may not be OK.
 0867: 0E 01       LD   C,$01
 ;
 ; Clear the screen and LIST the program ??
@@ -2224,14 +2224,14 @@ PRINT_HEX_WORD_HL:
 0876: 18 88       JR $0800
 0878: 21 00 0C    LD HL,$0C00
 087B: 7E          LD A,(HL)
-087C: FE C0       CP $C0
+087C: FE C0       CP $C0            ; End of program marker
 087E: 28 F0       JR Z,$0870
-0880: FE ED       CP $ED
+0880: FE ED       CP $ED            ; start of line marker?
 0882: 23          INC HL
 0883: 20 F6       JR NZ,$087B
 0885: 7E          LD A,(HL)
-0886: B9          CP C
-0887: 20 F7       JR NZ,$0880
+0886: B9          CP C              ; I think C should hold the line no we are deleting but it ended up with 1 in it?
+0887: 20 F7       JR NZ,$0880       ; Loop until we dinf the right line
 0889: CD 4A 07    CALL $074A  ; PUT_U8_AS_DEC3_AT_DE - Convert A (0..255) to 3 ASCII decimal digits (hundreds,tens,ones), outputs the line number in LIST command.
 088C: E7          RST $20
 088D: 7A          LD A,D

@@ -1634,7 +1634,7 @@ static INPUT_PORTS_START(psicomp80) INPUT_PORTS_END
 ROM_START(psicomp80)
 ROM_REGION(0x10000, "maincpu", 0)
 ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00,
-         CRC(6f651da6) SHA1(b75a2f8af83eea33bebc29f58468fee9e3014637))
+         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,

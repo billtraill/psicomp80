@@ -683,6 +683,7 @@ INLINE_DELAY_1B:
 0342: 23           INC HL         ; HL -> byte after inline parameter
 0343: E3           EX (SP),HL     ; update return address on stack to skip parameter
 0344: C9           RET
+
 0345: 11 08 80     LD DE,$8008
 0348: D5           PUSH DE
 0349: CD C4 03     CALL $03C4  ; align output cursor (start-of-line) before status/echo output
@@ -1923,27 +1924,37 @@ PRINT_HEX_WORD_HL:
 
 0726: 36 3F       LD  (HL),$3F    ; record[+0F] = 3F (terminator/default)
 0728: C9          RET
-
-; ## BURP_WAIT_KEY ($0729)
-
-0729: 76          HALT
-072A: 47          LD B,A
-072B: 76          HALT
-072C: 4F          LD C,A
-072D: 76          HALT
+;
+; ## BURP_WAIT_COMMAND ($0729)
+; Command token is returned in A.
+; LOAD = 
+; LIST = 2C
+; RUN  = 32
+; DEL  = 14
+; ADD  = 06
+; MOD  = 
+; DUMP = 
+;
+0729: 76          HALT       ; Waiting for First keystroke of BURP command
+072A: 47          LD B,A     ; keypress stored in B
+072B: 76          HALT       ; waiting for second keystroke of BURP command
+072C: 4F          LD C,A     ; keypress stored in C
+072D: 76          HALT       ; waiting for third and further keystroke of BURP command until space
 072E: FE 20       CP $20
 0730: 20 FA       JR NZ,$072C
-0732: 79          LD A,C
+0732: 79          LD A,C     ; Command token is 2nd char + 1st char + 1st char
 0733: 80          ADD A,B
 0734: 80          ADD A,B
-0735: C9          RET
+0735: C9          RET        ; 
+
+;
+; Read a Number from input terminated by a space. 
+; Then convert the number to 3 digits
+;
 0736: 76          HALT
 0737: E6 0F       AND $0F
 0739: 4F          LD C,A
 073A: 76          HALT
-
-
-
 073B: FE 20       CP $20
 073D: C8          RET Z
 073E: E6 0F       AND $0F
@@ -2142,21 +2153,23 @@ PRINT_HEX_WORD_HL:
 081C: 1E 08       LD E,$08
 081E: 3E 40       LD A,$40
 0820: CD 36 03    CALL $0336 — MON: EX (SP),HL ; HL = return address (points to inline delay count byte) [MON:INLINE_DELAY_1B]
-0823: 10 3E       DJNZ $0863
-0825: 3F          CCF
+0823: 10                       ; Not sure what this is used for...
+0824: 3E 3F       LD A,$3F
 0826: D3 60       OUT ($60),A
 0828: ED 56       IM 1
 082A: CD 36 03    CALL $0336 — MON: EX (SP),HL ; HL = return address (points to inline delay count byte) [MON:INLINE_DELAY_1B]
-082D: 90          SUB B
+082D: 90          ;  not sure what this is used for as skipped...
 082E: 3E BF       LD A,$BF
 0830: D3 60       OUT ($60),A
 0832: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
-; Inline data for CALL $0446: bytes 0835-0837 terminated by $FF
-0835:              DB  $2F,$22,$FF  ; MM57109 instructions MCLR,TOGM,
-0839: 29 07 FE    ADD HL,None
-083C: 14          INC D
-083D: 20 7F       JR NZ,$08BE
-083F: E7          RST $20
+0835:              DB  $2F,$22,$FF  ; MM57109 instructions MCLR,TOGM,  Inline data for CALL $0446: bytes 0835-0837 terminated by $FF
+0838: CD 29 07    CALL $0729  ; BURP_WAIT_COMMAND , LIST=2C,RUN=32, DEL=14, ADD=06
+083B: FE 14       CP $14      ; DEL command?
+083D: 20 7F       JR NZ,$08BE ; check 
+;
+; DEL command
+;
+083F: E7          RST $20     
 0840: CD 36 07    CALL $0736  ; wait for a key 
 0843: 21 00 0C    LD HL,$0C00 ; 
 0846: 7E          LD A,(HL)
@@ -2205,6 +2218,9 @@ PRINT_HEX_WORD_HL:
 0889: CD 4A 07    CALL $074A  ; PUT_U8_AS_DEC3_AT_DE - Convert A (0..255) to 3 ASCII decimal digits (hundreds,tens,ones), outputs the line number in LIST command.
 088C: E7          RST $20
 088D: 7A          LD A,D
+;
+; 88 Command ??
+;
 088E: FE 88       CP $88
 0890: 20 16       JR NZ,$08A8
 0892: CD CE 03    CALL $03CE — MON: EX (SP),HL ; HL <- return address (string ptr), [SP] <- old HL [MON:STR_PRINT_HL_AT_RETADDR]
@@ -2212,7 +2228,9 @@ PRINT_HEX_WORD_HL:
 0895:              DB  $0C,$09,$13,$14,$20,$09,$0E,$03,$0F,$0D,$10,$0C,$05,$14,$05,$1D  ; "LIST INCOMPLETE"
 08A5: 76          HALT
 08A6: 18 C1       JR $0869
-
+;
+; ???
+;
 08A8: 23          INC HL
 08A9: 7E          LD A,(HL)
 08AA: FE C0       CP $C0
@@ -2226,11 +2244,17 @@ PRINT_HEX_WORD_HL:
 08B8: FE 1E       CP $1E
 08BA: 20 B4       JR NZ,$0870
 08BC: 18 B8       JR $0876
+;
+; ????
+;
 08BE: F5          PUSH AF
 08BF: CD 93 03    CALL $0393 — MON: PUSH DE ; [MON:CLEAR_SCREEN_8040_87FF]
 08C2: F1          POP AF
-08C3: FE 1E       CP $1E
+08C3: FE 1E       CP $1E   ; is command == 1E
 08C5: 20 2C       JR NZ,$08F3
+;
+; Command 1E ?? 
+;
 08C7: 21 FF 0B    LD HL,$0BFF
 08CA: 23          INC HL
 08CB: 7E          LD A,(HL)
@@ -2253,11 +2277,13 @@ PRINT_HEX_WORD_HL:
 08EB: 20 DD       JR NZ,$08CA
 08ED: 11 AB 07    LD DE,$07AB
 08F0: 18 ED       JR $08DF
-08F2: 0E FE       LD C,$FE
-08F4: 06 20       LD B,$20
-08F6: 30 21       JR NC,$0919
-08F8: FF          RST $38
-08F9: 0B          DEC BC
+08F2: 0E 
+08F3: FE 06       CP $06 ; is it the ADD command
+08F5: 20 30       JR NZ, $0927
+:
+:  ADD command
+:
+08F7: 21 FF 0B    LD HL,$0BFF 
 08FA: 23          INC HL
 08FB: 7E          LD A,(HL)
 08FC: FE C0       CP $C0
@@ -2283,12 +2309,24 @@ PRINT_HEX_WORD_HL:
 0922: 23          INC HL
 0923: 36 C0       LD (HL),$C0
 0925: 18 95       JR $08BC
+;
+; Command 1C ????
+;
 0927: FE 1C       CP $1C
 0929: 28 D7       JR Z,$0902
+;
+; check for LIST command
+;
 092B: FE 2C       CP $2C
 092D: 20 06       JR NZ,$0935
+;
+; LIST command
+;
 092F: CD 36 07    CALL $0736
 0932: C3 69 08    JP $0869
+;
+;
+;
 0935: FE 18       CP $18
 0937: 20 3A       JR NZ,$0973
 0939: CD 36 07    CALL $0736

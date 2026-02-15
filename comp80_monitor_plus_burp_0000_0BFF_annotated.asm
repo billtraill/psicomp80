@@ -463,7 +463,7 @@ BURP_ENTRY_JP:
 020E: E3           EX (SP),HL
 020F: C1           POP BC
 0210: 7E           LD A,(HL)
-0211: CD 60 02     CALL $0260
+0211: CD 60 02     CALL $0260 ; Transmits the byte in register A to the tape interface
 0214: 23           INC HL
 0215: 7C           LD A,H
 0216: B8           DB $B8
@@ -501,6 +501,9 @@ BURP_ENTRY_JP:
 0250: 77           LD (HL),A
 0251: 23           INC HL
 0252: 18 D5        JR $0229
+;
+; Sets the tape interface to 2400Hz and then calls 255 long time delays - about 4 seconds
+;
 0254: 3E FF        LD A,$FF
 0256: 47           LD B,A
 0257: D3 20        OUT ($20),A
@@ -508,10 +511,13 @@ BURP_ENTRY_JP:
 025C: FF           DB $FF        ; delay count for INLINE_DELAY_1B
 025D: 10 FA        DJNZ $0259
 025F: C9           RET
+;
+; Transmits the byte in register A to the tape interface preceded by a start bit and followed by 2 stop bits
+;
 0260: C5           PUSH BC
 0261: F5           PUSH AF
 0262: AF           XOR A
-0263: D3 20        OUT ($20),A
+0263: D3 20        OUT ($20),A ; 
 0265: CD 36 03     CALL $0336 ; INLINE_DELAY_1B: 1-byte delay parameter follows
 0268: 35           DB $35        ; delay count for INLINE_DELAY_1B
 0269: F1           POP AF
@@ -527,13 +533,19 @@ BURP_ENTRY_JP:
 027C: 4C           DB $4C        ; delay count for INLINE_DELAY_1B
 027D: C1           POP BC
 027E: C9           RET
-027F: CD F0 02     CALL $02F0
+;
+; Calls a new line and then prints the contents of HL on the teleprinter
+;
+027F: CD F0 02     CALL $02F0  ; Prints new line on teleprinter 
 0282: 7C           LD A,H
 0283: CD 8E 02     CALL $028E
 0286: 7D           LD A,L
 0287: CD 8E 02     CALL $028E
-028A: CD EC 02     CALL $02EC
+028A: CD EC 02     CALL $02EC  ; 
 028D: C9           RET
+;
+; Formats the hex byte in register A for printing as two characters on the teleprinter
+;
 028E: C5           PUSH BC
 028F: 4F           LD C,A
 0290: E6 F0        AND A,$F0
@@ -596,8 +608,14 @@ BURP_ENTRY_JP:
 02E7: 1C           INC E
 02E8: 11 06 12     LD DE,$1206
 02EB: 14           INC D
+;
+; Prints a space on the teleprinter
+;
 02EC: 3E 1C        LD A,$1C
 02EE: 18 11        JR $0301
+;
+; Calls a new line on the teleprinter
+;
 02F0: 3E 1D        LD A,$1D
 02F2: CD 01 03     CALL $0301
 02F5: 3E 1E        LD A,$1E
@@ -606,6 +624,9 @@ BURP_ENTRY_JP:
 02FC: CD 01 03     CALL $0301
 02FF: 08           EX AF,AF'
 0300: C9           RET
+;
+; Prints the contents of register A on the teleprinter
+;
 0301: F5           PUSH AF
 0302: C5           PUSH BC
 0303: E6 1F        AND A,$1F
@@ -683,12 +704,17 @@ INLINE_DELAY_1B:
 0342: 23           INC HL         ; HL -> byte after inline parameter
 0343: E3           EX (SP),HL     ; update return address on stack to skip parameter
 0344: C9           RET
-
+;
+; Clears the top line and sets DE to 8008
+;
 0345: 11 08 80     LD DE,$8008
 0348: D5           PUSH DE
 0349: CD C4 03     CALL $03C4  ; align output cursor (start-of-line) before status/echo output
 034C: D1           POP DE
 034D: C9           RET
+;
+; Used to format results as in FIND and COR this rounds DE up to the next multiple of 8
+;
 034E: 7B           LD A,E
 034F: E6 07        AND A,$07
 0351: C8           RET Z
@@ -948,6 +974,9 @@ PRINT_HEX_WORD_HL:
 03F3: 80           ADD A,B               ; combine low nibble with (high_nibble<<4)
 03F4: C1           POP BC
 03F5: C9           RET
+;
+; Reads a single keyboard character end if a letter adds 6 then truncates to 4 bit binary (used as part of 03E7)
+;
 03F6: 76           HALT
 03F7: FE 20        CP A,$20
 03F9: 30 02        JR NC,$03FD
@@ -2420,10 +2449,13 @@ PRINT_HEX_WORD_HL:
 0993: CD 94 07    CALL $0794  ; We are at the right line, parse the opcode BURP_DECODE_LINE_OPCODE A returns the code.
 
 ;
-; Parse token 26
+; Test if INPUT token
 ;
 0996: FE 26       CP $26    ; token $26: parse numeric format specifier (CALL $06BB on following selector byte)
 0998: 20 14       JR NZ,$09AE
+; ------------------------------------------------------------
+; Execute INPUT token
+; ------------------------------------------------------------
 099A: CD C4 03    CALL $03C4
 099D: 23          INC HL
 099E: 7E          LD A,(HL)
@@ -2436,10 +2468,13 @@ PRINT_HEX_WORD_HL:
 09AA: 20 F2       JR NZ,$099E
 09AC: 18 D1       JR $097F
 ;
-; Parse token 34 - PRINT Statement.
+; Test if PRINT token
 ;
 09AE: FE 34       CP $34
 09B0: 20 22       JR NZ,$09D4
+; ------------------------------------------------------------
+; Execute PRINT token
+; ------------------------------------------------------------
 09B2: CD C4 03    CALL $03C4
 09B5: 23          INC HL
 09B6: 7E          LD A,(HL)
@@ -2466,20 +2501,27 @@ PRINT_HEX_WORD_HL:
 09D6: 20 03       JR NZ,$09DB
 09D8: C3 00 08    JP $0800
 ;
-; Parse token 1D 
+; Test if GOTO token - $
 ;
-09DB: FE 1D       CP $1D
+09DB: FE 1D       CP $1D - Is GOTO token
 09DD: 20 08       JR NZ,$09E7
+; ------------------------------------------------------------
+; Execute GOTO token 1D
+; ------------------------------------------------------------
 09DF: 23          INC HL
 09E0: 7E          LD A,(HL)
 09E1: CD BA 04    CALL $04BA
 09E4: E1          POP HL
 09E5: 18 9A       JR $0981
+
 ;
-; Parse token 2C - LET statement.
+; Test if LET token - 2C
 ;
-09E7: FE 2C       CP $2C
+09E7: FE 2C       CP $2C - Is LET token
 09E9: 20 15       JR NZ,$0A00
+; ------------------------------------------------------------
+; Execute LET token 2C
+; ------------------------------------------------------------
 09EB: 23          INC HL
 09EC: 46          LD B,(HL)
 09ED: C5          PUSH BC
@@ -2494,9 +2536,7 @@ PRINT_HEX_WORD_HL:
 09F9: 18 84       JR $097F
 09FB: CD E6 04    CALL $04E6
 09FE: 18 EF       JR $09EF
-;
-; Parse token 18 
-;
+
 ; -----------------------------------------------------------------------------
 ; BURP_STMT_TOKEN18_EXECUTE_MATH_OP ($0A00)
 ;  Statement handler for token $18.
@@ -2518,10 +2558,14 @@ PRINT_HEX_WORD_HL:
 ;    IN : HL -> token stream positioned just before/at token $18 operands
 ;    Uses: B as lookahead token, emits multiple bytes via MM57109_SEND_INSTRUCTION_IN_A.
 ; -----------------------------------------------------------------------------
-0A00: FE 18       CP $18  ; dispatch: token == $18 ?
-
+;
+; Test if IF token - 18
+;
+0A00: FE 18       CP $18  ; dispatch: is IF token == $18 ?
 0A02: 20 3B       JR NZ,$0A3F  ; if not token $18, try next statement handler
-
+; ------------------------------------------------------------
+; Execute IF Token 
+; ------------------------------------------------------------
 0A04: 23          INC HL  ; advance to operand selector byte
 
 0A05: 7E          LD A,(HL)  ; A := operand-block selector
@@ -2582,10 +2626,13 @@ PRINT_HEX_WORD_HL:
 0A3D: 18 A5       JR $09E4  ; alternate resume/cleanup path
 
 ;
-; Parse token 33 
+; Test if WRITE token - 33  
 ;
-0A3F: FE 33       CP $33
+0A3F: FE 33       CP $33 ; is WRITE token?
 0A41: 20 3C       JR NZ,$0A7F
+; ------------------------------------------------------------
+; Execute WRITE token
+; ------------------------------------------------------------
 0A43: CD F0 02    CALL $02F0 — MON: LD A,$1D ;
 0A46: D5          PUSH DE
 0A47: 11 C0 1D    LD DE,$1DC0
@@ -2622,18 +2669,24 @@ PRINT_HEX_WORD_HL:
 0A7C: D1          POP DE
 0A7D: 18 BC       JR $0A3B
 ;
-; Parse token 0F 
+; Test if ERASE token - OF  
 ;
-0A7F: FE 0F       CP $0F
+0A7F: FE 0F       CP $0F  ; is ERASE token ?
 0A81: 20 08       JR NZ,$0A8B
+; ------------------------------------------------------------
+; Execute ERASE token
+; ------------------------------------------------------------
 0A83: 11 40 80    LD DE,$8040
 0A86: CD 93 03    CALL $0393 — MON: PUSH DE ; [MON:CLEAR_SCREEN_8040_87FF]
 0A89: 18 F2       JR $0A7D
 ;
-; Parse token 38
+; Test if TOP token
 ;
-0A8B: FE 38       CP $38
+0A8B: FE 38       CP $38 ; is TOP token
 0A8D: 20 0B       JR NZ,$0A9A
+; ------------------------------------------------------------
+; Execute TOP token 
+; ------------------------------------------------------------
 0A8F: 11 40 80    LD DE,$8040
 0A92: D5          PUSH DE
 0A93: E7          RST $20
@@ -2641,33 +2694,43 @@ PRINT_HEX_WORD_HL:
 0A97: D1          POP DE
 0A98: 18 EF       JR $0A89
 ;
-; Parse token 10
+; Test if GOSUB
 ;
 0A9A: FE 10       CP $10
 0A9C: 20 08       JR NZ,$0AA6
+; ------------------------------------------------------------
+; Execute GOSUB token
+; ------------------------------------------------------------
 0A9E: 23          INC HL
 0A9F: 7E          LD A,(HL)
 0AA0: CD BA 04    CALL $04BA
 0AA3: E5          PUSH HL
 0AA4: 18 97       JR $0A3D
 ;
-; Parse token 32
+; Test if RETURN token
 ;
 0AA6: FE 32       CP $32
 0AA8: 20 04       JR NZ,$0AAE
+; ------------------------------------------------------------
+; Execute RETURN token
+; ------------------------------------------------------------
 0AAA: C1          POP BC
 0AAB: 00          NOP
 0AAC: 18 8D       JR $0A3B
-; ------------------------------------------------------------
+;
+; Test if FOR token
+;
+0AAE: FE 1E        CP  $1E
+0AB0: 20 2C        JR  NZ,$0ADE          ; not FOR -> try next statement type
+;------------------------------------------------------------
+; Execute FOR token
+; -----------------------------------------------------------
 ; Parse token 1E  -- FOR
 ; FOR X=... STEP ... UNTIL ...
 ; Note the Return line number is stored in 1FE3 
 ; BURP does not support embedded FOR loops, only a single loop
 ; can be active at a time.
 ; ------------------------------------------------------------
-0AAE: FE 1E        CP  $1E
-0AB0: 20 2C        JR  NZ,$0ADE          ; not FOR -> try next statement type
-
 0AB2: C1           POP BC
 0AB3: C5           PUSH BC               ; peek/preserve BC (interpreter state)
 
@@ -2703,11 +2766,14 @@ PRINT_HEX_WORD_HL:
 0AD6: DB  $30,$3A,$30,$3C,$1C,$FF        ; likely compiles UNTIL value + compare/jump micro-sequence,  MM57109 instructions  XEY,-,XEY,/,MS
 
 0ADC: 18 9F        JR  $0A7D             ; back to main statement dispatch loop
-; ------------------------------------------------------------
-; Parse token 30 - NEXT statement
-; ------------------------------------------------------------
+;
+; Test if  NEXT token
+;
 0ADE: FE 30       CP $30
 0AE0: 20 2D       JR NZ,$0B0F
+; ------------------------------------------------------------
+; Execute NEXT token
+; ------------------------------------------------------------
 0AE2: CD 46 04    CALL $0446  ; BURP_SEND_INLINE_MM57109_INSTRUCTIONS_UNTIL_FF(inline @ retaddr)
 
 ; Inline data for CALL $0446: bytes 0AE5-0AE6 terminated by $FF
@@ -2742,10 +2808,13 @@ PRINT_HEX_WORD_HL:
 ;
 0B0F: FE 24       CP $24
 0B11: 20 01       JR NZ,$0B14
+; ------------------------------------------------------------
+; Execute HALT token
+; ------------------------------------------------------------
 0B13: 76          HALT
-;
-; Deal with anything else ???
-;
+; ------------------------------------------------------------
+; Anything else is treated as a comment and ignored I think
+; ------------------------------------------------------------
 0B14: 18 C6       JR $0ADC
 0B16: 11 40 80    LD DE,$8040
 0B19: 21 E4 1F    LD HL,$1FE4

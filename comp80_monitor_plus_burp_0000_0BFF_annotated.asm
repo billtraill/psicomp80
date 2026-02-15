@@ -475,9 +475,12 @@ BURP_ENTRY_JP:
 0220: C7           RST 00H
 0221: FE F2        CP A,CMD_READ_CODE  ; READ XXXX (read tape into memory starting at XXXX; terminates on key)
 0223: C2 A4 01     JP NZ,$01A4
+;
+; READ XXXX (read tape into memory starting at XXXX; terminates on key)
+;
 0226: CD DE 03     CALL $03DE ; READ: read start address XXXX -> HL
 0229: 0E 00        LD C,$00
-022B: DB 00        IN A,($00)
+022B: DB 00        IN A,($00) ; Read tape interface
 022D: E6 01        AND A,$01
 022F: 20 FA        JR NZ,$022B
 0231: CD 36 03     CALL $0336 ; INLINE_DELAY_1B: 1-byte delay parameter follows
@@ -1956,13 +1959,13 @@ PRINT_HEX_WORD_HL:
 ;
 ; ## BURP_WAIT_COMMAND ($0729)
 ; Command token is returned in A.
-; LOAD = 
+; LOAD = 1C
 ; LIST = 2C
 ; RUN  = 32
 ; DEL  = 14
 ; ADD  = 06
-; MOD  = 
-; DUMP = 
+; MOD  = 1E
+; DUMP = 18
 ;
 0729: 76          HALT       ; Waiting for First keystroke of BURP command
 072A: 47          LD B,A     ; keypress stored in B

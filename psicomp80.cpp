@@ -39,8 +39,258 @@ graphics set selected by VRAM bit 6.
 #include <array>
 #include <cmath>
 #include <cstdlib>
+#include <system_error>
 #include <string>
 #include <vector>
+
+// ---------------------------------------------------------------------------
+// COMP80 cassette tape image + bitstream bridge
+//
+// The real COMP80 cassette interface presents the Z80 with a single decoded
+// logic bit (FSK demodulated) and accepts a single logic bit to drive the FSK
+// modulator. The monitor firmware uses:
+//   - IN  ($00) bit 0 : tape input (idle=1, start=0)
+//   - OUT ($20) bit 7 : tape output (bit7 first, async serial)
+// with 300 baud, 1 start bit (0), 8 data bits MSB-first, and ~1.5 stop bits.
+//
+// We model a *digital* bitstream (not audio tones). Files are raw byte streams
+// in the order the firmware reads/writes them.
+//
+// Mount/unmount (and therefore change filename at runtime) is handled by MAME's
+// File Manager because this is a device_image_interface.
+// ---------------------------------------------------------------------------
+
+class comp80_tape_device : public device_t, public device_image_interface
+{
+public:
+  comp80_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+  // tape input bit for IN ($00)
+  int input_level();
+  // tape output bit for OUT ($20)
+  void output_level(int level);
+
+protected:
+  // device_t
+  virtual void device_start() override;
+  virtual void device_reset() override;
+
+  // device_image_interface
+  virtual std::pair<std::error_condition, std::string> call_load() override;
+  virtual void call_unload() override;
+  virtual const char *image_interface() const noexcept override { return "comp80_tape"; }
+  virtual const char *file_extensions() const noexcept override { return "c80,bin"; }
+  virtual const char *image_type_name() const noexcept override { return "cassette"; }
+  virtual const char *image_brief_type_name() const noexcept override { return "tape"; }
+  virtual bool is_readable() const noexcept override { return true; }
+  virtual bool is_writeable() const noexcept override { return true; }
+  virtual bool is_creatable() const noexcept override { return true; }
+	// Don't hard-reset the whole machine when the user mounts/unmounts a tape.
+	// We want to be able to swap filenames while the monitor is running.
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+
+private:
+  void reset_input_stream();
+  void step_input_until(attotime now);
+
+  // input stream
+  std::vector<u8> m_in;
+	u32 m_in_byte = 0;
+  int m_in_phase = 0;   // 0=leader/idle, 1=start, 2=data, 3=stop
+  int m_in_bit = 0;     // data bit index 0..7 (MSB-first)
+  int m_in_level = 1;   // current level
+  attotime m_next_bit_edge;
+  u32 m_leader_bits = 0;
+
+  // output decoder
+  enum : u8 { OUT_WAIT_START = 0, OUT_DATA = 1, OUT_WAIT_STOP = 2 };
+  u8 m_out_state = OUT_WAIT_START;
+  int m_out_bits = 0;
+  u8 m_out_accum = 0;
+  std::vector<u8> m_out;
+  bool m_out_dirty = false;
+};
+
+DECLARE_DEVICE_TYPE(COMP80_TAPE, comp80_tape_device)
+DEFINE_DEVICE_TYPE(COMP80_TAPE, comp80_tape_device, "comp80_tape", "PSI COMP80 Cassette (digital)")
+
+comp80_tape_device::comp80_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+  : device_t(mconfig, COMP80_TAPE, tag, owner, clock)
+  , device_image_interface(mconfig, *this)
+{
+}
+
+void comp80_tape_device::device_start()
+{
+  save_item(NAME(m_in_byte));
+  save_item(NAME(m_in_phase));
+  save_item(NAME(m_in_bit));
+  save_item(NAME(m_in_level));
+  save_item(NAME(m_next_bit_edge));
+  save_item(NAME(m_leader_bits));
+
+  save_item(NAME(m_out_state));
+  save_item(NAME(m_out_bits));
+  save_item(NAME(m_out_accum));
+  save_item(NAME(m_out_dirty));
+
+  reset_input_stream();
+}
+
+void comp80_tape_device::device_reset()
+{
+  reset_input_stream();
+  m_out_state = OUT_WAIT_START;
+  m_out_bits = 0;
+  m_out_accum = 0;
+  // Do not clear m_out here: user may reset while still wanting captured data.
+}
+
+void comp80_tape_device::reset_input_stream()
+{
+  m_in_byte = 0;
+  m_in_phase = 0;
+  m_in_bit = 0;
+  m_in_level = 1;
+  m_next_bit_edge = machine().time();
+  // Firmware precedes data with “several seconds” of stop bits (idle=1).
+  // Use 2 seconds as a practical default.
+  m_leader_bits = 300 * 2;
+}
+
+std::pair<std::error_condition, std::string> comp80_tape_device::call_load()
+{
+  m_in.clear();
+  m_out.clear();
+  m_out_dirty = false;
+
+  u64 len = length();
+  if (len > 0)
+  {
+    m_in.resize(len);
+    fread(m_in.data(), len);
+  }
+
+  reset_input_stream();
+  // Success: empty error_condition and no message.
+  return { std::error_condition(), std::string() };
+}
+
+void comp80_tape_device::call_unload()
+{
+  if (m_out_dirty && !is_readonly())
+  {
+    fseek(0, SEEK_SET);
+    if (!m_out.empty())
+      fwrite(m_out.data(), m_out.size());
+  }
+  m_out_dirty = false;
+}
+
+void comp80_tape_device::step_input_until(attotime now)
+{
+  const attotime bit_time = attotime::from_hz(300);
+  const attotime stop_time = bit_time + bit_time / 2; // 1.5 bits
+
+  while (now >= m_next_bit_edge)
+  {
+    if (!is_loaded() || m_in.empty())
+    {
+      m_in_level = 1;
+      m_next_bit_edge += bit_time;
+      continue;
+    }
+
+    switch (m_in_phase)
+    {
+    case 0: // leader/idle (stop bits)
+      m_in_level = 1;
+      if (m_leader_bits > 0)
+        --m_leader_bits;
+      else
+        m_in_phase = 1;
+      m_next_bit_edge += bit_time;
+      break;
+
+    case 1: // start bit
+      m_in_level = 0;
+      m_in_phase = 2;
+      m_in_bit = 0;
+      m_next_bit_edge += bit_time;
+      break;
+
+    case 2: // data bits, MSB-first
+      {
+        const u8 cur = m_in[m_in_byte];
+        const int bit = (cur >> (7 - m_in_bit)) & 1;
+        m_in_level = bit;
+        m_in_bit++;
+        if (m_in_bit >= 8)
+          m_in_phase = 3;
+        m_next_bit_edge += bit_time;
+      }
+      break;
+
+    case 3: // stop bits (~1.5 bits)
+      m_in_level = 1;
+      m_in_phase = 1;
+      m_in_bit = 0;
+      m_in_byte++;
+      if (m_in_byte >= m_in.size())
+      {
+        m_in_phase = 0;
+        m_in_level = 1;
+      }
+      m_next_bit_edge += stop_time;
+      break;
+    }
+  }
+}
+
+int comp80_tape_device::input_level()
+{
+  step_input_until(machine().time());
+  return m_in_level ? 1 : 0;
+}
+
+void comp80_tape_device::output_level(int level)
+{
+  level = level ? 1 : 0;
+
+  switch (m_out_state)
+  {
+  case OUT_WAIT_START:
+    if (level == 0)
+    {
+      m_out_state = OUT_DATA;
+      m_out_bits = 0;
+      m_out_accum = 0;
+    }
+    break;
+
+  case OUT_DATA:
+    m_out_accum = (u8)((m_out_accum << 1) | (level & 1));
+    m_out_bits++;
+    if (m_out_bits >= 8)
+      m_out_state = OUT_WAIT_STOP;
+    break;
+
+  case OUT_WAIT_STOP:
+    if (level == 1)
+    {
+      m_out.push_back(m_out_accum);
+      m_out_dirty = true;
+      m_out_state = OUT_WAIT_START;
+    }
+    else
+    {
+      m_out_state = OUT_DATA;
+      m_out_bits = 0;
+      m_out_accum = 0;
+    }
+    break;
+  }
+}
 // ---------------------------------------------------------------------------
 // MM57109 tracing
 //
@@ -228,7 +478,8 @@ public:
   psicomp80_state(const machine_config &mconfig, device_type type,
                   const char *tag)
       : driver_device(mconfig, type, tag), m_cpu(*this, "maincpu"),
-        m_vram(*this, "vram"), m_keyboard(*this, "keyboard") {}
+        m_vram(*this, "vram"), m_keyboard(*this, "keyboard"),
+        m_tape(*this, "tape") {}
 
   void psicomp80(machine_config &config);
 
@@ -249,6 +500,7 @@ private:
   required_device<z80_device> m_cpu;
   required_shared_ptr<u8> m_vram;
   required_device<generic_keyboard_device> m_keyboard;
+  required_device<comp80_tape_device> m_tape;
 
   // ROM is mapped read-only (like real hardware)
 
@@ -343,8 +595,10 @@ private:
   void io_map(address_map &map);
 
   // I/O handlers
+  u8 port00_r();
   u8 port01_r();
   u8 port03_r();
+  void port20_w(u8 data);
   void port60_w(u8 data);
   void mm57109_dump_stream(const char *tag, u8 cmd);
 
@@ -525,9 +779,28 @@ void psicomp80_state::mem_map(address_map &map) {
 void psicomp80_state::io_map(address_map &map) {
   map.global_mask(0xff);
 
+  // Tape interface (digital)
+  //   IN  ($00) bit0 : tape input level (idle=1)
+  //   OUT ($20) bit7 : tape output level (bit7 first)
+  map(0x00, 0x00).r(FUNC(psicomp80_state::port00_r));
   map(0x01, 0x01).r(FUNC(psicomp80_state::port01_r));
   map(0x03, 0x03).r(FUNC(psicomp80_state::port03_r));
+  map(0x20, 0x20).w(FUNC(psicomp80_state::port20_w));
   map(0x60, 0x60).w(FUNC(psicomp80_state::port60_w));
+}
+
+u8 psicomp80_state::port00_r()
+{
+  // Firmware masks bit 0 (AND 1) and treats idle as 1.
+  const int lvl = m_tape->input_level();
+  return (lvl ? 0x01 : 0x00);
+}
+
+void psicomp80_state::port20_w(u8 data)
+{
+  // Cassette output is bit 7 of the data bus (D7).
+  const int lvl = (data & 0x80) ? 1 : 0;
+  m_tape->output_level(lvl);
 }
 
 u8 psicomp80_state::port01_r() {
@@ -1615,6 +1888,9 @@ static INPUT_PORTS_START(psicomp80) INPUT_PORTS_END
   Z80(config, m_cpu, 4'000'000);
   m_cpu->set_addrmap(AS_PROGRAM, &psicomp80_state::mem_map);
   m_cpu->set_addrmap(AS_IO, &psicomp80_state::io_map);
+
+  // Cassette (digital bitstream)
+  COMP80_TAPE(config, m_tape, 0);
 
   GENERIC_KEYBOARD(config, m_keyboard, 0);
   m_keyboard->set_keyboard_callback(FUNC(psicomp80_state::kbd_put));

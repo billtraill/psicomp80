@@ -1,0 +1,858 @@
+{
+ "figure": "Part 2 (Wireless World, May 1979): Fig. 12 tape interface (p.91), Fig. 15 teleprinter interface (p.92), Fig. 16 power supply (p.93)",
+ "parts": [
+  {
+   "ref": "IC51",
+   "value": "4013",
+   "pins": {
+    "1": "TAPE_TXQ",
+    "2": "NC",
+    "3": "CPU_IC2_Y4",
+    "4": "GND",
+    "5": "D7",
+    "6": "GND",
+    "7": "GND",
+    "8": "GND",
+    "9": "TAPE_MONO_Q",
+    "10": "GND",
+    "11": "TAPE_SQ",
+    "12": "NC",
+    "13": "TAPE_RXD",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14"
+   ],
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Dual D flip-flop; the figure shows two '1/2 4013' blocks with NO pin numbers. Half 1 (pins 1-6) = transmit latch: D=D7, CK=IC2 pin 11, R,S=0V, Q drives both 56k base resistors of the tone multivibrator. Half 2 (pins 8-13) = receive flip-flop: D=4528 Q, CK=Schmitt/buffer output, R,S=0V, Q -> IC53 pin 2. Which half does which job is NOT given (choice made here); all pin numbers from the CD4013 datasheet (1 Q1, 2 /Q1, 3 CK1, 4 R1, 5 D1, 6 S1, 7 VSS, 8 S2, 9 D2, 10 R2, 11 CK2, 12 /Q2, 13 Q2, 14 VDD). /Q outputs unused. IC number from kit board_data (article gives none); type matches."
+  },
+  {
+   "ref": "IC52",
+   "value": "4528",
+   "pins": {
+    "1": "TAPE_MONO_C",
+    "2": "TAPE_MONO_RC",
+    "3": "+5V",
+    "4": "TAPE_SQ",
+    "5": "+5V",
+    "6": "TAPE_MONO_Q",
+    "7": "NC",
+    "8": "GND",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "NC",
+    "14": "NC",
+    "15": "NC",
+    "16": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Dual retriggerable monostable, figure shows '1/2 4528' with NO pin numbers: B and C (clear) tied to +5V, A = trigger from the Schmitt/buffer output (TAPE_SQ), T2 = 27k/100n junction, T1 = other side of 100n, Q -> 4013 D. Half A used here (choice); pin numbers from the MC14528/CD4528 datasheet (1 T1A, 2 T2A, 3 /CD A, 4 A_A(+trig), 5 B_A(-trig), 6 QA, 7 /QA, 8 VSS, 9 /QB, 10 QB, 11 B_B, 12 A_B, 13 /CD B, 14 T2B, 15 T1B, 16 VDD). Unused half B not drawn: inputs 11, 12, 13 left NC here but CMOS inputs should not float (see uncertain). Wireless World Sept 1979 'Points arising' and the kit's Points Arising sheet (item 5, 'R36 (27K)') replace the 27k with a 50k preset if the reader does not work."
+  },
+  {
+   "ref": "IC53",
+   "value": "74LS367",
+   "pins": {
+    "1": "CPU_IC3_Y0",
+    "2": "TAPE_RXD",
+    "3": "D0",
+    "4": "NC",
+    "5": "D1",
+    "6": "NC",
+    "7": "D2",
+    "8": "GND",
+    "9": "D3",
+    "10": "NC",
+    "11": "D4",
+    "12": "NC",
+    "13": "D5",
+    "14": "NC",
+    "15": "CPU_IC3_Y0",
+    "16": "+5V"
+   },
+   "assumed_pins": [
+    "5",
+    "7",
+    "9",
+    "11",
+    "13",
+    "8",
+    "16"
+   ],
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Hex tri-state buffer ('6-bit buffer' in the text). Printed pins: 1 and 15 joined, fed from 'IC3 pin 15'; 2 = Q of the receive 4013. Outputs drawn only as a fat arrow 'D5 ... D0 Data bus'. Pin 3 (Y1, buffer of input pin 2) -> D0 is inferred from the monitor ROM (READ routine at 022B: IN A,($00); AND $01; the MAME driver also models IN($00) bit 0 = tape). Outputs Y2..Y6 (pins 5,7,9,11,13) -> D1..D5 assigned in order (assumption, consistent with the fat arrow and with Part 6 which feeds an RTTY unit 'via the serial input buffer IC53 to the line which feeds data bus line D2'). Inputs A2..A6 (pins 4,6,10,12,14) not drawn -> NC (LS-TTL inputs float high). Power pins from datasheet."
+  },
+  {
+   "ref": "VR2",
+   "value": "5k preset",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_MV_C1",
+    "3": "TAPE_VR2_W"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Drawn as a resistor with the 'To tape' coupling capacitor's arrow touching it = preset; it is the collector load of the left multivibrator transistor and its wiper sets the output level. Matched to kit VR2 (4k7 preset, the only preset in the kit tape section). End 1 = +5V end, end 2 = collector end."
+  },
+  {
+   "ref": "TAPE_C1",
+   "value": "100n",
+   "pins": {
+    "1": "TAPE_VR2_W",
+    "2": "TAPE_OUT"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Output coupling capacitor from the preset wiper to 'To tape'."
+  },
+  {
+   "ref": "TAPE_R1",
+   "value": "75k",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_MV_B1"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Upper base-bias resistor, left multivibrator transistor."
+  },
+  {
+   "ref": "TAPE_R2",
+   "value": "56k",
+   "pins": {
+    "1": "TAPE_MV_B1",
+    "2": "TAPE_TXQ"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Lower base-bias resistor, left transistor, returned to 4013 Q (frequency shift)."
+  },
+  {
+   "ref": "TAPE_R3",
+   "value": "75k",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_MV_B2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Upper base-bias resistor, right multivibrator transistor."
+  },
+  {
+   "ref": "TAPE_R4",
+   "value": "56k",
+   "pins": {
+    "1": "TAPE_MV_B2",
+    "2": "TAPE_TXQ"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Lower base-bias resistor, right transistor, returned to 4013 Q."
+  },
+  {
+   "ref": "TAPE_R5",
+   "value": "4k7",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_MV_C2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Collector load, right multivibrator transistor."
+  },
+  {
+   "ref": "TAPE_C2",
+   "value": "10n",
+   "pins": {
+    "1": "TAPE_MV_C1",
+    "2": "TAPE_MV_B2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Cross-coupling: left collector -> right base (wire crosses the left base line without a dot)."
+  },
+  {
+   "ref": "TAPE_C3",
+   "value": "10n",
+   "pins": {
+    "1": "TAPE_MV_B1",
+    "2": "TAPE_MV_C2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Cross-coupling: right collector -> left base (wire crosses the right base line without a dot)."
+  },
+  {
+   "ref": "TAPE_TR1",
+   "value": "2N3904",
+   "pins": {
+    "E": "GND",
+    "B": "TAPE_MV_B1",
+    "C": "TAPE_MV_C1"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Left multivibrator transistor, npn (figure note 'n.p.n. 2N3904'). Kit uses BC107L/BC182L (TR4-TR7); which kit TR this is cannot be read from the article (probably TR4 or TR5, nearest VR2)."
+  },
+  {
+   "ref": "TAPE_TR2",
+   "value": "2N3904",
+   "pins": {
+    "E": "GND",
+    "B": "TAPE_MV_B2",
+    "C": "TAPE_MV_C2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Right multivibrator transistor, npn. Kit equivalent one of TR4-TR7 (unknown which)."
+  },
+  {
+   "ref": "TAPE_C4",
+   "value": "10u",
+   "pins": {
+    "1": "TAPE_RX_BIAS",
+    "2": "TAPE_IN"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). 'From tape' input coupling capacitor, electrolytic. Hollow plate (= + in this article's convention, cf. all PSU reservoirs) is on the bias-divider side."
+  },
+  {
+   "ref": "TAPE_R6",
+   "value": "6k8",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_RX_BIAS"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Input bias divider, upper."
+  },
+  {
+   "ref": "TAPE_R7",
+   "value": "6k8",
+   "pins": {
+    "1": "TAPE_RX_BIAS",
+    "2": "GND"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Input bias divider, lower."
+  },
+  {
+   "ref": "TAPE_R8",
+   "value": "220",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_ST_C1"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Collector load, first Schmitt transistor."
+  },
+  {
+   "ref": "TAPE_TR3",
+   "value": "2N3904",
+   "pins": {
+    "E": "TAPE_ST_E",
+    "B": "TAPE_RX_BIAS",
+    "C": "TAPE_ST_C1"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Schmitt trigger input transistor, npn. Kit equivalent one of TR4-TR7 (probably TR6/TR7)."
+  },
+  {
+   "ref": "TAPE_R9",
+   "value": "4k7",
+   "pins": {
+    "1": "TAPE_ST_C1",
+    "2": "TAPE_ST_B2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Schmitt coupling, first collector -> second base (wire crosses the second collector line without a dot)."
+  },
+  {
+   "ref": "TAPE_R10",
+   "value": "4k7",
+   "pins": {
+    "1": "TAPE_ST_B2",
+    "2": "GND"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Second Schmitt base to 0V."
+  },
+  {
+   "ref": "TAPE_TR4",
+   "value": "2N3904",
+   "pins": {
+    "E": "TAPE_ST_E",
+    "B": "TAPE_ST_B2",
+    "C": "TAPE_ST_C2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Schmitt trigger output transistor, npn. Kit equivalent one of TR4-TR7."
+  },
+  {
+   "ref": "TAPE_R11",
+   "value": "2k2",
+   "pins": {
+    "1": "TAPE_ST_E",
+    "2": "GND"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Common emitter resistor of the Schmitt pair."
+  },
+  {
+   "ref": "TAPE_R12",
+   "value": "1k",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_ST_C2"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Collector load, second Schmitt transistor."
+  },
+  {
+   "ref": "TAPE_R13",
+   "value": "1k",
+   "pins": {
+    "1": "TAPE_ST_C2",
+    "2": "TAPE_BUF_B"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Base resistor of the pnp buffer."
+  },
+  {
+   "ref": "TR8",
+   "value": "2N3906",
+   "pins": {
+    "E": "+5V",
+    "B": "TAPE_BUF_B",
+    "C": "TAPE_SQ"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). pnp output buffer (figure note 'p.n.p. 2N3906'); emitter to +5V. Matched to kit TR8 BC212L, the only pnp in the kit tape section."
+  },
+  {
+   "ref": "TAPE_R14",
+   "value": "1k",
+   "pins": {
+    "1": "TAPE_SQ",
+    "2": "GND"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). Collector load of the pnp buffer; TAPE_SQ is the 5V square wave that triggers the 4528 and clocks the receive 4013."
+  },
+  {
+   "ref": "TAPE_R15",
+   "value": "27k",
+   "pins": {
+    "1": "+5V",
+    "2": "TAPE_MONO_RC"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). 4528 timing resistor (to T2). Errata: may be replaced by 50k preset (WW Sept 1979 Points arising; kit Points Arising item 5 calls it R36)."
+  },
+  {
+   "ref": "TAPE_C5",
+   "value": "100n",
+   "pins": {
+    "1": "TAPE_MONO_RC",
+    "2": "TAPE_MONO_C"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). 4528 timing capacitor between T2 and T1."
+  },
+  {
+   "ref": "J_TAPE",
+   "value": "tape connections",
+   "pins": {
+    "OUT": "TAPE_OUT",
+    "IN": "TAPE_IN",
+    "GND": "GND"
+   },
+   "notes": "Fig. 12 tape interface (Part 2, May 1979, p.91). 'To tape' and 'From tape' leads. GND return not drawn in the figure; the kit has pins TP1 TAPE OUT, TP2 0V, TP3 TAPE IN."
+  },
+  {
+   "ref": "TTY_IC1",
+   "value": "4013",
+   "pins": {
+    "1": "TTY_Q",
+    "2": "TTY_QN",
+    "3": "CPU_IC2_Y0",
+    "4": "GND",
+    "5": "D7",
+    "6": "GND",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "NC",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14"
+   ],
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). '1/2 4013', no pin numbers or IC number printed: D=D7, CK='IC2 pin 15', R,S=0V, Q and /Q both used. It must be a second 4013 package (the tape interface already uses both halves of IC51), and the kit board has only one 4013, so this interface is not on the Powertran board as supplied (treat as optional/off-board). Half 1 chosen; pins from CD4013 datasheet. Unused half 2 not drawn (NC; CMOS inputs should be tied)."
+  },
+  {
+   "ref": "TTY_R1",
+   "value": "2k2",
+   "pins": {
+    "1": "TTY_Q",
+    "2": "TTY_TR2_B"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). Q -> base of the right-hand MJE340 (wire crosses the left transistor's collector line without a dot)."
+  },
+  {
+   "ref": "TTY_R2",
+   "value": "2k2",
+   "pins": {
+    "1": "TTY_QN",
+    "2": "TTY_TR1_B"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). /Q -> base of the left-hand MJE340."
+  },
+  {
+   "ref": "TTY_TR1",
+   "value": "MJE340",
+   "pins": {
+    "E": "GND",
+    "B": "TTY_TR1_B",
+    "C": "TTY_MAG_A"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). npn, lower-left transistor, driven from /Q."
+  },
+  {
+   "ref": "TTY_TR2",
+   "value": "MJE340",
+   "pins": {
+    "E": "GND",
+    "B": "TTY_TR2_B",
+    "C": "TTY_MAG_B"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). npn, upper-right transistor, driven from Q."
+  },
+  {
+   "ref": "TTY_R3",
+   "value": "2k7 2W",
+   "pins": {
+    "1": "VUNREG_55",
+    "2": "TTY_MAG_A"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). Collector load of TTY_TR1 from +55V."
+  },
+  {
+   "ref": "TTY_R4",
+   "value": "2k7 2W",
+   "pins": {
+    "1": "VUNREG_55",
+    "2": "TTY_MAG_B"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). Collector load of TTY_TR2 from +55V."
+  },
+  {
+   "ref": "J_TTY",
+   "value": "teleprinter magnet",
+   "pins": {
+    "MAG_A": "TTY_MAG_A",
+    "MAG_B": "TTY_MAG_B"
+   },
+   "notes": "Fig. 15 teleprinter interface (Part 2, May 1979, p.92). 'To teleprinter magnet': the magnet coil is connected between the two collectors (bridge drive)."
+  },
+  {
+   "ref": "J_TRANSFORMER",
+   "value": "mains transformer secondaries (off-board)",
+   "pins": {
+    "S1_A": "PSU_S1_A",
+    "S1_CT": "GND",
+    "S1_B": "PSU_S1_B",
+    "S2_A": "PSU_S2_A",
+    "S2_CT": "GND",
+    "S2_B": "PSU_S2_B",
+    "S3_A": "PSU_S3_A",
+    "S3_B": "PSU_S3_B"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Transformer is off-board (prototype: RS 50VA 207-554). S1 = 9.5-0-9.5V for +5V (centre tap to 0V); S2 = '13V' centre-tapped winding for +/-12V and -5V (centre tap to 0V, ends to the W005 bridge); S3 = '40V' winding (36 s.w.g.) for the +55V teleprinter supply (no tap, to the W02 bridge). Eight secondary leads; the kit board has eight transformer pins TP4-TP11 (layout labels read roughly 9.5V/0V/9.5V ... 12V/0V/12V). Primary side (mains) is entirely off-board, see J_MAINS."
+  },
+  {
+   "ref": "J_MAINS",
+   "value": "mains input (off-board)",
+   "pins": {
+    "E": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Off-board: L -> double-pole mains switch -> 1A slow fuse -> primary; N -> switch -> primary; neon indicator across the primary; transformer has a screen (dashed line, no connection drawn). The earth line E is drawn running along the bottom of the supply and joined to 0V (W02 minus, 7912/7905 grounds, and a link up to the main 0V line), so 0V is earthed. Only the earth bond touches the board's circuit."
+  },
+  {
+   "ref": "D1",
+   "value": "1N5401",
+   "pins": {
+    "1": "VUNREG_5",
+    "2": "PSU_S1_A"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Full-wave rectifier ('2 x 1N5401'), anode to one end of the 9.5-0-9.5V winding. Kit D1 is 1N5402 (or BY254-5). D1/D2 order is arbitrary."
+  },
+  {
+   "ref": "D2",
+   "value": "1N5401",
+   "pins": {
+    "1": "VUNREG_5",
+    "2": "PSU_S1_B"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Full-wave rectifier, anode to the other end of the 9.5-0-9.5V winding. Kit D2 is 1N5402."
+  },
+  {
+   "ref": "C14",
+   "value": "4700u 25V",
+   "pins": {
+    "1": "VUNREG_5",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +5V reservoir. Hollow plate (+) at the rectifier side."
+  },
+  {
+   "ref": "R40",
+   "value": "0R22",
+   "pins": {
+    "1": "VUNREG_5",
+    "2": "PSU_PASS_C"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Current-sharing resistor in the pass-transistor path (2N3055 collector / TIP30 emitter side). Kit R40 is 0R27, the article says 0R22 (text: '56/22 times as much current passes through the 2N3055')."
+  },
+  {
+   "ref": "R41",
+   "value": "0R56",
+   "pins": {
+    "1": "VUNREG_5",
+    "2": "PSU_SENSE"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Current-sharing resistor in series with the 7805 input path. Kit R41 0R56; kit Points Arising item 4 changes it to 2R2 to cut regulator dissipation."
+  },
+  {
+   "ref": "PSU_D1",
+   "value": "1N5401",
+   "pins": {
+    "1": "PSU_REG5_IN",
+    "2": "PSU_SENSE"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Diode in series with 0R56 that mirrors the TIP30 base-emitter drop; text says it must be in good thermal contact with the regulator and transistors. Not in board_data's part list (the kit layout seems to show a part labelled D3 beside TR9 that may be this diode, but board_data uses D3 for the tape LED)."
+  },
+  {
+   "ref": "PSU_R1",
+   "value": "100",
+   "pins": {
+    "1": "PSU_PASS_C",
+    "2": "PSU_REG5_IN"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Vertical 100 ohm between the TIP30 emitter node and its base / 7805 input node."
+  },
+  {
+   "ref": "TR9",
+   "value": "TIP30",
+   "pins": {
+    "E": "PSU_PASS_C",
+    "B": "PSU_REG5_IN",
+    "C": "PSU_3055_B"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Pseudo-p-n-p driver, 'MM4002 or TIP30', pnp (arrow on emitter points in). Emitter at the 0R22 / 2N3055-collector node, base on the 7805 input node, collector drives the 2N3055 base. Kit TR9 TIP30A."
+  },
+  {
+   "ref": "PSU_R2",
+   "value": "100",
+   "pins": {
+    "1": "PSU_3055_B",
+    "2": "+5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Base-emitter resistor of the 2N3055 (horizontal 100 ohm from 2N3055 base to the +5V output)."
+  },
+  {
+   "ref": "J_2N3055",
+   "value": "2N3055 on heatsink (off-board)",
+   "pins": {
+    "B": "PSU_3055_B",
+    "C": "PSU_PASS_C",
+    "E": "+5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). npn series pass transistor (arrow on emitter points out), mounted off-board on a generous heatsink (Part 3). Collector to the 0R22 node, emitter to +5V output, base from TIP30 collector. Kit layout has pads marked c, b, e beside TR9 for its leads."
+  },
+  {
+   "ref": "IC56",
+   "value": "7805",
+   "pins": {
+    "IN": "PSU_REG5_IN",
+    "GND": "GND",
+    "OUT": "+5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). 1A regulator in parallel with the pass transistor. Kit IC56 is a 78M05 (0.5A), article specifies 7805."
+  },
+  {
+   "ref": "PSU_C1",
+   "value": "8u",
+   "pins": {
+    "1": "PSU_REG5_IN",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). 7805 input capacitor (hollow plate = + on the input side). Possibly kit C3 (10u) near TR9 - not verified."
+  },
+  {
+   "ref": "PSU_C2",
+   "value": "4u7 tantalum",
+   "pins": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). 7805 output capacitor, tantalum."
+  },
+  {
+   "ref": "PSU_R3",
+   "value": "1k",
+   "pins": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +5V minimum-load resistor. Kit has five 1k resistors R42-R46 in the PSU, matching the five 1k in Fig. 16 (individual mapping unknown)."
+  },
+  {
+   "ref": "BR1",
+   "value": "W005",
+   "pins": {
+    "AC1": "PSU_S2_A",
+    "AC2": "PSU_S2_B",
+    "+": "VUNREG_12P",
+    "-": "VUNREG_12N"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Bridge rectifier across the centre-tapped 13V winding (centre tap to 0V) giving + and - raw supplies. Kit replaces it with four discrete 1N4002 (board layout text groups D4-D7 in the C18 box); the arm-to-ref assignment is not known."
+  },
+  {
+   "ref": "C17",
+   "value": "1000u 25V",
+   "pins": {
+    "1": "VUNREG_12P",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Positive raw reservoir for the 7812 (hollow plate + on the raw side). Kit has two 1000u 25V, C17 and C18; which is the positive one is a GUESS."
+  },
+  {
+   "ref": "PSU_IC1",
+   "value": "7812",
+   "pins": {
+    "IN": "VUNREG_12P",
+    "GND": "GND",
+    "OUT": "+12V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Kit has three unlabelled TO-220 regulators REG1-REG3 (layout labels read roughly 78M12 / 79M05 ...); mapping not verified."
+  },
+  {
+   "ref": "PSU_C3",
+   "value": "1u tantalum",
+   "pins": {
+    "1": "+12V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +12V output capacitor ('1u Tan.'), hollow plate (+) on the +12V side."
+  },
+  {
+   "ref": "PSU_R4",
+   "value": "1k",
+   "pins": {
+    "1": "+12V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +12V load resistor."
+  },
+  {
+   "ref": "C18",
+   "value": "1000u 25V",
+   "pins": {
+    "1": "GND",
+    "2": "VUNREG_12N"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Negative raw reservoir feeding both the 7912 and 7905; + (hollow plate) to 0V. C17/C18 assignment is a GUESS."
+  },
+  {
+   "ref": "PSU_IC2",
+   "value": "7912",
+   "pins": {
+    "IN": "VUNREG_12N",
+    "GND": "GND",
+    "OUT": "-12V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Note 79xx physical pin order differs from 78xx (1 GND, 2 IN, 3 OUT). No output capacitor is drawn on -12V."
+  },
+  {
+   "ref": "PSU_R5",
+   "value": "1k",
+   "pins": {
+    "1": "-12V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). -12V load resistor."
+  },
+  {
+   "ref": "PSU_IC3",
+   "value": "7905",
+   "pins": {
+    "IN": "VUNREG_12N",
+    "GND": "GND",
+    "OUT": "-5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). -5V regulator fed from the same negative raw supply as the 7912. 79xx pin order 1 GND, 2 IN, 3 OUT."
+  },
+  {
+   "ref": "PSU_C4",
+   "value": "1u tantalum",
+   "pins": {
+    "1": "GND",
+    "2": "-5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). -5V output capacitor ('1u Tantalum'); its lead from the 0V vertical crosses the -12V line WITHOUT a dot, so it is on -5V, not -12V. + (hollow plate) to 0V."
+  },
+  {
+   "ref": "PSU_R6",
+   "value": "1k",
+   "pins": {
+    "1": "-5V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). -5V load resistor."
+  },
+  {
+   "ref": "PSU_D2",
+   "value": "1N4001",
+   "pins": {
+    "1": "-5V",
+    "2": "-4_5V"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Cathode to -5V, anode to the '-4.5V' output; with PSU_R7 it gives about -4.4V for the MM57109 (text: 'The -4.4V supply is for the MM57109')."
+  },
+  {
+   "ref": "PSU_R7",
+   "value": "1k",
+   "pins": {
+    "1": "-4_5V",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Bias resistor for the -4.5V diode drop."
+  },
+  {
+   "ref": "BR2",
+   "value": "W02",
+   "pins": {
+    "AC1": "PSU_S3_A",
+    "AC2": "PSU_S3_B",
+    "+": "VUNREG_55",
+    "-": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). Bridge rectifier across the 40V winding; minus output to the E/0V line, plus output is the unregulated +55V. Kit replaces it with discrete 1N4002 D8-D11 (layout text in the C19 box); arm mapping unknown."
+  },
+  {
+   "ref": "C19",
+   "value": "220u 100V",
+   "pins": {
+    "1": "VUNREG_55",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +55V reservoir. Kit C19 is 220u 63V (lower rating than the article's 100V - check the kit's HT winding voltage)."
+  },
+  {
+   "ref": "PSU_R8",
+   "value": "4k7",
+   "pins": {
+    "1": "VUNREG_55",
+    "2": "GND"
+   },
+   "notes": "Fig. 16 power supply (Part 2, May 1979, p.93). +55V bleeder/load."
+  }
+ ],
+ "offsheet": [
+  {
+   "net": "D7",
+   "label": "D7",
+   "note": "Z80 data bus (Fig. 2): IC51 pin 5 (tape transmit latch D) and TTY_IC1 pin 5 (teleprinter latch D)"
+  },
+  {
+   "net": "D0..D5",
+   "label": "Data bus D0-D5",
+   "note": "Z80 data bus (Fig. 2): IC53 outputs pins 3,5,7,9,11,13 = D0..D5 (D0 from firmware; D1-D5 order assumed)"
+  },
+  {
+   "net": "CPU_IC2_Y4",
+   "label": "IC2 pin 11",
+   "note": "Fig. 2 74LS138 IC2 output pin 11 (Y4); tape latch clock, IC51 pin 3. Monitor writes tape bits with OUT ($20),A. Rename to match the Fig. 2 transcription's net on IC2 pin 11."
+  },
+  {
+   "net": "CPU_IC2_Y0",
+   "label": "IC2 pin 15",
+   "note": "Fig. 2 74LS138 IC2 output pin 15 (Y0); teleprinter latch clock, TTY_IC1 pin 3. Monitor uses OUT ($00),A. Rename to match the Fig. 2 net on IC2 pin 15."
+  },
+  {
+   "net": "CPU_IC3_Y0",
+   "label": "IC3 pin 15",
+   "note": "Fig. 2 74LS138 IC3 output pin 15 (Y0); IC53 enables pins 1 and 15. Monitor reads the tape with IN A,($00). Rename to match the Fig. 2 net on IC3 pin 15."
+  },
+  {
+   "net": "+5V",
+   "label": "+5V",
+   "note": "regulated +5V 3.5A, generated here (IC56 + 2N3055); used by every board section"
+  },
+  {
+   "net": "GND",
+   "label": "0V",
+   "note": "0V; bonded to mains earth E in Fig. 16"
+  },
+  {
+   "net": "+12V",
+   "label": "+12V",
+   "note": "regulated (7812), 1A; 2708 EPROMs etc."
+  },
+  {
+   "net": "-12V",
+   "label": "-12V",
+   "note": "regulated (7912), 1A"
+  },
+  {
+   "net": "-5V",
+   "label": "-5V",
+   "note": "regulated (7905), 1A; 2708 EPROMs etc."
+  },
+  {
+   "net": "-4_5V",
+   "label": "-4.5V",
+   "note": "about -4.4V (text) via 1N4001 from -5V; MM57109 negative supply (Fig. 2). Rename if Fig. 2 uses another name."
+  },
+  {
+   "net": "VUNREG_55",
+   "label": "+55V",
+   "note": "unregulated +55V, 100mA, from the W02 bridge; used here by the teleprinter interface; text says it is also for a TV interface and the ROM programmer (Part 5 add-on)"
+  }
+ ],
+ "uncertain": [
+  "IC51 (4013): the figure prints no pin numbers; which half is the transmit latch and which the receive flip-flop is a free choice (here pins 1-6 transmit, 8-13 receive). Pin numbers are datasheet, not article.",
+  "IC52 (4528): no pin numbers printed; half A (pins 1-7) chosen. Unused half B (pins 9-15) is not drawn: inputs 11 (B), 12 (A), 13 (/CD) are left NC here, but CMOS inputs should be tied (e.g. to GND/+5V) - check the kit board.",
+  "IC53 (74LS367): pin 3 -> D0 is inferred from the ROM (IN A,($00); AND $01), not printed. Outputs pins 5,7,9,11,13 -> D1..D5 in order is an assumption; inputs 4,6,10,12,14 not drawn (NC, float high).",
+  "Net names CPU_IC2_Y4 (IC2 pin 11), CPU_IC2_Y0 (IC2 pin 15), CPU_IC3_Y0 (IC3 pin 15) must be reconciled with the Fig. 2 transcription.",
+  "TTY_IC1 is a second 4013 that the kit board does not have; Fig. 15 (MJE340s, 2k7 2W) does not appear in board_data, so the teleprinter interface was probably not on the Powertran PCB. Its unused half (pins 8-13) is NC.",
+  "J_TAPE GND return is not drawn in Fig. 12 (added from the kit's TP2 0V pin).",
+  "TAPE_C4 10u polarity taken from the hollow-plate = + convention (consistent with every PSU electrolytic in Fig. 16).",
+  "Kit tape section has parts the article lacks (LED D3 and a 'TO LED' pin, about 19 resistors vs 15 fixed + 1 preset in Fig. 12, C8/C9 10u, C123/C124 1u); the kit's tape circuit is therefore a modified version and this netlist follows the article only.",
+  "Kit refs for the four npn tape transistors (TR4-TR7) cannot be determined from the article; refs TAPE_TR1..4 used.",
+  "C17 vs C18 (both 1000u 25V): which is the positive (7812) reservoir and which the negative one is a guess.",
+  "D1/D2 order on the two ends of the 9.5-0-9.5V winding is arbitrary.",
+  "BR1 (W005) / BR2 (W02) are bridges in the article; the kit uses discrete 1N4002 D4-D7 and D8-D11 (grouping from layout text), arm mapping unknown.",
+  "PSU_IC1/2/3 (7812/7912/7905) vs kit REG1-REG3: mapping not known.",
+  "Mirror diode PSU_D1 has no kit ref in board_data (possibly the part labelled D3 beside TR9 on the kit layout, which conflicts with board_data's D3 = tape LED).",
+  "Where the mains earth bonds to board 0V on the kit is not known; the article draws E joined to 0V."
+ ],
+ "notes": [
+  "Unregulated rails: VUNREG_5 = full-wave rectified 9.5-0-9.5V (about +12V) feeding the +5V regulator/pass circuit; VUNREG_12P / VUNREG_12N = +/- outputs of the W005 bridge on the centre-tapped 13V winding (7812 / 7912 and 7905 inputs); VUNREG_55 = the article's unregulated '+55V' (W02 bridge, 40V winding).",
+  "Fig. 10 (typical television interface) and Fig. 11 (positive-to-negative sync converter) are NOT transcribed: they are modifications built into the TV set, not main-board circuits. The text says the Fig. 10 interface 'should be mounted as close as is possible to the tube base, and the video fed via good quality r.f. coaxial cable from the computer', and Fig. 11 is used where the sync is injected into the set's i.f./video-to-timebase path. None of their parts (2N2369, 560R, 120k/25k/56k, 1k/100n/diode) appear in the kit board list. Part 6 (Sept 1979) adds a set-specific TV interface (Fig. 26), also inside the TV.",
+  "Part 6 (Sept 1979) radio-teleprinter interface (LM3900 filters, 565 PLL, comparator) is an external add-on unit: 'A 12V supply is available from the computer and the output of the unit should be fed, via the serial input buffer IC53, to the line which feeds data bus line D2'. Not transcribed.",
+  "Part 3 (June 1979) construction notes only say: build the power supply first and load-test it (3A on +5V, 0.5A on -5V and +12V) and use a generous heatsink, especially for the 2N3055. Nothing on tape or teleprinter wiring.",
+  "Later changes, not applied here: WW Sept 1979 'Points arising' (4528 27k -> 50k preset if the reader does not work); kit Points Arising sheet items 4 (R41 0R56 -> 2R2), 5 (R36 27k -> 50k preset), 6 (4n7 across R35 1k, tape interface); WW Feb 1980 replaces the Creed 75 teleprinter interface with a 110-baud latch on D0 (CK = IC2 pin 15) driving a single transistor.",
+  "TR2/TR3 (BC212L) near IC7 are NOT the teleprinter interface: Part 1 says 'Tr2, Tr3 in Fig. 2 act as level shifters' for the MM57109 HOLD and POR lines.",
+  "Refs with a section prefix (TAPE_R1, TTY_TR1, PSU_C1 ...) are parts the article leaves unnumbered and that could not be tied to a kit ref. Kit refs are used where the match is clear: IC51, IC52, IC53, VR2, TR8, D1, D2, C14, C17, C18, C19, R40, R41, TR9, IC56."
+ ]
+}

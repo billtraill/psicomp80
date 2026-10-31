@@ -51,15 +51,15 @@
 <path d="M331.2,586.9 L331.2,605 L231.2,605 L231.2,557.5 L331.2,557.5 L331.2,575.6 A5.6,5.6 0 0 0 331.2,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="281.2" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC8  74LS367</text>
 <path d="M331.2,674.4 L331.2,692.5 L231.2,692.5 L231.2,645 L331.2,645 L331.2,663.1 A5.6,5.6 0 0 0 331.2,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="281.2" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC5  74LS173</text>
+<text x="281.2" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC5  74C173</text>
 <path d="M331.2,761.9 L331.2,780 L231.2,780 L231.2,732.5 L331.2,732.5 L331.2,750.6 A5.6,5.6 0 0 0 331.2,761.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="281.2" y="756.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC4  74LS173</text>
+<text x="281.2" y="756.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC4  74C173</text>
 <path d="M331.2,836.9 L331.2,855 L243.8,855 L243.8,807.5 L331.2,807.5 L331.2,825.6 A5.6,5.6 0 0 0 331.2,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="287.5" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC7  4011</text>
 <path d="M50.6,931.2 L32.5,931.2 L32.5,843.8 L80,843.8 L80,931.2 L61.9,931.2 A5.6,5.6 0 0 0 50.6,931.2 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="56.2" y="887.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 56.2 887.5)">IC55  74LS00</text>
 <path d="M218.8,924.4 L218.8,942.5 L93.8,942.5 L93.8,895 L218.8,895 L218.8,913.1 A5.6,5.6 0 0 0 218.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="156.2" y="918.8" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC13  81LS98</text>
+<text x="156.2" y="918.8" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC13  81LS95</text>
 <path d="M293.8,1018.1 L293.8,1055 L43.8,1055 L43.8,970 L293.8,970 L293.8,1006.9 A5.6,5.6 0 0 0 293.8,1018.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="168.8" y="1012.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC54  2376</text>
 <path d="M431.2,75.6 L431.2,57.5 L531.2,57.5 L531.2,105 L431.2,105 L431.2,86.9 A5.6,5.6 0 0 0 431.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
@@ -67,11 +67,11 @@
 <path d="M556.2,75.6 L556.2,57.5 L656.2,57.5 L656.2,105 L556.2,105 L556.2,86.9 A5.6,5.6 0 0 0 556.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="606.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC16  74LS367</text>
 <path d="M681.2,75.6 L681.2,57.5 L781.2,57.5 L781.2,105 L681.2,105 L681.2,86.9 A5.6,5.6 0 0 0 681.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="731.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC49  74LS138</text>
+<text x="731.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC57  74LS139</text>
 <path d="M793.8,88.1 L793.8,70 L893.8,70 L893.8,117.5 L793.8,117.5 L793.8,99.4 A5.6,5.6 0 0 0 793.8,88.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="843.8" y="93.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC17  74LS138</text>
 <path d="M918.8,88.1 L918.8,70 L1006.2,70 L1006.2,117.5 L918.8,117.5 L918.8,99.4 A5.6,5.6 0 0 0 918.8,88.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="962.5" y="93.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC50  74LS02</text>
+<text x="962.5" y="93.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC49  74LS02</text>
 <path d="M631.2,430.6 L631.2,467.5 L481.2,467.5 L481.2,382.5 L631.2,382.5 L631.2,419.4 A5.6,5.6 0 0 0 631.2,430.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="556.2" y="425" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC18  2708  (MONITOR)</text>
 <path d="M631.2,555.6 L631.2,592.5 L481.2,592.5 L481.2,507.5 L631.2,507.5 L631.2,544.4 A5.6,5.6 0 0 0 631.2,555.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
@@ -81,11 +81,11 @@
 <path d="M631.2,793.1 L631.2,830 L481.2,830 L481.2,745 L631.2,745 L631.2,781.9 A5.6,5.6 0 0 0 631.2,793.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="556.2" y="787.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC21  2708  (OPTIONAL)</text>
 <path d="M593.8,961.9 L593.8,980 L468.8,980 L468.8,932.5 L593.8,932.5 L593.8,950.6 A5.6,5.6 0 0 0 593.8,961.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="531.2" y="956.2" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC27  81LS98</text>
+<text x="531.2" y="956.2" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC27  81LS95</text>
 <path d="M1893.8,336.9 L1893.8,355 L1806.2,355 L1806.2,307.5 L1893.8,307.5 L1893.8,325.6 A5.6,5.6 0 0 0 1893.8,336.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1850" y="331.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC38  7493</text>
 <path d="M1949.4,293.8 L1967.5,293.8 L1967.5,381.2 L1920,381.2 L1920,293.8 L1938.1,293.8 A5.6,5.6 0 0 0 1949.4,293.8 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="1943.8" y="337.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 337.5)">IC33  7492</text>
+<text x="1943.8" y="337.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 337.5)">IC33  7425</text>
 <path d="M1418.8,424.4 L1418.8,442.5 L1318.8,442.5 L1318.8,395 L1418.8,395 L1418.8,413.1 A5.6,5.6 0 0 0 1418.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1368.8" y="418.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC42  74LS157</text>
 <path d="M1543.8,424.4 L1543.8,442.5 L1443.8,442.5 L1443.8,395 L1543.8,395 L1543.8,413.1 A5.6,5.6 0 0 0 1543.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
@@ -95,9 +95,9 @@
 <path d="M1781.2,436.9 L1781.2,455 L1693.8,455 L1693.8,407.5 L1781.2,407.5 L1781.2,425.6 A5.6,5.6 0 0 0 1781.2,436.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1737.5" y="431.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC35  7493</text>
 <path d="M1893.8,436.9 L1893.8,455 L1806.2,455 L1806.2,407.5 L1893.8,407.5 L1893.8,425.6 A5.6,5.6 0 0 0 1893.8,436.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="1850" y="431.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC39  7492</text>
+<text x="1850" y="431.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC39  7493</text>
 <path d="M1949.4,406.2 L1967.5,406.2 L1967.5,493.8 L1920,493.8 L1920,406.2 L1938.1,406.2 A5.6,5.6 0 0 0 1949.4,406.2 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="1943.8" y="450" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 450)">IC32  7425</text>
+<text x="1943.8" y="450" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 450)">IC32  74LS00</text>
 <path d="M1656.2,511.9 L1656.2,530 L1568.8,530 L1568.8,482.5 L1656.2,482.5 L1656.2,500.6 A5.6,5.6 0 0 0 1656.2,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1612.5" y="506.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC31  74LS02</text>
 <path d="M1781.2,511.9 L1781.2,530 L1693.8,530 L1693.8,482.5 L1781.2,482.5 L1781.2,500.6 A5.6,5.6 0 0 0 1781.2,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
@@ -117,9 +117,9 @@
 <path d="M1881.2,686.9 L1881.2,705 L1793.8,705 L1793.8,657.5 L1881.2,657.5 L1881.2,675.6 A5.6,5.6 0 0 0 1881.2,686.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1837.5" y="681.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC28  74LS04</text>
 <path d="M1936.9,618.8 L1955,618.8 L1955,706.2 L1907.5,706.2 L1907.5,618.8 L1925.6,618.8 A5.6,5.6 0 0 0 1936.9,618.8 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="1931.2" y="662.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1931.2 662.5)">IC36  7412</text>
+<text x="1931.2" y="662.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1931.2 662.5)">IC36  74121</text>
 <path d="M1881.2,774.4 L1881.2,792.5 L1793.8,792.5 L1793.8,745 L1881.2,745 L1881.2,763.1 A5.6,5.6 0 0 0 1881.2,774.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
-<text x="1837.5" y="768.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC37  74LS86</text>
+<text x="1837.5" y="768.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC37  7492</text>
 <path d="M1743.8,224.4 L1743.8,242.5 L1643.8,242.5 L1643.8,195 L1743.8,195 L1743.8,213.1 A5.6,5.6 0 0 0 1743.8,224.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
 <text x="1693.8" y="218.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC53  74LS367</text>
 <path d="M1856.2,224.4 L1856.2,242.5 L1768.8,242.5 L1768.8,195 L1856.2,195 L1856.2,213.1 A5.6,5.6 0 0 0 1856.2,224.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
@@ -449,14 +449,14 @@
 <rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
 <text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R46  1k</text>
 </g>
-<g transform="translate(1880 808.5) rotate(90)">
-<rect x="-13.5" y="-5" width="27" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<rect x="7.5" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<g transform="translate(1875 812) rotate(0)">
+<rect x="-30" y="-5" width="60" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="24" y="-5" width="5" height="10" fill="#1a1a1a"/>
 <text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D1  1N5402</text>
 </g>
-<g transform="translate(1880 898.5) rotate(90)">
-<rect x="-13.5" y="-5" width="27" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<rect x="7.5" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<g transform="translate(1875 893) rotate(0)">
+<rect x="-30" y="-5" width="60" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="24" y="-5" width="5" height="10" fill="#1a1a1a"/>
 <text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D2  1N5402</text>
 </g>
 <g transform="translate(1795 918) rotate(0)">
@@ -536,21 +536,21 @@
 <circle cx="518" cy="370" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
 <path d="M511,377 L525,363" stroke="#1a1a1a" stroke-width="1.2"/>
 <text x="533" y="370" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
-<circle cx="677" cy="708" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<path d="M670,715 L684,701" stroke="#1a1a1a" stroke-width="1.2"/>
-<text x="692" y="708" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
-<circle cx="800" cy="708" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<path d="M793,715 L807,701" stroke="#1a1a1a" stroke-width="1.2"/>
-<text x="815" y="708" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
-<circle cx="925" cy="710" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<path d="M918,717 L932,703" stroke="#1a1a1a" stroke-width="1.2"/>
-<text x="940" y="710" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
-<circle cx="1047" cy="710" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<path d="M1040,717 L1054,703" stroke="#1a1a1a" stroke-width="1.2"/>
-<text x="1062" y="710" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
-<circle cx="1170" cy="712" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
-<path d="M1163,719 L1177,705" stroke="#1a1a1a" stroke-width="1.2"/>
-<text x="1185" y="712" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="647" cy="707" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M640,714 L654,700" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="662" y="707" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="781" cy="707" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M774,714 L788,700" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="796" y="707" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="906" cy="707" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M899,714 L913,700" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="921" y="707" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1031" cy="707" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1024,714 L1038,700" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1046" y="707" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1150" cy="707" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1143,714 L1157,700" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1165" y="707" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
 <circle cx="680" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
 <path d="M673,1064 L687,1050" stroke="#1a1a1a" stroke-width="1.2"/>
 <text x="695" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>

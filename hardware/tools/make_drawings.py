@@ -223,12 +223,12 @@ def poly_path(polys):
 def pcb_artwork():
     traced = json.load(open(os.path.join(HERE, "artwork_traced.json")))
     out = svg_open("PSI COMP 80 PCB artwork",
-                   "Main board copper artwork. The red and blue layers are traced from a photo of the kit's "
-                   "artwork sheet (approximate); pads, key legends and outline are redrawn from the placement data.",
+                   "Main board copper artwork, seen from the component side. Blue is the component-side copper, "
+                   "red the solder-side copper, both traced from a photo of the kit's artwork sheet (approximate); pads, key legends and outline are redrawn from the placement data.",
                    "#fbf7ef")
-    out += layer("Blue copper (traced)", [f'<path d="{poly_path(traced["blue"])}" fill="#5b9fd6" fill-rule="evenodd"/>'],
+    out += layer("Blue copper - component side (traced)", [f'<path d="{poly_path(traced["blue"])}" fill="#5b9fd6" fill-rule="evenodd"/>'],
                  ' opacity="0.85"')
-    out += layer("Red copper (traced)", [f'<path d="{poly_path(traced["red"])}" fill="#d1492c" fill-rule="evenodd"/>'],
+    out += layer("Red copper - solder side (traced)", [f'<path d="{poly_path(traced["red"])}" fill="#d1492c" fill-rule="evenodd"/>'],
                  ' opacity="0.9"')
 
     pads = []

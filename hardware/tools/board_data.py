@@ -5,8 +5,8 @@ and kit-pcb-artwork.webp) after perspective-correcting them onto the same frame.
 Coordinates are in "frame pixels": the 16 x 12 inch board (crop mark to crop mark on
 the artwork) mapped onto 2000 x 1500, so 125 px = 1 inch, origin top-left, y down.
 
-Positions are good to roughly +/-0.03 in. Labels that were hard to read in the photo
-carry a '?' in NOTES. Parts whose reference designator could not be read at all use
+Positions are good to roughly +/-0.03 in. IC types follow the article's circuit diagrams
+where the photo was hard to read; NOTES lists those. Parts whose reference designator could not be read at all use
 placeholder references from 101 upwards (R101, C101, ...).
 """
 
@@ -28,33 +28,33 @@ _ICS = [
     ("IC11", "74LS367", 16, 0.3, 223, 473, 325, 522, "L"),
     ("IC6", "MM57109", 28, 0.6, 100, 557, 182, 735, "B"),
     ("IC8", "74LS367", 16, 0.3, 225, 560, 328, 608, "R"),
-    ("IC5", "74LS173", 16, 0.3, 227, 645, 328, 692, "R"),
-    ("IC4", "74LS173", 16, 0.3, 228, 730, 330, 775, "R"),
+    ("IC5", "74C173", 16, 0.3, 227, 645, 328, 692, "R"),
+    ("IC4", "74C173", 16, 0.3, 228, 730, 330, 775, "R"),
     ("IC7", "4011", 14, 0.3, 242, 813, 330, 858, "R"),
     ("IC55", "74LS00", 14, 0.3, 30, 842, 80, 927, "B"),
-    ("IC13", "81LS98", 20, 0.3, 88, 893, 218, 940, "R"),
+    ("IC13", "81LS95", 20, 0.3, 88, 893, 218, 940, "R"),
     # Keyboard encoder section
     ("IC54", "2376", 40, 0.6, 43, 963, 293, 1050, "R"),
     # Memory section
     ("IC15", "74LS367", 16, 0.3, 433, 63, 530, 108, "L"),
     ("IC16", "74LS367", 16, 0.3, 553, 62, 652, 107, "L"),
-    ("IC49", "74LS138", 16, 0.3, 676, 62, 776, 107, "L"),
+    ("IC57", "74LS139", 16, 0.3, 676, 62, 776, 107, "L"),
     ("IC17", "74LS138", 16, 0.3, 800, 66, 899, 110, "L"),
-    ("IC50", "74LS02", 14, 0.3, 922, 70, 1010, 112, "L"),
+    ("IC49", "74LS02", 14, 0.3, 922, 70, 1010, 112, "L"),
     ("IC18", "2708", 24, 0.6, 475, 381, 627, 470, "R"),
     ("IC19", "2708", 24, 0.6, 480, 502, 630, 590, "R"),
     ("IC20", "2708", 24, 0.6, 481, 625, 631, 712, "R"),
     ("IC21", "2708", 24, 0.6, 482, 745, 633, 830, "R"),
-    ("IC27", "81LS98", 20, 0.3, 472, 938, 598, 985, "R"),
+    ("IC27", "81LS95", 20, 0.3, 472, 938, 598, 985, "R"),
     # VDU section
     ("IC38", "7493", 14, 0.3, 1803, 302, 1890, 348, "R"),
-    ("IC33", "7492", 14, 0.3, 1920, 297, 1965, 385, "T"),
+    ("IC33", "7425", 14, 0.3, 1920, 297, 1965, 385, "T"),
     ("IC42", "74LS157", 16, 0.3, 1317, 395, 1417, 443, "R"),
     ("IC41", "74LS157", 16, 0.3, 1442, 397, 1541, 445, "R"),
     ("IC40", "74LS157", 16, 0.3, 1566, 398, 1665, 448, "R"),
     ("IC35", "7493", 14, 0.3, 1690, 401, 1777, 451, "R"),
-    ("IC39", "7492", 14, 0.3, 1800, 403, 1888, 453, "R"),
-    ("IC32", "7425", 14, 0.3, 1918, 405, 1968, 490, "T"),
+    ("IC39", "7493", 14, 0.3, 1800, 403, 1888, 453, "R"),
+    ("IC32", "74LS00", 14, 0.3, 1918, 405, 1968, 490, "T"),
     ("IC31", "74LS02", 14, 0.3, 1564, 484, 1652, 532, "R"),
     ("IC48", "7493", 14, 0.3, 1690, 487, 1777, 535, "R"),
     ("IC30", "7493", 14, 0.3, 1800, 490, 1882, 538, "R"),
@@ -64,8 +64,8 @@ _ICS = [
     ("IC29", "7493", 14, 0.3, 1797, 572, 1882, 620, "R"),
     ("IC47", "2513", 24, 0.6, 1558, 652, 1707, 738, "R"),
     ("IC28", "74LS04", 14, 0.3, 1795, 655, 1878, 703, "R"),
-    ("IC36", "7412", 14, 0.3, 1910, 622, 1960, 707, "T"),
-    ("IC37", "74LS86", 14, 0.3, 1790, 740, 1873, 787, "R"),
+    ("IC36", "74121", 14, 0.3, 1910, 622, 1960, 707, "T"),
+    ("IC37", "7492", 14, 0.3, 1790, 740, 1873, 787, "R"),
     # Tape interface section
     ("IC53", "74LS367", 16, 0.3, 1645, 197, 1745, 243, "R"),
     ("IC51", "4013", 14, 0.3, 1768, 203, 1855, 245, "R"),
@@ -83,16 +83,14 @@ _VID_ROWS = [(483, 531), (567, 615), (650, 698), (733, 781),
              (817, 865), (900, 948), (983, 1031)]
 
 NOTES = {
-    "IC49": "reference and type hard to read (74LS138 or 74LS139?)",
-    "IC50": "reference hard to read",
-    "IC38": "reference hard to read",
-    "IC39": "reference hard to read (printed as IC38 or IC39?)",
-    "IC46": "reference hard to read",
-    "IC48": "reference hard to read",
-    "IC36": "type hard to read (7412?)",
-    "IC37": "type hard to read (74LS86?)",
-    "IC13": "81LS97/81LS98 octal buffer",
-    "IC27": "81LS97/81LS98 octal buffer",
+    "IC57": "16-pin slot on the kit sheet; probably the optional Fig. 7 74LS139 for 32K expansion (label hard to read)",
+    "IC49": "printed IC50 or IC49 on the kit sheet; the article's IC49 is this 74LS02",
+    "IC38": "reference hard to read on the kit sheet",
+    "IC39": "printed IC38 or IC39 on the kit sheet",
+    "IC46": "reference hard to read on the kit sheet",
+    "IC48": "reference hard to read on the kit sheet",
+    "IC13": "kit sheet reads 81LS98; the article's 81LS95 is what the circuit needs",
+    "IC27": "kit sheet reads 81LS98; the article's 81LS95 is what the circuit needs",
 }
 
 ROLE = {"IC18": "MONITOR", "IC19": "BURP 1", "IC20": "BURP 2", "IC21": "OPTIONAL",
@@ -183,8 +181,8 @@ TWO_LEAD = [
     ("R43", "1k", "R", 1580, 975, 1630, 975),
     ("R45", "1k", "R", 1665, 980, 1722, 980),
     ("R46", "1k", "R", 1567, 995, 1625, 995),
-    ("D1", "1N5402", "D", 1880, 795, 1880, 822),
-    ("D2", "1N5402", "D", 1880, 885, 1880, 912),
+    ("D1", "1N5402", "D", 1845, 812, 1905, 812),
+    ("D2", "1N5402", "D", 1845, 893, 1905, 893),
     ("D8", "1N4002", "D", 1780, 918, 1810, 918),
     ("D9", "1N4002", "D", 1850, 918, 1880, 918),
     ("D10", "1N4002", "D", 1780, 992, 1810, 992),
@@ -205,8 +203,10 @@ ONE_POINT = [
     ("C12", "2u2", "CP", 180, 862),
     # Memory: decoupling capacitors ("all unmarked capacitors are 1u for decoupling")
     ("C103", "1u", "CP", 467, 355), ("C104", "1u", "CP", 490, 355), ("C105", "1u", "CP", 518, 370),
-    ("C106", "1u", "CP", 677, 708), ("C107", "1u", "CP", 800, 708), ("C108", "1u", "CP", 925, 710),
-    ("C109", "1u", "CP", 1047, 710), ("C110", "1u", "CP", 1170, 712),
+    # (kit sheet has these at the left end of each RAM column, between rows d and e; moved
+    # into the gaps between the columns so the column bus runs can pass)
+    ("C106", "1u", "CP", 647, 707), ("C107", "1u", "CP", 781, 707), ("C108", "1u", "CP", 906, 707),
+    ("C109", "1u", "CP", 1031, 707), ("C110", "1u", "CP", 1150, 707),
     ("C111", "1u", "CP", 680, 1057), ("C112", "1u", "CP", 803, 1057), ("C113", "1u", "CP", 925, 1057),
     ("C114", "1u", "CP", 1050, 1057), ("C115", "1u", "CP", 1172, 1057),
     ("C116", "1u", "CP", 600, 1000), ("C117", "1u", "CP", 598, 1020), ("C118", "1u", "CP", 607, 1038),
@@ -236,6 +236,9 @@ ONE_POINT = [
     # Keyboard LED
     ("D12", "LED", "LED", 117, 1472),
 ]
+
+# Parts that stand rotated (degrees anticlockwise) at their slot
+SLOT_ROTATION = {"C106": 90, "C107": 90, "C108": 90, "C109": 90, "C110": 90}
 
 # Large boxed parts: (ref, value, x0, y0, x1, y1) -- reservoir capacitors drawn as boxes
 BOXES = [

@@ -1,0 +1,1280 @@
+{
+ "figure": "Fig. 8 Visual display circuitry (Part 2, Wireless World May 1979, p.90)",
+ "parts": [
+  {
+   "ref": "IC28",
+   "value": "74LS04",
+   "pins": {
+    "1": "VDU_OSC_IN",
+    "2": "VDU_OSC_MID",
+    "3": "VDU_OSC_MID",
+    "4": "VDU_OSC_OUT",
+    "5": "VDU_OSC_OUT",
+    "6": "VDU_DOTCLK",
+    "7": "GND",
+    "9": "VDU_H_QA",
+    "8": "VDU_H_QA_N",
+    "11": "VDU_VIDGATE",
+    "10": "VIDEO",
+    "13": "VDU_MA10",
+    "12": "VDU_MA10_N",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Fig. 8 prints no pin numbers on any gate. Gates lettered in the figure (A, B, C) are mapped to the standard package sections A=1st, B=2nd, C=3rd ...; unlettered gates were assigned to the remaining sections. Gates within a package are interchangeable, so the router may swap them. A,B,C = crystal oscillator and buffer (lettered in figure). D (9->8) = inverter on IC48 pin 12 (article: omitting it shifts the display 4us left); E (11->10) = video output inverter; F (13->12) = Q10 inverter driving pin 13 of the IC44 bank. D/E/F unlettered in figure. Power pins from datasheet."
+  },
+  {
+   "ref": "X_VDU1",
+   "value": "8MHz crystal",
+   "pins": {
+    "1": "VDU_OSC_IN",
+    "2": "VDU_XTAL_C"
+   },
+   "notes": "Crystal from IC28A input to the 22p capacitor."
+  },
+  {
+   "ref": "C_VDU1",
+   "value": "22p",
+   "pins": {
+    "1": "VDU_XTAL_C",
+    "2": "VDU_OSC_OUT"
+   },
+   "notes": "Series with crystal, to IC28B output / IC28C input. Kit layout has C2 = 27p in this area."
+  },
+  {
+   "ref": "R_VDU1",
+   "value": "470",
+   "pins": {
+    "1": "VDU_OSC_IN",
+    "2": "VDU_OSC_MID"
+   },
+   "notes": "Feedback across IC28A. Probably kit R14 or R15 (470R)."
+  },
+  {
+   "ref": "R_VDU2",
+   "value": "470",
+   "pins": {
+    "1": "VDU_OSC_MID",
+    "2": "VDU_OSC_OUT"
+   },
+   "notes": "Feedback across IC28B. Probably kit R14 or R15 (470R)."
+  },
+  {
+   "ref": "IC29",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_ROW3",
+    "2": "GND",
+    "3": "GND",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "NC",
+    "9": "VDU_B6",
+    "10": "GND",
+    "11": "NC",
+    "12": "VDU_CLK4M",
+    "13": "NC",
+    "14": "VDU_DOTCLK"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "Drawn in two places: dashed box left of IC30 (pins 14, 12: 8MHz -> 4MHz) and dashed box under IC34 (pins 1, 2, 3, 9: B section, clocked by IC34 pin 11, QB pin 9 = B6 -> IC35 pin 14). Pins 2,3 to 0V as drawn. QC (8) and QD (11) not used."
+  },
+  {
+   "ref": "IC30",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_CLK4M",
+    "2": "GND",
+    "3": "GND",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "NC",
+    "9": "CLK_2MHZ",
+    "10": "GND",
+    "11": "VDU_IC30_QD",
+    "12": "VDU_250K",
+    "13": "NC",
+    "14": "VDU_IC30_QD"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "Pin 9 (2MHz) 'To Z80 clock input'. Pin 8 drawn as a stub with no connection. Pin 11 looped to pin 14; pin 12 (250kHz) to IC48 pin 14."
+  },
+  {
+   "ref": "IC48",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_H_QA",
+    "2": "GND",
+    "3": "GND",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "VDU_H_QC",
+    "9": "VDU_H_QB",
+    "10": "GND",
+    "11": "VDU_H_QD",
+    "12": "VDU_H_QA",
+    "13": "NC",
+    "14": "VDU_250K"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "16 states of 4us. Pin 12 looped to pin 1 and to inverter IC28; pin 11 (15.625kHz) clocks IC34 pin 14."
+  },
+  {
+   "ref": "IC31",
+   "value": "74LS02",
+   "pins": {
+    "1": "VDU_HSYNC_DEC",
+    "2": "VDU_H_QA_N",
+    "3": "VDU_H_QB",
+    "4": "VDU_DISP_RESET",
+    "5": "VDU_H_QC",
+    "6": "VDU_H_QD",
+    "7": "GND",
+    "8": "SYNC",
+    "9": "SYNC",
+    "10": "SYNC_N",
+    "11": "MREQ_N",
+    "12": "MREQ_N",
+    "13": "VDU_MREQ",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Fig. 8 prints no pin numbers on any gate. Gates lettered in the figure (A, B, C) are mapped to the standard package sections A=1st, B=2nd, C=3rd ...; unlettered gates were assigned to the remaining sections. Gates within a package are interchangeable, so the router may swap them. A (1-3) = NOR(IC28 inverted QA, IC48 pin 9) -> state 0001 decode; B (4-6) = NOR(IC48 pin 8, pin 11) = 'IC31b', low during states 0100-1111, resets IC37/IC38/IC39 and blanks video; C (8-10, unlettered) = inverter Sync -> Sync-bar; D (11-13, unlettered) = MREQ-bar inverter in the CPU write path."
+  },
+  {
+   "ref": "IC32",
+   "value": "74LS00",
+   "pins": {
+    "1": "VDU_HSYNC_DEC",
+    "2": "VDU_DISP_RESET",
+    "3": "VDU_HSYNC_N",
+    "4": "VDU_HSYNC_N",
+    "5": "VDU_VSYNC_TRIG",
+    "6": "SYNC",
+    "7": "GND",
+    "8": "VDU_LOAD_N",
+    "9": "VDU_CHR_DEC",
+    "10": "VDU_DOTCLK",
+    "11": "VDU_MUX_SEL",
+    "12": "VDU_MREQ",
+    "13": "A15",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Fig. 8 prints no pin numbers on any gate. Gates lettered in the figure (A, B, C) are mapped to the standard package sections A=1st, B=2nd, C=3rd ...; unlettered gates were assigned to the remaining sections. Gates within a package are interchangeable, so the router may swap them. A (1-3) = NAND(IC31A out, IC31B out) = 4us line-sync pulse (Table 2: 'IC32a out'); B (4-6) = NAND(IC32A out, differentiated field pulse) -> Sync (mixed syncs); C (8-10, unlettered) = NAND(IC33A out, 8MHz) -> 'X' = IC45 pin 1 load and IC38 pin 1 clock; D (11-13, unlettered) = NAND(MREQ, A15) -> IC40-42 pin 1 select and IC49."
+  },
+  {
+   "ref": "IC33",
+   "value": "7425",
+   "pins": {
+    "1": "GND",
+    "2": "VDU_CHR_QD",
+    "3": "NC",
+    "4": "VDU_CHR_QC",
+    "5": "VDU_CHR_QB",
+    "6": "VDU_CHR_DEC",
+    "7": "GND",
+    "8": "VDU_VIDGATE",
+    "9": "VDU_DISP_RESET",
+    "10": "VDU_ROWBLANK",
+    "11": "NC",
+    "12": "VDU_MONO_Q",
+    "13": "VDU_SR_OUT_N",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Fig. 8 prints no pin numbers on any gate. Gates lettered in the figure (A, B, C) are mapped to the standard package sections A=1st, B=2nd, C=3rd ...; unlettered gates were assigned to the remaining sections. Gates within a package are interchangeable, so the router may swap them. A = 4-input NOR of 0V, IC37 pins 8, 9, 11 (order of the four inputs within the gate arbitrary). B = video gate: NOR of IC31B out, IC34 pin 11 via 'Link', IC36 pin 6, IC45 pin 7; output via IC28 inverter to Video. Strobe inputs (pins 3, 11) are not drawn: left NC (floating TTL input reads high, which enables the gate)."
+  },
+  {
+   "ref": "IC34",
+   "value": "7490",
+   "pins": {
+    "1": "VDU_ROW0",
+    "2": "VDU_MONO_Q",
+    "3": "VDU_MONO_Q",
+    "4": "NC",
+    "5": "+5V",
+    "6": "GND",
+    "7": "GND",
+    "8": "VDU_ROW2",
+    "9": "VDU_ROW1",
+    "10": "GND",
+    "11": "VDU_ROW3",
+    "12": "VDU_ROW0",
+    "13": "NC",
+    "14": "VDU_H_QD"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "Decade row counter clocked at line rate. 12 looped to 1; 12/9/8 -> IC47 pins 14/15/16; 11 (Q4) -> Link -> IC33B and -> IC29 pin 1. R0 pins 2,3 from monostable IC36 pin 6; R9 pins 6,7 to 0V."
+  },
+  {
+   "ref": "IC35",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_B7",
+    "2": "GND",
+    "3": "GND",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "VDU_B9",
+    "9": "VDU_B8",
+    "10": "GND",
+    "11": "VDU_B10",
+    "12": "VDU_B7",
+    "13": "NC",
+    "14": "VDU_B6"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "With IC29 B section forms the divide-by-32 character-row counter B6-B10. Pin 11 (B10) also triggers IC36 pin 4."
+  },
+  {
+   "ref": "IC36",
+   "value": "74121",
+   "pins": {
+    "1": "VDU_MONO_Q_N",
+    "2": "NC",
+    "3": "NC",
+    "4": "VDU_B10",
+    "5": "NC",
+    "6": "VDU_MONO_Q",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "VDU_MONO_C",
+    "11": "VDU_MONO_RC",
+    "12": "NC",
+    "13": "NC",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Figure labels it IC36 74121 (frame monostable). Drawn pins: 1, 4, 6, 10, 11. A1 (3), B (5) and Rint (9) not drawn: left NC (floating A1/B read high, so the B10 falling edge on A2 triggers). Kit layout read this as '7412' - almost certainly 74121."
+  },
+  {
+   "ref": "VR1",
+   "value": "20k multiturn",
+   "pins": {
+    "1": "+5V",
+    "2": "VDU_MONO_RC",
+    "3": "VDU_MONO_RC"
+   },
+   "notes": "Drawn as a 2-terminal variable resistor (+5V to IC36 pin 11) labelled '20k multiturn'; no designator printed (VR1 from kit layout). Wiper not drawn separately; see uncertain list. Wiper (3) tied to end 2 so the preset acts as the variable resistor drawn."
+  },
+  {
+   "ref": "C_VDU2",
+   "value": "220n",
+   "pins": {
+    "1": "VDU_MONO_RC",
+    "2": "VDU_MONO_C"
+   },
+   "notes": "IC36 timing capacitor between pin 11 and pin 10. Non-polarised as drawn. Kit layout has C5 270n / C7 220n nearby."
+  },
+  {
+   "ref": "R_VDU3",
+   "value": "10k",
+   "pins": {
+    "1": "+5V",
+    "2": "VDU_MONO_Q_N"
+   },
+   "notes": "Pull-up on IC36 pin 1 (Q-bar) at the 100n capacitor. Probably kit R118 10k."
+  },
+  {
+   "ref": "C_VDU3",
+   "value": "100n",
+   "pins": {
+    "1": "VDU_MONO_Q_N",
+    "2": "VDU_VSYNC_TRIG"
+   },
+   "notes": "Differentiator from IC36 pin 1 to IC32B input."
+  },
+  {
+   "ref": "R_VDU4",
+   "value": "2k7",
+   "pins": {
+    "1": "+5V",
+    "2": "VDU_VSYNC_TRIG"
+   },
+   "notes": "Differentiator pull-up at IC32B input. Kit layout has R10 = 2k2 in the VDU area."
+  },
+  {
+   "ref": "IC37",
+   "value": "7492",
+   "pins": {
+    "1": "VDU_DOTCLK",
+    "2": "NC",
+    "3": "NC",
+    "4": "NC",
+    "5": "+5V",
+    "6": "VDU_DISP_RESET",
+    "7": "NC",
+    "8": "VDU_CHR_QD",
+    "9": "VDU_CHR_QC",
+    "10": "GND",
+    "11": "VDU_CHR_QB",
+    "12": "NC",
+    "13": "NC",
+    "14": "NC"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "Figure labels IC37 7492: divide-by-6 character-rate counter clocked at 8MHz on pin 1; 8/9/11 to IC33A. Only reset pin 6 is drawn (from IC31B); R0(2) pin 7 not drawn - left NC (floating high, so pin 6 alone controls reset). QA (12) / CKA (14) unused."
+  },
+  {
+   "ref": "IC38",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_LOAD_N",
+    "2": "VDU_DISP_RESET",
+    "3": "VDU_DISP_RESET",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "VDU_B1",
+    "9": "VDU_B0",
+    "10": "GND",
+    "11": "VDU_B2",
+    "12": "NC",
+    "13": "NC",
+    "14": "NC"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "B section only (clock pin 1 from IC32C 'X'); A section (14/12) unused. Reset 2,3 from IC31B with 200p to 0V."
+  },
+  {
+   "ref": "IC39",
+   "value": "7493",
+   "pins": {
+    "1": "VDU_B2",
+    "2": "VDU_DISP_RESET",
+    "3": "VDU_DISP_RESET",
+    "4": "NC",
+    "5": "+5V",
+    "6": "NC",
+    "7": "NC",
+    "8": "VDU_B4",
+    "9": "VDU_B3",
+    "10": "GND",
+    "11": "VDU_B5",
+    "12": "NC",
+    "13": "NC",
+    "14": "NC"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "B section only, clocked by IC38 pin 11; A section unused."
+  },
+  {
+   "ref": "C_VDU4",
+   "value": "200p",
+   "pins": {
+    "1": "VDU_DISP_RESET",
+    "2": "GND"
+   },
+   "notes": "From the IC37/IC38/IC39 reset line to 0V."
+  },
+  {
+   "ref": "IC45",
+   "value": "74165",
+   "pins": {
+    "1": "VDU_LOAD_N",
+    "2": "VDU_DOTCLK",
+    "3": "VDU_CG_O3",
+    "4": "VDU_CG_O4",
+    "5": "VDU_CG_O5",
+    "6": "VDU_SR_H",
+    "7": "VDU_SR_OUT_N",
+    "8": "GND",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "VDU_CG_O1",
+    "14": "VDU_CG_O2",
+    "15": "GND",
+    "16": "+5V"
+   },
+   "assumed_pins": [
+    "8",
+    "16"
+   ],
+   "notes": "Pin 1 = 'X' from IC32C; pin 2 = 8MHz; 13/14/3/4/5 from IC47 pins 4/5/6/7/8; pin 6 (H, blank dot) to 0V via dashed link (graphics option); pin 7 (QH-bar) to IC33B; pin 15 to 0V. Pins 9 (QH), 10 (SER), 11 (A), 12 (B) not drawn: NC (A, B, SER never reach the output in a 6-dot cell)."
+  },
+  {
+   "ref": "LINK_VDU2",
+   "value": "link (fitted for ASCII)",
+   "pins": {
+    "1": "VDU_SR_H",
+    "2": "GND"
+   },
+   "notes": "Dashed link with open-circle pads, IC45 pin 6 to 0V. Graphics option replaces it."
+  },
+  {
+   "ref": "IC46",
+   "value": "7490",
+   "pins": {
+    "1": "VDU_IC46_CLKIN",
+    "2": "GND",
+    "3": "GND",
+    "4": "NC",
+    "5": "+5V",
+    "6": "GND",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "GND",
+    "11": "VDU_IC46_QD",
+    "12": "MM57109_CLK",
+    "13": "NC",
+    "14": "VDU_IC46_QD"
+   },
+   "assumed_pins": [
+    "5",
+    "10"
+   ],
+   "notes": "Figure labels IC46 7490. Pin 1 'From IC29 pin 12 or 14' (link selects 400 or 800kHz); 11 looped to 14; pin 12 'To IC6 pin 7 clock' (MM57109). QB/QC (9, 8) unused."
+  },
+  {
+   "ref": "LINK_VDU3",
+   "value": "link: IC29 pin 12 or pin 14",
+   "pins": {
+    "A": "VDU_CLK4M",
+    "COM": "VDU_IC46_CLKIN",
+    "B": "VDU_DOTCLK"
+   },
+   "notes": "Not drawn as a component: figure says 'From IC29 pin 12 or 14'. Modelled as a 3-pad selector link. A (IC29 pin 12, 4MHz) gives 400kHz; B (IC29 pin 14, 8MHz) gives 800kHz."
+  },
+  {
+   "ref": "IC47",
+   "value": "2513",
+   "pins": {
+    "1": "-12V",
+    "2": "NC",
+    "3": "NC",
+    "4": "VDU_CG_O1",
+    "5": "VDU_CG_O2",
+    "6": "VDU_CG_O3",
+    "7": "VDU_CG_O4",
+    "8": "VDU_CG_O5",
+    "9": "NC",
+    "10": "GND",
+    "11": "VDU_CG_CE",
+    "12": "-5V",
+    "13": "NC",
+    "14": "VDU_ROW0",
+    "15": "VDU_ROW1",
+    "16": "VDU_ROW2",
+    "17": "VDU_RD0",
+    "18": "VDU_RD1",
+    "19": "VDU_RD2",
+    "20": "VDU_RD3",
+    "21": "VDU_RD4",
+    "22": "VDU_RD5",
+    "23": "NC",
+    "24": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "9",
+    "12",
+    "13",
+    "23",
+    "24"
+   ],
+   "notes": "Figure draws only pins 4-8 (outputs), 10 (0V), 11 (dashed link to 0V), 14-16 (row address from IC34), 17-22 (from video RAM data outputs, table Y/Z: D0->17 ... D5->22, D6 uncommitted). NO supply pins are drawn. Supplies from 2513 datasheet pinout: 1 = VGG (-12V), 12 = VDD (-5V), 24 = VCC (+5V); 2, 3, 9, 13, 23 NC. The board's rails are +5V, -5V, +12V only, so the pin 1 connection must be confirmed (see uncertain)."
+  },
+  {
+   "ref": "LINK_VDU4",
+   "value": "link (fitted for ASCII)",
+   "pins": {
+    "1": "GND",
+    "2": "VDU_CG_CE"
+   },
+   "notes": "Dashed link with open-circle pads, IC47 pin 11 (chip enable) to pin 10/0V. Graphics option feeds RAM bit 6 here instead."
+  },
+  {
+   "ref": "LINK_VDU1",
+   "value": "Link",
+   "pins": {
+    "1": "VDU_ROW3",
+    "2": "VDU_ROWBLANK"
+   },
+   "notes": "Labelled 'Link' in figure: IC34 pin 11 to IC33B input (blanks lines 9 and 10 of each character row). Removed for graphics option."
+  },
+  {
+   "ref": "IC40",
+   "value": "74LS157",
+   "pins": {
+    "1": "VDU_MUX_SEL",
+    "8": "GND",
+    "15": "GND",
+    "16": "+5V",
+    "2": "A0",
+    "3": "VDU_B0",
+    "4": "VDU_MA0",
+    "5": "A1",
+    "6": "VDU_B1",
+    "7": "VDU_MA1",
+    "11": "A2",
+    "10": "VDU_B2",
+    "9": "VDU_MA2",
+    "14": "A3",
+    "13": "VDU_B3",
+    "12": "VDU_MA3"
+   },
+   "assumed_pins": [
+    "8",
+    "16",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "11",
+    "10",
+    "9",
+    "14",
+    "13",
+    "12"
+   ],
+   "notes": "Figure draws IC40-42 as ONE block: 'All selects and enables wired in parallel', pin 1 select from IC32D (NAND of MREQ and A15), pin 15 to 0V, A inputs = CPU address bus A0-A10, B inputs = counter B0-B10, outputs Q0-Q9 -> 2102 A0-A9, Q10 -> RAM chip-select. A=CPU/B=counter follows from the select polarity (select low during a CPU access selects A). The bit-to-section allocation is NOT given: chosen here as IC40 bits 0-3, IC41 bits 4-7, IC42 bits 8-10 in sections 1-4 order; IC42 section 4 (pins 12-14) spare, left NC. Any consistent permutation is electrically equivalent."
+  },
+  {
+   "ref": "IC41",
+   "value": "74LS157",
+   "pins": {
+    "1": "VDU_MUX_SEL",
+    "8": "GND",
+    "15": "GND",
+    "16": "+5V",
+    "2": "A4",
+    "3": "VDU_B4",
+    "4": "VDU_MA4",
+    "5": "A5",
+    "6": "VDU_B5",
+    "7": "VDU_MA5",
+    "11": "A6",
+    "10": "VDU_B6",
+    "9": "VDU_MA6",
+    "14": "A7",
+    "13": "VDU_B7",
+    "12": "VDU_MA7"
+   },
+   "assumed_pins": [
+    "8",
+    "16",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "11",
+    "10",
+    "9",
+    "14",
+    "13",
+    "12"
+   ],
+   "notes": "Figure draws IC40-42 as ONE block: 'All selects and enables wired in parallel', pin 1 select from IC32D (NAND of MREQ and A15), pin 15 to 0V, A inputs = CPU address bus A0-A10, B inputs = counter B0-B10, outputs Q0-Q9 -> 2102 A0-A9, Q10 -> RAM chip-select. A=CPU/B=counter follows from the select polarity (select low during a CPU access selects A). The bit-to-section allocation is NOT given: chosen here as IC40 bits 0-3, IC41 bits 4-7, IC42 bits 8-10 in sections 1-4 order; IC42 section 4 (pins 12-14) spare, left NC. Any consistent permutation is electrically equivalent."
+  },
+  {
+   "ref": "IC42",
+   "value": "74LS157",
+   "pins": {
+    "1": "VDU_MUX_SEL",
+    "8": "GND",
+    "15": "GND",
+    "16": "+5V",
+    "2": "A8",
+    "3": "VDU_B8",
+    "4": "VDU_MA8",
+    "5": "A9",
+    "6": "VDU_B9",
+    "7": "VDU_MA9",
+    "11": "A10",
+    "10": "VDU_B10",
+    "9": "VDU_MA10",
+    "14": "NC",
+    "13": "NC",
+    "12": "NC"
+   },
+   "assumed_pins": [
+    "8",
+    "16",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "11",
+    "10",
+    "9",
+    "14",
+    "13",
+    "12"
+   ],
+   "notes": "Figure draws IC40-42 as ONE block: 'All selects and enables wired in parallel', pin 1 select from IC32D (NAND of MREQ and A15), pin 15 to 0V, A inputs = CPU address bus A0-A10, B inputs = counter B0-B10, outputs Q0-Q9 -> 2102 A0-A9, Q10 -> RAM chip-select. A=CPU/B=counter follows from the select polarity (select low during a CPU access selects A). The bit-to-section allocation is NOT given: chosen here as IC40 bits 0-3, IC41 bits 4-7, IC42 bits 8-10 in sections 1-4 order; IC42 section 4 (pins 12-14) spare, left NC. Any consistent permutation is electrically equivalent."
+  },
+  {
+   "ref": "IC49",
+   "value": "74LS02",
+   "pins": {
+    "1": "VDU_VWR",
+    "2": "VDU_MUX_SEL",
+    "3": "WR_N",
+    "4": "VDU_RAM_WE_N",
+    "5": "VDU_VWR",
+    "6": "VDU_VWR",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "NC",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "7",
+    "14"
+   ],
+   "notes": "Fig. 8 prints no pin numbers on any gate. Gates lettered in the figure (A, B, C) are mapped to the standard package sections A=1st, B=2nd, C=3rd ...; unlettered gates were assigned to the remaining sections. Gates within a package are interchangeable, so the router may swap them. Figure labels IC49 74LS02: first NOR(IC32D out, WR-bar) then NOR wired as inverter -> pin 3 (R/W) of all video RAMs. Gates 3 and 4 not drawn: NC (unused inputs not tied off in the figure)."
+  },
+  {
+   "ref": "IC43a",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D0",
+    "12": "VDU_RD0",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 0. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D0 from CPU data bus, pin 12 joined with the other bank's bit-0 chip to IC47 pin 17. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43b",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D1",
+    "12": "VDU_RD1",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 1. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D1 from CPU data bus, pin 12 joined with the other bank's bit-1 chip to IC47 pin 18. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43c",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D2",
+    "12": "VDU_RD2",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 2. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D2 from CPU data bus, pin 12 joined with the other bank's bit-2 chip to IC47 pin 19. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43d",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D3",
+    "12": "VDU_RD3",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 3. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D3 from CPU data bus, pin 12 joined with the other bank's bit-3 chip to IC47 pin 20. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43e",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D4",
+    "12": "VDU_RD4",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 4. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D4 from CPU data bus, pin 12 joined with the other bank's bit-4 chip to IC47 pin 21. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43f",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D5",
+    "12": "VDU_RD5",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 5. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D5 from CPU data bus, pin 12 joined with the other bank's bit-5 chip to IC47 pin 22. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC43g",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D6",
+    "12": "VDU_RD6",
+    "13": "VDU_MA10"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 6. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D6 from CPU data bus, pin 12 joined with the other bank's bit-6 chip - uncommitted ('*', graphics option). Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44a",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D0",
+    "12": "VDU_RD0",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 0. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D0 from CPU data bus, pin 12 joined with the other bank's bit-0 chip to IC47 pin 17. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44b",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D1",
+    "12": "VDU_RD1",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 1. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D1 from CPU data bus, pin 12 joined with the other bank's bit-1 chip to IC47 pin 18. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44c",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D2",
+    "12": "VDU_RD2",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 2. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D2 from CPU data bus, pin 12 joined with the other bank's bit-2 chip to IC47 pin 19. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44d",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D3",
+    "12": "VDU_RD3",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 3. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D3 from CPU data bus, pin 12 joined with the other bank's bit-3 chip to IC47 pin 20. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44e",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D4",
+    "12": "VDU_RD4",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 4. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D4 from CPU data bus, pin 12 joined with the other bank's bit-4 chip to IC47 pin 21. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44f",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D5",
+    "12": "VDU_RD5",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 5. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D5 from CPU data bus, pin 12 joined with the other bank's bit-5 chip to IC47 pin 22. Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  },
+  {
+   "ref": "IC44g",
+   "value": "21L02",
+   "pins": {
+    "8": "VDU_MA0",
+    "4": "VDU_MA1",
+    "5": "VDU_MA2",
+    "6": "VDU_MA3",
+    "7": "VDU_MA4",
+    "2": "VDU_MA5",
+    "1": "VDU_MA6",
+    "16": "VDU_MA7",
+    "15": "VDU_MA8",
+    "14": "VDU_MA9",
+    "3": "VDU_RAM_WE_N",
+    "9": "GND",
+    "10": "+5V",
+    "11": "D6",
+    "12": "VDU_RD6",
+    "13": "VDU_MA10_N"
+   },
+   "assumed_pins": [
+    "9",
+    "10",
+    "8",
+    "4",
+    "5",
+    "6",
+    "7",
+    "2",
+    "1",
+    "16",
+    "15",
+    "14"
+   ],
+   "notes": "Data bit 6. Fig. 8 draws one block per bank ('7 x 2102L-A4 with all pins in parallel except for pins 11, 12'). Pin 11 = D6 from CPU data bus, pin 12 joined with the other bank's bit-6 chip - uncommitted ('*', graphics option). Address pins mapped from the 2102 pinout (A0..A9 = pins 8,4,5,6,7,2,1,16,15,14) since the figure only says 'Q0-Q9 to A0-A9 of 2102'. Letter->bit rule (a=D0 ... g=D6) inferred; see uncertain."
+  }
+ ],
+ "offsheet": [
+  {
+   "net": "VIDEO",
+   "label": "Video",
+   "note": "output of IC28 (E) inverter; to TV/monitor interface (Fig. 10). No mixing resistors or connector drawn in Fig. 8."
+  },
+  {
+   "net": "SYNC",
+   "label": "Sync",
+   "note": "IC32B output, mixed syncs (positive); to TV interface / Fig. 11."
+  },
+  {
+   "net": "SYNC_N",
+   "label": "Sync (overbar)",
+   "note": "inverted sync from IC31 (C)."
+  },
+  {
+   "net": "CLK_2MHZ",
+   "label": "To Z80 clock input",
+   "note": "IC30 pin 9, 2MHz; goes to the Fig. 2 clock buffer (IC14 / TR1) feeding Z80 pin 6. Fig. 2 arrow is unlabelled; merge by hand."
+  },
+  {
+   "net": "MM57109_CLK",
+   "label": "To IC6 pin 7 clock",
+   "note": "IC46 pin 12, 400/800kHz to MM57109 (IC6) pin 7 in Fig. 2."
+  },
+  {
+   "net": "MREQ_N",
+   "label": "MREQ (overbar)",
+   "note": "from CPU (Fig. 2) into IC31 (D)."
+  },
+  {
+   "net": "WR_N",
+   "label": "WR (overbar)",
+   "note": "from CPU into IC49."
+  },
+  {
+   "net": "A15",
+   "label": "A15",
+   "note": "from CPU address bus into IC32 (D)."
+  },
+  {
+   "net": "A0..A10",
+   "label": "Address bus A0-A10",
+   "note": "CPU address bus into the A inputs of IC40-42 (expanded)."
+  },
+  {
+   "net": "D0..D6",
+   "label": "Data bus to pins 11 D0-D6",
+   "note": "CPU data bus into video RAM data inputs (pin 11). No read-back path to the CPU is drawn."
+  },
+  {
+   "net": "VDU_RD6",
+   "label": "D6 *",
+   "note": "Video RAM bit 6 outputs (IC43g/IC44g pin 12): 'Uncommitted but in for graphics option' - local net with no other connection on this figure."
+  }
+ ],
+ "uncertain": [
+  "All gate pin numbers (IC28, IC31, IC32, IC33, IC49) are NOT printed in Fig. 8; assigned by gate letter / free sections. Function per gate is certain, pin numbers are a choice.",
+  "IC40-42 bit-to-section allocation not drawn (single representative block); allocation chosen (IC40 bits 0-3, IC41 4-7, IC42 8-10, IC42 section 4 spare).",
+  "Video RAM letter->bit rule (IC43a/IC44a = D0 ... g = D6) is inferred: Fig. 8 shows only one representative pair; the rule matches the kit layout marking IC43g/IC44g optional (bit 6 = graphics bit that 'may be omitted'). Fig. 6 main memory uses the opposite order (a = D7), so confirm against the board.",
+  "21L02 address pins: figure says only 'Q0-Q9 to A0-A9 of 2102'; mapped by datasheet. Any permutation works electrically as long as all 14 chips are identical.",
+  "IC47 2513 supply pins are not drawn at all. Datasheet: pin 1 VGG = -12V, pin 12 VDD = -5V, pin 24 VCC = +5V. The board has only +5V/-5V/+12V (Part 3 PSU test), so pin 1's real connection on the kit (maybe -5V) must be checked; -12V left as a deliberately unmatched net.",
+  "VR1 wiper: drawn as a 2-terminal variable resistor; pin 3 (wiper) left NC. A 3-pin preset would normally have its wiper tied to one end (e.g. pin 2).",
+  "Floating TTL inputs as drawn: IC33 strobes (3, 11), IC36 A1/B (3, 5), IC37 R0(2) (7), IC45 SER/A/B (10-12). Electrically they read high and the circuit works, but a PCB may want them tied to +5V.",
+  "IC46 pin 1 link (IC29 pin 12 or 14) is only a text note in the figure; modelled as 3-pad LINK_VDU3.",
+  "No sync/video mixing resistors appear in Fig. 8 (only separate Video, Sync, Sync-bar outputs). The kit's VDU-area resistors (R119 1k8, R120, R10 2k2, C5 270n) are not on this figure.",
+  "Passive values differ from kit layout: osc capacitor 22p (kit C2 27p), differentiator 2k7 (kit R10 2k2?), timing cap 220n (kit C5 270n or C7 220n?). Figure values used; refs R_VDUn/C_VDUn are placeholders, since the figure prints no designators."
+ ]
+}

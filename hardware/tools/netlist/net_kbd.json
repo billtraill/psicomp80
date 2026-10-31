@@ -1,0 +1,2179 @@
+{
+ "figure": "Keyboard encoder (not drawn in Wireless World; reconstructed from the GI AY-5-2376 datasheet standard application, Part 3 Fig. 18 / text, and the Powertran layout sheet)",
+ "parts": [
+  {
+   "ref": "IC54",
+   "value": "AY-5-2376",
+   "pins": {
+    "1": "+5V",
+    "2": "KBD_OSC_B",
+    "3": "KBD_OSC_C",
+    "4": "KBD_SHIFT",
+    "5": "GND",
+    "6": "GND",
+    "7": "NC",
+    "8": "NC",
+    "9": "KBD_D6",
+    "10": "KBD_D5",
+    "11": "KBD_D4",
+    "12": "KBD_D3",
+    "13": "KBD_D2",
+    "14": "KBD_D1",
+    "15": "KBD_D0",
+    "16": "KBD_STROBE_N",
+    "17": "GND",
+    "18": "-12V",
+    "19": "KBD_STB_DELAY",
+    "20": "+5V",
+    "21": "KBD_Y10",
+    "22": "KBD_Y9",
+    "23": "KBD_Y8",
+    "24": "KBD_Y7",
+    "25": "KBD_Y6",
+    "26": "KBD_Y5",
+    "27": "KBD_Y4",
+    "28": "KBD_Y3",
+    "29": "KBD_Y2",
+    "30": "KBD_Y1",
+    "31": "KBD_Y0",
+    "32": "KBD_X7",
+    "33": "KBD_X6",
+    "34": "KBD_X5",
+    "35": "KBD_X4",
+    "36": "KBD_X3",
+    "37": "KBD_X2",
+    "38": "KBD_X1",
+    "39": "KBD_X0",
+    "40": "KBD_OSC_A"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40"
+   ],
+   "notes": "No article drawing; every pin from the GI AY-5-2376 datasheet. Pin functions: 1 VCC +5V (substrate); 17 VGI = GND; 18 VGG = -12V (+/-1V); 2/3/40 frequency control B/C/A (datasheet: C2 between 40 and 3, R2 between 2 and 3; R2=100k, C2=30p gives 50kHz); 4 Shift input; 5 Control input (CTRL not required -> GND); 6 Parity invert (GND); 7 Parity out (unused); 8 B8 (unused, only 7 bits needed); 9..15 = B7..B1 -> KBD_D6..KBD_D0; 16 Strobe out; 19 Strobe control (delay RC, datasheet R1=680k and C1 both to VCC); 20 Data & Strobe invert: tied to +5V so B1-B8 AND the strobe are inverted -> inverted data, active-low strobe (KBD_STROBE_N), which IC55a turns positive. 32..39 = X7..X0 (drive outputs, switch pin 1); 21..31 = Y10..Y0 (sense inputs with internal load to VGG, switch pin 2). Pin 20 tie, pin 5/6 ties, and use of -12V are inference (standard datasheet application); kit wiring unknown."
+  },
+  {
+   "ref": "IC55",
+   "value": "74LS00",
+   "pins": {
+    "1": "KBD_STROBE_N",
+    "2": "KBD_STROBE_N",
+    "3": "KBD_STROBE",
+    "4": "NC",
+    "5": "NC",
+    "6": "NC",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "NC",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14"
+   ],
+   "notes": "INFERENCE. The 2376 inverts data and strobe together (pin 20), so 'inverted data + positive strobe' needs one extra inverter: gate A (pins 1,2 -> 3) used as strobe inverter. Gate choice arbitrary. Gates B-D: role unknown (IC55 sits in the boxed CPU area round IC13 on the layout sheet, so it may serve the CPU figure); pins shown NC here only because nothing in this circuit needs them."
+  },
+  {
+   "ref": "R117",
+   "value": "? (datasheet 100k; ~47-56k would give ~50kHz with 56p)",
+   "pins": {
+    "1": "KBD_OSC_B",
+    "2": "KBD_OSC_C"
+   },
+   "notes": "Oscillator resistor, IC54 pin 2 to pin 3 (datasheet R2). Ref R117 is a placeholder from board_data (unreadable label), chosen because it lies right beside IC54 pins 1-3/40. With 100k and 56p the datasheet curve gives about 27kHz (spec range 10-100kHz)."
+  },
+  {
+   "ref": "C11",
+   "value": "56p",
+   "pins": {
+    "1": "KBD_OSC_A",
+    "2": "KBD_OSC_C"
+   },
+   "notes": "Oscillator capacitor, IC54 pin 40 to pin 3 (datasheet C2, 30p nominal). Position next to IC54 pin 40 on the layout sheet; connection per datasheet."
+  },
+  {
+   "ref": "R116",
+   "value": "680k (datasheet; kit label unreadable, possibly \"680K\")",
+   "pins": {
+    "1": "+5V",
+    "2": "KBD_STB_DELAY"
+   },
+   "notes": "Strobe-delay (key-bounce) resistor, IC54 pin 19 to VCC (datasheet R1). INFERENCE from position (just above IC54 pins 17-20, below IC55) - placeholder ref from board_data."
+  },
+  {
+   "ref": "C13",
+   "value": "22n",
+   "pins": {
+    "1": "+5V",
+    "2": "KBD_STB_DELAY"
+   },
+   "notes": "Strobe-delay capacitor, IC54 pin 19 to VCC (datasheet C1, 4n7 for ~1.5ms). 22n with 680k gives roughly 10ms debounce (datasheet curve). INFERENCE from position next to IC54 pin 19/20."
+  },
+  {
+   "ref": "D12",
+   "value": "LED (TIL209 in article)",
+   "pins": {
+    "1": "KBD_LED_K",
+    "2": "+5V"
+   },
+   "notes": "Halt / \"waiting for keyboard\" LED. Article Part 3 Fig. 18: +5V -> TIL209 -> 560R -> HALT_N; text: the LED lights whenever the Z80 is halted, i.e. waiting for keyboard data. Not driven by the 2376."
+  },
+  {
+   "ref": "R_D12",
+   "value": "560R",
+   "pins": {
+    "1": "KBD_LED_K",
+    "2": "HALT_N"
+   },
+   "notes": "LED series resistor from Fig. 18 (no reference printed there; R_D12 is a placeholder). On the kit board it is probably the boxed resistor beside IC55 that board_data lists as R115 330R (the layout photo label may read 560R) - unconfirmed."
+  },
+  {
+   "ref": "SW1",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y8"
+   },
+   "notes": "'1': X7/Y8, 2376 Normal=1 (0x31), Shift=! (0x21). Inferred wiring."
+  },
+  {
+   "ref": "SW2",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y7"
+   },
+   "notes": "'2': X7/Y7, 2376 Normal=2 (0x32), Shift=\" (0x22). Inferred wiring."
+  },
+  {
+   "ref": "SW3",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y6"
+   },
+   "notes": "'3': X7/Y6, 2376 Normal=3 (0x33), Shift=# (0x23). Inferred wiring."
+  },
+  {
+   "ref": "SW4",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y5"
+   },
+   "notes": "'4': X7/Y5, 2376 Normal=4 (0x34), Shift=$ (0x24). Inferred wiring."
+  },
+  {
+   "ref": "SW5",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y4"
+   },
+   "notes": "'5': X7/Y4, 2376 Normal=5 (0x35), Shift=% (0x25). Inferred wiring."
+  },
+  {
+   "ref": "SW6",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y3"
+   },
+   "notes": "'6': X7/Y3, 2376 Normal=6 (0x36), Shift=& (0x26). Inferred wiring."
+  },
+  {
+   "ref": "SW7",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y2"
+   },
+   "notes": "'7': X7/Y2, 2376 Normal=7 (0x37), Shift=' (0x27). Inferred wiring."
+  },
+  {
+   "ref": "SW8",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y1"
+   },
+   "notes": "'8': X7/Y1, 2376 Normal=8 (0x38), Shift=( (0x28). Inferred wiring."
+  },
+  {
+   "ref": "SW9",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y0"
+   },
+   "notes": "'9': X7/Y0, 2376 Normal=9 (0x39), Shift=) (0x29). Inferred wiring."
+  },
+  {
+   "ref": "SW10",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y0"
+   },
+   "notes": "'Ø': X3/Y0, 2376 Normal=0 (0x30), Shift=NUL (0x00). Inferred wiring."
+  },
+  {
+   "ref": "SW11",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y1"
+   },
+   "notes": "':': X3/Y1, 2376 Normal=: (0x3A), Shift=* (0x2A). Inferred wiring."
+  },
+  {
+   "ref": "SW12",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X2",
+    "2": "KBD_Y0"
+   },
+   "notes": "'-': X2/Y0, 2376 Normal=- (0x2D), Shift== (0x3D). Inferred wiring."
+  },
+  {
+   "ref": "SW13",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X2",
+    "2": "KBD_Y3"
+   },
+   "notes": "'↑': X2/Y3, 2376 Normal=RS (0x1E), Shift=RS (0x1E). Inferred wiring."
+  },
+  {
+   "ref": "SW14",
+   "value": "key switch (uncommitted)",
+   "pins": {
+    "1": "KBD_SPARE1_1",
+    "2": "KBD_SPARE1_2"
+   },
+   "notes": "Uncommitted switch for future expansion (layout sheet \"*\"); pads left on their own nets. Free 2376 crossings for a future key: X3Y5=BS, X3Y9=LF, X5Y10=ESC, X6Y9=HT, X3Y10=DEL, X1Y0..X1Y10/X0Y* = control codes."
+  },
+  {
+   "ref": "SW15",
+   "value": "key switch (uncommitted)",
+   "pins": {
+    "1": "KBD_SPARE2_1",
+    "2": "KBD_SPARE2_2"
+   },
+   "notes": "Uncommitted switch for future expansion (layout sheet \"*\"); pads left on their own nets. Free 2376 crossings for a future key: X3Y5=BS, X3Y9=LF, X5Y10=ESC, X6Y9=HT, X3Y10=DEL, X1Y0..X1Y10/X0Y* = control codes."
+  },
+  {
+   "ref": "SW16",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y8"
+   },
+   "notes": "'Q': X6/Y8, 2376 Normal=q (0x71), Shift=Q (0x51). Inferred wiring."
+  },
+  {
+   "ref": "SW17",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y7"
+   },
+   "notes": "'W': X6/Y7, 2376 Normal=w (0x77), Shift=W (0x57). Inferred wiring."
+  },
+  {
+   "ref": "SW18",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y6"
+   },
+   "notes": "'E': X6/Y6, 2376 Normal=e (0x65), Shift=E (0x45). Inferred wiring."
+  },
+  {
+   "ref": "SW19",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y5"
+   },
+   "notes": "'R': X6/Y5, 2376 Normal=r (0x72), Shift=R (0x52). Inferred wiring."
+  },
+  {
+   "ref": "SW20",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y4"
+   },
+   "notes": "'T': X6/Y4, 2376 Normal=t (0x74), Shift=T (0x54). Inferred wiring."
+  },
+  {
+   "ref": "SW21",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y3"
+   },
+   "notes": "'Y': X6/Y3, 2376 Normal=y (0x79), Shift=Y (0x59). Inferred wiring."
+  },
+  {
+   "ref": "SW22",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y2"
+   },
+   "notes": "'U': X6/Y2, 2376 Normal=u (0x75), Shift=U (0x55). Inferred wiring."
+  },
+  {
+   "ref": "SW23",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y1"
+   },
+   "notes": "'I': X6/Y1, 2376 Normal=i (0x69), Shift=I (0x49). Inferred wiring."
+  },
+  {
+   "ref": "SW24",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y0"
+   },
+   "notes": "'O': X6/Y0, 2376 Normal=o (0x6F), Shift=O (0x4F). Inferred wiring."
+  },
+  {
+   "ref": "SW25",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y2"
+   },
+   "notes": "'P': X3/Y2, 2376 Normal=p (0x70), Shift=P (0x50). Inferred wiring."
+  },
+  {
+   "ref": "SW26",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y4"
+   },
+   "notes": "'@': X3/Y4, 2376 Normal=@ (0x40), Shift=` (0x60). Inferred wiring."
+  },
+  {
+   "ref": "SW27",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X2",
+    "2": "KBD_Y4"
+   },
+   "notes": "'↓': X2/Y4, 2376 Normal=US (0x1F), Shift=US (0x1F). Inferred wiring."
+  },
+  {
+   "ref": "SW28",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y8"
+   },
+   "notes": "'RETURN': X3/Y8, 2376 Normal=CR (0x0D), Shift=CR (0x0D). Inferred wiring."
+  },
+  {
+   "ref": "SW29",
+   "value": "key switch (uncommitted)",
+   "pins": {
+    "1": "KBD_SPARE3_1",
+    "2": "KBD_SPARE3_2"
+   },
+   "notes": "Uncommitted switch for future expansion (layout sheet \"*\"); pads left on their own nets. Free 2376 crossings for a future key: X3Y5=BS, X3Y9=LF, X5Y10=ESC, X6Y9=HT, X3Y10=DEL, X1Y0..X1Y10/X0Y* = control codes."
+  },
+  {
+   "ref": "SW30",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y8"
+   },
+   "notes": "'A': X5/Y8, 2376 Normal=a (0x61), Shift=A (0x41). Inferred wiring."
+  },
+  {
+   "ref": "SW31",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y7"
+   },
+   "notes": "'S': X5/Y7, 2376 Normal=s (0x73), Shift=S (0x53). Inferred wiring."
+  },
+  {
+   "ref": "SW32",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y6"
+   },
+   "notes": "'D': X5/Y6, 2376 Normal=d (0x64), Shift=D (0x44). Inferred wiring."
+  },
+  {
+   "ref": "SW33",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y5"
+   },
+   "notes": "'F': X5/Y5, 2376 Normal=f (0x66), Shift=F (0x46). Inferred wiring."
+  },
+  {
+   "ref": "SW34",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y4"
+   },
+   "notes": "'G': X5/Y4, 2376 Normal=g (0x67), Shift=G (0x47). Inferred wiring."
+  },
+  {
+   "ref": "SW35",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y3"
+   },
+   "notes": "'H': X5/Y3, 2376 Normal=h (0x68), Shift=H (0x48). Inferred wiring."
+  },
+  {
+   "ref": "SW36",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y2"
+   },
+   "notes": "'J': X5/Y2, 2376 Normal=j (0x6A), Shift=J (0x4A). Inferred wiring."
+  },
+  {
+   "ref": "SW37",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y1"
+   },
+   "notes": "'K': X5/Y1, 2376 Normal=k (0x6B), Shift=K (0x4B). Inferred wiring."
+  },
+  {
+   "ref": "SW38",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y0"
+   },
+   "notes": "'L': X5/Y0, 2376 Normal=l (0x6C), Shift=L (0x4C). Inferred wiring."
+  },
+  {
+   "ref": "SW39",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y0"
+   },
+   "notes": "';': X4/Y0, 2376 Normal=; (0x3B), Shift=+ (0x2B). Inferred wiring."
+  },
+  {
+   "ref": "SW40",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y6"
+   },
+   "notes": "'[': X3/Y6, 2376 Normal=[ (0x5B), Shift={ (0x7B). Inferred wiring."
+  },
+  {
+   "ref": "SW41",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y7"
+   },
+   "notes": "']': X3/Y7, 2376 Normal=] (0x5D), Shift=} (0x7D). Inferred wiring."
+  },
+  {
+   "ref": "SW42",
+   "value": "key switch (uncommitted)",
+   "pins": {
+    "1": "KBD_SPARE4_1",
+    "2": "KBD_SPARE4_2"
+   },
+   "notes": "Uncommitted switch for future expansion (layout sheet \"*\"); pads left on their own nets. Free 2376 crossings for a future key: X3Y5=BS, X3Y9=LF, X5Y10=ESC, X6Y9=HT, X3Y10=DEL, X1Y0..X1Y10/X0Y* = control codes."
+  },
+  {
+   "ref": "SW43",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_RESET_KEY",
+    "2": "GND"
+   },
+   "notes": "RESET key, not part of the 2376 matrix. Shorts KBD_RESET_KEY to 0V; KBD_RESET_KEY must be merged with the CPU reset node (RESET_N, or the reset RC/transistor input if Fig. 2 has one). Inferred."
+  },
+  {
+   "ref": "SW44",
+   "value": "key switch",
+   "pins": {
+    "1": "+5V",
+    "2": "KBD_SHIFT"
+   },
+   "notes": "SHIFT: pulls IC54 pin 4 (Shift Input) to +5V = logic 1 = Shift mode. Input has an internal load to VGG, so it reads 0 (Normal) when open (inferred from datasheet input-current spec and input-stage drawing)."
+  },
+  {
+   "ref": "SW45",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y10"
+   },
+   "notes": "'Z': X4/Y10, 2376 Normal=z (0x7A), Shift=Z (0x5A). Inferred wiring."
+  },
+  {
+   "ref": "SW46",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y9"
+   },
+   "notes": "'X': X4/Y9, 2376 Normal=x (0x78), Shift=X (0x58). Inferred wiring."
+  },
+  {
+   "ref": "SW47",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y8"
+   },
+   "notes": "'C': X4/Y8, 2376 Normal=c (0x63), Shift=C (0x43). Inferred wiring."
+  },
+  {
+   "ref": "SW48",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y7"
+   },
+   "notes": "'V': X4/Y7, 2376 Normal=v (0x76), Shift=V (0x56). Inferred wiring."
+  },
+  {
+   "ref": "SW49",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y6"
+   },
+   "notes": "'B': X4/Y6, 2376 Normal=b (0x62), Shift=B (0x42). Inferred wiring."
+  },
+  {
+   "ref": "SW50",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y5"
+   },
+   "notes": "'N': X4/Y5, 2376 Normal=n (0x6E), Shift=N (0x4E). Inferred wiring."
+  },
+  {
+   "ref": "SW51",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y4"
+   },
+   "notes": "'M': X4/Y4, 2376 Normal=m (0x6D), Shift=M (0x4D). Inferred wiring."
+  },
+  {
+   "ref": "SW52",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y3"
+   },
+   "notes": "',': X4/Y3, 2376 Normal=, (0x2C), Shift=< (0x3C). Inferred wiring."
+  },
+  {
+   "ref": "SW53",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y2"
+   },
+   "notes": "'.': X4/Y2, 2376 Normal=. (0x2E), Shift=> (0x3E). Inferred wiring."
+  },
+  {
+   "ref": "SW54",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y1"
+   },
+   "notes": "'/': X4/Y1, 2376 Normal=/ (0x2F), Shift=? (0x3F). Inferred wiring."
+  },
+  {
+   "ref": "SW55",
+   "value": "key switch",
+   "pins": {
+    "1": "+5V",
+    "2": "KBD_SHIFT"
+   },
+   "notes": "SHIFT: pulls IC54 pin 4 (Shift Input) to +5V = logic 1 = Shift mode. Input has an internal load to VGG, so it reads 0 (Normal) when open (inferred from datasheet input-current spec and input-stage drawing)."
+  },
+  {
+   "ref": "SW56",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X2",
+    "2": "KBD_Y8"
+   },
+   "notes": "'SPACE': X2/Y8, 2376 Normal=SP (0x20), Shift=SP (0x20). Inferred wiring."
+  },
+  {
+   "ref": "SW57",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y2"
+   },
+   "notes": "'7' (hex keypad, wired in parallel with main key): X7/Y2, 2376 Normal=7 (0x37), Shift=' (0x27). Inferred wiring."
+  },
+  {
+   "ref": "SW58",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y1"
+   },
+   "notes": "'8' (hex keypad, wired in parallel with main key): X7/Y1, 2376 Normal=8 (0x38), Shift=( (0x28). Inferred wiring."
+  },
+  {
+   "ref": "SW59",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y0"
+   },
+   "notes": "'9' (hex keypad, wired in parallel with main key): X7/Y0, 2376 Normal=9 (0x39), Shift=) (0x29). Inferred wiring."
+  },
+  {
+   "ref": "SW60",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y5"
+   },
+   "notes": "'F' (hex keypad, wired in parallel with main key): X5/Y5, 2376 Normal=f (0x66), Shift=F (0x46). Inferred wiring."
+  },
+  {
+   "ref": "SW61",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y5"
+   },
+   "notes": "'4' (hex keypad, wired in parallel with main key): X7/Y5, 2376 Normal=4 (0x34), Shift=$ (0x24). Inferred wiring."
+  },
+  {
+   "ref": "SW62",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y4"
+   },
+   "notes": "'5' (hex keypad, wired in parallel with main key): X7/Y4, 2376 Normal=5 (0x35), Shift=% (0x25). Inferred wiring."
+  },
+  {
+   "ref": "SW63",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y3"
+   },
+   "notes": "'6' (hex keypad, wired in parallel with main key): X7/Y3, 2376 Normal=6 (0x36), Shift=& (0x26). Inferred wiring."
+  },
+  {
+   "ref": "SW64",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X6",
+    "2": "KBD_Y6"
+   },
+   "notes": "'E' (hex keypad, wired in parallel with main key): X6/Y6, 2376 Normal=e (0x65), Shift=E (0x45). Inferred wiring."
+  },
+  {
+   "ref": "SW65",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y8"
+   },
+   "notes": "'1' (hex keypad, wired in parallel with main key): X7/Y8, 2376 Normal=1 (0x31), Shift=! (0x21). Inferred wiring."
+  },
+  {
+   "ref": "SW66",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y7"
+   },
+   "notes": "'2' (hex keypad, wired in parallel with main key): X7/Y7, 2376 Normal=2 (0x32), Shift=\" (0x22). Inferred wiring."
+  },
+  {
+   "ref": "SW67",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X7",
+    "2": "KBD_Y6"
+   },
+   "notes": "'3' (hex keypad, wired in parallel with main key): X7/Y6, 2376 Normal=3 (0x33), Shift=# (0x23). Inferred wiring."
+  },
+  {
+   "ref": "SW68",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y6"
+   },
+   "notes": "'D' (hex keypad, wired in parallel with main key): X5/Y6, 2376 Normal=d (0x64), Shift=D (0x44). Inferred wiring."
+  },
+  {
+   "ref": "SW69",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X5",
+    "2": "KBD_Y8"
+   },
+   "notes": "'A' (hex keypad, wired in parallel with main key): X5/Y8, 2376 Normal=a (0x61), Shift=A (0x41). Inferred wiring."
+  },
+  {
+   "ref": "SW70",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X3",
+    "2": "KBD_Y0"
+   },
+   "notes": "'Ø' (hex keypad, wired in parallel with main key): X3/Y0, 2376 Normal=0 (0x30), Shift=NUL (0x00). Inferred wiring."
+  },
+  {
+   "ref": "SW71",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y6"
+   },
+   "notes": "'B' (hex keypad, wired in parallel with main key): X4/Y6, 2376 Normal=b (0x62), Shift=B (0x42). Inferred wiring."
+  },
+  {
+   "ref": "SW72",
+   "value": "key switch",
+   "pins": {
+    "1": "KBD_X4",
+    "2": "KBD_Y8"
+   },
+   "notes": "'C' (hex keypad, wired in parallel with main key): X4/Y8, 2376 Normal=c (0x63), Shift=C (0x43). Inferred wiring."
+  }
+ ],
+ "offsheet": [
+  {
+   "net": "KBD_D0",
+   "label": "D0",
+   "note": "inverted keyboard data bit 0 (IC54 B1, pin 15) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D1",
+   "label": "D1",
+   "note": "inverted keyboard data bit 1 (IC54 B2, pin 14) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D2",
+   "label": "D2",
+   "note": "inverted keyboard data bit 2 (IC54 B3, pin 13) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D3",
+   "label": "D3",
+   "note": "inverted keyboard data bit 3 (IC54 B4, pin 12) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D4",
+   "label": "D4",
+   "note": "inverted keyboard data bit 4 (IC54 B5, pin 11) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D5",
+   "label": "D5",
+   "note": "inverted keyboard data bit 5 (IC54 B6, pin 10) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_D6",
+   "label": "D6",
+   "note": "inverted keyboard data bit 6 (IC54 B7, pin 9) to J_KBD / IC13 (CPU, Fig. 2)"
+  },
+  {
+   "net": "KBD_STROBE",
+   "label": "Strobe",
+   "note": "positive strobe (IC55 pin 3), high while a key is held and the code is valid; to J_KBD / CPU NMI logic (Fig. 2)"
+  },
+  {
+   "net": "KBD_RESET_KEY",
+   "label": "RESET",
+   "note": "RESET key, shorts to GND when pressed; merge with the CPU reset node (RESET_N or its RC/transistor input) from Fig. 2"
+  },
+  {
+   "net": "HALT_N",
+   "label": "HALT",
+   "note": "Z80 HALT (pin 18), Fig. 2; drives D12 via 560R (Fig. 18)"
+  },
+  {
+   "net": "-12V",
+   "label": "-12V",
+   "note": "IC54 VGG. Fig. 18 shows a -12V pin on the Carter 756 keyboard connector, so the article design supplies -12V; check PSU figure"
+  },
+  {
+   "net": "+5V",
+   "label": "+5V",
+   "note": "supply"
+  },
+  {
+   "net": "GND",
+   "label": "0V",
+   "note": "supply"
+  }
+ ],
+ "key_map": [
+  {
+   "ref": "SW1",
+   "legend": "1",
+   "shifted_legend": "!",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 8,
+   "normal": "1",
+   "normal_hex": "31",
+   "shift": "!",
+   "shift_hex": "21"
+  },
+  {
+   "ref": "SW2",
+   "legend": "2",
+   "shifted_legend": "\"",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 7,
+   "normal": "2",
+   "normal_hex": "32",
+   "shift": "\"",
+   "shift_hex": "22"
+  },
+  {
+   "ref": "SW3",
+   "legend": "3",
+   "shifted_legend": "#",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 6,
+   "normal": "3",
+   "normal_hex": "33",
+   "shift": "#",
+   "shift_hex": "23"
+  },
+  {
+   "ref": "SW4",
+   "legend": "4",
+   "shifted_legend": "$",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 5,
+   "normal": "4",
+   "normal_hex": "34",
+   "shift": "$",
+   "shift_hex": "24"
+  },
+  {
+   "ref": "SW5",
+   "legend": "5",
+   "shifted_legend": "%",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 4,
+   "normal": "5",
+   "normal_hex": "35",
+   "shift": "%",
+   "shift_hex": "25"
+  },
+  {
+   "ref": "SW6",
+   "legend": "6",
+   "shifted_legend": "&",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 3,
+   "normal": "6",
+   "normal_hex": "36",
+   "shift": "&",
+   "shift_hex": "26"
+  },
+  {
+   "ref": "SW7",
+   "legend": "7",
+   "shifted_legend": "'",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 2,
+   "normal": "7",
+   "normal_hex": "37",
+   "shift": "'",
+   "shift_hex": "27"
+  },
+  {
+   "ref": "SW8",
+   "legend": "8",
+   "shifted_legend": "(",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 1,
+   "normal": "8",
+   "normal_hex": "38",
+   "shift": "(",
+   "shift_hex": "28"
+  },
+  {
+   "ref": "SW9",
+   "legend": "9",
+   "shifted_legend": ")",
+   "hex_keypad": false,
+   "X": 7,
+   "Y": 0,
+   "normal": "9",
+   "normal_hex": "39",
+   "shift": ")",
+   "shift_hex": "29"
+  },
+  {
+   "ref": "SW10",
+   "legend": "Ø",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 0,
+   "normal": "0",
+   "normal_hex": "30",
+   "shift": "NUL",
+   "shift_hex": "00"
+  },
+  {
+   "ref": "SW11",
+   "legend": ":",
+   "shifted_legend": "*",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 1,
+   "normal": ":",
+   "normal_hex": "3A",
+   "shift": "*",
+   "shift_hex": "2A"
+  },
+  {
+   "ref": "SW12",
+   "legend": "-",
+   "shifted_legend": "=",
+   "hex_keypad": false,
+   "X": 2,
+   "Y": 0,
+   "normal": "-",
+   "normal_hex": "2D",
+   "shift": "=",
+   "shift_hex": "3D"
+  },
+  {
+   "ref": "SW13",
+   "legend": "↑",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 2,
+   "Y": 3,
+   "normal": "RS",
+   "normal_hex": "1E",
+   "shift": "RS",
+   "shift_hex": "1E"
+  },
+  {
+   "ref": "SW14",
+   "legend": "uncommitted",
+   "to": "KBD_SPARE1_1/_2"
+  },
+  {
+   "ref": "SW15",
+   "legend": "uncommitted",
+   "to": "KBD_SPARE2_1/_2"
+  },
+  {
+   "ref": "SW16",
+   "legend": "Q",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 8,
+   "normal": "q",
+   "normal_hex": "71",
+   "shift": "Q",
+   "shift_hex": "51"
+  },
+  {
+   "ref": "SW17",
+   "legend": "W",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 7,
+   "normal": "w",
+   "normal_hex": "77",
+   "shift": "W",
+   "shift_hex": "57"
+  },
+  {
+   "ref": "SW18",
+   "legend": "E",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 6,
+   "normal": "e",
+   "normal_hex": "65",
+   "shift": "E",
+   "shift_hex": "45"
+  },
+  {
+   "ref": "SW19",
+   "legend": "R",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 5,
+   "normal": "r",
+   "normal_hex": "72",
+   "shift": "R",
+   "shift_hex": "52"
+  },
+  {
+   "ref": "SW20",
+   "legend": "T",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 4,
+   "normal": "t",
+   "normal_hex": "74",
+   "shift": "T",
+   "shift_hex": "54"
+  },
+  {
+   "ref": "SW21",
+   "legend": "Y",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 3,
+   "normal": "y",
+   "normal_hex": "79",
+   "shift": "Y",
+   "shift_hex": "59"
+  },
+  {
+   "ref": "SW22",
+   "legend": "U",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 2,
+   "normal": "u",
+   "normal_hex": "75",
+   "shift": "U",
+   "shift_hex": "55"
+  },
+  {
+   "ref": "SW23",
+   "legend": "I",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 1,
+   "normal": "i",
+   "normal_hex": "69",
+   "shift": "I",
+   "shift_hex": "49"
+  },
+  {
+   "ref": "SW24",
+   "legend": "O",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 6,
+   "Y": 0,
+   "normal": "o",
+   "normal_hex": "6F",
+   "shift": "O",
+   "shift_hex": "4F"
+  },
+  {
+   "ref": "SW25",
+   "legend": "P",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 2,
+   "normal": "p",
+   "normal_hex": "70",
+   "shift": "P",
+   "shift_hex": "50"
+  },
+  {
+   "ref": "SW26",
+   "legend": "@",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 4,
+   "normal": "@",
+   "normal_hex": "40",
+   "shift": "`",
+   "shift_hex": "60"
+  },
+  {
+   "ref": "SW27",
+   "legend": "↓",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 2,
+   "Y": 4,
+   "normal": "US",
+   "normal_hex": "1F",
+   "shift": "US",
+   "shift_hex": "1F"
+  },
+  {
+   "ref": "SW28",
+   "legend": "RETURN",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 8,
+   "normal": "CR",
+   "normal_hex": "0D",
+   "shift": "CR",
+   "shift_hex": "0D"
+  },
+  {
+   "ref": "SW29",
+   "legend": "uncommitted",
+   "to": "KBD_SPARE3_1/_2"
+  },
+  {
+   "ref": "SW30",
+   "legend": "A",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 8,
+   "normal": "a",
+   "normal_hex": "61",
+   "shift": "A",
+   "shift_hex": "41"
+  },
+  {
+   "ref": "SW31",
+   "legend": "S",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 7,
+   "normal": "s",
+   "normal_hex": "73",
+   "shift": "S",
+   "shift_hex": "53"
+  },
+  {
+   "ref": "SW32",
+   "legend": "D",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 6,
+   "normal": "d",
+   "normal_hex": "64",
+   "shift": "D",
+   "shift_hex": "44"
+  },
+  {
+   "ref": "SW33",
+   "legend": "F",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 5,
+   "normal": "f",
+   "normal_hex": "66",
+   "shift": "F",
+   "shift_hex": "46"
+  },
+  {
+   "ref": "SW34",
+   "legend": "G",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 4,
+   "normal": "g",
+   "normal_hex": "67",
+   "shift": "G",
+   "shift_hex": "47"
+  },
+  {
+   "ref": "SW35",
+   "legend": "H",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 3,
+   "normal": "h",
+   "normal_hex": "68",
+   "shift": "H",
+   "shift_hex": "48"
+  },
+  {
+   "ref": "SW36",
+   "legend": "J",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 2,
+   "normal": "j",
+   "normal_hex": "6A",
+   "shift": "J",
+   "shift_hex": "4A"
+  },
+  {
+   "ref": "SW37",
+   "legend": "K",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 1,
+   "normal": "k",
+   "normal_hex": "6B",
+   "shift": "K",
+   "shift_hex": "4B"
+  },
+  {
+   "ref": "SW38",
+   "legend": "L",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 5,
+   "Y": 0,
+   "normal": "l",
+   "normal_hex": "6C",
+   "shift": "L",
+   "shift_hex": "4C"
+  },
+  {
+   "ref": "SW39",
+   "legend": ";",
+   "shifted_legend": "+",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 0,
+   "normal": ";",
+   "normal_hex": "3B",
+   "shift": "+",
+   "shift_hex": "2B"
+  },
+  {
+   "ref": "SW40",
+   "legend": "[",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 6,
+   "normal": "[",
+   "normal_hex": "5B",
+   "shift": "{",
+   "shift_hex": "7B"
+  },
+  {
+   "ref": "SW41",
+   "legend": "]",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 3,
+   "Y": 7,
+   "normal": "]",
+   "normal_hex": "5D",
+   "shift": "}",
+   "shift_hex": "7D"
+  },
+  {
+   "ref": "SW42",
+   "legend": "uncommitted",
+   "to": "KBD_SPARE4_1/_2"
+  },
+  {
+   "ref": "SW43",
+   "legend": "RESET",
+   "to": "KBD_RESET_KEY (CPU reset) / GND"
+  },
+  {
+   "ref": "SW44",
+   "legend": "SHIFT",
+   "to": "IC54 pin 4 (Shift) via switch to +5V"
+  },
+  {
+   "ref": "SW45",
+   "legend": "Z",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 10,
+   "normal": "z",
+   "normal_hex": "7A",
+   "shift": "Z",
+   "shift_hex": "5A"
+  },
+  {
+   "ref": "SW46",
+   "legend": "X",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 9,
+   "normal": "x",
+   "normal_hex": "78",
+   "shift": "X",
+   "shift_hex": "58"
+  },
+  {
+   "ref": "SW47",
+   "legend": "C",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 8,
+   "normal": "c",
+   "normal_hex": "63",
+   "shift": "C",
+   "shift_hex": "43"
+  },
+  {
+   "ref": "SW48",
+   "legend": "V",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 7,
+   "normal": "v",
+   "normal_hex": "76",
+   "shift": "V",
+   "shift_hex": "56"
+  },
+  {
+   "ref": "SW49",
+   "legend": "B",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 6,
+   "normal": "b",
+   "normal_hex": "62",
+   "shift": "B",
+   "shift_hex": "42"
+  },
+  {
+   "ref": "SW50",
+   "legend": "N",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 5,
+   "normal": "n",
+   "normal_hex": "6E",
+   "shift": "N",
+   "shift_hex": "4E"
+  },
+  {
+   "ref": "SW51",
+   "legend": "M",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 4,
+   "normal": "m",
+   "normal_hex": "6D",
+   "shift": "M",
+   "shift_hex": "4D"
+  },
+  {
+   "ref": "SW52",
+   "legend": ",",
+   "shifted_legend": "<",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 3,
+   "normal": ",",
+   "normal_hex": "2C",
+   "shift": "<",
+   "shift_hex": "3C"
+  },
+  {
+   "ref": "SW53",
+   "legend": ".",
+   "shifted_legend": ">",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 2,
+   "normal": ".",
+   "normal_hex": "2E",
+   "shift": ">",
+   "shift_hex": "3E"
+  },
+  {
+   "ref": "SW54",
+   "legend": "/",
+   "shifted_legend": "?",
+   "hex_keypad": false,
+   "X": 4,
+   "Y": 1,
+   "normal": "/",
+   "normal_hex": "2F",
+   "shift": "?",
+   "shift_hex": "3F"
+  },
+  {
+   "ref": "SW55",
+   "legend": "SHIFT",
+   "to": "IC54 pin 4 (Shift) via switch to +5V"
+  },
+  {
+   "ref": "SW56",
+   "legend": "SPACE",
+   "shifted_legend": "",
+   "hex_keypad": false,
+   "X": 2,
+   "Y": 8,
+   "normal": "SP",
+   "normal_hex": "20",
+   "shift": "SP",
+   "shift_hex": "20"
+  },
+  {
+   "ref": "SW57",
+   "legend": "7",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 2,
+   "normal": "7",
+   "normal_hex": "37",
+   "shift": "'",
+   "shift_hex": "27"
+  },
+  {
+   "ref": "SW58",
+   "legend": "8",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 1,
+   "normal": "8",
+   "normal_hex": "38",
+   "shift": "(",
+   "shift_hex": "28"
+  },
+  {
+   "ref": "SW59",
+   "legend": "9",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 0,
+   "normal": "9",
+   "normal_hex": "39",
+   "shift": ")",
+   "shift_hex": "29"
+  },
+  {
+   "ref": "SW60",
+   "legend": "F",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 5,
+   "Y": 5,
+   "normal": "f",
+   "normal_hex": "66",
+   "shift": "F",
+   "shift_hex": "46"
+  },
+  {
+   "ref": "SW61",
+   "legend": "4",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 5,
+   "normal": "4",
+   "normal_hex": "34",
+   "shift": "$",
+   "shift_hex": "24"
+  },
+  {
+   "ref": "SW62",
+   "legend": "5",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 4,
+   "normal": "5",
+   "normal_hex": "35",
+   "shift": "%",
+   "shift_hex": "25"
+  },
+  {
+   "ref": "SW63",
+   "legend": "6",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 3,
+   "normal": "6",
+   "normal_hex": "36",
+   "shift": "&",
+   "shift_hex": "26"
+  },
+  {
+   "ref": "SW64",
+   "legend": "E",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 6,
+   "Y": 6,
+   "normal": "e",
+   "normal_hex": "65",
+   "shift": "E",
+   "shift_hex": "45"
+  },
+  {
+   "ref": "SW65",
+   "legend": "1",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 8,
+   "normal": "1",
+   "normal_hex": "31",
+   "shift": "!",
+   "shift_hex": "21"
+  },
+  {
+   "ref": "SW66",
+   "legend": "2",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 7,
+   "normal": "2",
+   "normal_hex": "32",
+   "shift": "\"",
+   "shift_hex": "22"
+  },
+  {
+   "ref": "SW67",
+   "legend": "3",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 7,
+   "Y": 6,
+   "normal": "3",
+   "normal_hex": "33",
+   "shift": "#",
+   "shift_hex": "23"
+  },
+  {
+   "ref": "SW68",
+   "legend": "D",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 5,
+   "Y": 6,
+   "normal": "d",
+   "normal_hex": "64",
+   "shift": "D",
+   "shift_hex": "44"
+  },
+  {
+   "ref": "SW69",
+   "legend": "A",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 5,
+   "Y": 8,
+   "normal": "a",
+   "normal_hex": "61",
+   "shift": "A",
+   "shift_hex": "41"
+  },
+  {
+   "ref": "SW70",
+   "legend": "Ø",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 3,
+   "Y": 0,
+   "normal": "0",
+   "normal_hex": "30",
+   "shift": "NUL",
+   "shift_hex": "00"
+  },
+  {
+   "ref": "SW71",
+   "legend": "B",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 4,
+   "Y": 6,
+   "normal": "b",
+   "normal_hex": "62",
+   "shift": "B",
+   "shift_hex": "42"
+  },
+  {
+   "ref": "SW72",
+   "legend": "C",
+   "shifted_legend": "",
+   "hex_keypad": true,
+   "X": 4,
+   "Y": 8,
+   "normal": "c",
+   "normal_hex": "63",
+   "shift": "C",
+   "shift_hex": "43"
+  }
+ ],
+ "code_table_2376": {
+  "X0Y0": {
+   "N": "00",
+   "S": "00",
+   "C": "00"
+  },
+  "X0Y1": {
+   "N": "01",
+   "S": "01",
+   "C": "01"
+  },
+  "X0Y10": {
+   "N": "4F",
+   "S": "5F",
+   "C": "0F"
+  },
+  "X0Y2": {
+   "N": "02",
+   "S": "02",
+   "C": "02"
+  },
+  "X0Y3": {
+   "N": "03",
+   "S": "03",
+   "C": "03"
+  },
+  "X0Y4": {
+   "N": "04",
+   "S": "04",
+   "C": "04"
+  },
+  "X0Y5": {
+   "N": "05",
+   "S": "05",
+   "C": "05"
+  },
+  "X0Y6": {
+   "N": "06",
+   "S": "06",
+   "C": "06"
+  },
+  "X0Y7": {
+   "N": "07",
+   "S": "07",
+   "C": "07"
+  },
+  "X0Y8": {
+   "N": "11",
+   "S": "11",
+   "C": "11"
+  },
+  "X0Y9": {
+   "N": "50",
+   "S": "40",
+   "C": "10"
+  },
+  "X1Y0": {
+   "N": "10",
+   "S": "10",
+   "C": "10"
+  },
+  "X1Y1": {
+   "N": "4B",
+   "S": "5B",
+   "C": "0B"
+  },
+  "X1Y10": {
+   "N": "1A",
+   "S": "1A",
+   "C": "1A"
+  },
+  "X1Y2": {
+   "N": "4C",
+   "S": "5C",
+   "C": "0C"
+  },
+  "X1Y3": {
+   "N": "4E",
+   "S": "5E",
+   "C": "0E"
+  },
+  "X1Y4": {
+   "N": "4D",
+   "S": "5D",
+   "C": "0D"
+  },
+  "X1Y5": {
+   "N": "15",
+   "S": "15",
+   "C": "15"
+  },
+  "X1Y6": {
+   "N": "16",
+   "S": "16",
+   "C": "16"
+  },
+  "X1Y7": {
+   "N": "17",
+   "S": "17",
+   "C": "17"
+  },
+  "X1Y8": {
+   "N": "18",
+   "S": "18",
+   "C": "18"
+  },
+  "X1Y9": {
+   "N": "19",
+   "S": "19",
+   "C": "19"
+  },
+  "X2Y0": {
+   "N": "2D",
+   "S": "3D",
+   "C": "00"
+  },
+  "X2Y1": {
+   "N": "1C",
+   "S": "1C",
+   "C": "1C"
+  },
+  "X2Y10": {
+   "N": "5F",
+   "S": "5F",
+   "C": "1F"
+  },
+  "X2Y2": {
+   "N": "1D",
+   "S": "1D",
+   "C": "1D"
+  },
+  "X2Y3": {
+   "N": "1E",
+   "S": "1E",
+   "C": "1E"
+  },
+  "X2Y4": {
+   "N": "1F",
+   "S": "1F",
+   "C": "1F"
+  },
+  "X2Y5": {
+   "N": "3C",
+   "S": "3C",
+   "C": "00"
+  },
+  "X2Y6": {
+   "N": "3E",
+   "S": "3E",
+   "C": "00"
+  },
+  "X2Y7": {
+   "N": "2C",
+   "S": "2C",
+   "C": "00"
+  },
+  "X2Y8": {
+   "N": "20",
+   "S": "20",
+   "C": "20"
+  },
+  "X2Y9": {
+   "N": "2E",
+   "S": "2E",
+   "C": "00"
+  },
+  "X3Y0": {
+   "N": "30",
+   "S": "00",
+   "C": "00"
+  },
+  "X3Y1": {
+   "N": "3A",
+   "S": "2A",
+   "C": "00"
+  },
+  "X3Y10": {
+   "N": "7F",
+   "S": "7F",
+   "C": "7F"
+  },
+  "X3Y2": {
+   "N": "70",
+   "S": "50",
+   "C": "10"
+  },
+  "X3Y3": {
+   "N": "5F",
+   "S": "7F",
+   "C": "1F"
+  },
+  "X3Y4": {
+   "N": "40",
+   "S": "60",
+   "C": "00"
+  },
+  "X3Y5": {
+   "N": "08",
+   "S": "08",
+   "C": "08"
+  },
+  "X3Y6": {
+   "N": "5B",
+   "S": "7B",
+   "C": "1B"
+  },
+  "X3Y7": {
+   "N": "5D",
+   "S": "7D",
+   "C": "1D"
+  },
+  "X3Y8": {
+   "N": "0D",
+   "S": "0D",
+   "C": "0D"
+  },
+  "X3Y9": {
+   "N": "0A",
+   "S": "0A",
+   "C": "0A"
+  },
+  "X4Y0": {
+   "N": "3B",
+   "S": "2B",
+   "C": "00"
+  },
+  "X4Y1": {
+   "N": "2F",
+   "S": "3F",
+   "C": "00"
+  },
+  "X4Y10": {
+   "N": "7A",
+   "S": "5A",
+   "C": "1A"
+  },
+  "X4Y2": {
+   "N": "2E",
+   "S": "3E",
+   "C": "00"
+  },
+  "X4Y3": {
+   "N": "2C",
+   "S": "3C",
+   "C": "00"
+  },
+  "X4Y4": {
+   "N": "6D",
+   "S": "4D",
+   "C": "0D"
+  },
+  "X4Y5": {
+   "N": "6E",
+   "S": "4E",
+   "C": "0E"
+  },
+  "X4Y6": {
+   "N": "62",
+   "S": "42",
+   "C": "02"
+  },
+  "X4Y7": {
+   "N": "76",
+   "S": "56",
+   "C": "16"
+  },
+  "X4Y8": {
+   "N": "63",
+   "S": "43",
+   "C": "03"
+  },
+  "X4Y9": {
+   "N": "78",
+   "S": "58",
+   "C": "18"
+  },
+  "X5Y0": {
+   "N": "6C",
+   "S": "4C",
+   "C": "0C"
+  },
+  "X5Y1": {
+   "N": "6B",
+   "S": "4B",
+   "C": "0B"
+  },
+  "X5Y10": {
+   "N": "1B",
+   "S": "1B",
+   "C": "1B"
+  },
+  "X5Y2": {
+   "N": "6A",
+   "S": "4A",
+   "C": "0A"
+  },
+  "X5Y3": {
+   "N": "68",
+   "S": "48",
+   "C": "08"
+  },
+  "X5Y4": {
+   "N": "67",
+   "S": "47",
+   "C": "07"
+  },
+  "X5Y5": {
+   "N": "66",
+   "S": "46",
+   "C": "06"
+  },
+  "X5Y6": {
+   "N": "64",
+   "S": "44",
+   "C": "04"
+  },
+  "X5Y7": {
+   "N": "73",
+   "S": "53",
+   "C": "13"
+  },
+  "X5Y8": {
+   "N": "61",
+   "S": "41",
+   "C": "01"
+  },
+  "X5Y9": {
+   "N": "0C",
+   "S": "0C",
+   "C": "0C"
+  },
+  "X6Y0": {
+   "N": "6F",
+   "S": "4F",
+   "C": "0F"
+  },
+  "X6Y1": {
+   "N": "69",
+   "S": "49",
+   "C": "09"
+  },
+  "X6Y10": {
+   "N": "0B",
+   "S": "0B",
+   "C": "0B"
+  },
+  "X6Y2": {
+   "N": "75",
+   "S": "55",
+   "C": "15"
+  },
+  "X6Y3": {
+   "N": "79",
+   "S": "59",
+   "C": "19"
+  },
+  "X6Y4": {
+   "N": "74",
+   "S": "54",
+   "C": "14"
+  },
+  "X6Y5": {
+   "N": "72",
+   "S": "52",
+   "C": "12"
+  },
+  "X6Y6": {
+   "N": "65",
+   "S": "45",
+   "C": "05"
+  },
+  "X6Y7": {
+   "N": "77",
+   "S": "57",
+   "C": "17"
+  },
+  "X6Y8": {
+   "N": "71",
+   "S": "51",
+   "C": "11"
+  },
+  "X6Y9": {
+   "N": "09",
+   "S": "09",
+   "C": "09"
+  },
+  "X7Y0": {
+   "N": "39",
+   "S": "29",
+   "C": "00"
+  },
+  "X7Y1": {
+   "N": "38",
+   "S": "28",
+   "C": "00"
+  },
+  "X7Y10": {
+   "N": "5C",
+   "S": "7C",
+   "C": "1C"
+  },
+  "X7Y2": {
+   "N": "37",
+   "S": "27",
+   "C": "00"
+  },
+  "X7Y3": {
+   "N": "36",
+   "S": "26",
+   "C": "00"
+  },
+  "X7Y4": {
+   "N": "35",
+   "S": "25",
+   "C": "00"
+  },
+  "X7Y5": {
+   "N": "34",
+   "S": "24",
+   "C": "00"
+  },
+  "X7Y6": {
+   "N": "33",
+   "S": "23",
+   "C": "00"
+  },
+  "X7Y7": {
+   "N": "32",
+   "S": "22",
+   "C": "00"
+  },
+  "X7Y8": {
+   "N": "31",
+   "S": "21",
+   "C": "00"
+  },
+  "X7Y9": {
+   "N": "5E",
+   "S": "7E",
+   "C": "1E"
+  }
+ },
+ "notes": [
+  "Polarity: IC54 pin 20 = +5V inverts B1-B8 and the strobe; IC55a re-inverts the strobe -> KBD_D0..D6 inverted, KBD_STROBE positive, as Part 3 requires.",
+  "ALTERNATIVE (likely on the kit): board_data and the layout photo give IC13 as 81LS98 (INVERTING), not the article 81LS95. The monitor NMI routine at 0066H does IN A,(01) / CPL, so with an inverting buffer the connector data must be TRUE: then IC54 pin 20 = GND, strobe is already positive, IC55 is not needed for the strobe. Resolve against the CPU transcription.",
+  "Letters use the 2376 standard cells that give lower case in Normal and upper case in Shift (e.g. X6Y8 q/Q). The 2376 standard ROM has no upper-case-unshifted cell for most letters (only TTY-style K/[ L/\\ M/] N/^ O/_ P/@ at X1Y1..X1Y4, X0Y10, X0Y9). Case does not matter to the monitor: after CPL the NMI routine does CP 40H / AND 1FH for every code >= 40H.",
+  "Arrow keys per Part 3 text: up-arrow = RS (1EH, X2Y3), down-arrow = US (1FH, X2Y4); both cells give the same code in all modes. The NMI routine jumps to 0800H on 1EH and maps CR to 1FH.",
+  "Code table read by sampling the bit squares of the datasheet chart (B1 = LSB) and checked with the odd-parity bit B9; B8 is set on some cells in GI's chart but is unused here.",
+  "Hex keypad keys are wired in parallel with the main keys of the same code, so SHIFT also acts on them (e.g. SHIFT+keypad 1 gives !).",
+  "board_data.keys() lists 72 switches (56 main incl. RESET, 2 SHIFT and 4 uncommitted, plus 16 hex keypad), not 63.",
+  "Supplies: VCC pin 1 +5V (max 10mA), VGG pin 18 -12V +/-1V (max 10mA), VGI pin 17 GND. -5V on VGG is outside the datasheet range (-11 to -13V) and is not recommended; it may work marginally (Y trip level is VCC-5..VCC-2, X/Y loads return to VGG) but nothing guarantees it."
+ ],
+ "uncertain": [
+  "Whole circuit is inferred: no article drawing and the PCB artwork photo (about 65 px/in) is too coarse to trace IC54 pins; the X/Y assignment to keys is chosen, not read from the kit.",
+  "IC54 pin 20 polarity (+5V here) depends on whether IC13 is an inverting 81LS98 (kit) or non-inverting 81LS95 (article) - see notes.",
+  "IC55 gate A as strobe inverter is inference; IC55 might instead belong to the CPU circuit.",
+  "R117 value unknown (layout label unreadable); R116/C13 as the pin-19 strobe-delay network inferred from position only.",
+  "D12 resistor ref/value: article 560R (Fig. 18); kit part may be R115 (board_data reads 330R).",
+  "VGG -12V: task brief says the board has only +5V, -5V, +12V, but Fig. 18 feeds -12V to the keyboard, so the article PSU must provide -12V; to be confirmed from the PSU figure.",
+  "KBD_RESET_KEY target (RESET_N directly or a reset RC node) to be fixed when merging with Fig. 2.",
+  "IC55 unused-gate pins and IC54 pins 7/8 left NC; unused TTL inputs on IC55 would normally be tied off."
+ ]
+}

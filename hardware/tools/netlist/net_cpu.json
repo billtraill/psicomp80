@@ -1,0 +1,979 @@
+{
+ "figure": "Fig. 2 Main processing circuit (Part 1, April 1979, p.46) + Fig. 18 Carter 756 keyboard connector (Part 3, June 1979, p.85, connector only)",
+ "parts": [
+  {
+   "ref": "IC1",
+   "value": "Z80",
+   "pins": {
+    "1": "A11",
+    "2": "A12",
+    "3": "A13",
+    "4": "A14",
+    "5": "A15",
+    "6": "CLK",
+    "7": "CPU_ZD4",
+    "8": "CPU_ZD3",
+    "9": "CPU_ZD5",
+    "10": "CPU_ZD6",
+    "11": "+5V",
+    "12": "CPU_ZD2",
+    "13": "CPU_ZD7",
+    "14": "CPU_ZD0",
+    "15": "CPU_ZD1",
+    "16": "INT_N",
+    "17": "NMI_N",
+    "18": "HALT_N",
+    "19": "CPU_Z_MREQ_N",
+    "20": "IORQ_N",
+    "21": "CPU_Z_RD_N",
+    "22": "CPU_Z_WR_N",
+    "23": "BUSAK_N",
+    "24": "WAIT_N",
+    "25": "WAIT_N",
+    "26": "RESET_N",
+    "27": "M1_N",
+    "28": "RFSH_N",
+    "29": "GND",
+    "30": "A0",
+    "31": "A1",
+    "32": "A2",
+    "33": "A3",
+    "34": "A4",
+    "35": "A5",
+    "36": "A6",
+    "37": "A7",
+    "38": "A8",
+    "39": "A9",
+    "40": "A10"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "7",
+    "8",
+    "9",
+    "10",
+    "12",
+    "13",
+    "14",
+    "15",
+    "23",
+    "27",
+    "28",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40"
+   ],
+   "notes": "Address bus drawn as fat arrow 'A0-A15, pins 5-30' (expanded from Z80 datasheet: 30-40=A0-A10, 1-5=A11-A15); address lines are taken straight from the Z80 (unbuffered here; A0-A9 are buffered later by IC15/IC16 in the memory figure). Data pins printed 13,10,9,7,8,12,15,14 (=D7..D0) go only to the IC9-12 transceiver, so they are the local Z80 data bus CPU_ZD0-7; the system data bus D0-D7 is on the far side of IC9-12. RD/WR/MREQ (21/22/19) are likewise local (CPU_Z_*) and buffered by IC9-12 to RD_N/WR_N/MREQ_N. IORQ (20) is NOT buffered: it goes straight to IC2/IC3 pin 4. Pins 24 (WAIT) and 25 (BUSRQ) are joined and pulled to +5V by 47k: one net, named WAIT_N (it is also BUSRQ_N). Pins 23 BUSAK, 27 M1, 28 RFSH are not drawn in Fig. 2; given their standard net names so the merge can pick them up (single-pin nets = unconnected on this figure). Pin 6 CLK is driven by IC14 plus TR1 active pull-up."
+  },
+  {
+   "ref": "IC2",
+   "value": "74LS138",
+   "pins": {
+    "1": "A7",
+    "2": "A6",
+    "3": "A5",
+    "4": "IORQ_N",
+    "5": "WR_N",
+    "6": "+5V",
+    "8": "GND",
+    "16": "+5V",
+    "15": "CPU_IC2_Y0",
+    "14": "CPU_IC2_Y1",
+    "13": "CPU_IC2_Y2",
+    "12": "CPU_IC2_Y3",
+    "11": "CPU_IC2_Y4",
+    "10": "CPU_IC2_Y5",
+    "9": "CPU_IC2_Y6",
+    "7": "CPU_IC2_Y7"
+   },
+   "assumed_pins": [
+    "6",
+    "8",
+    "16"
+   ],
+   "notes": "Output-port decoder. Pins 1,2,3 = A7,A6,A5 (so select = A7 + 2*A6 + 4*A5); pin 4 = Z80 IORQ (pin 20); pin 5 = buffered WR. Port map: Y0 p15=00h, Y1 p14=80h, Y2 p13=40h, Y3 p12=C0h, Y4 p11=20h, Y5 p10=A0h, Y6 p9=60h, Y7 p7=E0h. Only pin 9 (Y6, OUT 60h) is used here: clocks latch IC4/IC5 (pin 7) for the MM57109 - agrees with the monitor ROM (OUT ($60)) and Fig. 4 ('From IC2 pin 9'). Other outputs are drawn as unconnected stubs (used in later figures, e.g. OUT 20h tape). Pin 6 (G1) not drawn: must be high for the decoder to work - assumed +5V."
+  },
+  {
+   "ref": "IC3",
+   "value": "74LS138",
+   "pins": {
+    "1": "A2",
+    "2": "A1",
+    "3": "A0",
+    "4": "IORQ_N",
+    "5": "RD_N",
+    "6": "+5V",
+    "8": "GND",
+    "16": "+5V",
+    "15": "CPU_IC3_Y0",
+    "14": "CPU_IC3_Y1",
+    "13": "CPU_IC3_Y2",
+    "12": "CPU_IC3_Y3",
+    "11": "CPU_IC3_Y4",
+    "10": "CPU_IC3_Y5",
+    "9": "CPU_IC3_Y6",
+    "7": "CPU_IC3_Y7"
+   },
+   "assumed_pins": [
+    "6",
+    "8",
+    "16"
+   ],
+   "notes": "Input-port decoder. Pins 1,2,3 = A2,A1,A0 (select = A2 + 2*A1 + 4*A0); pin 4 = Z80 IORQ; pin 5 = buffered RD. Port map: Y0 p15=00h, Y1 p14=04h, Y2 p13=02h, Y3 p12=06h, Y4 p11=01h, Y5 p10=05h, Y6 p9=03h, Y7 p7=07h. Pin 11 (Y4, IN 01h) enables keyboard buffer IC13 (pins 1+19); pin 9 (Y6, IN 03h) enables MM57109 status buffer IC8 (pins 1+15). Matches ROM (IN ($01) keyboard, IN ($03) MM57109) and Fig. 4 ('From IC33 pin 9' = misprint for IC3). Pin 6 (G1) not drawn - assumed +5V."
+  },
+  {
+   "ref": "IC9",
+   "value": "74LS367",
+   "pins": {
+    "1": "RD_N",
+    "15": "GND",
+    "8": "GND",
+    "16": "+5V",
+    "2": "D0",
+    "3": "CPU_ZD0",
+    "4": "D1",
+    "5": "CPU_ZD1",
+    "6": "D2",
+    "7": "CPU_ZD2",
+    "10": "D3",
+    "9": "CPU_ZD3",
+    "12": "CPU_Z_RD_N",
+    "11": "RD_N",
+    "14": "CPU_Z_WR_N",
+    "13": "WR_N"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "Fig. 2 draws IC9-12 only as a block: a bidirectional 8-bit transceiver between the Z80 data pins and the system 'Data bus', with one direction enabled by the buffered RD line and the other by the buffered WR line, plus three buffers RD, WR, MREQ (Z80 pins 21, 22, 19) whose enables go to 0V. No 74LS367 pin numbers are printed, so this pin allocation is ours (functionally per the figure; any equivalent allocation is fine for routing): the four 4-buffer groups (1G) form the two 8-bit directions, the 2-buffer groups (2G) with 2G=0V carry RD/WR/MREQ. Read direction (system D -> Z80) is enabled by RD_N, write direction (Z80 -> system D) by WR_N. IC9: read buffers D0-D3, and RD/WR control buffers."
+  },
+  {
+   "ref": "IC10",
+   "value": "74LS367",
+   "pins": {
+    "1": "RD_N",
+    "15": "GND",
+    "8": "GND",
+    "16": "+5V",
+    "2": "D4",
+    "3": "CPU_ZD4",
+    "4": "D5",
+    "5": "CPU_ZD5",
+    "6": "D6",
+    "7": "CPU_ZD6",
+    "10": "D7",
+    "9": "CPU_ZD7",
+    "12": "CPU_Z_MREQ_N",
+    "11": "MREQ_N",
+    "14": "NC",
+    "13": "NC"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "Fig. 2 draws IC9-12 only as a block: a bidirectional 8-bit transceiver between the Z80 data pins and the system 'Data bus', with one direction enabled by the buffered RD line and the other by the buffered WR line, plus three buffers RD, WR, MREQ (Z80 pins 21, 22, 19) whose enables go to 0V. No 74LS367 pin numbers are printed, so this pin allocation is ours (functionally per the figure; any equivalent allocation is fine for routing): the four 4-buffer groups (1G) form the two 8-bit directions, the 2-buffer groups (2G) with 2G=0V carry RD/WR/MREQ. Read direction (system D -> Z80) is enabled by RD_N, write direction (Z80 -> system D) by WR_N. IC10: read buffers D4-D7, MREQ control buffer; 2A2/2Y2 (pins 14/13) spare, not drawn (NC)."
+  },
+  {
+   "ref": "IC11",
+   "value": "74LS367",
+   "pins": {
+    "1": "WR_N",
+    "15": "NC",
+    "8": "GND",
+    "16": "+5V",
+    "2": "CPU_ZD0",
+    "3": "D0",
+    "4": "CPU_ZD1",
+    "5": "D1",
+    "6": "CPU_ZD2",
+    "7": "D2",
+    "10": "CPU_ZD3",
+    "9": "D3",
+    "12": "NC",
+    "11": "NC",
+    "14": "NC",
+    "13": "NC"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "Fig. 2 draws IC9-12 only as a block: a bidirectional 8-bit transceiver between the Z80 data pins and the system 'Data bus', with one direction enabled by the buffered RD line and the other by the buffered WR line, plus three buffers RD, WR, MREQ (Z80 pins 21, 22, 19) whose enables go to 0V. No 74LS367 pin numbers are printed, so this pin allocation is ours (functionally per the figure; any equivalent allocation is fine for routing): the four 4-buffer groups (1G) form the two 8-bit directions, the 2-buffer groups (2G) with 2G=0V carry RD/WR/MREQ. Read direction (system D -> Z80) is enabled by RD_N, write direction (Z80 -> system D) by WR_N. IC11: write buffers D0-D3; group 2 (pins 11-15) spare, not drawn (NC; floating LS 2G = outputs off)."
+  },
+  {
+   "ref": "IC12",
+   "value": "74LS367",
+   "pins": {
+    "1": "WR_N",
+    "15": "NC",
+    "8": "GND",
+    "16": "+5V",
+    "2": "CPU_ZD4",
+    "3": "D4",
+    "4": "CPU_ZD5",
+    "5": "D5",
+    "6": "CPU_ZD6",
+    "7": "D6",
+    "10": "CPU_ZD7",
+    "9": "D7",
+    "12": "NC",
+    "11": "NC",
+    "14": "NC",
+    "13": "NC"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "Fig. 2 draws IC9-12 only as a block: a bidirectional 8-bit transceiver between the Z80 data pins and the system 'Data bus', with one direction enabled by the buffered RD line and the other by the buffered WR line, plus three buffers RD, WR, MREQ (Z80 pins 21, 22, 19) whose enables go to 0V. No 74LS367 pin numbers are printed, so this pin allocation is ours (functionally per the figure; any equivalent allocation is fine for routing): the four 4-buffer groups (1G) form the two 8-bit directions, the 2-buffer groups (2G) with 2G=0V carry RD/WR/MREQ. Read direction (system D -> Z80) is enabled by RD_N, write direction (Z80 -> system D) by WR_N. IC12: write buffers D4-D7; group 2 (pins 11-15) spare, not drawn (NC)."
+  },
+  {
+   "ref": "IC13",
+   "value": "81LS95",
+   "pins": {
+    "1": "CPU_IC3_Y4",
+    "19": "CPU_IC3_Y4",
+    "10": "GND",
+    "20": "+5V",
+    "2": "KBD_D0",
+    "3": "D0",
+    "4": "KBD_D1",
+    "5": "D1",
+    "6": "KBD_D2",
+    "7": "D2",
+    "8": "KBD_D3",
+    "9": "D3",
+    "12": "KBD_D4",
+    "11": "D4",
+    "14": "KBD_D5",
+    "13": "D5",
+    "16": "KBD_D6",
+    "15": "D6",
+    "18": "NC",
+    "17": "NC"
+   },
+   "assumed_pins": [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "20"
+   ],
+   "notes": "Keyboard input buffer (DM81LS95 = DM74LS465, octal non-inverting tri-state, enables G1 pin1 / G2 pin19 both active low). Pins 1 and 19 are printed and joined to IC3 pin 11 (IN 01h). Keyboard data in and data bus out are fat arrows: expanded from the NSC datasheet pinout (A1..A8 = 2,4,6,8,12,14,16,18; Y1..Y8 = 3,5,7,9,11,13,15,17). Bit allocation KBD_Dn -> Dn is ours (7 data bits per Fig. 18). Channel 8 (A8 pin 18 / Y8 pin 17) is not defined by the figure: left NC. Keyboard data is inverted (article Part 3) and the ROM does IN A,($01) then CPL and compares with 0Dh, so D7 must read 1 - see 'uncertain'. Kit layout sheet calls IC13 an 81LS98 (inverting, split enable, same pinout)."
+  },
+  {
+   "ref": "IC14",
+   "value": "74LS04",
+   "pins": {
+    "1": "Z80_CLOCK_INPUT",
+    "2": "CLK",
+    "3": "KBD_STROBE",
+    "4": "NMI_N",
+    "5": "NC",
+    "6": "NC",
+    "7": "GND",
+    "8": "NC",
+    "9": "NC",
+    "10": "NC",
+    "11": "NC",
+    "12": "NC",
+    "13": "NC",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "7",
+    "14"
+   ],
+   "notes": "Two inverters drawn (no pin numbers printed; gate allocation is ours): clock buffer (incoming 2 MHz clock -> Z80 pin 6, with TR1 active pull-up) and keyboard strobe inverter (positive strobe -> Z80 NMI pin 17). Article text calls it a 'Schottky inverter' (74S04?) but the figure label is 74LS04. Gates 3-6 unused in Fig. 2 (NC) - check other figures do not also allocate IC14 gates."
+  },
+  {
+   "ref": "IC4",
+   "value": "74C173",
+   "pins": {
+    "1": "GND",
+    "2": "GND",
+    "7": "CPU_IC2_Y6",
+    "8": "GND",
+    "9": "GND",
+    "10": "GND",
+    "15": "GND",
+    "16": "+5V",
+    "14": "D0",
+    "13": "D1",
+    "12": "D2",
+    "11": "D3",
+    "3": "CPU_MM_I1",
+    "4": "CPU_MM_I2",
+    "5": "CPU_MM_I3",
+    "6": "CPU_MM_I4"
+   },
+   "assumed_pins": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "MM57109 instruction/control latch, drawn as one block 'IC4,5 74C173' with pins 1,2,8,9,10 to 0V (outputs enabled, load enabled) and pin 7 (CLK) from IC2 pin 9. Data in (D0-D7) and the 6 outputs to IC6 are fat arrows; two further outputs drive the IC7 gates (upper -> POR, lower -> HOLD). Bit allocation from the ROM: bits 0-5 = MM57109 I1-I6 (IC6 pins printed 24,5,4,3,2,1 top-to-bottom = I6..I1), bit 7 = HOLD (ROM ORs 80h to set HOLD), so bit 6 = POR. Which package holds which nibble is ours. Pin 15 (CLR, active high) is not drawn - assumed GND (must be low for the latch to work). IC4: D0-D3 -> I1-I4 (IC6 pins 1-4)."
+  },
+  {
+   "ref": "IC5",
+   "value": "74C173",
+   "pins": {
+    "1": "GND",
+    "2": "GND",
+    "7": "CPU_IC2_Y6",
+    "8": "GND",
+    "9": "GND",
+    "10": "GND",
+    "15": "GND",
+    "16": "+5V",
+    "14": "D4",
+    "13": "D5",
+    "12": "D6",
+    "11": "D7",
+    "3": "CPU_MM_I5",
+    "4": "CPU_MM_I6",
+    "5": "CPU_LATCH_POR",
+    "6": "CPU_LATCH_HOLD"
+   },
+   "assumed_pins": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+   ],
+   "notes": "MM57109 instruction/control latch, drawn as one block 'IC4,5 74C173' with pins 1,2,8,9,10 to 0V (outputs enabled, load enabled) and pin 7 (CLK) from IC2 pin 9. Data in (D0-D7) and the 6 outputs to IC6 are fat arrows; two further outputs drive the IC7 gates (upper -> POR, lower -> HOLD). Bit allocation from the ROM: bits 0-5 = MM57109 I1-I6 (IC6 pins printed 24,5,4,3,2,1 top-to-bottom = I6..I1), bit 7 = HOLD (ROM ORs 80h to set HOLD), so bit 6 = POR. Which package holds which nibble is ours. Pin 15 (CLR, active high) is not drawn - assumed GND (must be low for the latch to work). IC5: D4->I5 (IC6 pin 5), D5->I6 (IC6 pin 24), D6->POR gate, D7->HOLD gate."
+  },
+  {
+   "ref": "IC7",
+   "value": "4011",
+   "pins": {
+    "1": "CPU_LATCH_POR",
+    "2": "CPU_LATCH_POR",
+    "3": "CPU_POR_DRV_N",
+    "5": "CPU_LATCH_HOLD",
+    "6": "CPU_MM_ISEL",
+    "4": "CPU_HOLD_DRV_N",
+    "8": "CPU_MM_ISEL",
+    "9": "CPU_MM_RDY",
+    "10": "CPU_MM_RDY_GATED_N",
+    "12": "NC",
+    "13": "NC",
+    "11": "NC",
+    "7": "GND",
+    "14": "+5V"
+   },
+   "assumed_pins": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14"
+   ],
+   "notes": "Three gates drawn, no pin numbers printed (gate allocation is ours): (a) inputs joined, from latch POR bit, output -> 47k -> TR3 base; (b) latch HOLD bit NAND IC6 pin 8 (ISEL) -> 47k -> TR2 base; (c) IC6 pin 8 (ISEL) NAND IC6 pin 12 (RDY) -> IC8 (read back as D5). Power assumed VDD=+5V, VSS=0V (must be +5V so the PNP level shifters turn off). Fourth gate (pins 11-13) unused and not drawn: CMOS inputs 12/13 should be tied off."
+  },
+  {
+   "ref": "IC6",
+   "value": "MM57109",
+   "pins": {
+    "1": "CPU_MM_I1",
+    "2": "CPU_MM_I2",
+    "3": "CPU_MM_I3",
+    "4": "CPU_MM_I4",
+    "5": "CPU_MM_I5",
+    "6": "NC",
+    "7": "MM57109_CLOCK",
+    "8": "CPU_MM_ISEL",
+    "9": "CPU_MM_HOLD",
+    "10": "INT_N",
+    "11": "CPU_MM_POR",
+    "12": "CPU_MM_RDY",
+    "13": "NC",
+    "14": "NC",
+    "15": "+5V",
+    "16": "NC",
+    "17": "CPU_MM_DO1",
+    "18": "CPU_MM_DO2",
+    "19": "CPU_MM_DO3",
+    "20": "CPU_MM_DO4",
+    "21": "-4V",
+    "22": "NC",
+    "23": "CPU_MM_BR",
+    "24": "CPU_MM_I6",
+    "25": "NC",
+    "26": "NC",
+    "27": "NC",
+    "28": "NC"
+   },
+   "assumed_pins": [
+    "6",
+    "13",
+    "14",
+    "16",
+    "22",
+    "25",
+    "26",
+    "27",
+    "28"
+   ],
+   "notes": "All used pin numbers are printed in Fig. 2: 24,5,4,3,2,1 (I6..I1 from latch), 9 HOLD (TR2), 11 POR (TR3), 21 -> -4V (VDD), 15 -> +5V (VSS), 8 (ISEL) and 12 (RDY) with 10k to 0V, 7 OSC 'From IC46', 23 BR, 20/19/18/17 DO4..DO1 to IC8, 10 R/W -> Z80 INT (pin 16) with 10k to 0V. Pin functions checked against the NSC MM57109 datasheet (Table II): 8=ISEL, 12=RDY, 15=VSS, 21=VDD. The article text says 'ISEL at pin 12' - that is a text error; the figure wiring (pin 8 feeds both IC7 gates, as ISEL does in Fig. 4) agrees with the datasheet. Unused outputs NC: 6 SYNC, 13 ERROR, 14 F2, 16 F1, 22 DAS, 25-28 DA4-DA1."
+  },
+  {
+   "ref": "IC8",
+   "value": "74LS367",
+   "pins": {
+    "1": "CPU_IC3_Y6",
+    "15": "CPU_IC3_Y6",
+    "8": "GND",
+    "16": "+5V",
+    "2": "CPU_MM_DO1",
+    "3": "D0",
+    "4": "CPU_MM_DO2",
+    "5": "D1",
+    "6": "CPU_MM_DO3",
+    "7": "D2",
+    "10": "CPU_MM_DO4",
+    "9": "D3",
+    "12": "CPU_MM_RDY_GATED_N",
+    "11": "D5",
+    "14": "CPU_MM_BR",
+    "13": "D6"
+   },
+   "assumed_pins": [
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "16"
+   ],
+   "notes": "Printed: IC8 (type not printed in Fig. 2; '74LS367' from the kit layout, and it is a hex tri-state buffer with enables pins 1 and 15) pins 1 and 15 joined to IC3 pin 9 (IN 03h). Inputs: DO1-DO4 (IC6 pins 17-20, fat arrow), BR (IC6 pin 23), and the IC7 RDY/ISEL NAND output; outputs labelled 'D0-D3, D5, D6'. Bit allocation from the ROM: low nibble = DO1..DO4 (DO1 = LSB, AND 0Fh in the INT handler), bit 5 = RDY (gated), bit 6 = BR. Pin allocation is ours. Footnote: the 5 connections from IC6 to IC8 (DO1-4, BR) have 10k resistors to -4V (R_CPU13-17)."
+  },
+  {
+   "ref": "TR1",
+   "value": "2N3906",
+   "pins": {
+    "E": "CPU_TR1_E",
+    "B": "CPU_TR1_B",
+    "C": "CLK"
+   },
+   "notes": "Active pull-up on Z80 clock. Emitter -> 10R -> +5V and -> 1k2 -> base; base -> 220R || 33p -> incoming clock (IC14 input); collector -> Z80 pin 6."
+  },
+  {
+   "ref": "R_CPU1",
+   "value": "220",
+   "pins": {
+    "1": "Z80_CLOCK_INPUT",
+    "2": "CPU_TR1_B"
+   },
+   "notes": "article prints no R numbers; R_CPU* refs are ours"
+  },
+  {
+   "ref": "C_CPU1",
+   "value": "33p",
+   "pins": {
+    "1": "Z80_CLOCK_INPUT",
+    "2": "CPU_TR1_B"
+   },
+   "notes": "in parallel with R_CPU1"
+  },
+  {
+   "ref": "R_CPU2",
+   "value": "1k2",
+   "pins": {
+    "1": "CPU_TR1_B",
+    "2": "CPU_TR1_E"
+   }
+  },
+  {
+   "ref": "R_CPU3",
+   "value": "10R",
+   "pins": {
+    "1": "CPU_TR1_E",
+    "2": "+5V"
+   },
+   "notes": "drawn as '10 ohm' between TR1 emitter and the +5V node at Z80 pin 11"
+  },
+  {
+   "ref": "C_CPU2",
+   "value": "100n",
+   "pins": {
+    "1": "+5V",
+    "2": "GND"
+   },
+   "notes": "decoupling between Z80 pin 11 and pin 29 lines"
+  },
+  {
+   "ref": "C_CPU3",
+   "value": "100n",
+   "pins": {
+    "1": "RESET_N",
+    "2": "GND"
+   },
+   "notes": "reset capacitor, Z80 pin 26 to pin 29 (0V)"
+  },
+  {
+   "ref": "R_CPU4",
+   "value": "47k",
+   "pins": {
+    "1": "RESET_N",
+    "2": "+5V"
+   },
+   "notes": "reset pull-up"
+  },
+  {
+   "ref": "R_CPU5",
+   "value": "47k",
+   "pins": {
+    "1": "WAIT_N",
+    "2": "+5V"
+   },
+   "notes": "pull-up for joined Z80 pins 24 (WAIT) and 25 (BUSRQ)"
+  },
+  {
+   "ref": "R_CPU6",
+   "value": "10k",
+   "pins": {
+    "1": "INT_N",
+    "2": "GND"
+   },
+   "notes": "pull-down on Z80 INT / MM57109 R/W (open-drain PMOS output)"
+  },
+  {
+   "ref": "R_CPU7",
+   "value": "47k",
+   "pins": {
+    "1": "CPU_POR_DRV_N",
+    "2": "CPU_TR3_B"
+   }
+  },
+  {
+   "ref": "R_CPU8",
+   "value": "47k",
+   "pins": {
+    "1": "CPU_HOLD_DRV_N",
+    "2": "CPU_TR2_B"
+   }
+  },
+  {
+   "ref": "TR2",
+   "value": "2N3906",
+   "pins": {
+    "E": "+5V",
+    "B": "CPU_TR2_B",
+    "C": "CPU_MM_HOLD"
+   },
+   "notes": "HOLD level shifter; collector 47k to -4V, to IC6 pin 9"
+  },
+  {
+   "ref": "TR3",
+   "value": "2N3906",
+   "pins": {
+    "E": "+5V",
+    "B": "CPU_TR3_B",
+    "C": "CPU_MM_POR"
+   },
+   "notes": "POR level shifter; collector 47k to -4V, to IC6 pin 11"
+  },
+  {
+   "ref": "R_CPU9",
+   "value": "47k",
+   "pins": {
+    "1": "CPU_MM_HOLD",
+    "2": "-4V"
+   }
+  },
+  {
+   "ref": "R_CPU10",
+   "value": "47k",
+   "pins": {
+    "1": "CPU_MM_POR",
+    "2": "-4V"
+   }
+  },
+  {
+   "ref": "R_CPU11",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_ISEL",
+    "2": "GND"
+   },
+   "notes": "pull-down on IC6 pin 8 (drawn from the 0V node at IC4,5 pins 1,2,8,9,10)"
+  },
+  {
+   "ref": "R_CPU12",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_RDY",
+    "2": "GND"
+   },
+   "notes": "pull-down on IC6 pin 12"
+  },
+  {
+   "ref": "R_CPU13",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_DO1",
+    "2": "-4V"
+   },
+   "assumed_pins": [
+    "1",
+    "2"
+   ],
+   "notes": "not drawn individually: from the Fig. 2 footnote '* The 5 connections from IC6 to IC8 have 10k resistors to the -4V supply'"
+  },
+  {
+   "ref": "R_CPU14",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_DO2",
+    "2": "-4V"
+   },
+   "assumed_pins": [
+    "1",
+    "2"
+   ],
+   "notes": "not drawn individually: from the Fig. 2 footnote '* The 5 connections from IC6 to IC8 have 10k resistors to the -4V supply'"
+  },
+  {
+   "ref": "R_CPU15",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_DO3",
+    "2": "-4V"
+   },
+   "assumed_pins": [
+    "1",
+    "2"
+   ],
+   "notes": "not drawn individually: from the Fig. 2 footnote '* The 5 connections from IC6 to IC8 have 10k resistors to the -4V supply'"
+  },
+  {
+   "ref": "R_CPU16",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_DO4",
+    "2": "-4V"
+   },
+   "assumed_pins": [
+    "1",
+    "2"
+   ],
+   "notes": "not drawn individually: from the Fig. 2 footnote '* The 5 connections from IC6 to IC8 have 10k resistors to the -4V supply'"
+  },
+  {
+   "ref": "R_CPU17",
+   "value": "10k",
+   "pins": {
+    "1": "CPU_MM_BR",
+    "2": "-4V"
+   },
+   "assumed_pins": [
+    "1",
+    "2"
+   ],
+   "notes": "not drawn individually: from the Fig. 2 footnote '* The 5 connections from IC6 to IC8 have 10k resistors to the -4V supply'"
+  },
+  {
+   "ref": "J_RESET",
+   "value": "reset switch",
+   "pins": {
+    "RESET": "RESET_N",
+    "0V": "GND"
+   },
+   "notes": "Fig. 2 shows two arrows 'Reset switch' from the Z80 pin 26 line and the 0V line (a normally-open push button shorting RESET to 0V). On the kit board this is the RESET key in the keyboard area."
+  },
+  {
+   "ref": "J_KBD",
+   "value": "keyboard connector (Carter 756 edge)",
+   "pins": {
+    "STROBE": "KBD_STROBE",
+    "+5V": "+5V",
+    "D6": "KBD_D6",
+    "D5": "KBD_D5",
+    "D4": "KBD_D4",
+    "D3": "KBD_D3",
+    "D2": "KBD_D2",
+    "D1": "KBD_D1",
+    "D0": "KBD_D0",
+    "0V_A": "GND",
+    "-12V": "-12V",
+    "0V_B": "GND"
+   },
+   "notes": "From Fig. 18 (Part 3, June 1979, p.85): 15-way edge, polarising cut between contacts 3 and 4 (counting from the Strobe end). Upper-side labels: contact 2 = Strobe, 4 = +5V, 7 = D6, 9 = D5, 10 = D4, 11 = D3, 12 = D2, 13 = D1, 14 = D0; contacts 1,3,5,6,8,15 unlabelled. Lower-side labels: 0V under contact 13 (0V_A), -12V under contact 14, 0V under contact 15 (0V_B) - read as the reverse-side contacts. Signal sense (article text): 7 bits of inverted data plus a positive strobe pulse active while the code is present. Fig. 18 also shows HALT -> 560R -> TIL209 LED (anode to +5V); that LED is not part of this connector and is not included here (see offsheet HALT_N)."
+  }
+ ],
+ "offsheet": [
+  {
+   "net": "A0..A15",
+   "label": "Address bus A0-A15",
+   "note": "Z80 address bus (unbuffered) to memory (Fig. 6), VDU mux IC40-42 (Fig. 8), etc."
+  },
+  {
+   "net": "D0..D7",
+   "label": "Data bus",
+   "note": "system data bus on the far side of the IC9-12 transceiver; to memory, VDU RAM, IC13, IC8, IC4/IC5, tape"
+  },
+  {
+   "net": "RD_N",
+   "label": "RD (overbar)",
+   "note": "buffered RD from IC9-12; also IC3 pin 5; to memory (Fig. 6)"
+  },
+  {
+   "net": "WR_N",
+   "label": "WR (overbar)",
+   "note": "buffered WR from IC9-12; also IC2 pin 5; to memory/VDU (Fig. 6, Fig. 8 IC49)"
+  },
+  {
+   "net": "MREQ_N",
+   "label": "MREQ (overbar)",
+   "note": "buffered MREQ from IC9-12; to memory decoder IC17 via link (Fig. 6/7) and VDU (Fig. 8 IC31)"
+  },
+  {
+   "net": "IORQ_N",
+   "label": "(Z80 pin 20)",
+   "note": "used only by IC2/IC3 in this figure; unbuffered"
+  },
+  {
+   "net": "HALT_N",
+   "label": "RDY (arrow 'To keyboard')",
+   "note": "Z80 pin 18 goes out to the keyboard as the arrow labelled RDY; Fig. 18 shows it as HALT -> 560R -> TIL209 LED to +5V (kit D12)"
+  },
+  {
+   "net": "KBD_STROBE",
+   "label": "Strobe (To keyboard)",
+   "note": "positive keyboard strobe -> IC14 inverter -> Z80 NMI; from keyboard encoder / J_KBD contact 2"
+  },
+  {
+   "net": "KBD_D0..KBD_D6",
+   "label": "Data (To keyboard)",
+   "note": "inverted 7-bit ASCII from keyboard encoder / J_KBD, into IC13 A1-A7"
+  },
+  {
+   "net": "Z80_CLOCK_INPUT",
+   "label": "(unlabelled arrow into IC14)",
+   "note": "2 MHz Z80 clock from VDU circuit, Fig. 8 'To Z80 clock input' (IC30 7493)"
+  },
+  {
+   "net": "MM57109_CLOCK",
+   "label": "From IC46",
+   "note": "400 kHz MM57109 clock into IC6 pin 7; Fig. 8 IC46 7490 pin 12 'To IC6 pin 7 clock'"
+  },
+  {
+   "net": "-4V",
+   "label": "-4V",
+   "note": "MM57109 negative supply (VDD), also used by the five 10k pull-downs and the TR2/TR3 collector loads; from the power supply figure"
+  },
+  {
+   "net": "-12V",
+   "label": "-12V",
+   "note": "only on J_KBD (Fig. 18) for the keyboard"
+  },
+  {
+   "net": "RESET_N",
+   "label": "Reset switch",
+   "note": "to reset push button (J_RESET); also standard Z80 reset net"
+  },
+  {
+   "net": "INT_N",
+   "label": "(Z80 pin 16)",
+   "note": "MM57109 R/W -> Z80 INT; local to this figure"
+  },
+  {
+   "net": "M1_N, RFSH_N, BUSAK_N",
+   "label": "(not drawn)",
+   "note": "Z80 pins 27, 28, 23 not drawn in Fig. 2; named for possible use by expansion figures"
+  },
+  {
+   "net": "CPU_IC2_Y0",
+   "label": "IC2 pin 15 (stub)",
+   "note": "output-port select OUT 00h (active low, IORQ+WR); stub drawn, destination in later figures (monitor does OUT ($00))"
+  },
+  {
+   "net": "CPU_IC2_Y1",
+   "label": "IC2 pin 14 (stub)",
+   "note": "output-port select OUT 80h (active low, IORQ+WR); stub drawn, destination in later figures (monitor does OUT ($80))"
+  },
+  {
+   "net": "CPU_IC2_Y2",
+   "label": "IC2 pin 13 (stub)",
+   "note": "output-port select OUT 40h (active low, IORQ+WR); stub drawn, destination in later figures (monitor does OUT ($40))"
+  },
+  {
+   "net": "CPU_IC2_Y3",
+   "label": "IC2 pin 12 (stub)",
+   "note": "output-port select OUT C0h (active low, IORQ+WR); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC2_Y4",
+   "label": "IC2 pin 11 (stub)",
+   "note": "output-port select OUT 20h (active low, IORQ+WR); stub drawn, destination in later figures (tape/TTY output port 20h)"
+  },
+  {
+   "net": "CPU_IC2_Y5",
+   "label": "IC2 pin 10 (stub)",
+   "note": "output-port select OUT A0h (active low, IORQ+WR); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC2_Y7",
+   "label": "IC2 pin 7 (stub)",
+   "note": "output-port select OUT E0h (active low, IORQ+WR); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC3_Y0",
+   "label": "IC3 pin 15 (stub)",
+   "note": "input-port select IN 00h (active low, IORQ+RD); stub drawn, destination in later figures (tape input port 00h)"
+  },
+  {
+   "net": "CPU_IC3_Y1",
+   "label": "IC3 pin 14 (stub)",
+   "note": "input-port select IN 04h (active low, IORQ+RD); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC3_Y2",
+   "label": "IC3 pin 13 (stub)",
+   "note": "input-port select IN 02h (active low, IORQ+RD); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC3_Y3",
+   "label": "IC3 pin 12 (stub)",
+   "note": "input-port select IN 06h (active low, IORQ+RD); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC3_Y5",
+   "label": "IC3 pin 10 (stub)",
+   "note": "input-port select IN 05h (active low, IORQ+RD); stub drawn, destination in later figures"
+  },
+  {
+   "net": "CPU_IC3_Y7",
+   "label": "IC3 pin 7 (stub)",
+   "note": "input-port select IN 07h (active low, IORQ+RD); stub drawn, destination in later figures"
+  }
+ ],
+ "uncertain": [
+  "IC9-IC12 (74LS367 transceiver/control buffers): Fig. 2 is block-level only, no 74LS367 pin numbers or package allocation printed. Pin allocation here is ours; it is functionally what the figure shows but is not 'read' from it. Direction/enable pairing (RD_N enables system->Z80, WR_N enables Z80->system) is inferred from logic; the drawing's two enable lines are ambiguous about which buffer each one feeds.",
+  "IC4/IC5 74C173: which package holds D0-D3 vs D4-D7, and bit 6 = POR, are inferred (latch block is a fat arrow). Bit 7 = HOLD and bits 0-5 = I1-I6 are well supported by the ROM (042E routine) and MAME; bit 6 = POR is the only remaining bit but the ROM never writes 40h to port 60h in the dumped code (an LD A,$40 at 081E is followed by a delay, not an OUT).",
+  "IC4/IC5 pin 15 (CLR) not drawn; assumed GND. If CLR were left open on a 74LS173 the latch would be held cleared.",
+  "IC2/IC3 pin 6 (G1) not drawn; assumed +5V (ports 00h/01h/03h/20h/40h/60h/80h used by the ROM all need G1 high with A3/A4 low, so G1 is not an address line).",
+  "IC13 channel 8 (A8 pin 18, Y8 pin 17) undefined by the figure, left NC. The ROM does IN ($01), CPL, CP 0Dh, so D7 must read 1 on IN 01h: either Y8 drives D7 with A8 tied to +5V, or D7 floats high through the LS transceiver inputs. Suggest A8 -> +5V and Y8 -> D7.",
+  "IC13 / IC8 / IC14 / IC7 gate and bit-to-channel allocation is ours (figure gives only pins 1/19 for IC13, 1/15 for IC8, none for IC14/IC7).",
+  "-4V rail: printed '-4V' in Fig. 2; not one of the spec's standard rails. Check the PSU figure for how it is generated (possibly from -5V).",
+  "MM57109 ISEL/RDY: article text says 'ISEL at pin 12', figure wiring and NSC datasheet say ISEL = pin 8, RDY = pin 12. Netlist follows figure + datasheet.",
+  "J_KBD (Fig. 18): the 0V / -12V / 0V labels are printed below the edge under contacts 13/14/15 and are read as the reverse-side contacts; contact numbering (1 = Strobe end) is ours; the figure prints no contact numbers.",
+  "IC4,5 type printed as 74C173 in Fig. 2 (kit layout says 74LS173); IC6 inputs need VIH >= VSS-1V, which a 74C part meets; keep 74C173 or an HC part."
+ ]
+}

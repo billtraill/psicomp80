@@ -1,0 +1,15 @@
+{
+  "figure": "Board-level additions from the kit layout sheet (not in any article figure)",
+  "parts": [
+    {"ref": "J_VIDEO", "value": "video / sync output pads", "pins": {"VIDEO": "VIDEO", "SYNC": "SYNC", "SYNC_N": "SYNC_N", "GND": "GND"},
+     "notes": "Fig. 8 brings out Video, Sync and Sync-bar; the kit sheet has VIDEO and SYNC pads at the right-hand edge"},
+    {"ref": "C119", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"},
+    {"ref": "C120", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"},
+    {"ref": "C121", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"},
+    {"ref": "C122", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"},
+    {"ref": "C123", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"},
+    {"ref": "C124", "value": "1u", "pins": {"1": "+5V", "2": "GND"}, "notes": "kit: unmarked capacitors are 1u decoupling"}
+  ],
+  "offsheet": [],
+  "uncertain": []
+}

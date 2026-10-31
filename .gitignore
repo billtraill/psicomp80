@@ -1,1 +1,6 @@
 .DS_Store
+# KiCad per-user and cache files
+*.kicad_prl
+*-backups/
+fp-info-cache
+__pycache__/

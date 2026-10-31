@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="16.96in" height="13.28in" viewBox="-60 -60 2120 1660" font-family="'DejaVu Sans Mono', 'Courier New', monospace">
+<title>PSI COMP 80 component layout</title>
+<desc>Main board component layout, redrawn as vectors from a photo of the Powertran kit sheet.</desc>
+<rect x="-60" y="-60" width="2120" height="1660" fill="#ffffff"/>
+<g inkscape:groupmode="layer" inkscape:label="Outline and sections" id="outline">
+<rect x="0" y="0" width="2000" height="1500" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="430,0 430,1075" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="0,948 430,948" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="0,840 222,840 222,948" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="918,0 918,297 1292,297 1292,1075" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="1023,0 1023,262 2000,262" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="1537,0 1537,262" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="1537,1075 1537,785 2000,785" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<polyline points="0,1075 2000,1075" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+<text x="305" y="158" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">CPU SECTION</text>
+<text x="643" y="237" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">MEMORY SECTION</text>
+<text x="1415" y="318" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">VDU SECTION</text>
+<text x="1395" y="172" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TAPE INTERFACE SECTION</text>
+<text x="372" y="978" font-size="19" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">KEYBOARD</text>
+<text x="372" y="1000" font-size="19" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">ENCODER</text>
+<text x="372" y="1022" font-size="19" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">SECTION</text>
+<text x="1518" y="1128" font-size="17" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">POWER</text>
+<text x="1518" y="1150" font-size="17" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">SUPPLY</text>
+<text x="1518" y="1172" font-size="17" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">SECTION</text>
+<text x="962" y="372" font-size="8" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22a-h, IC23a-h, IC26a-h all 21L02-4K   IC24a-h, IC25a-h all 21L02-4 (OPTIONAL)</text>
+<text x="1425" y="467" font-size="8" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43a-g, IC44a-g all 21L02-4</text>
+<text x="930" y="1045" font-size="8" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">ALL UNMARKED CAPACITORS ARE 1u 10V FOR DECOUPLING POWER LINES</text>
+<text x="1530" y="1478" font-size="8" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">PRINTING ON KEYBOARDS MAY DIFFER SLIGHTLY FROM THAT SHOWN ABOVE</text>
+<text x="655" y="345" font-size="8" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">Fit link 1 or 2 but not both</text>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="Integrated circuits" id="integrated">
+<path d="M68.8,75.6 L68.8,57.5 L156.2,57.5 L156.2,105 L68.8,105 L68.8,86.9 A5.6,5.6 0 0 0 68.8,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="112.5" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC14  74LS04</text>
+<path d="M181.2,75.6 L181.2,57.5 L281.2,57.5 L281.2,105 L181.2,105 L181.2,86.9 A5.6,5.6 0 0 0 181.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="231.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC2  74LS138</text>
+<path d="M306.2,75.6 L306.2,57.5 L406.2,57.5 L406.2,105 L306.2,105 L306.2,86.9 A5.6,5.6 0 0 0 306.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="356.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC3  74LS138</text>
+<path d="M93.8,281.9 L93.8,245 L343.8,245 L343.8,330 L93.8,330 L93.8,293.1 A5.6,5.6 0 0 0 93.8,281.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="218.8" y="287.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC1  Z80</text>
+<path d="M193.8,411.9 L193.8,430 L93.8,430 L93.8,382.5 L193.8,382.5 L193.8,400.6 A5.6,5.6 0 0 0 193.8,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="143.8" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC10  74LS367</text>
+<path d="M318.8,424.4 L318.8,442.5 L218.8,442.5 L218.8,395 L318.8,395 L318.8,413.1 A5.6,5.6 0 0 0 318.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="268.8" y="418.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC9  74LS367</text>
+<path d="M193.8,499.4 L193.8,517.5 L93.8,517.5 L93.8,470 L193.8,470 L193.8,488.1 A5.6,5.6 0 0 0 193.8,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="143.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC12  74LS367</text>
+<path d="M218.8,488.1 L218.8,470 L318.8,470 L318.8,517.5 L218.8,517.5 L218.8,499.4 A5.6,5.6 0 0 0 218.8,488.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="268.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC11  74LS367</text>
+<path d="M131.9,731.2 L95,731.2 L95,556.2 L180,556.2 L180,731.2 L143.1,731.2 A5.6,5.6 0 0 0 131.9,731.2 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="137.5" y="643.8" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 137.5 643.8)">IC6  MM57109</text>
+<path d="M331.2,586.9 L331.2,605 L231.2,605 L231.2,557.5 L331.2,557.5 L331.2,575.6 A5.6,5.6 0 0 0 331.2,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="281.2" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC8  74LS367</text>
+<path d="M331.2,674.4 L331.2,692.5 L231.2,692.5 L231.2,645 L331.2,645 L331.2,663.1 A5.6,5.6 0 0 0 331.2,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="281.2" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC5  74LS173</text>
+<path d="M331.2,761.9 L331.2,780 L231.2,780 L231.2,732.5 L331.2,732.5 L331.2,750.6 A5.6,5.6 0 0 0 331.2,761.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="281.2" y="756.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC4  74LS173</text>
+<path d="M331.2,836.9 L331.2,855 L243.8,855 L243.8,807.5 L331.2,807.5 L331.2,825.6 A5.6,5.6 0 0 0 331.2,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="287.5" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC7  4011</text>
+<path d="M50.6,931.2 L32.5,931.2 L32.5,843.8 L80,843.8 L80,931.2 L61.9,931.2 A5.6,5.6 0 0 0 50.6,931.2 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="56.2" y="887.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 56.2 887.5)">IC55  74LS00</text>
+<path d="M218.8,924.4 L218.8,942.5 L93.8,942.5 L93.8,895 L218.8,895 L218.8,913.1 A5.6,5.6 0 0 0 218.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="156.2" y="918.8" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC13  81LS98</text>
+<path d="M293.8,1018.1 L293.8,1055 L43.8,1055 L43.8,970 L293.8,970 L293.8,1006.9 A5.6,5.6 0 0 0 293.8,1018.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="168.8" y="1012.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC54  2376</text>
+<path d="M431.2,75.6 L431.2,57.5 L531.2,57.5 L531.2,105 L431.2,105 L431.2,86.9 A5.6,5.6 0 0 0 431.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="481.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC15  74LS367</text>
+<path d="M556.2,75.6 L556.2,57.5 L656.2,57.5 L656.2,105 L556.2,105 L556.2,86.9 A5.6,5.6 0 0 0 556.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="606.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC16  74LS367</text>
+<path d="M681.2,75.6 L681.2,57.5 L781.2,57.5 L781.2,105 L681.2,105 L681.2,86.9 A5.6,5.6 0 0 0 681.2,75.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="731.2" y="81.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC49  74LS138</text>
+<path d="M793.8,88.1 L793.8,70 L893.8,70 L893.8,117.5 L793.8,117.5 L793.8,99.4 A5.6,5.6 0 0 0 793.8,88.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="93.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC17  74LS138</text>
+<path d="M918.8,88.1 L918.8,70 L1006.2,70 L1006.2,117.5 L918.8,117.5 L918.8,99.4 A5.6,5.6 0 0 0 918.8,88.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="962.5" y="93.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC50  74LS02</text>
+<path d="M631.2,430.6 L631.2,467.5 L481.2,467.5 L481.2,382.5 L631.2,382.5 L631.2,419.4 A5.6,5.6 0 0 0 631.2,430.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="556.2" y="425" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC18  2708  (MONITOR)</text>
+<path d="M631.2,555.6 L631.2,592.5 L481.2,592.5 L481.2,507.5 L631.2,507.5 L631.2,544.4 A5.6,5.6 0 0 0 631.2,555.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="556.2" y="550" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC19  2708  (BURP 1)</text>
+<path d="M631.2,668.1 L631.2,705 L481.2,705 L481.2,620 L631.2,620 L631.2,656.9 A5.6,5.6 0 0 0 631.2,668.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="556.2" y="662.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC20  2708  (BURP 2)</text>
+<path d="M631.2,793.1 L631.2,830 L481.2,830 L481.2,745 L631.2,745 L631.2,781.9 A5.6,5.6 0 0 0 631.2,793.1 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="556.2" y="787.5" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC21  2708  (OPTIONAL)</text>
+<path d="M593.8,961.9 L593.8,980 L468.8,980 L468.8,932.5 L593.8,932.5 L593.8,950.6 A5.6,5.6 0 0 0 593.8,961.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="531.2" y="956.2" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC27  81LS98</text>
+<path d="M1893.8,336.9 L1893.8,355 L1806.2,355 L1806.2,307.5 L1893.8,307.5 L1893.8,325.6 A5.6,5.6 0 0 0 1893.8,336.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1850" y="331.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC38  7493</text>
+<path d="M1949.4,293.8 L1967.5,293.8 L1967.5,381.2 L1920,381.2 L1920,293.8 L1938.1,293.8 A5.6,5.6 0 0 0 1949.4,293.8 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1943.8" y="337.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 337.5)">IC33  7492</text>
+<path d="M1418.8,424.4 L1418.8,442.5 L1318.8,442.5 L1318.8,395 L1418.8,395 L1418.8,413.1 A5.6,5.6 0 0 0 1418.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="418.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC42  74LS157</text>
+<path d="M1543.8,424.4 L1543.8,442.5 L1443.8,442.5 L1443.8,395 L1543.8,395 L1543.8,413.1 A5.6,5.6 0 0 0 1543.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="418.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC41  74LS157</text>
+<path d="M1668.8,424.4 L1668.8,442.5 L1568.8,442.5 L1568.8,395 L1668.8,395 L1668.8,413.1 A5.6,5.6 0 0 0 1668.8,424.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1618.8" y="418.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC40  74LS157</text>
+<path d="M1781.2,436.9 L1781.2,455 L1693.8,455 L1693.8,407.5 L1781.2,407.5 L1781.2,425.6 A5.6,5.6 0 0 0 1781.2,436.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1737.5" y="431.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC35  7493</text>
+<path d="M1893.8,436.9 L1893.8,455 L1806.2,455 L1806.2,407.5 L1893.8,407.5 L1893.8,425.6 A5.6,5.6 0 0 0 1893.8,436.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1850" y="431.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC39  7492</text>
+<path d="M1949.4,406.2 L1967.5,406.2 L1967.5,493.8 L1920,493.8 L1920,406.2 L1938.1,406.2 A5.6,5.6 0 0 0 1949.4,406.2 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1943.8" y="450" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1943.8 450)">IC32  7425</text>
+<path d="M1656.2,511.9 L1656.2,530 L1568.8,530 L1568.8,482.5 L1656.2,482.5 L1656.2,500.6 A5.6,5.6 0 0 0 1656.2,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1612.5" y="506.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC31  74LS02</text>
+<path d="M1781.2,511.9 L1781.2,530 L1693.8,530 L1693.8,482.5 L1781.2,482.5 L1781.2,500.6 A5.6,5.6 0 0 0 1781.2,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1737.5" y="506.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC48  7493</text>
+<path d="M1881.2,524.4 L1881.2,542.5 L1793.8,542.5 L1793.8,495 L1881.2,495 L1881.2,513.1 A5.6,5.6 0 0 0 1881.2,524.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1837.5" y="518.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC30  7493</text>
+<path d="M1936.9,518.8 L1955,518.8 L1955,606.2 L1907.5,606.2 L1907.5,518.8 L1925.6,518.8 A5.6,5.6 0 0 0 1936.9,518.8 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1931.2" y="562.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1931.2 562.5)">IC46  7490</text>
+<path d="M1656.2,599.4 L1656.2,617.5 L1556.2,617.5 L1556.2,570 L1656.2,570 L1656.2,588.1 A5.6,5.6 0 0 0 1656.2,599.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1606.2" y="593.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC45  74165</text>
+<path d="M1768.8,599.4 L1768.8,617.5 L1681.2,617.5 L1681.2,570 L1768.8,570 L1768.8,588.1 A5.6,5.6 0 0 0 1768.8,599.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1725" y="593.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC34  7490</text>
+<path d="M1881.2,599.4 L1881.2,617.5 L1793.8,617.5 L1793.8,570 L1881.2,570 L1881.2,588.1 A5.6,5.6 0 0 0 1881.2,599.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1837.5" y="593.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC29  7493</text>
+<path d="M1706.2,705.6 L1706.2,742.5 L1556.2,742.5 L1556.2,657.5 L1706.2,657.5 L1706.2,694.4 A5.6,5.6 0 0 0 1706.2,705.6 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1631.2" y="700" font-size="11" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC47  2513  (CHARACTER GEN)</text>
+<path d="M1881.2,686.9 L1881.2,705 L1793.8,705 L1793.8,657.5 L1881.2,657.5 L1881.2,675.6 A5.6,5.6 0 0 0 1881.2,686.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1837.5" y="681.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC28  74LS04</text>
+<path d="M1936.9,618.8 L1955,618.8 L1955,706.2 L1907.5,706.2 L1907.5,618.8 L1925.6,618.8 A5.6,5.6 0 0 0 1936.9,618.8 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1931.2" y="662.5" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a" transform="rotate(-90 1931.2 662.5)">IC36  7412</text>
+<path d="M1881.2,774.4 L1881.2,792.5 L1793.8,792.5 L1793.8,745 L1881.2,745 L1881.2,763.1 A5.6,5.6 0 0 0 1881.2,774.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1837.5" y="768.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC37  74LS86</text>
+<path d="M1743.8,224.4 L1743.8,242.5 L1643.8,242.5 L1643.8,195 L1743.8,195 L1743.8,213.1 A5.6,5.6 0 0 0 1743.8,224.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1693.8" y="218.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC53  74LS367</text>
+<path d="M1856.2,224.4 L1856.2,242.5 L1768.8,242.5 L1768.8,195 L1856.2,195 L1856.2,213.1 A5.6,5.6 0 0 0 1856.2,224.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1812.5" y="218.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC51  4013</text>
+<path d="M1981.2,236.9 L1981.2,255 L1881.2,255 L1881.2,207.5 L1981.2,207.5 L1981.2,225.6 A5.6,5.6 0 0 0 1981.2,236.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1931.2" y="231.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC52  4528</text>
+<path d="M768.8,411.9 L768.8,430 L668.8,430 L668.8,382.5 L768.8,382.5 L768.8,400.6 A5.6,5.6 0 0 0 768.8,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22a</text>
+<path d="M768.8,499.4 L768.8,517.5 L668.8,517.5 L668.8,470 L768.8,470 L768.8,488.1 A5.6,5.6 0 0 0 768.8,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22b</text>
+<path d="M768.8,586.9 L768.8,605 L668.8,605 L668.8,557.5 L768.8,557.5 L768.8,575.6 A5.6,5.6 0 0 0 768.8,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22c</text>
+<path d="M768.8,674.4 L768.8,692.5 L668.8,692.5 L668.8,645 L768.8,645 L768.8,663.1 A5.6,5.6 0 0 0 768.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22d</text>
+<path d="M768.8,749.4 L768.8,767.5 L668.8,767.5 L668.8,720 L768.8,720 L768.8,738.1 A5.6,5.6 0 0 0 768.8,749.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="743.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22e</text>
+<path d="M768.8,836.9 L768.8,855 L668.8,855 L668.8,807.5 L768.8,807.5 L768.8,825.6 A5.6,5.6 0 0 0 768.8,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22f</text>
+<path d="M768.8,924.4 L768.8,942.5 L668.8,942.5 L668.8,895 L768.8,895 L768.8,913.1 A5.6,5.6 0 0 0 768.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22g</text>
+<path d="M768.8,1011.9 L768.8,1030 L668.8,1030 L668.8,982.5 L768.8,982.5 L768.8,1000.6 A5.6,5.6 0 0 0 768.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="718.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC22h</text>
+<path d="M893.8,411.9 L893.8,430 L793.8,430 L793.8,382.5 L893.8,382.5 L893.8,400.6 A5.6,5.6 0 0 0 893.8,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23a</text>
+<path d="M893.8,499.4 L893.8,517.5 L793.8,517.5 L793.8,470 L893.8,470 L893.8,488.1 A5.6,5.6 0 0 0 893.8,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23b</text>
+<path d="M893.8,586.9 L893.8,605 L793.8,605 L793.8,557.5 L893.8,557.5 L893.8,575.6 A5.6,5.6 0 0 0 893.8,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23c</text>
+<path d="M893.8,674.4 L893.8,692.5 L793.8,692.5 L793.8,645 L893.8,645 L893.8,663.1 A5.6,5.6 0 0 0 893.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23d</text>
+<path d="M893.8,749.4 L893.8,767.5 L793.8,767.5 L793.8,720 L893.8,720 L893.8,738.1 A5.6,5.6 0 0 0 893.8,749.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="743.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23e</text>
+<path d="M893.8,836.9 L893.8,855 L793.8,855 L793.8,807.5 L893.8,807.5 L893.8,825.6 A5.6,5.6 0 0 0 893.8,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23f</text>
+<path d="M893.8,924.4 L893.8,942.5 L793.8,942.5 L793.8,895 L893.8,895 L893.8,913.1 A5.6,5.6 0 0 0 893.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23g</text>
+<path d="M893.8,1011.9 L893.8,1030 L793.8,1030 L793.8,982.5 L893.8,982.5 L893.8,1000.6 A5.6,5.6 0 0 0 893.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="843.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC23h</text>
+<path d="M1018.8,411.9 L1018.8,430 L918.8,430 L918.8,382.5 L1018.8,382.5 L1018.8,400.6 A5.6,5.6 0 0 0 1018.8,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24a</text>
+<path d="M1018.8,499.4 L1018.8,517.5 L918.8,517.5 L918.8,470 L1018.8,470 L1018.8,488.1 A5.6,5.6 0 0 0 1018.8,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24b</text>
+<path d="M1018.8,586.9 L1018.8,605 L918.8,605 L918.8,557.5 L1018.8,557.5 L1018.8,575.6 A5.6,5.6 0 0 0 1018.8,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24c</text>
+<path d="M1018.8,674.4 L1018.8,692.5 L918.8,692.5 L918.8,645 L1018.8,645 L1018.8,663.1 A5.6,5.6 0 0 0 1018.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24d</text>
+<path d="M1018.8,749.4 L1018.8,767.5 L918.8,767.5 L918.8,720 L1018.8,720 L1018.8,738.1 A5.6,5.6 0 0 0 1018.8,749.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="743.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24e</text>
+<path d="M1018.8,836.9 L1018.8,855 L918.8,855 L918.8,807.5 L1018.8,807.5 L1018.8,825.6 A5.6,5.6 0 0 0 1018.8,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24f</text>
+<path d="M1018.8,924.4 L1018.8,942.5 L918.8,942.5 L918.8,895 L1018.8,895 L1018.8,913.1 A5.6,5.6 0 0 0 1018.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24g</text>
+<path d="M1018.8,1011.9 L1018.8,1030 L918.8,1030 L918.8,982.5 L1018.8,982.5 L1018.8,1000.6 A5.6,5.6 0 0 0 1018.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="968.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC24h</text>
+<path d="M1143.8,411.9 L1143.8,430 L1043.8,430 L1043.8,382.5 L1143.8,382.5 L1143.8,400.6 A5.6,5.6 0 0 0 1143.8,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25a</text>
+<path d="M1143.8,499.4 L1143.8,517.5 L1043.8,517.5 L1043.8,470 L1143.8,470 L1143.8,488.1 A5.6,5.6 0 0 0 1143.8,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25b</text>
+<path d="M1143.8,586.9 L1143.8,605 L1043.8,605 L1043.8,557.5 L1143.8,557.5 L1143.8,575.6 A5.6,5.6 0 0 0 1143.8,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25c</text>
+<path d="M1143.8,674.4 L1143.8,692.5 L1043.8,692.5 L1043.8,645 L1143.8,645 L1143.8,663.1 A5.6,5.6 0 0 0 1143.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25d</text>
+<path d="M1143.8,749.4 L1143.8,767.5 L1043.8,767.5 L1043.8,720 L1143.8,720 L1143.8,738.1 A5.6,5.6 0 0 0 1143.8,749.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="743.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25e</text>
+<path d="M1143.8,836.9 L1143.8,855 L1043.8,855 L1043.8,807.5 L1143.8,807.5 L1143.8,825.6 A5.6,5.6 0 0 0 1143.8,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25f</text>
+<path d="M1143.8,924.4 L1143.8,942.5 L1043.8,942.5 L1043.8,895 L1143.8,895 L1143.8,913.1 A5.6,5.6 0 0 0 1143.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25g</text>
+<path d="M1143.8,1011.9 L1143.8,1030 L1043.8,1030 L1043.8,982.5 L1143.8,982.5 L1143.8,1000.6 A5.6,5.6 0 0 0 1143.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1093.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC25h</text>
+<path d="M1256.2,411.9 L1256.2,430 L1156.2,430 L1156.2,382.5 L1256.2,382.5 L1256.2,400.6 A5.6,5.6 0 0 0 1256.2,411.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="406.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26a</text>
+<path d="M1256.2,499.4 L1256.2,517.5 L1156.2,517.5 L1156.2,470 L1256.2,470 L1256.2,488.1 A5.6,5.6 0 0 0 1256.2,499.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="493.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26b</text>
+<path d="M1256.2,586.9 L1256.2,605 L1156.2,605 L1156.2,557.5 L1256.2,557.5 L1256.2,575.6 A5.6,5.6 0 0 0 1256.2,586.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="581.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26c</text>
+<path d="M1256.2,674.4 L1256.2,692.5 L1156.2,692.5 L1156.2,645 L1256.2,645 L1256.2,663.1 A5.6,5.6 0 0 0 1256.2,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26d</text>
+<path d="M1256.2,749.4 L1256.2,767.5 L1156.2,767.5 L1156.2,720 L1256.2,720 L1256.2,738.1 A5.6,5.6 0 0 0 1256.2,749.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="743.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26e</text>
+<path d="M1256.2,836.9 L1256.2,855 L1156.2,855 L1156.2,807.5 L1256.2,807.5 L1256.2,825.6 A5.6,5.6 0 0 0 1256.2,836.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="831.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26f</text>
+<path d="M1256.2,924.4 L1256.2,942.5 L1156.2,942.5 L1156.2,895 L1256.2,895 L1256.2,913.1 A5.6,5.6 0 0 0 1256.2,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26g</text>
+<path d="M1256.2,1011.9 L1256.2,1030 L1156.2,1030 L1156.2,982.5 L1256.2,982.5 L1256.2,1000.6 A5.6,5.6 0 0 0 1256.2,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1206.2" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC26h</text>
+<path d="M1418.8,511.9 L1418.8,530 L1318.8,530 L1318.8,482.5 L1418.8,482.5 L1418.8,500.6 A5.6,5.6 0 0 0 1418.8,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="506.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43a</text>
+<path d="M1418.8,599.4 L1418.8,617.5 L1318.8,617.5 L1318.8,570 L1418.8,570 L1418.8,588.1 A5.6,5.6 0 0 0 1418.8,599.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="593.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43b</text>
+<path d="M1418.8,674.4 L1418.8,692.5 L1318.8,692.5 L1318.8,645 L1418.8,645 L1418.8,663.1 A5.6,5.6 0 0 0 1418.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43c</text>
+<path d="M1418.8,761.9 L1418.8,780 L1318.8,780 L1318.8,732.5 L1418.8,732.5 L1418.8,750.6 A5.6,5.6 0 0 0 1418.8,761.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="756.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43d</text>
+<path d="M1418.8,849.4 L1418.8,867.5 L1318.8,867.5 L1318.8,820 L1418.8,820 L1418.8,838.1 A5.6,5.6 0 0 0 1418.8,849.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="843.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43e</text>
+<path d="M1418.8,924.4 L1418.8,942.5 L1318.8,942.5 L1318.8,895 L1418.8,895 L1418.8,913.1 A5.6,5.6 0 0 0 1418.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43f</text>
+<path d="M1418.8,1011.9 L1418.8,1030 L1318.8,1030 L1318.8,982.5 L1418.8,982.5 L1418.8,1000.6 A5.6,5.6 0 0 0 1418.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1368.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC43g  (OPTIONAL)</text>
+<path d="M1543.8,511.9 L1543.8,530 L1443.8,530 L1443.8,482.5 L1543.8,482.5 L1543.8,500.6 A5.6,5.6 0 0 0 1543.8,511.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="506.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44a</text>
+<path d="M1543.8,599.4 L1543.8,617.5 L1443.8,617.5 L1443.8,570 L1543.8,570 L1543.8,588.1 A5.6,5.6 0 0 0 1543.8,599.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="593.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44b</text>
+<path d="M1543.8,674.4 L1543.8,692.5 L1443.8,692.5 L1443.8,645 L1543.8,645 L1543.8,663.1 A5.6,5.6 0 0 0 1543.8,674.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="668.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44c</text>
+<path d="M1543.8,761.9 L1543.8,780 L1443.8,780 L1443.8,732.5 L1543.8,732.5 L1543.8,750.6 A5.6,5.6 0 0 0 1543.8,761.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="756.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44d</text>
+<path d="M1543.8,849.4 L1543.8,867.5 L1443.8,867.5 L1443.8,820 L1543.8,820 L1543.8,838.1 A5.6,5.6 0 0 0 1543.8,849.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="843.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44e</text>
+<path d="M1543.8,924.4 L1543.8,942.5 L1443.8,942.5 L1443.8,895 L1543.8,895 L1543.8,913.1 A5.6,5.6 0 0 0 1543.8,924.4 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="918.8" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44f</text>
+<path d="M1543.8,1011.9 L1543.8,1030 L1443.8,1030 L1443.8,982.5 L1543.8,982.5 L1543.8,1000.6 A5.6,5.6 0 0 0 1543.8,1011.9 Z" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1493.8" y="1006.2" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC44g  (OPTIONAL)</text>
+<rect x="1087.2" y="93" width="412.5" height="36" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1293.5" y="111" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">OPTIONAL EXPANSION PLUG</text>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="Discrete parts" id="discrete">
+<g transform="translate(65 105) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">4k7</text>
+</g>
+<g transform="translate(46.5 118) rotate(0)">
+<rect x="-11.5" y="-4.5" width="23" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C1  100n</text>
+</g>
+<g transform="translate(45 205) rotate(90)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R4  4k7</text>
+</g>
+<g transform="translate(45 277.5) rotate(90)">
+<rect x="-30.5" y="-5.5" width="61" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R3  1k</text>
+</g>
+<g transform="translate(281.5 222) rotate(0)">
+<rect x="-31.5" y="-5.5" width="63" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R6  47k</text>
+</g>
+<g transform="translate(356 222) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R5  47k</text>
+</g>
+<g transform="translate(58 544) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 576) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 596) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 614) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 632) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 650) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(58 671) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">47k</text>
+</g>
+<g transform="translate(58 695) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">47k</text>
+</g>
+<g transform="translate(128 782) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">2k7</text>
+</g>
+<g transform="translate(128 836) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">4k7</text>
+</g>
+<g transform="translate(185 782) rotate(90)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(215 782) rotate(90)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(16 773.5) rotate(90)">
+<rect x="-31.5" y="-5.5" width="63" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(123 862) rotate(0)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">330R</text>
+</g>
+<g transform="translate(50 938) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(56.5 952) rotate(0)">
+<rect x="-11.5" y="-4.5" width="23" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C13  22n</text>
+</g>
+<g transform="translate(307 1011.5) rotate(90)">
+<rect x="-36.5" y="-5.5" width="73" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(303.5 1062) rotate(0)">
+<rect x="-11.5" y="-4.5" width="23" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C11  56p</text>
+</g>
+<g transform="translate(1839 627) rotate(0)">
+<rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">10k</text>
+</g>
+<g transform="translate(1740 698) rotate(90)">
+<rect x="-30" y="-5.5" width="60" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">1k8</text>
+</g>
+<g transform="translate(1899 652.5) rotate(90)">
+<rect x="-22.5" y="-5.5" width="45" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1791 717) rotate(0)">
+<rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R14  470R</text>
+</g>
+<g transform="translate(1864 717) rotate(0)">
+<rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R15  470R</text>
+</g>
+<g transform="translate(1792 738.5) rotate(90)">
+<rect x="-11.5" y="-4.5" width="23" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C2  27p</text>
+</g>
+<g transform="translate(1917.5 771) rotate(0)">
+<rect x="-32.5" y="-4.5" width="65" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C5  270n</text>
+</g>
+<g transform="translate(1747 770) rotate(0)">
+<rect x="-31" y="-5.5" width="62" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R10  2k2</text>
+</g>
+<g transform="translate(1838 283) rotate(0)">
+<rect x="-30" y="-4.5" width="60" height="9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C7  220n</text>
+</g>
+<g transform="translate(1555 117.5) rotate(90)">
+<rect x="-22.5" y="-5.5" width="45" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1600 108) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1600 123) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1630 121.5) rotate(90)">
+<rect x="-23.5" y="-5.5" width="47" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1645 121.5) rotate(90)">
+<rect x="-23.5" y="-5.5" width="47" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1608 186) rotate(90)">
+<rect x="-26" y="-5.5" width="52" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1625 186) rotate(90)">
+<rect x="-26" y="-5.5" width="52" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1758 125) rotate(90)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1785 154) rotate(90)">
+<rect x="-24" y="-5.5" width="48" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1797 125) rotate(90)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1835 108) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1835 127) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1870 127.5) rotate(90)">
+<rect x="-27.5" y="-5.5" width="55" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1893 135) rotate(90)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1861.5 177) rotate(0)">
+<rect x="-28.5" y="-5.5" width="57" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1917 160) rotate(90)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1938 170) rotate(90)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1958 177.5) rotate(90)">
+<rect x="-22.5" y="-5.5" width="45" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1881 66) rotate(0)">
+<rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+</g>
+<g transform="translate(1605 801) rotate(0)">
+<rect x="-35" y="-10" width="70" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R40  0R27</text>
+</g>
+<g transform="translate(1605 830) rotate(0)">
+<rect x="-35" y="-10" width="70" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R41  0R56</text>
+</g>
+<g transform="translate(1577.5 955) rotate(0)">
+<rect x="-29.5" y="-5.5" width="59" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R44  1k</text>
+</g>
+<g transform="translate(1653.5 960) rotate(0)">
+<rect x="-26.5" y="-5.5" width="53" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R42  1k</text>
+</g>
+<g transform="translate(1605 975) rotate(0)">
+<rect x="-25" y="-5.5" width="50" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R43  1k</text>
+</g>
+<g transform="translate(1693.5 980) rotate(0)">
+<rect x="-28.5" y="-5.5" width="57" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R45  1k</text>
+</g>
+<g transform="translate(1596 995) rotate(0)">
+<rect x="-29" y="-5.5" width="58" height="11" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">R46  1k</text>
+</g>
+<g transform="translate(1880 808.5) rotate(90)">
+<rect x="-13.5" y="-5" width="27" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="7.5" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D1  1N5402</text>
+</g>
+<g transform="translate(1880 898.5) rotate(90)">
+<rect x="-13.5" y="-5" width="27" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="7.5" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D2  1N5402</text>
+</g>
+<g transform="translate(1795 918) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D8  1N4002</text>
+</g>
+<g transform="translate(1865 918) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D9  1N4002</text>
+</g>
+<g transform="translate(1795 992) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D10  1N4002</text>
+</g>
+<g transform="translate(1865 992) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D11  1N4002</text>
+</g>
+<g transform="translate(1795 1008) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D4  1N4002</text>
+</g>
+<g transform="translate(1865 1008) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D5  1N4002</text>
+</g>
+<g transform="translate(1795 1068) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D6  1N4002</text>
+</g>
+<g transform="translate(1865 1068) rotate(0)">
+<rect x="-15" y="-5" width="30" height="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="9" y="-5" width="5" height="10" fill="#1a1a1a"/>
+<text x="0" y="0" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D7  1N4002</text>
+</g>
+<path d="M28,161 A13,13 0 1 1 52,161 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="33" cy="155" r="1.6" fill="#1a1a1a"/>
+<circle cx="40" cy="155" r="1.6" fill="#1a1a1a"/>
+<circle cx="47" cy="155" r="1.6" fill="#1a1a1a"/>
+<text x="58" y="147" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR1</text>
+<text x="58" y="157" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">2N3906</text>
+<circle cx="226" cy="222" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M219,229 L233,215" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="241" y="222" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="354" cy="286" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M347,293 L361,279" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="369" y="286" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<path d="M58,779 A13,13 0 1 1 82,779 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="63" cy="773" r="1.6" fill="#1a1a1a"/>
+<circle cx="70" cy="773" r="1.6" fill="#1a1a1a"/>
+<circle cx="77" cy="773" r="1.6" fill="#1a1a1a"/>
+<text x="88" y="765" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR3</text>
+<text x="88" y="775" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC212L</text>
+<path d="M53,828 A13,13 0 1 1 77,828 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="58" cy="822" r="1.6" fill="#1a1a1a"/>
+<circle cx="65" cy="822" r="1.6" fill="#1a1a1a"/>
+<circle cx="72" cy="822" r="1.6" fill="#1a1a1a"/>
+<text x="83" y="814" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR2</text>
+<text x="83" y="824" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC212L</text>
+<circle cx="180" cy="862" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M173,869 L187,855" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="195" y="862" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<text x="180" y="880" font-size="7" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C12 2u2</text>
+<circle cx="467" cy="355" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M460,362 L474,348" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="482" y="355" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="490" cy="355" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M483,362 L497,348" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="505" y="355" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="518" cy="370" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M511,377 L525,363" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="533" y="370" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="677" cy="708" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M670,715 L684,701" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="692" y="708" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="800" cy="708" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M793,715 L807,701" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="815" y="708" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="925" cy="710" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M918,717 L932,703" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="940" y="710" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1047" cy="710" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1040,717 L1054,703" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1062" y="710" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1170" cy="712" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1163,719 L1177,705" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1185" y="712" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="680" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M673,1064 L687,1050" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="695" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="803" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M796,1064 L810,1050" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="818" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="925" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M918,1064 L932,1050" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="940" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1050" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1043,1064 L1057,1050" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1065" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1172" cy="1057" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1165,1064 L1179,1050" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1187" y="1057" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="600" cy="1000" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M593,1007 L607,993" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="615" y="1000" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="598" cy="1020" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M591,1027 L605,1013" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="613" y="1020" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="607" cy="1038" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M600,1045 L614,1031" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="622" y="1038" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1325" cy="1060" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1318,1067 L1332,1053" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1340" y="1060" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1445" cy="1060" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1438,1067 L1452,1053" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1460" y="1060" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1682" cy="436" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1675,443 L1689,429" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1697" y="436" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1945" cy="393" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1938,400 L1952,386" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1960" y="393" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<path d="M1904,746 L1904,726 L1942,726 A14,10 0 0 1 1942,746 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1926" y="736" font-size="7.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">VR1 20k</text>
+<path d="M1573,151 A13,13 0 1 1 1597,151 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="1578" cy="145" r="1.6" fill="#1a1a1a"/>
+<circle cx="1585" cy="145" r="1.6" fill="#1a1a1a"/>
+<circle cx="1592" cy="145" r="1.6" fill="#1a1a1a"/>
+<text x="1603" y="137" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR5</text>
+<text x="1603" y="147" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC107L</text>
+<path d="M1663,151 A13,13 0 1 1 1687,151 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="1668" cy="145" r="1.6" fill="#1a1a1a"/>
+<circle cx="1675" cy="145" r="1.6" fill="#1a1a1a"/>
+<circle cx="1682" cy="145" r="1.6" fill="#1a1a1a"/>
+<text x="1693" y="137" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR4</text>
+<text x="1693" y="147" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC182L</text>
+<path d="M1811,154 A13,13 0 1 1 1835,154 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="1816" cy="148" r="1.6" fill="#1a1a1a"/>
+<circle cx="1823" cy="148" r="1.6" fill="#1a1a1a"/>
+<circle cx="1830" cy="148" r="1.6" fill="#1a1a1a"/>
+<text x="1841" y="140" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR6</text>
+<text x="1841" y="150" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC182L</text>
+<path d="M1846,156 A13,13 0 1 1 1870,156 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="1851" cy="150" r="1.6" fill="#1a1a1a"/>
+<circle cx="1858" cy="150" r="1.6" fill="#1a1a1a"/>
+<circle cx="1865" cy="150" r="1.6" fill="#1a1a1a"/>
+<text x="1876" y="142" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR7</text>
+<text x="1876" y="152" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC182L</text>
+<path d="M1918,118 A13,13 0 1 1 1942,118 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="1923" cy="112" r="1.6" fill="#1a1a1a"/>
+<circle cx="1930" cy="112" r="1.6" fill="#1a1a1a"/>
+<circle cx="1937" cy="112" r="1.6" fill="#1a1a1a"/>
+<text x="1948" y="104" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR8</text>
+<text x="1948" y="114" font-size="7.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">BC212L</text>
+<path d="M1664,115 L1664,95 L1702,95 A14,10 0 0 1 1702,115 Z" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1686" y="105" font-size="7.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">VR2 4k7</text>
+<path d="M1808,66 L1822,66 L1815,78 Z" fill="#1a1a1a"/>
+<path d="M1807,79 L1823,79" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1825,70 l8,-6 M1827,76 l8,-6" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1803" y="72" font-size="7" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D3 LED</text>
+<circle cx="1745" cy="115" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1738,122 L1752,108" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1760" y="115" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<text x="1745" y="133" font-size="7" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C8 10u</text>
+<circle cx="1768" cy="165" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1761,172 L1775,158" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1783" y="165" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<text x="1768" y="183" font-size="7" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C9 10u</text>
+<circle cx="1540" cy="125" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1533,132 L1547,118" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1555" y="125" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1868" cy="225" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1861,232 L1875,218" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1883" y="225" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1712" cy="137" r="3.5" fill="#1a1a1a"/>
+<text x="1719" y="137" font-size="7" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TAPE OUT</text>
+<circle cx="1714" cy="167" r="3.5" fill="#1a1a1a"/>
+<text x="1721" y="167" font-size="7" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">0V</text>
+<circle cx="1750" cy="167" r="3.5" fill="#1a1a1a"/>
+<text x="1757" y="167" font-size="7" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TAPE IN</text>
+<circle cx="1575" cy="857" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1568,864 L1582,850" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1590" y="857" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<text x="1575" y="875" font-size="7" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C3 10u</text>
+<rect x="1586" y="850" width="48" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="1586" y="850" width="48" height="5" fill="#1a1a1a"/>
+<text x="1610" y="863" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">TR9 TIP30A</text>
+<rect x="1636" y="868" width="48" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="1636" y="868" width="48" height="5" fill="#1a1a1a"/>
+<text x="1660" y="881" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">IC56 78M05</text>
+<rect x="1564" y="926" width="48" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="1564" y="926" width="48" height="5" fill="#1a1a1a"/>
+<text x="1588" y="939" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">REG1</text>
+<rect x="1626" y="926" width="48" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="1626" y="926" width="48" height="5" fill="#1a1a1a"/>
+<text x="1650" y="939" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">REG2</text>
+<rect x="1691" y="926" width="48" height="20" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<rect x="1691" y="926" width="48" height="5" fill="#1a1a1a"/>
+<text x="1715" y="939" font-size="6.5" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">REG3</text>
+<circle cx="1600" cy="965" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1593,972 L1607,958" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1615" y="965" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1647" cy="992" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1640,999 L1654,985" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1662" y="992" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1690" cy="990" r="10" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M1683,997 L1697,983" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="1705" y="990" font-size="9" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="1958" cy="813" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="850" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="885" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="920" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="955" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="990" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="1025" r="3.5" fill="#1a1a1a"/>
+<circle cx="1958" cy="1060" r="3.5" fill="#1a1a1a"/>
+<path d="M110,1466 L124,1466 L117,1478 Z" fill="#1a1a1a"/>
+<path d="M109,1479 L125,1479" stroke="#1a1a1a" stroke-width="1.6"/>
+<path d="M127,1470 l8,-6 M129,1476 l8,-6" stroke="#1a1a1a" stroke-width="1.2"/>
+<text x="105" y="1472" font-size="7" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">D12 LED</text>
+<rect x="1685" y="793" width="253" height="115" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1811.5" y="860.5" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C14   4700u 25V</text>
+<text x="1693" y="860.5" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<rect x="1752" y="915" width="156" height="82" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1830" y="966" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C19   220u 63V</text>
+<text x="1760" y="966" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<rect x="1755" y="1002" width="153" height="70" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1831.5" y="1047" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C18   1000u 25V</text>
+<text x="1763" y="1047" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<rect x="1570" y="1002" width="160" height="70" fill="none" stroke="#1a1a1a" stroke-width="1.8"/>
+<text x="1650" y="1047" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">C17   1000u 25V</text>
+<text x="1578" y="1047" font-size="10" text-anchor="middle" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">+</text>
+<circle cx="28" cy="28" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="1972" cy="28" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="28" cy="1472" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="1972" cy="1472" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="1042" cy="92" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="1077" cy="92" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+<circle cx="1508" cy="95" r="6" fill="none" stroke="#1a1a1a" stroke-width="1.4"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="Keyboard" id="keyboard">
+<rect x="154" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="199" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">!</text>
+<text x="199" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">1</text>
+<rect x="249" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="294" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">"</text>
+<text x="294" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">2</text>
+<rect x="342" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="387" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">#</text>
+<text x="387" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">3</text>
+<rect x="436" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="481" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">$</text>
+<text x="481" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">4</text>
+<rect x="532" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="577" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">%</text>
+<text x="577" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">5</text>
+<rect x="624" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="669" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">&amp;</text>
+<text x="669" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">6</text>
+<rect x="717" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="762" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">'</text>
+<text x="762" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">7</text>
+<rect x="808" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="853" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">(</text>
+<text x="853" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">8</text>
+<rect x="900" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="945" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">)</text>
+<text x="945" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">9</text>
+<rect x="990" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1035" y="1129" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">Ø</text>
+<rect x="1082" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1127" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">*</text>
+<text x="1127" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">:</text>
+<rect x="1174" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1219" y="1114" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">=</text>
+<text x="1219" y="1141" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">-</text>
+<rect x="1266" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1311" y="1129" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">↑</text>
+<rect x="1357" y="1087.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1361" y="1117" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">UNCOMMITTED SWITCH</text>
+<text x="1361" y="1128" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">(FOR FUTURE</text>
+<text x="1361" y="1139" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">EXPANSION)</text>
+<rect x="101" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="105" y="1204" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">UNCOMMITTED SWITCH</text>
+<text x="105" y="1215" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">(FOR FUTURE</text>
+<text x="105" y="1226" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">EXPANSION)</text>
+<rect x="196" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="241" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">Q</text>
+<rect x="289" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="334" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">W</text>
+<rect x="384" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="429" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">E</text>
+<rect x="479" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="524" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">R</text>
+<rect x="572" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="617" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">T</text>
+<rect x="666" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="711" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">Y</text>
+<rect x="759" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="804" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">U</text>
+<rect x="852" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="897" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">I</text>
+<rect x="944" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="989" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">O</text>
+<rect x="1036" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1081" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">P</text>
+<rect x="1129" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1174" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">@</text>
+<rect x="1219" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1264" y="1216" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">↓</text>
+<rect x="1309" y="1174.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1354" y="1216" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">RETURN</text>
+<rect x="122" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="126" y="1292" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">UNCOMMITTED SWITCH</text>
+<text x="126" y="1303" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">(FOR FUTURE</text>
+<text x="126" y="1314" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">EXPANSION)</text>
+<rect x="217" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="262" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">A</text>
+<rect x="312" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="357" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">S</text>
+<rect x="409" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="454" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">D</text>
+<rect x="501" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="546" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">F</text>
+<rect x="599" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="644" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">G</text>
+<rect x="691" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="736" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">H</text>
+<rect x="784" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="829" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">J</text>
+<rect x="878" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="923" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">K</text>
+<rect x="966" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1011" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">L</text>
+<rect x="1059" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1104" y="1289" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">+</text>
+<text x="1104" y="1316" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">;</text>
+<rect x="1151" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1196" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">[</text>
+<rect x="1242" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1287" y="1304" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">]</text>
+<rect x="1334" y="1262.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1338" y="1292" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">UNCOMMITTED SWITCH</text>
+<text x="1338" y="1303" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">(FOR FUTURE</text>
+<text x="1338" y="1314" font-size="6.5" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">EXPANSION)</text>
+<rect x="87.6" y="1350.1" width="68.8" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="122" y="1392" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">RESET</text>
+<rect x="159.6" y="1350.1" width="68.8" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="194" y="1392" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">SHIFT</text>
+<rect x="267" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="312" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">Z</text>
+<rect x="362" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="407" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">X</text>
+<rect x="459" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="504" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">C</text>
+<rect x="551" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="596" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">V</text>
+<rect x="646" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="691" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">B</text>
+<rect x="739" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="784" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">N</text>
+<rect x="830" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="875" y="1392" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">M</text>
+<rect x="924" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="969" y="1377" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">&lt;</text>
+<text x="969" y="1404" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">,</text>
+<rect x="1016" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1061" y="1377" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">&gt;</text>
+<text x="1061" y="1404" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">.</text>
+<rect x="1107" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1152" y="1377" font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">?</text>
+<text x="1152" y="1404" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">/</text>
+<rect x="1197" y="1350.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1242" y="1392" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">SHIFT</text>
+<rect x="529" y="1457.8" width="414" height="42.5" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="736" y="1479" font-size="12" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">SPACE</text>
+<rect x="1620" y="1090.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1665" y="1132" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">7</text>
+<rect x="1709" y="1090.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1754" y="1132" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">8</text>
+<rect x="1799" y="1090.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1844" y="1132" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">9</text>
+<rect x="1894" y="1090.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1939" y="1132" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">F</text>
+<rect x="1620" y="1178.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1665" y="1220" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">4</text>
+<rect x="1709" y="1178.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1754" y="1220" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">5</text>
+<rect x="1799" y="1178.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1844" y="1220" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">6</text>
+<rect x="1894" y="1178.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1939" y="1220" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">E</text>
+<rect x="1620" y="1265.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1665" y="1307" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">1</text>
+<rect x="1709" y="1265.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1754" y="1307" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">2</text>
+<rect x="1799" y="1265.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1844" y="1307" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">3</text>
+<rect x="1894" y="1265.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1939" y="1307" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">D</text>
+<rect x="1620" y="1353.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1665" y="1395" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">A</text>
+<rect x="1709" y="1353.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1754" y="1395" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">Ø</text>
+<rect x="1799" y="1353.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1844" y="1395" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">B</text>
+<rect x="1894" y="1353.1" width="90" height="83.8" fill="none" stroke="#1a1a1a" stroke-width="1.6"/>
+<text x="1939" y="1395" font-size="26" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#1a1a1a">C</text>
+</g>
+<text x="0" y="1534" font-size="14" text-anchor="start" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">PSI COMP 80 (Wireless World 1979) - main board component layout, redrawn from the Powertran kit sheet</text>
+<text x="2000" y="1534" font-size="12" text-anchor="end" dominant-baseline="central" font-weight="normal" fill="#1a1a1a">board 16 in x 12 in (crop marks)  -  1 in = 125 units</text>
+</svg>

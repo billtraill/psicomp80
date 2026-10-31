@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "PSI_COMP80")(type "KiCad")(uri "${KIPRJMOD}/PSI_COMP80.pretty")(options "")(descr "PSI COMP 80 key switch"))
+)

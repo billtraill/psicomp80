@@ -1,0 +1,27 @@
+^
+#wait 0.5
+(DEFUN TREE (N) (COND ((EQ N 0) N)\r
+ (T (CONS (TREE (- N 1)) (TREE (- N 1))))))\r
+(DEFUN LEAVES (X) (COND ((ATOM X) 1)\r
+ (T (+ (LEAVES (CAR X)) (LEAVES (CDR X))))))\r
+(DEFUN SAME (A B) (COND ((ATOM A) (EQ A B)) ((ATOM B) NIL)\r
+ ((SAME (CAR A) (CAR B)) (SAME (CDR A) (CDR B)))))\r
+(NULL (SETQ A (TREE 7)))\r
+(GC)\r
+(DEFUN CHURN (K)\r
+ (COND ((EQ K 0) 0) (T (TREE 6) (CHURN (- K 1)))))\r
+(CHURN 40)\r
+(LEAVES A)\r
+(SAME A (TREE 7))\r
+(SETQ L '(1 2 3 4 5 6 7 8 9 10))\r
+(DEFUN REV (L R)\r
+ (COND ((NULL L) R) (T (REV (CDR L) (CONS (CAR L) R)))))\r
+(DEFUN SPIN (K)\r
+ (COND ((EQ K 0) 0) (T (REV L NIL) (SPIN (- K 1)))))\r
+(SPIN 40)\r
+L\r
+(REV L NIL)\r
+(NULL (SETQ A NIL))\r
+(GC)\r
+\r
+#screen

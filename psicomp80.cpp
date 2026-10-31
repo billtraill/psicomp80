@@ -1772,10 +1772,10 @@ void psicomp80_state::kbd_put(u8 data) {
     return;
   }
 
-  // With the FORTH ROM, RS (^) is rubout, but the monitor's NMI handler
-  // folds Backspace (08h) into the same code as H.  Let the host Backspace
-  // key send RS instead.
-  if (data == 0x08 && system_bios() == 2)
+  // With the FORTH and LISP ROMs, RS (^) is rubout, but the monitor's NMI
+  // handler folds Backspace (08h) into the same code as H.  Let the host
+  // Backspace key send RS instead.
+  if (data == 0x08 && system_bios() >= 2)
     data = 0x1e;
 
   // The COMP80 keyboard interface is a latched ASCII byte with a single strobe
@@ -1932,6 +1932,10 @@ ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
 ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
          CRC(a6681425) SHA1(0f0804fd4a9f0048feffe6b47b18bf8fdd91f232), ROM_BIOS(1))
+// Monitor + COMP80 LISP in place of BURP (lisp/, built by lisp/build.sh)
+ROM_SYSTEM_BIOS(2, "lisp", "Monitor + LISP")
+ROMX_LOAD("psicomp80_lisp.rom", 0x0000, 0x0c00,
+         CRC(dacda6b0) SHA1(bb6dd54ec8e27fb2456cb89c2891a533a8870753), ROM_BIOS(2))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1947,6 +1951,10 @@ ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
 ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
          CRC(a6681425) SHA1(0f0804fd4a9f0048feffe6b47b18bf8fdd91f232), ROM_BIOS(1))
+// Monitor + COMP80 LISP in place of BURP (lisp/, built by lisp/build.sh)
+ROM_SYSTEM_BIOS(2, "lisp", "Monitor + LISP")
+ROMX_LOAD("psicomp80_lisp.rom", 0x0000, 0x0c00,
+         CRC(dacda6b0) SHA1(bb6dd54ec8e27fb2456cb89c2891a533a8870753), ROM_BIOS(2))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

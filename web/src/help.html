@@ -1,0 +1,165 @@
+  <div class="panel" role="tabpanel" id="panel-examples" aria-labelledby="tab-examples">
+    <h2>Examples</h2>
+    <p>Run switches to the right ROM, powers the computer on and types the program in for you, flat out, then runs it at the real speed. Pressing a key stops the typing. Each example’s help is on its language’s page.</p>
+    <div class="exgroup"><h3>Monitor programs</h3><p class="note">Machine code that came on cassette, copied straight into memory at 1000 and started with RUN. They work with any ROM.</p><div class="exlist" id="ex-monitor"></div></div>
+    <div class="exgroup"><h3>BURP</h3><div class="exlist" id="ex-burp"></div></div>
+    <div class="exgroup"><h3>FORTH</h3><div class="exlist" id="ex-forth"></div></div>
+    <div class="exgroup"><h3>LISP</h3><div class="exlist" id="ex-lisp"></div></div>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-using" aria-labelledby="tab-using" hidden>
+    <h2>Using the emulator</h2>
+    <p>The COMP80 starts in its monitor, which shows READY on the top line. Click the screen (or use the typing box on a phone) and type. The keyboard is upper case only; letters are sent as capitals whatever you type.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Key</th><th>On the COMP80</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>Return</kbd></td><td>End a line. The monitor itself doesn’t need it: a command runs once its last hex digit is typed.</td></tr>
+        <tr><td><kbd>^</kbd></td><td>RS. At READY it enters the language in the ROM (BURP, FORTH or LISP). In FORTH and LISP it rubs out the last character.</td></tr>
+        <tr><td><kbd>Backspace</kbd></td><td>Rubout in FORTH and LISP (the emulator sends RS for you).</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>\</kbd></td><td>FS: back to the monitor’s command state.</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>The RESET key: restarts the monitor. Memory is kept, so RS gets back into FORTH or LISP with your words and functions still there.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Keys while a program runs</h3>
+    <p>The keyboard interrupts the processor, and the monitor only accepts a key while the processor is waiting for one. A key pressed while a program is busy restarts the monitor, which is how you stop a program: press any key, then RS to get back into the language. Programs that read the keys, like Life, wait for them in the way the monitor expects.</p>
+    <h3>Controls</h3>
+    <ul>
+      <li><strong>ROM</strong> switches the language in the top 2 KB of the ROM. Switching powers the computer off and on, so memory is cleared.</li>
+      <li><strong>Memory</strong> adds the 32 KB expansion at 8800–FFFF. LISP uses it for 7680 cells instead of 672; the others don’t need it.</li>
+      <li><strong>Fast</strong> runs as fast as your browser can instead of at the real 4 MHz. Examples are typed in fast anyway.</li>
+      <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for FORTH or LISP to be ready for each line.</li>
+    </ul>
+    <h3>What isn’t emulated</h3>
+    <p>There is no cassette interface or floppy disc, so READ, TAPE and the disc commands do nothing useful. Programs that came on tape are loaded straight into memory by the examples. BURP’s calculations go through the MM57109 calculator chip, and that chip’s emulation isn’t finished, so BURP programs list and edit but don’t run (see <a href="#burp" data-goto="burp">BURP</a>).</p>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-monitor" aria-labelledby="tab-monitor" hidden>
+    <h2>The monitor</h2>
+    <p>The monitor fills the first 1 KB of the ROM and is the same whichever language is fitted. At READY, type a command and its addresses as four hex digits each, run together: <code>LIST 1000</code>, <code>MOV 0BB50C000C00</code>. The command appears on the top line as you type and runs as soon as its last digit is typed. A mistake can be abandoned with FS.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LIST XXXX</code></td><td>Shows memory from XXXX, a screenful: each line is an address and 16 bytes in hex.</td></tr>
+        <tr><td><code>ALT XXXXYY</code></td><td>Changes location XXXX to YY, then lists from the last LIST address and waits for more XXXXYY changes. FS ends it.</td></tr>
+        <tr><td><code>LOAD XXXX</code></td><td>Loads hex bytes from XXXX, shown as LIST shows them. <code>[</code> switches to typing ASCII and <code>]</code> back to hex; <code>@</code> ends and lists what was loaded.</td></tr>
+        <tr><td><code>RUN XXXX</code></td><td>Runs the program at XXXX.</td></tr>
+        <tr><td><code>MOV XXXXYYYYZZZZ</code></td><td>Copies XXXX up to YYYY−1 to ZZZZ onwards.</td></tr>
+        <tr><td><code>COR XXXXYYYYAABB</code></td><td>Changes every AA to BB from XXXX up to YYYY−1.</td></tr>
+        <tr><td><code>FIND XXYY</code></td><td>Lists the addresses where the bytes XX YY occur together.</td></tr>
+        <tr><td><code>FILL XXXX</code></td><td>Fills from XXXX to the next YY00 with FF.</td></tr>
+        <tr><td><code>ALPH</code></td><td>Shows the character set as a test pattern.</td></tr>
+        <tr><td><code>READ XXXX</code>, <code>TAPE XXXXYYYY</code></td><td>Read from and record to cassette. Not emulated here.</td></tr>
+        <tr><td><code>PRINT</code>, <code>PROM</code></td><td>Listing to a second output device, and the EPROM programmer. Not emulated.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Memory</h3>
+    <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>
+      <li><strong>The pictures</strong> recreate Fig. 22 of the August 1979 article from photos of the screen: a 16-byte loader copies a 2 KB picture to the screen and waits for a key.</li>
+      <li><strong>ALPH</strong> and <strong>LIST</strong> show two of the monitor’s own commands.</li>
+    </ul>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-burp" aria-labelledby="tab-burp" hidden>
+    <h2>BURP</h2>
+    <p>BURP is the high-level language of the original ROM, from the Wireless World articles: a small BASIC-like language whose arithmetic is done by a National MM57109 scientific calculator chip. Press RS at READY and the top line changes to BURP. Commands end with a space.</p>
+    <p class="note">In this emulator (and in the MAME driver it follows) the MM57109 isn’t emulated well enough yet for programs to run: RUN stops part way. Entering, listing and editing programs works.</p>
+    <h3>Commands</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LIST n</code></td><td>Lists the program from line n, then shows the end address of the program in memory (programs live from 0C00 to 1DC0).</td></tr>
+        <tr><td><code>RUN n</code></td><td>Runs from line n. Any key stops it, back to READY; RS returns to BURP.</td></tr>
+        <tr><td><code>ADD</code></td><td>Adds lines, each typed with its number and ended with Return. A colon at the end leaves ADD; it marks the end of the program.</td></tr>
+        <tr><td><code>DEL n</code></td><td>Deletes line n and lists what is left.</td></tr>
+        <tr><td><code>LOAD</code></td><td>Starts a new program, ended with a colon like ADD.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Statements</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Statement</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LET X=A SIN SQ</code></td><td>Assigns an expression, written in calculator order: the value, then the operations on it.</td></tr>
+        <tr><td><code>INPUT A B</code></td><td>Reads values into variables.</td></tr>
+        <tr><td><code>PRINT "TEXT" A4</code></td><td>Prints text and numbers. A number with a digit after it is printed to that many decimal places; a comma after it closes up the gaps.</td></tr>
+        <tr><td><code>IF X=Y THEN 50</code></td><td>Goes to line 50 if the condition (&lt;, = or &gt;) holds.</td></tr>
+        <tr><td><code>FOR X=1 STEP B UNTIL C</code> … <code>NEXT X</code></td><td>A loop. FOR loops can’t be nested: the chip’s one memory register counts the loop.</td></tr>
+        <tr><td><code>GOTO</code>, <code>GOSUB</code>, <code>RETURN</code></td><td>Jumps and subroutines.</td></tr>
+        <tr><td><code>HALT</code>, <code>TOP</code>, <code>ERASE</code>, <code>END</code></td><td>Wait for a key; clear the display area from the top; clear all of it; stop.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>The sample program</h3>
+    <p>The ROM holds the articles’ sample program at 0BB5. At READY, <code>MOV 0BB50C000C00</code> copies it to the program area, RS enters BURP, and <code>LIST 5 </code> shows it:</p>
+<pre><code>005 FOR A=1 STEP 1 UNTIL 25
+006 LET L=A LOG
+007 PRINT A0 L8
+008 NEXT A
+009 END
+0C4A</code></pre>
+    <p>On a real COMP80, <code>RUN 5 </code> prints the common logarithms of 1 to 25. The articles go on to change line 6 to <code>LET L=A ROOT</code> or <code>LET L=A EX</code> with DEL and ADD.</p>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-forth" aria-labelledby="tab-forth" hidden>
+    <h2>FORTH</h2>
+    <p>A small FORTH, written for this project, in the 2 KB that held BURP. Press RS at READY; the top line changes to FORTH and a <code>_</code> cursor appears. Type a line and press Return: it runs and FORTH prints OK. Numbers are 16-bit integers.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Group</th><th>Words</th></tr></thead>
+      <tbody>
+        <tr><td>Stack</td><td><code>DUP DROP SWAP OVER ROT &gt;R R&gt; I J</code></td></tr>
+        <tr><td>Arithmetic</td><td><code>+ - * / MOD /MOD NEGATE 1+ 1-</code> (16-bit signed; <code>/</code> rounds towards zero)</td></tr>
+        <tr><td>Logic and tests</td><td><code>AND OR XOR 0= 0&lt; = &lt; &gt;</code> (true is −1)</td></tr>
+        <tr><td>Memory</td><td><code>@ ! C@ C! +! HERE , ALLOT</code></td></tr>
+        <tr><td>Output</td><td><code>. .S EMIT CR SPACE AT PAGE WORDS ."</code></td></tr>
+        <tr><td>Input</td><td><code>KEY</code></td></tr>
+        <tr><td>Numbers</td><td><code>BASE HEX DECIMAL</code></td></tr>
+        <tr><td>Defining</td><td><code>: ; VARIABLE CONSTANT</code></td></tr>
+        <tr><td>Control</td><td><code>IF ELSE THEN BEGIN UNTIL AGAIN WHILE REPEAT DO LOOP +LOOP EXIT</code></td></tr>
+        <tr><td>Other</td><td><code>( COLD BYE</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>A word can call itself: <code>: FACT DUP 1 &gt; IF DUP 1- FACT * ELSE DROP 1 THEN ;</code></li>
+      <li><code>EMIT</code> prints ASCII; 128 + n prints graphics character n, so <code>143 EMIT</code> is a solid block.</li>
+      <li><code>col row AT</code> moves the print position (0–63, 0–31); <code>PAGE</code> clears lines 1–31.</li>
+      <li><code>KEY</code> waits for a key and returns its code (13 for Return).</li>
+      <li><code>COLD</code> forgets your words; <code>BYE</code> goes to the monitor.</li>
+      <li>An unknown word prints <code>WORD ?</code>; taking more off the stack than there was prints <code>EMPTY</code>.</li>
+    </ul>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Game of Life in FORTH</strong> plays on 64 × 31 cells, one per character, reading the board straight from screen memory. It adds up columns of three cells first, so each cell takes three additions; a generation takes about 3 s. <code>1000 LIFE</code> runs 1000 generations.</li>
+      <li><strong>Mandelbrot set in FORTH</strong> draws one point per character, shaded by how many steps it takes to escape, with the set in solid blocks. With only 16-bit integers it works in fixed point with 90 as 1.0. <code>MANDEL</code> takes about 95 s.</li>
+    </ul>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-lisp" aria-labelledby="tab-lisp" hidden>
+    <h2>LISP</h2>
+    <p>A small LISP 1.5 style interpreter, written for this project, in the 2 KB that held BURP, with garbage collection and dynamic scope. Press RS at READY; the top line changes to LISP. Type an expression and press Return to see its value. An expression can run over several lines: LISP keeps reading until the brackets balance.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Group</th><th>Built-ins</th></tr></thead>
+      <tbody>
+        <tr><td>Special forms</td><td><code>QUOTE</code> (and <code>'x</code>) <code>COND LAMBDA DEFUN SETQ AND OR</code></td></tr>
+        <tr><td>Lists</td><td><code>CAR CDR CONS LIST CADR CADDR</code></td></tr>
+        <tr><td>Tests</td><td><code>ATOM EQ NULL NUMBERP</code> (true is T, false NIL)</td></tr>
+        <tr><td>Arithmetic</td><td><code>+ - * / REM &lt; &gt;</code>, two arguments each</td></tr>
+        <tr><td>Output</td><td><code>PRINT PRIN1 TERPRI TYO</code></td></tr>
+        <tr><td>Other</td><td><code>EVAL GC</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>Numbers are integers from −16384 to 16383. <code>EQ</code> compares numbers too.</li>
+      <li><code>(DEFUN SQ (X) (* X X))</code> sets SQ to <code>(LAMBDA (X) (* X X))</code>. A function is a value: <code>(MAPCAR SQ L)</code> passes it, and <code>(F X)</code> calls whatever F holds.</li>
+      <li>Variables are dynamically scoped, as in the original LISP: a function sees the variables of whatever called it, unless it has a parameter of the same name.</li>
+      <li><code>(PRINT x)</code> prints x and a new line, <code>(PRIN1 x)</code> without one, <code>(TERPRI)</code> starts a new line and <code>(TYO n)</code> prints character code n. <code>(GC)</code> returns the number of free cells.</li>
+      <li><code>;</code> starts a comment. Errors print a message and the culprit: <code>UNBOUND FOO</code>, <code>BAD FN 1</code>, <code>BAD ARG A</code>, <code>TOO DEEP</code>, <code>NO MEM</code>.</li>
+      <li>Without the expansion there are 672 cells and recursion goes about 45 calls deep; with it, 7680 cells and about 140.</li>
+    </ul>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Symbolic differentiation</strong> is the program LISP was made for: an expression is a list, so DERIV can take it apart and build its derivative. <code>(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)</code> gives <code>(+ (* 6 X) 2)</code>.</li>
+      <li><strong>Towers of Hanoi</strong>: move all but the bottom disc out of the way, move the bottom disc, move the rest back on top. <code>(HANOI 4 'A 'C 'B)</code> prints 15 moves.</li>
+      <li><strong>Eight queens</strong> puts a queen in the first safe row of each column and backs up when a column has none. N is never passed to the inner functions: dynamic scope finds the N that QUEENS was called with.</li>
+    </ul>
+  </div>

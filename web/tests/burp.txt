@@ -1,0 +1,11 @@
+#wait 0.5
+MOV 0BB50C000C00
+#wait 0.5
+^
+#wait 0.5
+LIST 5 
+#wait 1
+#screen
+RUN 5 
+#wait 30
+#screen

@@ -1,0 +1,1614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+</head>
+<body>
+<title>COMP80 Emulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&amp;family=Source+Sans+3:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+/* Layout: a bench instrument. The screen in its bezel with the controls under it; the
+   manual (examples and a help page per language) beside it, below it on a phone. */
+:root {
+  --paper: #eceff2; --panel: #f6f7f9; --ink: #14181d; --muted: #59626c; --rule: #ccd2d9;
+  --accent: #1c6a86; --accent-ink: #ffffff; --bezel: #23272c; --glass: #000;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e1114; --panel: #151a1f; --ink: #e5e9ed; --muted: #97a0aa; --rule: #283039;
+  --accent: #6bb4cd; --accent-ink: #0e1114; --bezel: #2c3238; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0e1114; --panel: #151a1f; --ink: #e5e9ed; --muted: #97a0aa; --rule: #283039;
+  --accent: #6bb4cd; --accent-ink: #0e1114; --bezel: #2c3238; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font: 400 1rem/1.55 var(--body); }
+[hidden] { display: none !important; }
+.wrap { max-width: 92rem; margin: 0 auto; display: grid; gap: 1.75rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 1.75rem 3rem; }
+header { display: grid; gap: .6rem; max-width: 52rem; }
+.kicker { font: 600 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 800 clamp(2.1rem, 5vw, 3.25rem)/.95 var(--display); font-stretch: 70%; margin: 0; text-wrap: balance; }
+header p { margin: 0; max-width: 64ch; }
+.main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
+@media (max-width: 60rem) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+/* the machine */
+.machine { display: grid; gap: .9rem; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); min-width: 0; }
+@media (max-width: 60rem) { .machine { position: static; } }
+.bezel { background: var(--bezel); padding: clamp(8px, 1.6vw, 18px); border-radius: 16px; }
+#screen { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 4 / 3; background: var(--glass);
+  border-radius: 6px; image-rendering: pixelated; outline: none; cursor: text; }
+#screen:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
+.state { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem;
+  font: 400 .8125rem/1.4 var(--mono); color: var(--muted); }
+.state b { color: var(--ink); font-weight: 600; }
+.controls { display: flex; flex-wrap: wrap; gap: .6rem 1.25rem; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.lbl { font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: .45rem .8rem; font: 600 .875rem/1 var(--body); cursor: pointer; }
+.seg label + label span { border-left: 1px solid var(--rule); }
+.seg input:checked + span { background: var(--accent); color: var(--accent-ink); }
+.seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: -3px; }
+select, button, textarea, input[type=text] { font: inherit; color: inherit; }
+select { padding: .4rem .5rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.btn { padding: .45rem .75rem; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 8px;
+  background: var(--panel); font: 600 .875rem/1 var(--body); cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn kbd { font: 600 .75rem/1 var(--mono); color: var(--muted); margin-left: .3rem; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn[aria-pressed="true"] kbd { color: inherit; }
+#btn-stop { display: none; }
+body.busy #btn-stop { display: inline-block; }
+.typing { display: grid; gap: .35rem; }
+#kbd { width: 100%; box-sizing: border-box; padding: .55rem .7rem; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--panel); font: 400 .9375rem/1.3 var(--mono); }
+.paste summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.paste[open] { display: grid; gap: .5rem; }
+.paste textarea { width: 100%; box-sizing: border-box; min-height: 9rem; padding: .6rem .7rem; border: 1px solid var(--rule);
+  border-radius: 8px; background: var(--panel); font: 400 .8125rem/1.5 var(--mono); resize: vertical; }
+.paste p { margin: 0; color: var(--muted); font-size: .9375rem; }
+
+/* the manual */
+.manual { display: grid; gap: 1rem; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: .25rem; border-bottom: 1px solid var(--rule); }
+.tabs button { padding: .55rem .8rem; border: 0; border-bottom: 3px solid transparent; background: none;
+  font: 600 .9375rem/1 var(--body); color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.panel { display: grid; gap: 1rem; min-width: 0; }
+.panel h2 { font: 700 1.6rem/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
+.panel h3 { font: 700 1.125rem/1.2 var(--display); font-stretch: 85%; margin: .5rem 0 0; }
+.panel p { margin: 0; max-width: 68ch; }
+.panel ul, .panel ol { margin: 0; padding-left: 1.25rem; display: grid; gap: .35rem; max-width: 68ch; }
+.panel code { font-family: var(--mono); font-size: .875em; }
+.panel pre { margin: 0; overflow-x: auto; padding: .7rem .85rem; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--panel); font: 400 .8125rem/1.5 var(--mono); }
+.panel pre code { font-size: inherit; }
+.panel a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.note { color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9375rem; }
+th { text-align: left; font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  padding: 0 1rem .5rem 0; border-bottom: 1px solid var(--rule); }
+td { padding: .5rem 1rem .5rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td:first-child { white-space: nowrap; }
+kbd { font: 600 .8125rem/1 var(--mono); padding: .2rem .35rem; border: 1px solid var(--rule); border-bottom-width: 2px;
+  border-radius: 4px; background: var(--panel); }
+.exgroup { display: grid; gap: .75rem; }
+.exlist { display: grid; gap: .75rem; }
+.ex { display: grid; gap: .4rem; padding: .85rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); min-width: 0; }
+.exhead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.ex h4 { margin: 0; font: 700 1.05rem/1.2 var(--display); font-stretch: 90%; }
+.ex .run { padding: .4rem .9rem; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+  font: 600 .875rem/1 var(--body); cursor: pointer; flex: none; }
+.ex .run:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.ex p { margin: 0; font-size: .9375rem; }
+.exkeys { font: 400 .8125rem/1.4 var(--mono) !important; color: var(--muted); }
+.ex details summary { cursor: pointer; color: var(--accent); font-size: .875rem; font-weight: 600; }
+.ex details pre { margin-top: .5rem; max-height: 22rem; overflow: auto; }
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--muted); font-size: .875rem; max-width: 72ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="kicker">PSI COMP80 · Wireless World, 1979 · in your browser</span>
+  <h1>COMP80 Emulator</h1>
+  <p>The PSI COMP80, a Z80 computer published as a build-it-yourself series in Wireless World, running its monitor ROM with one of three languages in the top 2 KB: the original BURP, or the FORTH and LISP written for this project. Pick a ROM, then click the screen and type, or run one of the examples.</p>
+</header>
+
+<div class="main">
+<section class="machine" aria-label="The computer">
+  <div class="bezel"><canvas id="screen" width="384" height="320" tabindex="0" aria-label="COMP80 screen. Click or focus it to type."></canvas></div>
+  <div class="state" aria-live="polite"><span><b id="romname">BURP</b> · <span id="status">Starting</span></span><span id="speed"></span></div>
+  <div class="controls">
+    <div class="group" role="radiogroup" aria-label="ROM">
+      <span class="lbl">ROM</span>
+      <span class="seg">
+        <label><input type="radio" name="rom" value="burp" id="rom-burp"><span>BURP</span></label>
+        <label><input type="radio" name="rom" value="forth" id="rom-forth"><span>FORTH</span></label>
+        <label><input type="radio" name="rom" value="lisp" id="rom-lisp"><span>LISP</span></label>
+      </span>
+    </div>
+    <div class="group">
+      <label class="lbl" for="mem">Memory</label>
+      <select id="mem"><option value="5">5 KB</option><option value="32">32 KB expansion</option></select>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="group" aria-label="Keys">
+      <button type="button" class="btn" id="btn-rs" title="RS: enter the language from READY; rubs out in FORTH and LISP">RS<kbd>^</kbd></button>
+      <button type="button" class="btn" id="btn-fs" title="FS: back to the monitor">FS<kbd>Ctrl \</kbd></button>
+      <button type="button" class="btn" id="btn-reset" title="The RESET key: restarts the monitor, memory kept">Reset<kbd>Esc</kbd></button>
+      <button type="button" class="btn" id="btn-power" title="Switch off and on: memory cleared">Power off and on</button>
+    </div>
+    <div class="group">
+      <button type="button" class="btn" id="btn-fast" aria-pressed="false" title="Run as fast as the browser can">Fast</button>
+      <button type="button" class="btn" id="btn-stop">Stop typing</button>
+    </div>
+  </div>
+  <div class="typing">
+    <label class="lbl" for="kbd">Type here, or click the screen</label>
+    <input type="text" id="kbd" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Keys go straight to the COMP80">
+  </div>
+  <details class="paste">
+    <summary>Type in a program</summary>
+    <p>Paste a FORTH or LISP program, or monitor commands. It is typed a line at a time, waiting for the computer between lines. Enter the language first (RS at READY).</p>
+    <label class="lbl" for="paste">Program</label>
+    <textarea id="paste" spellcheck="false" placeholder="(DEFUN SQ (X) (* X X))&#10;(SQ 7)"></textarea>
+    <div><button type="button" class="btn" id="btn-type">Type it in</button></div>
+  </details>
+</section>
+
+<section class="manual" aria-label="Examples and help">
+  <div class="tabs" role="tablist" aria-label="Manual">
+    <button type="button" role="tab" id="tab-examples" data-tab="examples" aria-controls="panel-examples">Examples</button>
+    <button type="button" role="tab" id="tab-using" data-tab="using" aria-controls="panel-using">Using it</button>
+    <button type="button" role="tab" id="tab-monitor" data-tab="monitor" aria-controls="panel-monitor">Monitor</button>
+    <button type="button" role="tab" id="tab-burp" data-tab="burp" aria-controls="panel-burp">BURP</button>
+    <button type="button" role="tab" id="tab-forth" data-tab="forth" aria-controls="panel-forth">FORTH</button>
+    <button type="button" role="tab" id="tab-lisp" data-tab="lisp" aria-controls="panel-lisp">LISP</button>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-examples" aria-labelledby="tab-examples">
+    <h2>Examples</h2>
+    <p>Run switches to the right ROM, powers the computer on and types the program in for you, flat out, then runs it at the real speed. Pressing a key stops the typing. Each example’s help is on its language’s page.</p>
+    <div class="exgroup"><h3>Monitor programs</h3><p class="note">Machine code that came on cassette, copied straight into memory at 1000 and started with RUN. They work with any ROM.</p><div class="exlist" id="ex-monitor"></div></div>
+    <div class="exgroup"><h3>BURP</h3><div class="exlist" id="ex-burp"></div></div>
+    <div class="exgroup"><h3>FORTH</h3><div class="exlist" id="ex-forth"></div></div>
+    <div class="exgroup"><h3>LISP</h3><div class="exlist" id="ex-lisp"></div></div>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-using" aria-labelledby="tab-using" hidden>
+    <h2>Using the emulator</h2>
+    <p>The COMP80 starts in its monitor, which shows READY on the top line. Click the screen (or use the typing box on a phone) and type. The keyboard is upper case only; letters are sent as capitals whatever you type.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Key</th><th>On the COMP80</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>Return</kbd></td><td>End a line. The monitor itself doesn’t need it: a command runs once its last hex digit is typed.</td></tr>
+        <tr><td><kbd>^</kbd></td><td>RS. At READY it enters the language in the ROM (BURP, FORTH or LISP). In FORTH and LISP it rubs out the last character.</td></tr>
+        <tr><td><kbd>Backspace</kbd></td><td>Rubout in FORTH and LISP (the emulator sends RS for you).</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>\</kbd></td><td>FS: back to the monitor’s command state.</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>The RESET key: restarts the monitor. Memory is kept, so RS gets back into FORTH or LISP with your words and functions still there.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Keys while a program runs</h3>
+    <p>The keyboard interrupts the processor, and the monitor only accepts a key while the processor is waiting for one. A key pressed while a program is busy restarts the monitor, which is how you stop a program: press any key, then RS to get back into the language. Programs that read the keys, like Life, wait for them in the way the monitor expects.</p>
+    <h3>Controls</h3>
+    <ul>
+      <li><strong>ROM</strong> switches the language in the top 2 KB of the ROM. Switching powers the computer off and on, so memory is cleared.</li>
+      <li><strong>Memory</strong> adds the 32 KB expansion at 8800–FFFF. LISP uses it for 7680 cells instead of 672; the others don’t need it.</li>
+      <li><strong>Fast</strong> runs as fast as your browser can instead of at the real 4 MHz. Examples are typed in fast anyway.</li>
+      <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for FORTH or LISP to be ready for each line.</li>
+    </ul>
+    <h3>What isn’t emulated</h3>
+    <p>There is no cassette interface or floppy disc, so READ, TAPE and the disc commands do nothing useful. Programs that came on tape are loaded straight into memory by the examples. BURP’s calculations go through the MM57109 calculator chip, and that chip’s emulation isn’t finished, so BURP programs list and edit but don’t run (see <a href="#burp" data-goto="burp">BURP</a>).</p>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-monitor" aria-labelledby="tab-monitor" hidden>
+    <h2>The monitor</h2>
+    <p>The monitor fills the first 1 KB of the ROM and is the same whichever language is fitted. At READY, type a command and its addresses as four hex digits each, run together: <code>LIST 1000</code>, <code>MOV 0BB50C000C00</code>. The command appears on the top line as you type and runs as soon as its last digit is typed. A mistake can be abandoned with FS.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LIST XXXX</code></td><td>Shows memory from XXXX, a screenful: each line is an address and 16 bytes in hex.</td></tr>
+        <tr><td><code>ALT XXXXYY</code></td><td>Changes location XXXX to YY, then lists from the last LIST address and waits for more XXXXYY changes. FS ends it.</td></tr>
+        <tr><td><code>LOAD XXXX</code></td><td>Loads hex bytes from XXXX, shown as LIST shows them. <code>[</code> switches to typing ASCII and <code>]</code> back to hex; <code>@</code> ends and lists what was loaded.</td></tr>
+        <tr><td><code>RUN XXXX</code></td><td>Runs the program at XXXX.</td></tr>
+        <tr><td><code>MOV XXXXYYYYZZZZ</code></td><td>Copies XXXX up to YYYY−1 to ZZZZ onwards.</td></tr>
+        <tr><td><code>COR XXXXYYYYAABB</code></td><td>Changes every AA to BB from XXXX up to YYYY−1.</td></tr>
+        <tr><td><code>FIND XXYY</code></td><td>Lists the addresses where the bytes XX YY occur together.</td></tr>
+        <tr><td><code>FILL XXXX</code></td><td>Fills from XXXX to the next YY00 with FF.</td></tr>
+        <tr><td><code>ALPH</code></td><td>Shows the character set as a test pattern.</td></tr>
+        <tr><td><code>READ XXXX</code>, <code>TAPE XXXXYYYY</code></td><td>Read from and record to cassette. Not emulated here.</td></tr>
+        <tr><td><code>PRINT</code>, <code>PROM</code></td><td>Listing to a second output device, and the EPROM programmer. Not emulated.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Memory</h3>
+    <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>
+      <li><strong>The pictures</strong> recreate Fig. 22 of the August 1979 article from photos of the screen: a 16-byte loader copies a 2 KB picture to the screen and waits for a key.</li>
+      <li><strong>ALPH</strong> and <strong>LIST</strong> show two of the monitor’s own commands.</li>
+    </ul>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-burp" aria-labelledby="tab-burp" hidden>
+    <h2>BURP</h2>
+    <p>BURP is the high-level language of the original ROM, from the Wireless World articles: a small BASIC-like language whose arithmetic is done by a National MM57109 scientific calculator chip. Press RS at READY and the top line changes to BURP. Commands end with a space.</p>
+    <p class="note">In this emulator (and in the MAME driver it follows) the MM57109 isn’t emulated well enough yet for programs to run: RUN stops part way. Entering, listing and editing programs works.</p>
+    <h3>Commands</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LIST n</code></td><td>Lists the program from line n, then shows the end address of the program in memory (programs live from 0C00 to 1DC0).</td></tr>
+        <tr><td><code>RUN n</code></td><td>Runs from line n. Any key stops it, back to READY; RS returns to BURP.</td></tr>
+        <tr><td><code>ADD</code></td><td>Adds lines, each typed with its number and ended with Return. A colon at the end leaves ADD; it marks the end of the program.</td></tr>
+        <tr><td><code>DEL n</code></td><td>Deletes line n and lists what is left.</td></tr>
+        <tr><td><code>LOAD</code></td><td>Starts a new program, ended with a colon like ADD.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Statements</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Statement</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>LET X=A SIN SQ</code></td><td>Assigns an expression, written in calculator order: the value, then the operations on it.</td></tr>
+        <tr><td><code>INPUT A B</code></td><td>Reads values into variables.</td></tr>
+        <tr><td><code>PRINT "TEXT" A4</code></td><td>Prints text and numbers. A number with a digit after it is printed to that many decimal places; a comma after it closes up the gaps.</td></tr>
+        <tr><td><code>IF X=Y THEN 50</code></td><td>Goes to line 50 if the condition (&lt;, = or &gt;) holds.</td></tr>
+        <tr><td><code>FOR X=1 STEP B UNTIL C</code> … <code>NEXT X</code></td><td>A loop. FOR loops can’t be nested: the chip’s one memory register counts the loop.</td></tr>
+        <tr><td><code>GOTO</code>, <code>GOSUB</code>, <code>RETURN</code></td><td>Jumps and subroutines.</td></tr>
+        <tr><td><code>HALT</code>, <code>TOP</code>, <code>ERASE</code>, <code>END</code></td><td>Wait for a key; clear the display area from the top; clear all of it; stop.</td></tr>
+      </tbody>
+    </table></div>
+    <h3>The sample program</h3>
+    <p>The ROM holds the articles’ sample program at 0BB5. At READY, <code>MOV 0BB50C000C00</code> copies it to the program area, RS enters BURP, and <code>LIST 5 </code> shows it:</p>
+<pre><code>005 FOR A=1 STEP 1 UNTIL 25
+006 LET L=A LOG
+007 PRINT A0 L8
+008 NEXT A
+009 END
+0C4A</code></pre>
+    <p>On a real COMP80, <code>RUN 5 </code> prints the common logarithms of 1 to 25. The articles go on to change line 6 to <code>LET L=A ROOT</code> or <code>LET L=A EX</code> with DEL and ADD.</p>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-forth" aria-labelledby="tab-forth" hidden>
+    <h2>FORTH</h2>
+    <p>A small FORTH, written for this project, in the 2 KB that held BURP. Press RS at READY; the top line changes to FORTH and a <code>_</code> cursor appears. Type a line and press Return: it runs and FORTH prints OK. Numbers are 16-bit integers.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Group</th><th>Words</th></tr></thead>
+      <tbody>
+        <tr><td>Stack</td><td><code>DUP DROP SWAP OVER ROT &gt;R R&gt; I J</code></td></tr>
+        <tr><td>Arithmetic</td><td><code>+ - * / MOD /MOD NEGATE 1+ 1-</code> (16-bit signed; <code>/</code> rounds towards zero)</td></tr>
+        <tr><td>Logic and tests</td><td><code>AND OR XOR 0= 0&lt; = &lt; &gt;</code> (true is −1)</td></tr>
+        <tr><td>Memory</td><td><code>@ ! C@ C! +! HERE , ALLOT</code></td></tr>
+        <tr><td>Output</td><td><code>. .S EMIT CR SPACE AT PAGE WORDS ."</code></td></tr>
+        <tr><td>Input</td><td><code>KEY</code></td></tr>
+        <tr><td>Numbers</td><td><code>BASE HEX DECIMAL</code></td></tr>
+        <tr><td>Defining</td><td><code>: ; VARIABLE CONSTANT</code></td></tr>
+        <tr><td>Control</td><td><code>IF ELSE THEN BEGIN UNTIL AGAIN WHILE REPEAT DO LOOP +LOOP EXIT</code></td></tr>
+        <tr><td>Other</td><td><code>( COLD BYE</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>A word can call itself: <code>: FACT DUP 1 &gt; IF DUP 1- FACT * ELSE DROP 1 THEN ;</code></li>
+      <li><code>EMIT</code> prints ASCII; 128 + n prints graphics character n, so <code>143 EMIT</code> is a solid block.</li>
+      <li><code>col row AT</code> moves the print position (0–63, 0–31); <code>PAGE</code> clears lines 1–31.</li>
+      <li><code>KEY</code> waits for a key and returns its code (13 for Return).</li>
+      <li><code>COLD</code> forgets your words; <code>BYE</code> goes to the monitor.</li>
+      <li>An unknown word prints <code>WORD ?</code>; taking more off the stack than there was prints <code>EMPTY</code>.</li>
+    </ul>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Game of Life in FORTH</strong> plays on 64 × 31 cells, one per character, reading the board straight from screen memory. It adds up columns of three cells first, so each cell takes three additions; a generation takes about 3 s. <code>1000 LIFE</code> runs 1000 generations.</li>
+      <li><strong>Mandelbrot set in FORTH</strong> draws one point per character, shaded by how many steps it takes to escape, with the set in solid blocks. With only 16-bit integers it works in fixed point with 90 as 1.0. <code>MANDEL</code> takes about 95 s.</li>
+    </ul>
+  </div>
+
+  <div class="panel" role="tabpanel" id="panel-lisp" aria-labelledby="tab-lisp" hidden>
+    <h2>LISP</h2>
+    <p>A small LISP 1.5 style interpreter, written for this project, in the 2 KB that held BURP, with garbage collection and dynamic scope. Press RS at READY; the top line changes to LISP. Type an expression and press Return to see its value. An expression can run over several lines: LISP keeps reading until the brackets balance.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Group</th><th>Built-ins</th></tr></thead>
+      <tbody>
+        <tr><td>Special forms</td><td><code>QUOTE</code> (and <code>'x</code>) <code>COND LAMBDA DEFUN SETQ AND OR</code></td></tr>
+        <tr><td>Lists</td><td><code>CAR CDR CONS LIST CADR CADDR</code></td></tr>
+        <tr><td>Tests</td><td><code>ATOM EQ NULL NUMBERP</code> (true is T, false NIL)</td></tr>
+        <tr><td>Arithmetic</td><td><code>+ - * / REM &lt; &gt;</code>, two arguments each</td></tr>
+        <tr><td>Output</td><td><code>PRINT PRIN1 TERPRI TYO</code></td></tr>
+        <tr><td>Other</td><td><code>EVAL GC</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li>Numbers are integers from −16384 to 16383. <code>EQ</code> compares numbers too.</li>
+      <li><code>(DEFUN SQ (X) (* X X))</code> sets SQ to <code>(LAMBDA (X) (* X X))</code>. A function is a value: <code>(MAPCAR SQ L)</code> passes it, and <code>(F X)</code> calls whatever F holds.</li>
+      <li>Variables are dynamically scoped, as in the original LISP: a function sees the variables of whatever called it, unless it has a parameter of the same name.</li>
+      <li><code>(PRINT x)</code> prints x and a new line, <code>(PRIN1 x)</code> without one, <code>(TERPRI)</code> starts a new line and <code>(TYO n)</code> prints character code n. <code>(GC)</code> returns the number of free cells.</li>
+      <li><code>;</code> starts a comment. Errors print a message and the culprit: <code>UNBOUND FOO</code>, <code>BAD FN 1</code>, <code>BAD ARG A</code>, <code>TOO DEEP</code>, <code>NO MEM</code>.</li>
+      <li>Without the expansion there are 672 cells and recursion goes about 45 calls deep; with it, 7680 cells and about 140.</li>
+    </ul>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Symbolic differentiation</strong> is the program LISP was made for: an expression is a list, so DERIV can take it apart and build its derivative. <code>(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)</code> gives <code>(+ (* 6 X) 2)</code>.</li>
+      <li><strong>Towers of Hanoi</strong>: move all but the bottom disc out of the way, move the bottom disc, move the rest back on top. <code>(HANOI 4 'A 'C 'B)</code> prints 15 moves.</li>
+      <li><strong>Eight queens</strong> puts a queen in the first safe row of each column and backs up when a column has none. N is never passed to the inner functions: dynamic scope finds the N that QUEENS was called with.</li>
+    </ul>
+  </div>
+
+</section>
+</div>
+
+<footer>The emulator follows the MAME driver in the psicomp80 repository: a Z80 at 4 MHz, the 3 KB ROM typed in from the magazine’s hex listing, a 64 × 32 character screen and the keyboard on an NMI. It has no cassette or floppy disc; programs that came on tape are loaded straight into memory.</footer>
+</div>
+<script>
+const C80DATA = {"fonts":{"ascii":[[0,0,0,0,0,0,0,0],[4,4,4,4,4,0,4,0],[10,10,10,0,0,0,0,0],[10,10,31,10,31,10,10,0],[4,15,20,14,5,30,4,0],[24,25,2,4,8,19,3,0],[12,18,20,8,21,18,13,0],[6,4,8,0,0,0,0,0],[2,4,8,8,8,4,2,0],[8,4,2,2,2,4,8,0],[0,10,4,31,4,10,0,0],[0,4,4,31,4,4,0,0],[0,0,0,0,6,4,8,0],[0,0,0,31,0,0,0,0],[0,0,0,0,0,6,6,0],[1,2,4,8,16,0,0,0],[14,17,19,21,25,17,14,0],[4,12,4,4,4,4,14,0],[14,17,1,2,4,8,31,0],[31,2,4,2,1,17,14,0],[2,6,10,18,31,2,2,0],[31,16,30,1,1,17,14,0],[6,8,16,30,17,17,14,0],[31,1,2,4,8,8,8,0],[14,17,17,14,17,17,14,0],[14,17,17,15,1,2,12,0],[0,6,6,0,6,6,0,0],[0,6,6,0,6,4,8,0],[2,4,8,16,8,4,2,0],[0,0,31,0,31,0,0,0],[8,4,2,1,2,4,8,0],[14,17,1,2,4,0,4,0],[14,17,29,21,29,16,14,0],[14,17,17,31,17,17,17,0],[30,17,17,30,17,17,30,0],[14,17,16,16,16,17,14,0],[28,18,17,17,17,18,28,0],[31,16,16,30,16,16,31,0],[31,16,16,30,16,16,16,0],[14,17,16,23,17,17,14,0],[17,17,17,31,17,17,17,0],[14,4,4,4,4,4,14,0],[7,2,2,2,2,18,12,0],[17,18,20,24,20,18,17,0],[16,16,16,16,16,16,31,0],[17,27,21,21,17,17,17,0],[17,25,21,19,17,17,17,0],[14,17,17,17,17,17,14,0],[30,17,17,30,16,16,16,0],[14,17,17,17,21,18,13,0],[30,17,17,30,20,18,17,0],[15,16,16,14,1,1,30,0],[31,4,4,4,4,4,4,0],[17,17,17,17,17,17,14,0],[17,17,17,17,17,10,4,0],[17,17,17,21,21,27,17,0],[17,17,10,4,10,17,17,0],[17,17,10,4,4,4,4,0],[31,1,2,4,8,16,31,0],[14,8,8,8,8,8,14,0],[16,8,4,2,1,0,0,0],[14,2,2,2,2,2,14,0],[4,10,17,0,0,0,0,0],[0,0,0,0,0,0,31,0]],"gfx":[[42,21,42,21,42,21,42,21,42,21],[56,56,56,56,56,0,0,0,0,0],[7,7,7,7,7,0,0,0,0,0],[63,63,63,63,63,0,0,0,0,0],[0,0,0,0,0,7,7,7,7,7],[56,56,56,56,56,7,7,7,7,7],[7,7,7,7,7,7,7,7,7,7],[63,63,63,63,63,7,7,7,7,7],[0,0,0,0,0,56,56,56,56,56],[56,56,56,56,56,56,56,56,56,56],[7,7,7,7,7,56,56,56,56,56],[63,63,63,63,63,56,56,56,56,56],[0,0,0,0,0,63,63,63,63,63],[56,56,56,56,56,63,63,63,63,63],[7,7,7,7,7,63,63,63,63,63],[63,63,63,63,63,63,63,63,63,63],[0,0,0,0,3,12,16,16,32,32],[0,0,0,0,48,12,2,2,1,1],[1,1,2,2,12,48,0,0,0,0],[32,32,16,16,12,3,0,0,0,0],[0,0,0,0,3,15,31,31,63,63],[0,0,0,0,48,60,62,62,63,63],[63,63,62,62,60,48,0,0,0,0],[63,63,31,31,15,3,0,0,0,0],[1,3,3,7,7,15,15,31,31,63],[32,48,48,56,56,60,60,62,62,63],[63,62,62,60,60,56,56,48,48,32],[63,31,31,15,15,7,7,3,3,1],[62,33,33,33,62,33,33,33,33,62],[33,33,33,33,33,33,33,33,33,63],[62,33,33,33,62,34,33,33,33,33],[62,33,33,33,62,32,32,32,32,32],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,14,9,9,14,8,8],[0,0,8,8,9,14,10,9,0,0],[0,0,0,0,26,21,21,21,0,0],[0,6,9,8,28,8,8,23,0,0],[0,0,0,20,40,40,20,0,0,0],[0,0,12,18,30,17,17,30,16,16],[0,0,0,9,9,9,15,14,8,16],[0,0,0,14,17,17,10,27,0,0],[0,0,0,16,40,5,2,0,0,0],[0,16,40,5,18,40,5,2,0,0],[42,42,42,42,42,42,42,42,42,42],[63,0,63,0,63,0,63,0,63,0],[0,0,0,11,24,24,11,0,0,0],[48,48,24,24,12,12,6,6,3,3],[3,3,6,6,12,12,24,24,48,48],[48,48,48,48,48,48,48,48,48,48],[12,12,12,12,12,12,12,12,12,12],[3,3,3,3,3,3,3,3,3,3],[63,63,0,0,0,0,0,0,0,0],[0,0,63,63,0,0,0,0,0,0],[0,0,0,0,63,63,0,0,0,0],[0,0,0,0,0,0,63,63,0,0],[0,0,0,0,0,0,0,0,63,63],[4,14,21,4,4,4,4,4,4,4],[0,0,4,2,63,2,4,0,0,0],[0,0,128,16,63,16,128,0,0,0],[4,4,4,4,4,21,14,4,0,0],[48,48,48,48,48,10,14,6,15,3],[0,32,32,33,3,5,15,1,0,0],[48,48,48,48,48,4,12,14,10,3],[0,0,0,3,7,12,48,48,48,48]]},"roms":{"burp":"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","forth":"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","lisp":"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"},"bins":{"life":"w1EQABcQG+GsABQVFgAAAAAAdjHAHxFAH/4SylIQ/hPKAAD+EMKtECE6gDYQIzYBIzYVIzYTIzYFIzYEdhFAH/4SylIQ/hPKAAD+ECDuw60Q8zG4BhFAH+1fKgcQrW+0IAEs3SoDEAEABHwffR+sZ30ffB+tb6xn3XcAfB99H6xnfR98H61vrGfdtgDddwB8H30frGd9H3wfrW+sZ92mAN13AN0jC3ixIMAiBxAxuAYRQB/dKgMQAQCA/SHIEt1+AP13AN1+EP13Ad0jr/3LABYX/csAFhf9ywEWF/3LARYXxtBvJhJ+AgOv/csAFhf9ywAWF/3LARYX/csBFhfG0G8mEn4CA6/9ywAWF/3LABYX/csBFhf9ywEWF8bQbyYSfgIDr/3LABYX/csAFhf9ywEWF/3LARYXxtBvJhJ+AgN55j/CvhAuEN0jLSD7eP6Iwr4QOgQQ/hchEBsoAyEAFyIFEN0qBRDdNgABKgMQAfADCURNOgoQZ/0hfxHDgRLtSwMQOgsQZ/0hjhHDgRKvMgkQOgkQPOY/byYAKSkpKe1LAxAJRE06DBBn/SGxEcOBEjoKEDLGEToLEDLJEToMEDLMES4AJgB+JgCGJgCGJhN3LH3+giDuOgsQTwYTLgFgLX4shiyGLf4DKAn+BCAIYX4fGAQ3GAG33csAFjAG3SPdNgABLH3+gSDVOgoQZzoLEDIKEDoMEDILEHwyDBA6CRA8MgkQ/kDCkhEqBRAiAxDDrRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDrRAuAQoDBzYAyxYsBzYAyxYsBzYAyxYsBzYAyxYsBzYAyxYsBzYAyxYsBzYAyxYsBzYAyxYsff6BIMkugH4uAHcuAX4ugXf96QAAAAAAAAAAIERITEJGSk5BRUlNQ0dLTw==","boat":"IRAQEQCAAQAI7bAY/gAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3dyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQ0MgICAgICAgICAgICAgICBEWSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFNSICAgICAgU1IgT09IICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUVSAgICAgICAgICAgICAgWE9PT0ggICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgV1YgICAgICAgICAgICAgRE9PT09NICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9PT0dPT1kgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFhPT09GT09PSCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIERPT09PRk9PT09IICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBPT09PT0ZPT09PTyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBYT09PT09GT09PT09NICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgR09PTyAgICAgICAgICAgICAgICAgICAgT09PT08gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBPT09PT09PT09PT09PT09PT09PT09PT09PT09PICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQk9PT09PT09PT09PT09PT09PT09PT09PT09PTyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXFxcXEgSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKiAUCAUgCA0TIBMFASAIARcLICogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg","schmitt":"IRAQEQCAAQAI7bAY/gAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHd3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3dyArNRYgExUQEAwZICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcSAgICBxICAgICAgICBxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE8gICAgTyAgICAgICAgTyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA0NwsgICBPICAgIE8gMTAwCyAgIE8gMQsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTyAgICBPICAgICAgICBPICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHEgICAgcSAgICAgICAgcXV1dXVPICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBxICAgIHF1T09PT3V1dXEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcSAgICBxIDEwCyAgICBxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdXV1cXB1dXF1dXV1cSAgICAgICAgcSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgMWcgICBxICAgIHEgICAgICAgIHEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcSAgICBxdXV1dXV1dXVxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHEgICAgcSAgICAgIHEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBPICAgIE8gICAgICBxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgNDcLICAgTyAgICBPIDIuMgsgTyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE8gICAgTyAgICAgIE8gMTALICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBxICAgIHEgICAgICBPICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcSAgICBxICAgICAgcSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHEgICAgcSAgICAgIHEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3NzcyAwFiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgEwMIDQkUFCAUEgkHBwUSIAMJEgMVCRQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3NzICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg"},"sources":{"life.fs":"( GAME OF LIFE IN COMP80 FORTH )\n( 64 X 31 CELLS ON SCREEN LINES 1-31, EDGES WRAP )\n( N LIFE  RUNS N GENERATIONS FROM A RANDOM BOARD )\nHEX 8040 CONSTANT SCR DECIMAL\n31 CONSTANT ROWS\n79 CONSTANT ALIVE  ( GRAPHIC 15: A SOLID BLOCK )\nVARIABLE SEED  1979 SEED !\n: RND ( -- N ) SEED @ 31421 * 6927 + DUP SEED ! ;\nVARIABLE NEW  ROWS 64 * 2 - ALLOT  ( NEXT GENERATION )\nVARIABLE SUMS  64 ALLOT  ( COLUMN SUMS, WRAPPED ONE EACH END )\nVARIABLE UP  VARIABLE MID  VARIABLE DN\n: ROW ( Y -- ADDR ) 64 * SCR + ;\n: ROWS! ( Y -- ) DUP ROW MID !\n  DUP DUP 0= IF ROWS + THEN 1- ROW UP !\n  1+ DUP ROWS = IF DROP 0 THEN ROW DN ! ;\n( A CELL IS 79 OR 32, SO A SUM OF 9 IS 288 + 47 * LIVE CELLS )\n: COLSUMS ( -- ) 64 0 DO UP @ I + C@  MID @ I + C@ +\n  DN @ I + C@ +  SUMS 1+ I + C! LOOP\n  SUMS 64 + C@ SUMS C!  SUMS 1+ C@ SUMS 65 + C! ;\n( 3 LIVE IN THE 3X3 SQUARE MEANS ALIVE, 4 MEANS NO CHANGE )\n: CELL ( X -- C ) DUP SUMS + DUP C@  OVER 1+ C@ +  SWAP 2 + C@ +\n  DUP 429 = IF DROP DROP ALIVE EXIT THEN\n  476 = IF MID @ + C@ ELSE DROP 32 THEN ;\n: GEN ( -- ) NEW  ROWS 0 DO I ROWS! COLSUMS\n  64 0 DO I CELL OVER C! 1+ LOOP LOOP DROP\n  ROWS 64 * 0 DO NEW I + @  SCR I + ! 2 +LOOP ;\n: RANDOM ( -- ) ROWS 64 * 0 DO\n  RND 0< IF ALIVE ELSE 32 THEN  SCR I + C! LOOP ;\n: LIFE ( N -- ) PAGE RANDOM\n  0 DO 50 0 AT .\" GEN \" I 1+ . GEN LOOP ;\n","mandel.fs":"( MANDELBROT SET IN COMP80 FORTH )\n( ONE POINT PER CHARACTER, SHADED BY HOW SOON IT ESCAPES )\n( FIXED POINT: 90 IS 1.0, SO 2.0 SQUARED STILL FITS 16 BITS )\n90 CONSTANT S\n24 CONSTANT MAXIT\nHEX 8040 CONSTANT SCR DECIMAL\nVARIABLE X  VARIABLE Y  VARIABLE CX  VARIABLE CY\n: SQ ( A -- A*A ) DUP * S / ;\n: SMALL ( A -- F ) DUP 0< IF NEGATE THEN 182 < ;\n( ONE STEP OF Z = Z*Z + C; FALSE ONCE Z HAS ESCAPED )\n: STEP ( -- F ) X @ SMALL  Y @ SMALL  AND 0= IF 0 EXIT THEN\n  X @ SQ  Y @ SQ  OVER OVER + 360 > IF DROP DROP 0 EXIT THEN\n  - CX @ +  X @ Y @ * S / DUP + CY @ + Y !  X ! -1 ;\n: ITER ( -- N ) 0 X ! 0 Y ! 0\n  BEGIN DUP MAXIT < WHILE STEP WHILE 1+ REPEAT THEN ;\n( SHADES FOR 1 TO 9 STEPS; 79 IS A SOLID BLOCK, FOR THE SET )\nVARIABLE PAL  32 PAL !  46 , 58 , 45 , 61 , 43 , 42 , 35 , 37 ,\n: SHADE ( N -- C ) DUP MAXIT = IF DROP 79 EXIT THEN\n  1- DUP 8 > IF DROP 8 THEN  DUP + PAL + @ ;\n( COLUMN 0-63 TO X -2.0 TO 0.6, ROW 0-30 TO Y -1.05 TO 1.05 )\n: POINT ( COL ROW -- C ) 189 * 30 / 94 - CY !\n  234 * 63 / 180 - CX !  ITER SHADE ;\n: MANDEL ( -- ) PAGE  31 0 DO 64 0 DO\n  I J POINT  J 64 * I + SCR + C! LOOP LOOP  56 0 AT .\" DONE\" ;\n","deriv.lsp":"; Symbolic differentiation, the classic LISP program.\n; (DERIV E X) is the derivative of E with respect to X, where\n; E is built from numbers, symbols, (+ A B), (- A B), (* A B)\n; and (EXPT A N).  S+ S- S* and SEXPT build a result,\n; simplifying as they go.\n(DEFUN DERIV (E X)\n  (COND ((ATOM E) (COND ((EQ E X) 1) (T 0)))\n        ((EQ (CAR E) '+)\n         (S+ (DERIV (CADR E) X) (DERIV (CADDR E) X)))\n        ((EQ (CAR E) '-)\n         (S- (DERIV (CADR E) X) (DERIV (CADDR E) X)))\n        ((EQ (CAR E) '*)\n         (S+ (S* (CADR E) (DERIV (CADDR E) X))\n             (S* (DERIV (CADR E) X) (CADDR E))))\n        ((EQ (CAR E) 'EXPT)\n         (S* (S* (CADDR E) (SEXPT (CADR E) (- (CADDR E) 1)))\n             (DERIV (CADR E) X)))))\n(DEFUN S+ (A B)\n  (COND ((EQ A 0) B)\n        ((EQ B 0) A)\n        ((AND (NUMBERP A) (NUMBERP B)) (+ A B))\n        ((EQUAL A B) (S* 2 A))\n        (T (LIST '+ A B))))\n(DEFUN S- (A B)\n  (COND ((EQ B 0) A)\n        ((AND (NUMBERP A) (NUMBERP B)) (- A B))\n        ((EQUAL A B) 0)\n        (T (LIST '- A B))))\n(DEFUN S* (A B)\n  (COND ((EQ A 0) 0)\n        ((EQ B 0) 0)\n        ((EQ A 1) B)\n        ((EQ B 1) A)\n        ((NUMBERP B) (COND ((NUMBERP A) (* A B)) (T (S* B A))))\n        ((AND (NUMBERP A) (NULL (ATOM B)) (EQ (CAR B) '*)\n              (NUMBERP (CADR B)))\n         (S* (* A (CADR B)) (CADDR B)))\n        (T (LIST '* A B))))\n(DEFUN SEXPT (A N)\n  (COND ((EQ N 0) 1) ((EQ N 1) A) (T (LIST 'EXPT A N))))\n(DEFUN EQUAL (A B)\n  (COND ((ATOM A) (EQ A B))\n        ((ATOM B) NIL)\n        ((EQUAL (CAR A) (CAR B)) (EQUAL (CDR A) (CDR B)))))\n","hanoi.lsp":"; The Towers of Hanoi: move N discs from peg FROM to peg TO,\n; using peg VIA, one disc at a time and never a bigger disc\n; on a smaller one.\n(DEFUN HANOI (N FROM TO VIA)\n  (COND ((EQ N 0) NIL)\n        (T (HANOI (- N 1) FROM VIA TO)\n           (PRINT (LIST 'MOVE 'DISC N 'FROM FROM 'TO TO))\n           (HANOI (- N 1) VIA TO FROM))))\n","queens.lsp":"; The eight queens: put N queens on an N x N board with no two\n; in the same row, column or diagonal.  A board is the list of\n; the queens' rows, the newest column first.  N is a free\n; variable in PLACE, TRY and ROW: LISP's dynamic scope finds\n; QUEENS's N.\n(DEFUN OK (R QS D)\n  (COND ((NULL QS) T)\n        ((EQ R (CAR QS)) NIL)\n        ((EQ (- R (CAR QS)) D) NIL)\n        ((EQ (- (CAR QS) R) D) NIL)\n        (T (OK R (CDR QS) (+ D 1)))))\n(DEFUN PLACE (QS K)\n  (COND ((EQ K N) QS) (T (TRY 1 QS K))))\n(DEFUN TRY (R QS K)\n  (COND ((> R N) NIL)\n        (T (OR (AND (OK R QS 1) (PLACE (CONS R QS) (+ K 1)))\n               (TRY (+ R 1) QS K)))))\n(DEFUN ROW (C Q)\n  (COND ((> C N) (TERPRI))\n        (T (TYO (COND ((EQ C Q) 81) (T 46)))\n           (TYO 32)\n           (ROW (+ C 1) Q))))\n(DEFUN SHOW (B)\n  (COND (B (ROW 1 (CAR B)) (SHOW (CDR B)))))\n(DEFUN QUEENS (N)\n  ((LAMBDA (B) (SHOW B) B) (PLACE NIL 0)))\n"}};
+</script>
+<script>
+// A Z80 CPU for the COMP80 emulator.
+//
+// new Z80(bus) where bus has read(addr), write(addr, v), input(port16),
+// output(port16, v).  step() runs one instruction (or one HALT cycle, or
+// takes a pending interrupt) and returns the T-states it took.  nmi() and
+// irq = true/false raise the interrupt lines.  Documented behaviour and
+// flags; the undocumented X/Y flag bits follow the usual rules but nothing
+// on the COMP80 depends on them.
+"use strict";
+
+const FC = 0x01, FN = 0x02, FP = 0x04, F3 = 0x08, FH = 0x10, F5 = 0x20, FZ = 0x40, FS = 0x80;
+
+const SZ53 = new Uint8Array(256), SZ53P = new Uint8Array(256), PAR = new Uint8Array(256);
+for (let i = 0; i < 256; i++) {
+  let p = i, par = 1;
+  for (let k = 0; k < 8; k++) { par ^= p & 1; p >>= 1; }
+  PAR[i] = par ? FP : 0;
+  SZ53[i] = (i & (FS | F3 | F5)) | (i === 0 ? FZ : 0);
+  SZ53P[i] = SZ53[i] | PAR[i];
+}
+
+// T-states for unprefixed opcodes (conditional jumps etc. add the extra
+// when taken).
+const CYC = [
+  4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,
+  8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4,
+  7, 10, 16, 6, 4, 4, 7, 4, 7, 11, 16, 6, 4, 4, 7, 4,
+  7, 10, 13, 6, 11, 11, 10, 4, 7, 11, 13, 6, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+  5, 10, 10, 10, 10, 11, 7, 11, 5, 10, 10, 0, 10, 17, 7, 11,
+  5, 10, 10, 11, 10, 11, 7, 11, 5, 4, 10, 11, 10, 0, 7, 11,
+  5, 10, 10, 19, 10, 11, 7, 11, 5, 4, 10, 4, 10, 0, 7, 11,
+  5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11,
+];
+
+class Z80 {
+  constructor(bus) {
+    this.bus = bus;
+    this.reset();
+  }
+
+  reset() {
+    this.a = 0xff; this.f = 0xff; this.b = 0; this.c = 0; this.d = 0; this.e = 0; this.h = 0; this.l = 0;
+    this.a_ = 0; this.f_ = 0; this.b_ = 0; this.c_ = 0; this.d_ = 0; this.e_ = 0; this.h_ = 0; this.l_ = 0;
+    this.ix = 0xffff; this.iy = 0xffff; this.sp = 0xffff; this.pc = 0;
+    this.i = 0; this.r = 0; this.iff1 = 0; this.iff2 = 0; this.im = 0;
+    this.halted = false; this.eiDelay = false;
+    this.nmiPending = false; this.irq = false;
+  }
+
+  nmi() { this.nmiPending = true; }
+
+  // ---------------------------------------------------------------- memory
+
+  rb(a) { return this.bus.read(a & 0xffff); }
+  wb(a, v) { this.bus.write(a & 0xffff, v & 0xff); }
+  rw(a) { return this.rb(a) | (this.rb(a + 1) << 8); }
+  ww(a, v) { this.wb(a, v); this.wb(a + 1, v >> 8); }
+  fetch() { const v = this.rb(this.pc); this.pc = (this.pc + 1) & 0xffff; return v; }
+  fetchw() { const v = this.rw(this.pc); this.pc = (this.pc + 2) & 0xffff; return v; }
+  fetchd() { const v = this.fetch(); return v < 128 ? v : v - 256; }
+  push(v) { this.sp = (this.sp - 2) & 0xffff; this.ww(this.sp, v); }
+  pop() { const v = this.rw(this.sp); this.sp = (this.sp + 2) & 0xffff; return v; }
+  incr() { this.r = (this.r & 0x80) | ((this.r + 1) & 0x7f); }
+
+  get bc() { return (this.b << 8) | this.c; } set bc(v) { this.b = (v >> 8) & 0xff; this.c = v & 0xff; }
+  get de() { return (this.d << 8) | this.e; } set de(v) { this.d = (v >> 8) & 0xff; this.e = v & 0xff; }
+  get hl() { return (this.h << 8) | this.l; } set hl(v) { this.h = (v >> 8) & 0xff; this.l = v & 0xff; }
+  get af() { return (this.a << 8) | this.f; } set af(v) { this.a = (v >> 8) & 0xff; this.f = v & 0xff; }
+
+  // ---------------------------------------------------------------- ALU
+
+  add8(v, carry) {
+    const c = carry ? (this.f & FC) : 0, r = this.a + v + c;
+    this.f = SZ53[r & 0xff] | ((r >> 8) & FC) | ((this.a ^ v ^ r) & FH) |
+      ((((this.a ^ ~v) & (this.a ^ r)) & 0x80) ? FP : 0);
+    this.a = r & 0xff;
+  }
+  sub8(v, carry, store) {
+    const c = carry ? (this.f & FC) : 0, r = this.a - v - c;
+    const f = (r & 0x80) | ((r & 0xff) === 0 ? FZ : 0) | ((r >> 8) & FC) | FN |
+      ((this.a ^ v ^ r) & FH) | ((((this.a ^ v) & (this.a ^ r)) & 0x80) ? FP : 0);
+    if (store) { this.a = r & 0xff; this.f = f | (r & (F3 | F5)); }
+    else this.f = f | (v & (F3 | F5));
+  }
+  and8(v) { this.a &= v; this.f = SZ53P[this.a] | FH; }
+  xor8(v) { this.a = (this.a ^ v) & 0xff; this.f = SZ53P[this.a]; }
+  or8(v) { this.a = (this.a | v) & 0xff; this.f = SZ53P[this.a]; }
+  alu(op, v) {
+    switch (op) {
+      case 0: this.add8(v, false); break;
+      case 1: this.add8(v, true); break;
+      case 2: this.sub8(v, false, true); break;
+      case 3: this.sub8(v, true, true); break;
+      case 4: this.and8(v); break;
+      case 5: this.xor8(v); break;
+      case 6: this.or8(v); break;
+      case 7: this.sub8(v, false, false); break;
+    }
+  }
+  inc8(v) {
+    const r = (v + 1) & 0xff;
+    this.f = (this.f & FC) | SZ53[r] | (r === 0x80 ? FP : 0) | ((r & 0x0f) === 0 ? FH : 0);
+    return r;
+  }
+  dec8(v) {
+    const r = (v - 1) & 0xff;
+    this.f = (this.f & FC) | SZ53[r] | FN | (r === 0x7f ? FP : 0) | ((r & 0x0f) === 0x0f ? FH : 0);
+    return r;
+  }
+  add16(x, y) {
+    const r = x + y;
+    this.f = (this.f & (FS | FZ | FP)) | ((r >> 16) & FC) | (((x ^ y ^ r) >> 8) & FH) | ((r >> 8) & (F3 | F5));
+    return r & 0xffff;
+  }
+  adc16(v) {
+    const x = this.hl, r = x + v + (this.f & FC);
+    this.f = ((r >> 8) & (FS | F3 | F5)) | ((r & 0xffff) === 0 ? FZ : 0) | ((r >> 16) & FC) |
+      (((x ^ v ^ r) >> 8) & FH) | ((((x ^ ~v) & (x ^ r)) & 0x8000) ? FP : 0);
+    this.hl = r & 0xffff;
+  }
+  sbc16(v) {
+    const x = this.hl, r = x - v - (this.f & FC);
+    this.f = ((r >> 8) & (FS | F3 | F5)) | ((r & 0xffff) === 0 ? FZ : 0) | ((r >> 16) & FC) | FN |
+      (((x ^ v ^ r) >> 8) & FH) | ((((x ^ v) & (x ^ r)) & 0x8000) ? FP : 0);
+    this.hl = r & 0xffff;
+  }
+  // CB rotates and shifts: op 0-7 = RLC RRC RL RR SLA SRA SLL SRL
+  rot(op, v) {
+    let r, c;
+    switch (op) {
+      case 0: c = v >> 7; r = ((v << 1) | c) & 0xff; break;
+      case 1: c = v & 1; r = (v >> 1) | (c << 7); break;
+      case 2: c = v >> 7; r = ((v << 1) | (this.f & FC)) & 0xff; break;
+      case 3: c = v & 1; r = (v >> 1) | ((this.f & FC) << 7); break;
+      case 4: c = v >> 7; r = (v << 1) & 0xff; break;
+      case 5: c = v & 1; r = (v >> 1) | (v & 0x80); break;
+      case 6: c = v >> 7; r = ((v << 1) | 1) & 0xff; break;
+      default: c = v & 1; r = v >> 1; break;
+    }
+    this.f = SZ53P[r] | c;
+    return r;
+  }
+  daa() {
+    let a = this.a, add = 0, c = this.f & FC;
+    if ((this.f & FH) || (a & 0x0f) > 9) add = 6;
+    if (c || a > 0x99) { add |= 0x60; c = FC; }
+    if (this.f & FN) {
+      const h = (this.f & FH) && (a & 0x0f) < 6 ? FH : 0;
+      a = (a - add) & 0xff;
+      this.f = SZ53P[a] | c | FN | h;
+    } else {
+      const h = (a & 0x0f) > 9 ? FH : 0;
+      a = (a + add) & 0xff;
+      this.f = SZ53P[a] | c | h;
+    }
+    this.a = a;
+  }
+
+  // ---------------------------------------------------------------- registers by index
+
+  // r: 0 B 1 C 2 D 3 E 4 H 5 L 7 A (6 is (HL) and handled by the caller).
+  // xy: 0 for HL, 1 IX, 2 IY: H and L then mean the index register halves.
+  getr(r, xy) {
+    switch (r) {
+      case 0: return this.b; case 1: return this.c; case 2: return this.d; case 3: return this.e;
+      case 4: return xy === 0 ? this.h : (xy === 1 ? this.ix : this.iy) >> 8;
+      case 5: return xy === 0 ? this.l : (xy === 1 ? this.ix : this.iy) & 0xff;
+      default: return this.a;
+    }
+  }
+  setr(r, v, xy) {
+    v &= 0xff;
+    switch (r) {
+      case 0: this.b = v; break; case 1: this.c = v; break; case 2: this.d = v; break; case 3: this.e = v; break;
+      case 4: if (xy === 0) this.h = v; else if (xy === 1) this.ix = (this.ix & 0xff) | (v << 8); else this.iy = (this.iy & 0xff) | (v << 8); break;
+      case 5: if (xy === 0) this.l = v; else if (xy === 1) this.ix = (this.ix & 0xff00) | v; else this.iy = (this.iy & 0xff00) | v; break;
+      default: this.a = v;
+    }
+  }
+  getxy(xy) { return xy === 0 ? this.hl : xy === 1 ? this.ix : this.iy; }
+  setxy(xy, v) { v &= 0xffff; if (xy === 0) this.hl = v; else if (xy === 1) this.ix = v; else this.iy = v; }
+  // rp: 0 BC 1 DE 2 HL/IX/IY 3 SP
+  getrp(p, xy) { return p === 0 ? this.bc : p === 1 ? this.de : p === 2 ? this.getxy(xy) : this.sp; }
+  setrp(p, v, xy) { v &= 0xffff; if (p === 0) this.bc = v; else if (p === 1) this.de = v; else if (p === 2) this.setxy(xy, v); else this.sp = v; }
+  // rp2 for PUSH/POP: 3 is AF
+  getrp2(p, xy) { return p === 3 ? this.af : this.getrp(p, xy); }
+  setrp2(p, v, xy) { if (p === 3) this.af = v; else this.setrp(p, v, xy); }
+  cond(cc) {
+    switch (cc) {
+      case 0: return !(this.f & FZ); case 1: return !!(this.f & FZ);
+      case 2: return !(this.f & FC); case 3: return !!(this.f & FC);
+      case 4: return !(this.f & FP); case 5: return !!(this.f & FP);
+      case 6: return !(this.f & FS); default: return !!(this.f & FS);
+    }
+  }
+
+  // ---------------------------------------------------------------- step
+
+  step() {
+    this.tookInt = false;
+    if (this.nmiPending) {
+      this.tookInt = true;
+      this.nmiPending = false;
+      this.halted = false;
+      this.iff1 = 0;
+      this.incr();
+      this.push(this.pc);
+      this.pc = 0x66;
+      return 11;
+    }
+    if (this.irq && this.iff1 && !this.eiDelay) {
+      this.tookInt = true;
+      this.halted = false;
+      this.iff1 = this.iff2 = 0;
+      this.incr();
+      if (this.im === 2) {
+        this.push(this.pc);
+        this.pc = this.rw((this.i << 8) | 0xff);
+        return 19;
+      }
+      this.push(this.pc);   // IM 0 with RST 38h on the bus, or IM 1
+      this.pc = 0x38;
+      return 13;
+    }
+    this.eiDelay = false;
+    if (this.halted) { this.incr(); return 4; }
+    this.incr();
+    return this.exec(this.fetch(), 0);
+  }
+
+  // Run one unprefixed (xy = 0) or DD/FD-prefixed (xy = 1/2) opcode.
+  exec(op, xy) {
+    let t = CYC[op];
+    const x = op >> 6, y = (op >> 3) & 7, z = op & 7, p = y >> 1, q = y & 1;
+    // address of (HL) or (IX+d), fetched only when the opcode uses it
+    const mem = () => xy === 0 ? this.hl : (this.getxy(xy) + this.fetchd()) & 0xffff;
+
+    if (x === 1) {
+      if (op === 0x76) { this.halted = true; return 4; }
+      if (z === 6) { const a = mem(); this.setr(y, this.rb(a), 0); return t + (xy ? 8 : 0); }
+      if (y === 6) { const a = mem(); this.wb(a, this.getr(z, 0)); return t + (xy ? 8 : 0); }
+      this.setr(y, this.getr(z, xy), xy);
+      return t;
+    }
+    if (x === 2) {
+      if (z === 6) { const a = mem(); this.alu(y, this.rb(a)); return t + (xy ? 8 : 0); }
+      this.alu(y, this.getr(z, xy));
+      return t;
+    }
+    if (x === 0) {
+      switch (z) {
+        case 0:
+          switch (y) {
+            case 0: return t;
+            case 1: { const a = this.a, f = this.f; this.a = this.a_; this.f = this.f_; this.a_ = a; this.f_ = f; return t; }
+            case 2: { const d = this.fetchd(); this.b = (this.b - 1) & 0xff; if (this.b) { this.pc = (this.pc + d) & 0xffff; t += 5; } return t; }
+            case 3: { const d = this.fetchd(); this.pc = (this.pc + d) & 0xffff; return t; }
+            default: { const d = this.fetchd(); if (this.cond(y - 4)) { this.pc = (this.pc + d) & 0xffff; t += 5; } return t; }
+          }
+        case 1:
+          if (q === 0) this.setrp(p, this.fetchw(), xy);
+          else this.setxy(xy, this.add16(this.getxy(xy), this.getrp(p, xy)));
+          return t;
+        case 2:
+          switch (y) {
+            case 0: this.wb(this.bc, this.a); break;
+            case 1: this.a = this.rb(this.bc); break;
+            case 2: this.wb(this.de, this.a); break;
+            case 3: this.a = this.rb(this.de); break;
+            case 4: this.ww(this.fetchw(), this.getxy(xy)); break;
+            case 5: this.setxy(xy, this.rw(this.fetchw())); break;
+            case 6: this.wb(this.fetchw(), this.a); break;
+            default: this.a = this.rb(this.fetchw());
+          }
+          return t;
+        case 3:
+          this.setrp(p, this.getrp(p, xy) + (q ? -1 : 1), xy);
+          return t;
+        case 4: case 5: {
+          const f = z === 4 ? (v) => this.inc8(v) : (v) => this.dec8(v);
+          if (y === 6) { const a = mem(); this.wb(a, f(this.rb(a))); return t + (xy ? 8 : 0); }
+          this.setr(y, f(this.getr(y, xy)), xy);
+          return t;
+        }
+        case 6:
+          if (y === 6) { const a = mem(); this.wb(a, this.fetch()); return t + (xy ? 5 : 0); }
+          this.setr(y, this.fetch(), xy);
+          return t;
+        default:
+          switch (y) {
+            case 0: { const c = this.a >> 7; this.a = ((this.a << 1) | c) & 0xff; this.f = (this.f & (FS | FZ | FP)) | (this.a & (F3 | F5)) | c; break; }
+            case 1: { const c = this.a & 1; this.a = (this.a >> 1) | (c << 7); this.f = (this.f & (FS | FZ | FP)) | (this.a & (F3 | F5)) | c; break; }
+            case 2: { const c = this.a >> 7; this.a = ((this.a << 1) | (this.f & FC)) & 0xff; this.f = (this.f & (FS | FZ | FP)) | (this.a & (F3 | F5)) | c; break; }
+            case 3: { const c = this.a & 1; this.a = (this.a >> 1) | ((this.f & FC) << 7); this.f = (this.f & (FS | FZ | FP)) | (this.a & (F3 | F5)) | c; break; }
+            case 4: this.daa(); break;
+            case 5: this.a ^= 0xff; this.f = (this.f & (FS | FZ | FP | FC)) | FH | FN | (this.a & (F3 | F5)); break;
+            case 6: this.f = (this.f & (FS | FZ | FP)) | FC | (this.a & (F3 | F5)); break;
+            default: this.f = (this.f & (FS | FZ | FP)) | ((this.f & FC) ? FH : FC) | (this.a & (F3 | F5)); break;
+          }
+          return t;
+      }
+    }
+    // x === 3
+    switch (z) {
+      case 0: if (this.cond(y)) { this.pc = this.pop(); t += 6; } return t;
+      case 1:
+        if (q === 0) { this.setrp2(p, this.pop(), xy); return t; }
+        switch (p) {
+          case 0: this.pc = this.pop(); return t;
+          case 1: {
+            let v;
+            v = this.b; this.b = this.b_; this.b_ = v; v = this.c; this.c = this.c_; this.c_ = v;
+            v = this.d; this.d = this.d_; this.d_ = v; v = this.e; this.e = this.e_; this.e_ = v;
+            v = this.h; this.h = this.h_; this.h_ = v; v = this.l; this.l = this.l_; this.l_ = v;
+            return t;
+          }
+          case 2: this.pc = this.getxy(xy); return t;
+          default: this.sp = this.getxy(xy); return t;
+        }
+      case 2: { const a = this.fetchw(); if (this.cond(y)) this.pc = a; return t; }
+      case 3:
+        switch (y) {
+          case 0: this.pc = this.fetchw(); return t;
+          case 1: return this.execCB(xy);
+          case 2: this.bus.output((this.a << 8) | this.fetch(), this.a); return t;
+          case 3: this.a = this.bus.input((this.a << 8) | this.fetch()) & 0xff; return t;
+          case 4: { const v = this.rw(this.sp); this.ww(this.sp, this.getxy(xy)); this.setxy(xy, v); return t; }
+          case 5: { const v = this.de; this.de = this.hl; this.hl = v; return t; }
+          case 6: this.iff1 = this.iff2 = 0; return t;
+          default: this.iff1 = this.iff2 = 1; this.eiDelay = true; return t;
+        }
+      case 4: { const a = this.fetchw(); if (this.cond(y)) { this.push(this.pc); this.pc = a; t += 7; } return t; }
+      case 5:
+        if (q === 0) { this.push(this.getrp2(p, xy)); return t; }
+        switch (p) {
+          case 0: { const a = this.fetchw(); this.push(this.pc); this.pc = a; return t; }
+          case 1: this.incr(); return this.exec(this.fetch(), 1) + 4;
+          case 2: this.incr(); return this.execED();
+          default: this.incr(); return this.exec(this.fetch(), 2) + 4;
+        }
+      case 6: this.alu(y, this.fetch()); return t;
+      default: this.push(this.pc); this.pc = y * 8; return t;
+    }
+  }
+
+  execCB(xy) {
+    let a, op;
+    if (xy) { a = (this.getxy(xy) + this.fetchd()) & 0xffff; op = this.fetch(); }
+    else { this.incr(); op = this.fetch(); a = this.hl; }
+    const x = op >> 6, y = (op >> 3) & 7, z = op & 7;
+    const memop = xy !== 0 || z === 6;
+    const v = memop ? this.rb(a) : this.getr(z, 0);
+    let r;
+    if (x === 1) {
+      const bit = v & (1 << y);
+      this.f = (this.f & FC) | FH | (bit ? 0 : FZ | FP) | (bit & FS) | ((memop ? (a >> 8) : v) & (F3 | F5));
+      return xy ? 20 : (z === 6 ? 12 : 8);
+    }
+    if (x === 0) r = this.rot(y, v);
+    else if (x === 2) r = v & ~(1 << y);
+    else r = v | (1 << y);
+    if (memop) {
+      this.wb(a, r);
+      if (xy && z !== 6) this.setr(z, r, 0);   // undocumented copy to a register
+      return xy ? 23 : 15;
+    }
+    this.setr(z, r, 0);
+    return 8;
+  }
+
+  execED() {
+    const op = this.fetch();
+    const x = op >> 6, y = (op >> 3) & 7, z = op & 7, p = y >> 1, q = y & 1;
+    if (x === 1) {
+      switch (z) {
+        case 0: {
+          const v = this.bus.input(this.bc) & 0xff;
+          if (y !== 6) this.setr(y, v, 0);
+          this.f = (this.f & FC) | SZ53P[v];
+          return 12;
+        }
+        case 1: this.bus.output(this.bc, y === 6 ? 0 : this.getr(y, 0)); return 12;
+        case 2: if (q === 0) this.sbc16(this.getrp(p, 0)); else this.adc16(this.getrp(p, 0)); return 15;
+        case 3: {
+          const a = this.fetchw();
+          if (q === 0) this.ww(a, this.getrp(p, 0)); else this.setrp(p, this.rw(a), 0);
+          return 20;
+        }
+        case 4: { const v = this.a; this.a = 0; this.sub8(v, false, true); return 8; }
+        case 5: this.pc = this.pop(); this.iff1 = this.iff2; return 14;
+        case 6: this.im = [0, 0, 1, 2, 0, 0, 1, 2][y]; return 8;
+        default:
+          switch (y) {
+            case 0: this.i = this.a; return 9;
+            case 1: this.r = this.a; return 9;
+            case 2: this.a = this.i; this.f = (this.f & FC) | SZ53[this.a] | (this.iff2 ? FP : 0); return 9;
+            case 3: this.a = this.r; this.f = (this.f & FC) | SZ53[this.a] | (this.iff2 ? FP : 0); return 9;
+            case 4: { // RRD
+              const m = this.rb(this.hl);
+              this.wb(this.hl, ((this.a << 4) | (m >> 4)) & 0xff);
+              this.a = (this.a & 0xf0) | (m & 0x0f);
+              this.f = (this.f & FC) | SZ53P[this.a];
+              return 18;
+            }
+            case 5: { // RLD
+              const m = this.rb(this.hl);
+              this.wb(this.hl, ((m << 4) | (this.a & 0x0f)) & 0xff);
+              this.a = (this.a & 0xf0) | (m >> 4);
+              this.f = (this.f & FC) | SZ53P[this.a];
+              return 18;
+            }
+            default: return 8;
+          }
+      }
+    }
+    if (x === 2 && z <= 3 && y >= 4) {
+      const inc = (y & 1) ? -1 : 1, repeat = y >= 6;
+      switch (z) {
+        case 0: { // LDI LDD LDIR LDDR
+          const v = this.rb(this.hl);
+          this.wb(this.de, v);
+          this.hl = (this.hl + inc) & 0xffff; this.de = (this.de + inc) & 0xffff; this.bc = (this.bc - 1) & 0xffff;
+          const n = v + this.a;
+          this.f = (this.f & (FS | FZ | FC)) | (this.bc ? FP : 0) | (n & F3) | ((n << 4) & F5);
+          if (repeat && this.bc) { this.pc = (this.pc - 2) & 0xffff; return 21; }
+          return 16;
+        }
+        case 1: { // CPI CPD CPIR CPDR
+          const v = this.rb(this.hl), r = (this.a - v) & 0xff;
+          const h = (this.a ^ v ^ r) & FH;
+          this.hl = (this.hl + inc) & 0xffff; this.bc = (this.bc - 1) & 0xffff;
+          const n = r - (h ? 1 : 0);
+          this.f = (this.f & FC) | FN | h | (r & FS) | (r === 0 ? FZ : 0) | (this.bc ? FP : 0) | (n & F3) | ((n << 4) & F5);
+          if (repeat && this.bc && r !== 0) { this.pc = (this.pc - 2) & 0xffff; return 21; }
+          return 16;
+        }
+        case 2: { // INI IND INIR INDR
+          const v = this.bus.input(this.bc) & 0xff;
+          this.wb(this.hl, v);
+          this.hl = (this.hl + inc) & 0xffff; this.b = (this.b - 1) & 0xff;
+          this.f = SZ53[this.b] | FN | (this.f & FC);
+          if (repeat && this.b) { this.pc = (this.pc - 2) & 0xffff; return 21; }
+          return 16;
+        }
+        default: { // OUTI OUTD OTIR OTDR
+          const v = this.rb(this.hl);
+          this.b = (this.b - 1) & 0xff;
+          this.bus.output(this.bc, v);
+          this.hl = (this.hl + inc) & 0xffff;
+          this.f = SZ53[this.b] | FN | (this.f & FC);
+          if (repeat && this.b) { this.pc = (this.pc - 2) & 0xffff; return 21; }
+          return 16;
+        }
+      }
+    }
+    return 8;   // other ED codes act as NOPs
+  }
+}
+
+if (typeof module !== "undefined") module.exports = { Z80 };
+
+// The PSI COMP80, following the MAME driver (psicomp80.cpp): 3 KB ROM at
+// 0000, RAM 0C00-1FFF, a 2 KB screen at 8000 (mirrored up to FFFF unless the
+// 32 KB expansion fills 8800-FFFF), the keyboard as a latched byte on port
+// 01 with an NMI per key, and the MM57109 number cruncher on ports 60 and 03
+// that BURP uses.  No tape or floppy disc.
+"use strict";
+
+const CLOCK = 4000000;
+
+class COMP80 {
+  // fonts: { ascii: [64][8] 5-bit rows, gfx: [64][10] 6-bit rows }
+  constructor(fonts) {
+    this.fonts = fonts;
+    this.mem = new Uint8Array(0x10000);
+    this.cpu = new Z80(this);
+    this.cycles = 0;
+    this.timers = {};
+    this.rom = null;
+    this.romName = "";
+    this.expansion = false;
+  }
+
+  // ---------------------------------------------------------------- lifecycle
+
+  // Power on with ROM image rom (3072 bytes): RAM cleared, screen blank.
+  powerOn(rom, romName, expansion) {
+    this.rom = rom;
+    this.romName = romName;
+    this.expansion = expansion;
+    this.mem.fill(0);
+    this.mem.set(rom.subarray(0, 0x0c00), 0);
+    this.mem.fill(0x20, 0x8000, 0x8800);
+    this.reset();
+  }
+
+  // The RESET key: the CPU restarts, memory stays.
+  reset() {
+    this.cpu.reset();
+    this.timers = {};
+    this.keyLatch = 0xff;
+    this.keyTime = -1e9;
+    this.irqMmLine = false;
+    this.irqMmPulse = false;
+    this.mmReset();
+    this.updateIrq();
+  }
+
+  // Run for n cycles (or a little over).
+  run(n) {
+    const end = this.cycles + n;
+    const cpu = this.cpu;
+    while (this.cycles < end) {
+      this.cycles += cpu.step();
+      if (this.nextTimer <= this.cycles) this.runTimers();
+    }
+  }
+
+  // ---------------------------------------------------------------- timers
+
+  setTimer(name, cycles) {
+    if (cycles === null) delete this.timers[name];
+    else this.timers[name] = this.cycles + cycles;
+    this.nextTimer = Infinity;
+    for (const k in this.timers) if (this.timers[k] < this.nextTimer) this.nextTimer = this.timers[k];
+  }
+  timerOn(name) { return name in this.timers; }
+  runTimers() {
+    for (;;) {
+      let name = null, at = Infinity;
+      for (const k in this.timers) if (this.timers[k] <= this.cycles && this.timers[k] < at) { at = this.timers[k]; name = k; }
+      if (name === null) return;
+      this.setTimer(name, null);
+      this["tick_" + name]();
+    }
+  }
+
+  // ---------------------------------------------------------------- bus
+
+  read(a) {
+    if (a >= 0x8000 && !this.expansion) return this.mem[0x8000 | (a & 0x7ff)];
+    if (a >= 0x2000 && a < 0x8000) return 0;
+    return this.mem[a];
+  }
+  write(a, v) {
+    if (a < 0x0c00) return;                      // ROM
+    if (a >= 0x8000) { this.mem[this.expansion ? a : 0x8000 | (a & 0x7ff)] = v; return; }
+    if (a >= 0x2000) return;                     // nothing there
+    this.mem[a] = v;
+  }
+  input(port) {
+    switch (port & 0xff) {
+      case 0x00: return 0x01;                    // tape: idle
+      case 0x01: { const v = this.keyLatch; this.keyLatch = 0xff; return v; }
+      case 0x03: return this.port03();
+      default: return 0xff;
+    }
+  }
+  output(port, v) {
+    if ((port & 0xff) === 0x60) this.port60(v);
+  }
+
+  updateIrq() { this.cpu.irq = this.irqMmLine || this.irqMmPulse; }
+  tick_pulse() { this.irqMmPulse = false; this.updateIrq(); }
+
+  // ---------------------------------------------------------------- keyboard
+
+  // True when a key now would be read rather than reset the machine: the CPU
+  // is waiting in a HALT and the last key has been taken.
+  waitingForKey() { return this.cpu.halted && this.keyLatch === 0xff; }
+
+  // A key with ASCII code c (the host keyboard's view).  ESC is RESET.
+  // Backspace becomes RS under FORTH and LISP, which use RS as rubout.
+  key(c) {
+    if (c === 0x1b) { this.reset(); return true; }
+    if (c === 0x08 && this.romName !== "burp") c = 0x1e;
+    if (c === 0) return false;
+    if (this.keyLatch !== 0xff && this.cycles - this.keyTime < CLOCK / 20) return false;
+    this.keyLatch = ~c & 0xff;
+    this.keyTime = this.cycles;
+    this.cpu.nmi();
+    this.mmSetDataReady(this.asciiToMmCode(c));
+    return true;
+  }
+
+  asciiToMmCode(c) {
+    if (c >= 0x30 && c <= 0x39) return c - 0x30;
+    if (c >= 0x61 && c <= 0x66) return c - 0x61 + 10;
+    if (c >= 0x41 && c <= 0x46) return c - 0x41 + 10;
+    if (c === 0x0d || c === 0x0a) return 0x10;
+    if (c === 0x1b) return 0x11;
+    if (c === 0x20) return 0x12;
+    return 0x1f;
+  }
+
+  mmSetDataReady(code) {
+    this.mmCode = code & 0x0f;
+    this.irqMmPulse = true;
+    this.updateIrq();
+    this.setTimer("pulse", 4);                   // 1 us
+  }
+
+  // ---------------------------------------------------------------- screen
+
+  // Draw the screen into a 384 x 320 RGBA buffer (Uint8ClampedArray).
+  render(px, fg = [255, 255, 255], bg = [0, 0, 0]) {
+    const A = this.fonts.ascii, G = this.fonts.gfx, m = this.mem;
+    for (let row = 0; row < 32; row++) {
+      for (let col = 0; col < 64; col++) {
+        const v = m[0x8000 + row * 64 + col], gfx = v & 0x40, code = v & 0x3f;
+        for (let y = 0; y < 10; y++) {
+          let bits;
+          if (gfx) bits = G[code][y] & 0x3f;
+          else bits = y < 8 ? (A[code ^ 0x20][y] & 0x1f) << 1 : 0;
+          let o = ((row * 10 + y) * 384 + col * 6) * 4;
+          for (let x = 0; x < 6; x++, o += 4) {
+            const c = bits & (0x20 >> x) ? fg : bg;
+            px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
+          }
+        }
+      }
+    }
+  }
+
+  // The screen as text, one string per line (graphics as #).
+  screenText() {
+    const lines = [];
+    for (let row = 0; row < 32; row++) {
+      let s = "";
+      for (let col = 0; col < 64; col++) {
+        const v = this.mem[0x8000 + row * 64 + col], c = v & 0x3f;
+        s += v & 0x40 ? "#" : String.fromCharCode(c < 0x20 ? c + 64 : c);
+      }
+      lines.push(s);
+    }
+    return lines;
+  }
+
+  // ---------------------------------------------------------------- MM57109
+  // A coarse model of the National MM57109 calculator chip, as in the MAME
+  // driver: BURP writes instructions to port 60 (bit 7 set first as HOLD,
+  // then the instruction), polls RDY and BR on port 03, and reads results a
+  // digit at a time through IM 1 interrupts.
+
+  mmReset() {
+    this.mmCode = 0x1f;
+    this.mmRDY = true;
+    this.mmBR = false;
+    this.mmInv = false;
+    this.mmIrq0 = false;
+    this.mmX = 0; this.mmY = 0; this.mmZ = 0; this.mmT = 0; this.mmM = 0;
+    this.mmDeg = false;
+    this.mmMantDigits = 8;
+    this.mmEntry = false;
+    this.mmTwoWord = false;
+    this.mmTwoWordOp = 0;
+    this.mmError = false;
+    this.mmNibbles = [];
+    this.mmPendingBranch = false;
+    this.mmPendingBranchState = false;
+    this.entryReset();
+  }
+
+  entryReset() {
+    this.enExp = false; this.enDp = false; this.enDpIndex = 0;
+    this.enMantCount = 0; this.enExpCount = 0; this.enMantSign = 1; this.enExpSign = 1;
+    this.enMant = [0, 0, 0, 0, 0, 0, 0, 0]; this.enExpDigits = [0, 0];
+  }
+
+  port03() {
+    const v = (this.mmRDY ? 0 : 0x20) | (this.mmBR ? 0 : 0x40) | (this.mmCode & 0x1f);
+    if (this.mmIrq0) {
+      this.irqMmLine = false;
+      this.updateIrq();
+      this.mmIrq0 = false;
+      if (this.mmNibbles.length) this.setTimer("nibble", 0);
+    }
+    return v;
+  }
+
+  port60(v) {
+    if (v & 0x80) return;                        // HOLD
+    this.mmIrq0 = false;
+    this.mmExecute(v);
+  }
+
+  mmPush(v) { this.mmT = this.mmZ; this.mmZ = this.mmY; this.mmY = this.mmX; this.mmX = v; }
+  mmPop() { const v = this.mmX; this.mmX = this.mmY; this.mmY = this.mmZ; this.mmZ = this.mmT; return v; }
+
+  mmQueueNibble(n) {
+    this.mmNibbles.push(n & 0x0f);
+    if (!this.timerOn("nibble")) this.setTimer("nibble", 0);
+  }
+
+  tick_nibble() {
+    if (!this.mmNibbles.length) return;
+    this.mmCode = this.mmNibbles.shift();
+    if (!this.mmNibbles.length) this.setTimer("ready", 300);
+    else if (!this.timerOn("ready")) this.mmRDY = true;
+    if (!this.mmIrq0) { this.irqMmLine = true; this.updateIrq(); this.mmIrq0 = true; }
+  }
+
+  tick_ready() {
+    if (this.mmPendingBranch) {
+      this.mmBR = this.mmPendingBranchState;
+      this.mmRDY = !this.mmPendingBranchState;
+      this.setTimer("branch", this.mmRDY ? 20 : 100);
+    } else {
+      this.mmRDY = true;
+    }
+  }
+
+  tick_branch() { this.mmBR = false; this.mmRDY = true; }
+
+  mmBegin(isBranch, branchState) {
+    this.mmRDY = false;
+    this.mmBR = false;
+    this.mmPendingBranch = isBranch;
+    this.mmPendingBranchState = branchState;
+    this.setTimer("ready", null);
+    this.setTimer("branch", null);
+    this.setTimer("ready", isBranch ? 150 : 40);
+  }
+
+  // OUT*: X as a digit stream: exponent MSD, LSD, sign bits, decimal point
+  // position, then the mantissa digits.
+  mmOutX() {
+    this.setTimer("ready", null);
+    const x = this.mmX, mdc = this.mmMantDigits || 8, dp = 0x0b;
+    if (x === 0) {
+      [0, 0, 0, dp].forEach((n) => this.mmQueueNibble(n));
+      for (let i = 0; i < mdc; i++) this.mmQueueNibble(0);
+      return;
+    }
+    const neg = x < 0, ax = Math.abs(x);
+    let e = Math.floor(Math.log10(ax)), norm = ax / Math.pow(10, e);
+    if (norm >= 10) { norm /= 10; e++; }
+    if (norm < 1) { norm *= 10; e--; }
+    const ae = Math.min(Math.abs(e), 99);
+    this.mmQueueNibble(Math.floor(ae / 10) % 10);
+    this.mmQueueNibble(ae % 10);
+    this.mmQueueNibble((neg ? 0x08 : 0) | (e < 0 ? 0x01 : 0));
+    this.mmQueueNibble(dp);
+    let t = norm;
+    for (let i = 0; i < mdc; i++) {
+      const d = Math.max(0, Math.min(9, Math.floor(t)));
+      this.mmQueueNibble(d);
+      t = (t - d) * 10;
+    }
+  }
+
+  mmEntryValue() {
+    let mant = 0;
+    for (let i = 0; i < this.enMantCount; i++) mant = mant * 10 + (this.enMant[i] % 10);
+    const dpIndex = this.enDp ? this.enDpIndex : this.enMantCount;
+    let v = mant;
+    if (dpIndex !== this.enMantCount) v *= Math.pow(10, dpIndex - this.enMantCount);
+    v *= this.enMantSign;
+    if (this.enExpCount > 0) {
+      let ev = this.enExpCount === 1 ? this.enExpDigits[0] % 10 : (this.enExpDigits[0] % 10) * 10 + (this.enExpDigits[1] % 10);
+      v *= Math.pow(10, ev * this.enExpSign);
+    }
+    return v;
+  }
+
+  mmExecute(op) {
+    const opcode = op & 0x3f;
+    const isBranch = opcode === 0x13;            // TXF*
+    this.mmBegin(isBranch, isBranch ? Math.abs(this.mmX) < 1 : false);
+    if (this.mmTwoWord) {
+      const two = this.mmTwoWordOp;
+      this.mmTwoWord = false;
+      this.mmTwoWordOp = 0;
+      if (two === 0x16) this.mmOutX();
+      return;
+    }
+    if (!this.mmInv && opcode === 0x20) { this.mmInv = true; return; }
+    if ([0x10, 0x11, 0x12, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a].includes(opcode)) {
+      this.mmTwoWord = true;
+      this.mmTwoWordOp = opcode;
+      return;
+    }
+    this.mmExecuteSingle(opcode);
+  }
+
+  mmExecuteSingle(opcode) {
+    const DEG = 180 / Math.PI;
+    this.mmBR = false;
+    const isEntry = opcode <= 0x0f, isEn = opcode === 0x21;
+    if (this.mmEntry && !isEntry) {
+      this.mmX = this.mmEntryValue();
+      this.mmEntry = false;
+      this.entryReset();
+    }
+    if (isEn) return;
+    const start = () => {
+      if (!this.mmEntry) {
+        this.mmT = this.mmZ; this.mmZ = this.mmY; this.mmY = this.mmX; this.mmX = 0;
+        this.mmEntry = true;
+        this.entryReset();
+      }
+    };
+    if (opcode <= 0x09) {
+      start();
+      if (!this.enExp) { if (this.enMantCount < 8) this.enMant[this.enMantCount++] = opcode; }
+      else if (this.enExpCount < 2) this.enExpDigits[this.enExpCount++] = opcode;
+      this.mmX = this.mmEntryValue();
+      return;
+    }
+    switch (opcode) {
+      case 0x0a: start(); if (!this.enDp) { this.enDp = true; this.enDpIndex = this.enMantCount; } return;
+      case 0x0b: start(); this.enExp = true; return;
+      case 0x0c: start(); if (this.enExp) this.enExpSign = -this.enExpSign; else this.enMantSign = -this.enMantSign; return;
+      case 0x0d: start(); this.mmX = Math.PI; return;
+      case 0x0e: start(); return;
+      case 0x0f: return;
+    }
+    if (this.mmInv) {
+      this.mmInv = false;
+      const x = this.mmX;
+      switch (opcode) {
+        case 0x24: if (x < -1 || x > 1) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.asin(x) * (this.mmDeg ? DEG : 1); return;
+        case 0x25: if (x < -1 || x > 1) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.acos(x) * (this.mmDeg ? DEG : 1); return;
+        case 0x26: this.mmX = Math.atan(x) * (this.mmDeg ? DEG : 1); return;
+        case 0x39: this.mmM += x; return;
+        case 0x3a: this.mmM -= x; return;
+        case 0x3b: this.mmM *= x; return;
+        case 0x3c: if (x === 0) this.mmError = true; else this.mmM /= x; return;
+      }
+    }
+    const x = this.mmX, rad = this.mmDeg ? x / DEG : x;
+    switch (opcode) {
+      case 0x1c: this.mmM = x; return;
+      case 0x1d: this.mmPush(this.mmM); return;
+      case 0x39: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b + a); return; }
+      case 0x3a: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b - a); return; }
+      case 0x3b: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b * a); return; }
+      case 0x3c: { const a = this.mmPop(), b = this.mmPop(); if (a === 0) { this.mmError = true; this.mmPush(0); } else this.mmPush(b / a); return; }
+      case 0x2b: this.mmError = false; return;
+      case 0x2f: this.mmM = 0; return;
+      case 0x2c: this.mmX = x * DEG; return;
+      case 0x2d: this.mmX = x / DEG; return;
+      case 0x2e: this.mmPop(); return;
+      case 0x30: this.mmX = this.mmY; this.mmY = x; return;
+      case 0x31: this.mmX = Math.exp(x); return;
+      case 0x32: this.mmX = Math.pow(10, x); return;
+      case 0x33: this.mmX = x * x; return;
+      case 0x34: if (x < 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.sqrt(x); return;
+      case 0x35: if (x <= 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.log(x); return;
+      case 0x36: if (x <= 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.log10(x); return;
+      case 0x37: if (x === 0) { this.mmError = true; this.mmX = 0; } else this.mmX = 1 / x; return;
+      case 0x38: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(Math.pow(b, a)); return; }
+      case 0x24: this.mmX = Math.sin(rad); return;
+      case 0x25: this.mmX = Math.cos(rad); return;
+      case 0x26: this.mmX = Math.tan(rad); return;
+      case 0x22: this.mmDeg = !this.mmDeg; return;
+    }
+  }
+}
+
+if (typeof module !== "undefined") module.exports = { COMP80, CLOCK };
+
+// The example programs.  Each one powers the machine on with its ROM and
+// runs its steps:
+//   { fs: true }               FS, which puts the monitor back to READY
+//   { keys: "text" }           type text a key at a time
+//   { bin: name, at: addr }    copy a program into memory
+//   { source: file }           type a FORTH or LISP file a line at a time,
+//                              leaving out blank lines and LISP comments
+//   { line: "text" }           type a line once FORTH or LISP is waiting
+//   { fast: true | false }     run flat out, or at the real speed
+// "rom": null means any ROM: the monitor is the same in all three.
+"use strict";
+
+const EXAMPLES = [
+  {
+    id: "life", lang: "monitor", rom: null, title: "Game of Life",
+    text: "Conway’s Game of Life in Z80 machine code, 128 × 64 cells, each character showing a 2 × 2 block of cells. It loads at 1000 and runs with RUN 1000, as it would from tape.",
+    keys: "R new random board · P pause and resume · S stop",
+    steps: [{ fs: true }, { bin: "life", at: 0x1000 }, { keys: "RUN 1000" }],
+  },
+  {
+    id: "boat", lang: "monitor", rom: null, title: "Sailing boat (Fig. 22b)",
+    text: "The articles’ picture of HMS Sea Hawk, redrawn with the COMP80’s graphics characters. A short loader copies the picture to the screen and waits.",
+    keys: "any key: back to the monitor",
+    steps: [{ fs: true }, { bin: "boat", at: 0x1000 }, { keys: "RUN 1000" }],
+  },
+  {
+    id: "schmitt", lang: "monitor", rom: null, title: "Schmitt trigger (Fig. 22a)",
+    text: "The circuit diagram from the same figure, drawn the same way.",
+    keys: "any key: back to the monitor",
+    steps: [{ fs: true }, { bin: "schmitt", at: 0x1000 }, { keys: "RUN 1000" }],
+  },
+  {
+    id: "alph", lang: "monitor", rom: null, title: "ALPH test pattern",
+    text: "The monitor’s own character test: every letter, digit and sign, and all 64 graphics characters.",
+    steps: [{ fs: true }, { keys: "ALPH " }],
+  },
+  {
+    id: "list", lang: "monitor", rom: null, title: "LIST a program",
+    text: "Life’s machine code in memory, shown with the monitor’s LIST command: an address, then the bytes in hex.",
+    steps: [{ fs: true }, { bin: "life", at: 0x1000 }, { keys: "LIST 1000" }],
+  },
+  {
+    id: "burp", lang: "burp", rom: "burp", title: "BURP sample program",
+    text: "The sample program from the articles, kept in the BURP ROM at 0BB5: MOV copies it to 0C00, RS enters BURP and LIST shows it. RUN does not work yet: the emulated MM57109 calculator chip, which does BURP’s arithmetic, is not complete.",
+    steps: [{ fs: true }, { keys: "MOV 0BB50C000C00" }, { keys: "^" }, { keys: "LIST 5 " }],
+  },
+  {
+    id: "forth", lang: "forth", rom: "forth", title: "A FORTH session",
+    text: "Squares, a factorial that calls itself, hex numbers, bars of graphics blocks, and the stack shown with .S.",
+    steps: [{ keys: "^" }, { fast: true },
+      { line: ": SQUARES 11 1 DO I DUP * . LOOP ;" }, { line: "SQUARES" },
+      { line: ": FACT DUP 1 > IF DUP 1- FACT * ELSE DROP 1 THEN ;" }, { line: "7 FACT ." },
+      { line: "VARIABLE N  10 N !  N @ 3 * ." }, { line: "HEX FF . 1000 DECIMAL . " },
+      { line: ": BOX 0 DO 143 EMIT LOOP ;" }, { line: ": BAR 5 0 DO CR I 4 * 1+ BOX LOOP ;" },
+      { line: "BAR" }, { fast: false }, { line: "1 2 3 .S" }],
+  },
+  {
+    id: "forthlife", lang: "forth", rom: "forth", title: "Game of Life in FORTH",
+    text: "64 × 31 cells, one per character, read straight from screen memory. About 3 s a generation.",
+    file: "life.fs",
+    steps: [{ keys: "^" }, { fast: true }, { source: "life.fs" }, { fast: false }, { line: "1000 LIFE" }],
+  },
+  {
+    id: "mandel", lang: "forth", rom: "forth", title: "Mandelbrot set in FORTH",
+    text: "One point per character, shaded by escape time, in 16-bit fixed point with 90 as 1.0. About 95 s to draw.",
+    file: "mandel.fs",
+    steps: [{ keys: "^" }, { fast: true }, { source: "mandel.fs" }, { fast: false }, { line: "MANDEL" }],
+  },
+  {
+    id: "lisp", lang: "lisp", rom: "lisp", title: "A LISP session",
+    text: "DEFUN, a factorial that calls itself, APPEND and REVERSE built from CONS, and MAPCAR given a function as its argument.",
+    steps: [{ keys: "^" }, { fast: true },
+      { line: "(CONS 'A '(B C))" }, { line: "(DEFUN SQ (X) (* X X))" }, { line: "(SQ 12)" },
+      { line: "(DEFUN FACT (N)" }, { line: "  (COND ((EQ N 0) 1) (T (* N (FACT (- N 1))))))" }, { line: "(FACT 7)" },
+      { line: "(DEFUN APP (A B)" }, { line: "  (COND ((NULL A) B) (T (CONS (CAR A) (APP (CDR A) B)))))" },
+      { line: "(DEFUN REV (L)" }, { line: "  (COND (L (APP (REV (CDR L)) (LIST (CAR L))))))" },
+      { line: "(REV '(A B C D E))" },
+      { line: "(DEFUN MAPCAR (F L)" }, { line: "  (COND (L (CONS (F (CAR L)) (MAPCAR F (CDR L))))))" },
+      { line: "(MAPCAR SQ '(1 2 3 4 5))" }, { line: "(MAPCAR '(LAMBDA (X) (CONS X X)) '(A B))" },
+      { fast: false }, { line: "(GC)" }],
+  },
+  {
+    id: "deriv", lang: "lisp", rom: "lisp", title: "Symbolic differentiation",
+    text: "DERIV applies the sum, product and power rules to an expression and tidies the answer as it goes. The last example differentiates twice.",
+    file: "deriv.lsp",
+    steps: [{ keys: "^" }, { fast: true }, { source: "deriv.lsp" }, { fast: false },
+      { line: "(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)" },
+      { line: "(DERIV '(EXPT (+ (* 2 X) 1) 3) 'X)" },
+      { line: "(DERIV (DERIV '(EXPT X 4) 'X) 'X)" }],
+  },
+  {
+    id: "hanoi", lang: "lisp", rom: "lisp", title: "Towers of Hanoi",
+    text: "Moves four discs from peg A to peg C, one at a time, never a bigger one on a smaller one: 15 moves.",
+    file: "hanoi.lsp",
+    steps: [{ keys: "^" }, { fast: true }, { source: "hanoi.lsp" }, { fast: false }, { line: "(HANOI 4 'A 'C 'B)" }],
+  },
+  {
+    id: "queens", lang: "lisp", rom: "lisp", title: "Eight queens",
+    text: "A backtracking search for eight queens that don’t attack each other. The first solution takes about 26 s.",
+    file: "queens.lsp",
+    steps: [{ keys: "^" }, { fast: true }, { source: "queens.lsp" }, { fast: false }, { line: "(QUEENS 8)" }],
+  },
+];
+
+// The page: runs the machine in real time (or flat out), draws the screen,
+// takes keys, and types in the examples.
+"use strict";
+(function () {
+  const D = C80DATA;
+  const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const ROMS = { burp: b64(D.roms.burp), forth: b64(D.roms.forth), lisp: b64(D.roms.lisp) };
+  const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP" };
+  // FORTH and LISP keep the address of their cursor here; it shows _ (1Fh)
+  // while they wait for a line.
+  const CURS = { forth: 0x1da0, lisp: 0x0c12 };
+  const $ = (id) => document.getElementById(id);
+  const canvas = $("screen"), ctx = canvas.getContext("2d"), img = ctx.createImageData(384, 320);
+  const m = new COMP80(D.fonts);
+
+  const store = {
+    get(k, d) { try { return localStorage.getItem("c80." + k) || d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("c80." + k, v); } catch (e) { /* not kept */ } },
+  };
+
+  // ---------------------------------------------------------------- tasks
+  // A task is a generator that yields predicates: it carries on once the
+  // predicate is true.  The machine runs in 1 ms slices and the tasks are
+  // looked at between slices.
+
+  let tasks = [];
+  let script = null;            // the example or pasted program being typed
+  let scriptFast = false, fast = false;
+  let status = "";
+  const keyQueue = [];
+
+  function addTask(gen, name) { const t = { gen, pred: null, name }; tasks.push(t); return t; }
+  function pump() {
+    for (const t of tasks.slice()) {
+      for (let n = 0; n < 1000 && (t.pred === null || t.pred()); n++) {
+        const r = t.gen.next();
+        if (r.done) { tasks = tasks.filter((x) => x !== t); if (t === script) endScript(); break; }
+        t.pred = r.value;
+      }
+    }
+  }
+
+  const after = (s) => { const at = m.cycles + s * CLOCK; return () => m.cycles >= at; };
+
+  // One key: wait until the machine is waiting for one (or half a second,
+  // so a key can still stop a running program), then press it.
+  function* typeKey(c) {
+    const t0 = m.cycles;
+    yield () => m.waitingForKey() || m.cycles - t0 > CLOCK / 2;
+    yield () => m.key(c);
+    yield after(0.02);
+  }
+  function* typeText(text) {
+    for (const ch of text) yield* typeKey(ch === "\n" ? 13 : ch.toUpperCase().charCodeAt(0));
+  }
+  function waitingLine() {
+    const a = CURS[m.romName];
+    if (a === undefined) return m.waitingForKey();
+    return m.mem[m.mem[a] | (m.mem[a + 1] << 8)] === 0x1f && m.waitingForKey();
+  }
+  function* typeLine(text) {
+    yield waitingLine;
+    yield after(0.05);
+    yield* typeText(text + "\r");
+  }
+  function sourceLines(text, lisp) {
+    return text.split("\n").map((l) => l.replace(/\s+$/, ""))
+      .filter((l) => l.trim() !== "" && !(lisp && /^\s*;/.test(l)));
+  }
+
+  function* userKeys() {
+    for (;;) {
+      yield () => keyQueue.length > 0;
+      yield* typeKey(keyQueue.shift());
+    }
+  }
+
+  function* exampleSteps(ex) {
+    yield after(1.0);
+    for (const s of ex.steps) {
+      if (s.fs) { yield* typeKey(0x1c); yield after(0.3); }
+      else if (s.keys) { yield* typeText(s.keys); yield after(0.3); }
+      else if (s.bin) m.mem.set(b64(D.bins[s.bin]), s.at);
+      else if (s.source) {
+        const lines = sourceLines(D.sources[s.source], s.source.endsWith(".lsp"));
+        for (let i = 0; i < lines.length; i++) {
+          status = `Typing ${s.source}: line ${i + 1} of ${lines.length}`;
+          yield* typeLine(lines[i]);
+        }
+      }
+      else if (s.line) { status = "Typing " + s.line.trim(); yield* typeLine(s.line); }
+      else if ("fast" in s) scriptFast = s.fast;
+    }
+  }
+
+  function* pasted(text) {
+    const lines = sourceLines(text, m.romName === "lisp");
+    for (let i = 0; i < lines.length; i++) {
+      status = `Typing line ${i + 1} of ${lines.length}`;
+      if (CURS[m.romName] !== undefined) yield* typeLine(lines[i]);
+      else { yield* typeText(lines[i] + "\r"); yield after(0.2); }
+    }
+  }
+
+  function startScript(gen, label) {
+    stopScript();
+    script = addTask(gen, label);
+    status = label;
+    document.body.classList.add("busy");
+  }
+  function stopScript() {
+    if (script) tasks = tasks.filter((t) => t !== script);
+    script = null;
+    scriptFast = false;
+    endScript();
+  }
+  function endScript() {
+    script = null;
+    scriptFast = false;
+    status = "";
+    document.body.classList.remove("busy");
+  }
+
+  // ---------------------------------------------------------------- machine
+
+  function power(rom) {
+    stopScript();
+    keyQueue.length = 0;
+    m.powerOn(ROMS[rom], rom, $("mem").value === "32");
+    for (const r of document.querySelectorAll("input[name=rom]")) r.checked = r.value === rom;
+    store.set("rom", rom);
+    document.title = "COMP80 Emulator";
+    $("romname").textContent = ROM_NAMES[rom];
+  }
+
+  function press(c) {
+    if (script) stopScript();
+    if (c === 0x1b) { keyQueue.length = 0; m.key(0x1b); return; }
+    keyQueue.push(c);
+  }
+
+  function runExample(id) {
+    const ex = EXAMPLES.find((e) => e.id === id);
+    power(ex.rom || m.romName);
+    startScript(exampleSteps(ex), "Starting " + ex.title);
+    canvas.focus({ preventScroll: true });
+    if (window.matchMedia("(max-width: 60rem)").matches) canvas.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---------------------------------------------------------------- main loop
+
+  let last = performance.now(), rate = 0, rateCycles = 0, rateTime = 0;
+  function frame(now) {
+    const wall = now - last;
+    const dt = Math.min(wall, 250);   // catch up after a slow frame, but not after a long pause
+    last = now;
+    const turbo = fast || scriptFast;
+    const start = performance.now(), c0 = m.cycles;
+    const budget = dt * CLOCK / 1000;
+    while (turbo ? performance.now() - start < 14 : m.cycles - c0 < budget) {
+      m.run(4000);
+      pump();
+    }
+    rateCycles += m.cycles - c0; rateTime += wall;
+    if (rateTime > 500) { rate = rateCycles / rateTime * 1000 / CLOCK; rateCycles = 0; rateTime = 0; }
+    m.render(img.data);
+    ctx.putImageData(img, 0, 0);
+    $("status").textContent = status || (m.cpu.halted ? "Waiting for a key" : "Running");
+    $("speed").textContent = rate ? `${rate >= 10 ? Math.round(rate) : rate.toFixed(1)}× real speed` : "";
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------- keyboard
+
+  function hostKey(e) {
+    if (e.metaKey || e.altKey) return;
+    let c = null;
+    if (e.key === "Enter") c = 13;
+    else if (e.key === "Backspace") c = 8;
+    else if (e.key === "Escape") c = 0x1b;
+    else if (e.ctrlKey && (e.key === "\\" || e.code === "Backslash")) c = 0x1c;
+    else if (!e.ctrlKey && e.key.length === 1) {
+      c = e.key.toUpperCase().charCodeAt(0);
+      if (c < 0x20 || c > 0x5f) c = null;
+    }
+    if (c === null) return;
+    e.preventDefault();
+    press(c);
+  }
+  canvas.addEventListener("keydown", hostKey);
+  canvas.addEventListener("pointerdown", () => canvas.focus());
+
+  // The typing box, for phones and tablets: take what is typed and clear it.
+  const kbd = $("kbd");
+  kbd.addEventListener("beforeinput", (e) => {
+    if (e.inputType === "deleteContentBackward") press(8);
+    else if (e.inputType === "insertLineBreak" || e.inputType === "insertParagraph") press(13);
+    else if (e.data) for (const ch of e.data) { const c = ch.toUpperCase().charCodeAt(0); if (c >= 0x20 && c <= 0x5f) press(c); }
+    e.preventDefault();
+  });
+  kbd.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); press(13); } });
+
+  // ---------------------------------------------------------------- controls
+
+  for (const r of document.querySelectorAll("input[name=rom]")) r.addEventListener("change", () => power(r.value));
+  $("mem").addEventListener("change", () => { store.set("mem", $("mem").value); power(m.romName); });
+  $("btn-rs").addEventListener("click", () => { press(0x1e); canvas.focus(); });
+  $("btn-fs").addEventListener("click", () => { press(0x1c); canvas.focus(); });
+  $("btn-reset").addEventListener("click", () => { press(0x1b); canvas.focus(); });
+  $("btn-power").addEventListener("click", () => { power(m.romName); canvas.focus(); });
+  $("btn-fast").addEventListener("click", () => {
+    fast = !fast;
+    $("btn-fast").setAttribute("aria-pressed", String(fast));
+  });
+  $("btn-stop").addEventListener("click", () => stopScript());
+  $("btn-type").addEventListener("click", () => {
+    const text = $("paste").value;
+    if (text.trim()) { startScript(pasted(text), "Typing your program"); canvas.focus({ preventScroll: true }); }
+  });
+
+  // Examples: one card each, grouped by language.
+  for (const ex of EXAMPLES) {
+    const list = $("ex-" + ex.lang);
+    const card = document.createElement("article");
+    card.className = "ex";
+    const src = ex.file ? D.sources[ex.file]
+      : ex.steps.filter((s) => s.line || s.keys).map((s) => s.line || s.keys).join("\n");
+    card.innerHTML = `<div class="exhead"><h4></h4><button type="button" class="run">Run</button></div>
+      <p class="extext"></p>${ex.keys ? '<p class="exkeys"></p>' : ""}
+      <details><summary></summary><pre><code></code></pre></details>`;
+    card.querySelector("h4").textContent = ex.title;
+    card.querySelector(".extext").textContent = ex.text;
+    if (ex.keys) card.querySelector(".exkeys").textContent = ex.keys;
+    card.querySelector("summary").textContent = ex.file ? "Show " + ex.file : "Show what gets typed";
+    card.querySelector("code").textContent = src;
+    card.querySelector(".run").addEventListener("click", () => runExample(ex.id));
+    card.querySelector(".run").setAttribute("aria-label", "Run " + ex.title);
+    list.appendChild(card);
+  }
+
+  // Tabs
+  const tabs = Array.from(document.querySelectorAll("[role=tab]"));
+  function showTab(id, focus) {
+    for (const t of tabs) {
+      const on = t.dataset.tab === id;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      $("panel-" + t.dataset.tab).hidden = !on;
+      if (on && focus) t.focus();
+    }
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => showTab(t.dataset.tab));
+    t.addEventListener("keydown", (e) => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (d) { e.preventDefault(); showTab(tabs[(i + d + tabs.length) % tabs.length].dataset.tab, true); }
+    });
+  });
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-goto]");
+    if (a) { e.preventDefault(); showTab(a.dataset.goto); $("panel-" + a.dataset.goto).scrollIntoView({ block: "nearest" }); }
+  });
+  const hash = location.hash.replace("#", "");
+  showTab(tabs.some((t) => t.dataset.tab === hash) ? hash : "examples");
+
+  // For testing from the console: c80.advance(s) runs s seconds of the
+  // machine and the typing, however slowly the page is drawing.
+  window.c80 = {
+    machine: m, runExample, power,
+    advance(s) { const end = m.cycles + s * CLOCK; while (m.cycles < end) { m.run(4000); pump(); } },
+    get busy() { return script !== null; },
+  };
+
+  $("mem").value = store.get("mem", "5");
+  power(ROMS[store.get("rom", "burp")] ? store.get("rom", "burp") : "burp");
+  addTask(userKeys(), "keys");
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>

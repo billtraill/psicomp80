@@ -9,3 +9,4 @@ forth/forth.lbl
 hardware/kicad/*.dsn
 hardware/kicad/*.ses
 lisp/lisp.lbl
+web/build/

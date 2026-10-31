@@ -90,6 +90,14 @@ after the name.
 ```
 screenshots.html shows what each one looks like.
 
+/h2 In a web browser
+
+emulator.html is the COMP80 as a single web page: open it in any browser. It
+switches between the BURP, FORTH and LISP ROMs, runs all the example
+programs (typing them in for you) and has a help page for each language.
+It has no tape or disc. See web/README.md; rebuild it with
+python3 web/build.py.
+
 /h2 Floppy disc
 
 The floppy disc extension from the Oct/Dec 1980 articles: FD1771 controller,

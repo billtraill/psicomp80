@@ -1,0 +1,183 @@
+<title>COMP80 Emulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&amp;family=Source+Sans+3:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+/* Layout: a bench instrument. The screen in its bezel with the controls under it; the
+   manual (examples and a help page per language) beside it, below it on a phone. */
+:root {
+  --paper: #eceff2; --panel: #f6f7f9; --ink: #14181d; --muted: #59626c; --rule: #ccd2d9;
+  --accent: #1c6a86; --accent-ink: #ffffff; --bezel: #23272c; --glass: #000;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e1114; --panel: #151a1f; --ink: #e5e9ed; --muted: #97a0aa; --rule: #283039;
+  --accent: #6bb4cd; --accent-ink: #0e1114; --bezel: #2c3238; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0e1114; --panel: #151a1f; --ink: #e5e9ed; --muted: #97a0aa; --rule: #283039;
+  --accent: #6bb4cd; --accent-ink: #0e1114; --bezel: #2c3238; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font: 400 1rem/1.55 var(--body); }
+[hidden] { display: none !important; }
+.wrap { max-width: 92rem; margin: 0 auto; display: grid; gap: 1.75rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 1.75rem 3rem; }
+header { display: grid; gap: .6rem; max-width: 52rem; }
+.kicker { font: 600 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 800 clamp(2.1rem, 5vw, 3.25rem)/.95 var(--display); font-stretch: 70%; margin: 0; text-wrap: balance; }
+header p { margin: 0; max-width: 64ch; }
+.main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 1.75rem; align-items: start; }
+@media (max-width: 60rem) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+/* the machine */
+.machine { display: grid; gap: .9rem; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); min-width: 0; }
+@media (max-width: 60rem) { .machine { position: static; } }
+.bezel { background: var(--bezel); padding: clamp(8px, 1.6vw, 18px); border-radius: 16px; }
+#screen { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 4 / 3; background: var(--glass);
+  border-radius: 6px; image-rendering: pixelated; outline: none; cursor: text; }
+#screen:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
+.state { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem;
+  font: 400 .8125rem/1.4 var(--mono); color: var(--muted); }
+.state b { color: var(--ink); font-weight: 600; }
+.controls { display: flex; flex-wrap: wrap; gap: .6rem 1.25rem; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.lbl { font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: .45rem .8rem; font: 600 .875rem/1 var(--body); cursor: pointer; }
+.seg label + label span { border-left: 1px solid var(--rule); }
+.seg input:checked + span { background: var(--accent); color: var(--accent-ink); }
+.seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: -3px; }
+select, button, textarea, input[type=text] { font: inherit; color: inherit; }
+select { padding: .4rem .5rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+.btn { padding: .45rem .75rem; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 8px;
+  background: var(--panel); font: 600 .875rem/1 var(--body); cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn kbd { font: 600 .75rem/1 var(--mono); color: var(--muted); margin-left: .3rem; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn[aria-pressed="true"] kbd { color: inherit; }
+#btn-stop { display: none; }
+body.busy #btn-stop { display: inline-block; }
+.typing { display: grid; gap: .35rem; }
+#kbd { width: 100%; box-sizing: border-box; padding: .55rem .7rem; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--panel); font: 400 .9375rem/1.3 var(--mono); }
+.paste summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.paste[open] { display: grid; gap: .5rem; }
+.paste textarea { width: 100%; box-sizing: border-box; min-height: 9rem; padding: .6rem .7rem; border: 1px solid var(--rule);
+  border-radius: 8px; background: var(--panel); font: 400 .8125rem/1.5 var(--mono); resize: vertical; }
+.paste p { margin: 0; color: var(--muted); font-size: .9375rem; }
+
+/* the manual */
+.manual { display: grid; gap: 1rem; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: .25rem; border-bottom: 1px solid var(--rule); }
+.tabs button { padding: .55rem .8rem; border: 0; border-bottom: 3px solid transparent; background: none;
+  font: 600 .9375rem/1 var(--body); color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.panel { display: grid; gap: 1rem; min-width: 0; }
+.panel h2 { font: 700 1.6rem/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
+.panel h3 { font: 700 1.125rem/1.2 var(--display); font-stretch: 85%; margin: .5rem 0 0; }
+.panel p { margin: 0; max-width: 68ch; }
+.panel ul, .panel ol { margin: 0; padding-left: 1.25rem; display: grid; gap: .35rem; max-width: 68ch; }
+.panel code { font-family: var(--mono); font-size: .875em; }
+.panel pre { margin: 0; overflow-x: auto; padding: .7rem .85rem; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--panel); font: 400 .8125rem/1.5 var(--mono); }
+.panel pre code { font-size: inherit; }
+.panel a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.note { color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9375rem; }
+th { text-align: left; font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  padding: 0 1rem .5rem 0; border-bottom: 1px solid var(--rule); }
+td { padding: .5rem 1rem .5rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td:first-child { white-space: nowrap; }
+kbd { font: 600 .8125rem/1 var(--mono); padding: .2rem .35rem; border: 1px solid var(--rule); border-bottom-width: 2px;
+  border-radius: 4px; background: var(--panel); }
+.exgroup { display: grid; gap: .75rem; }
+.exlist { display: grid; gap: .75rem; }
+.ex { display: grid; gap: .4rem; padding: .85rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); min-width: 0; }
+.exhead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.ex h4 { margin: 0; font: 700 1.05rem/1.2 var(--display); font-stretch: 90%; }
+.ex .run { padding: .4rem .9rem; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+  font: 600 .875rem/1 var(--body); cursor: pointer; flex: none; }
+.ex .run:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.ex p { margin: 0; font-size: .9375rem; }
+.exkeys { font: 400 .8125rem/1.4 var(--mono) !important; color: var(--muted); }
+.ex details summary { cursor: pointer; color: var(--accent); font-size: .875rem; font-weight: 600; }
+.ex details pre { margin-top: .5rem; max-height: 22rem; overflow: auto; }
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--muted); font-size: .875rem; max-width: 72ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="kicker">PSI COMP80 · Wireless World, 1979 · in your browser</span>
+  <h1>COMP80 Emulator</h1>
+  <p>The PSI COMP80, a Z80 computer published as a build-it-yourself series in Wireless World, running its monitor ROM with one of three languages in the top 2 KB: the original BURP, or the FORTH and LISP written for this project. Pick a ROM, then click the screen and type, or run one of the examples.</p>
+</header>
+
+<div class="main">
+<section class="machine" aria-label="The computer">
+  <div class="bezel"><canvas id="screen" width="384" height="320" tabindex="0" aria-label="COMP80 screen. Click or focus it to type."></canvas></div>
+  <div class="state" aria-live="polite"><span><b id="romname">BURP</b> · <span id="status">Starting</span></span><span id="speed"></span></div>
+  <div class="controls">
+    <div class="group" role="radiogroup" aria-label="ROM">
+      <span class="lbl">ROM</span>
+      <span class="seg">
+        <label><input type="radio" name="rom" value="burp" id="rom-burp"><span>BURP</span></label>
+        <label><input type="radio" name="rom" value="forth" id="rom-forth"><span>FORTH</span></label>
+        <label><input type="radio" name="rom" value="lisp" id="rom-lisp"><span>LISP</span></label>
+      </span>
+    </div>
+    <div class="group">
+      <label class="lbl" for="mem">Memory</label>
+      <select id="mem"><option value="5">5 KB</option><option value="32">32 KB expansion</option></select>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="group" aria-label="Keys">
+      <button type="button" class="btn" id="btn-rs" title="RS: enter the language from READY; rubs out in FORTH and LISP">RS<kbd>^</kbd></button>
+      <button type="button" class="btn" id="btn-fs" title="FS: back to the monitor">FS<kbd>Ctrl \</kbd></button>
+      <button type="button" class="btn" id="btn-reset" title="The RESET key: restarts the monitor, memory kept">Reset<kbd>Esc</kbd></button>
+      <button type="button" class="btn" id="btn-power" title="Switch off and on: memory cleared">Power off and on</button>
+    </div>
+    <div class="group">
+      <button type="button" class="btn" id="btn-fast" aria-pressed="false" title="Run as fast as the browser can">Fast</button>
+      <button type="button" class="btn" id="btn-stop">Stop typing</button>
+    </div>
+  </div>
+  <div class="typing">
+    <label class="lbl" for="kbd">Type here, or click the screen</label>
+    <input type="text" id="kbd" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Keys go straight to the COMP80">
+  </div>
+  <details class="paste">
+    <summary>Type in a program</summary>
+    <p>Paste a FORTH or LISP program, or monitor commands. It is typed a line at a time, waiting for the computer between lines. Enter the language first (RS at READY).</p>
+    <label class="lbl" for="paste">Program</label>
+    <textarea id="paste" spellcheck="false" placeholder="(DEFUN SQ (X) (* X X))&#10;(SQ 7)"></textarea>
+    <div><button type="button" class="btn" id="btn-type">Type it in</button></div>
+  </details>
+</section>
+
+<section class="manual" aria-label="Examples and help">
+  <div class="tabs" role="tablist" aria-label="Manual">
+    <button type="button" role="tab" id="tab-examples" data-tab="examples" aria-controls="panel-examples">Examples</button>
+    <button type="button" role="tab" id="tab-using" data-tab="using" aria-controls="panel-using">Using it</button>
+    <button type="button" role="tab" id="tab-monitor" data-tab="monitor" aria-controls="panel-monitor">Monitor</button>
+    <button type="button" role="tab" id="tab-burp" data-tab="burp" aria-controls="panel-burp">BURP</button>
+    <button type="button" role="tab" id="tab-forth" data-tab="forth" aria-controls="panel-forth">FORTH</button>
+    <button type="button" role="tab" id="tab-lisp" data-tab="lisp" aria-controls="panel-lisp">LISP</button>
+  </div>
+<!--HELP-->
+</section>
+</div>
+
+<footer>The emulator follows the MAME driver in the psicomp80 repository: a Z80 at 4 MHz, the 3 KB ROM typed in from the magazine’s hex listing, a 64 × 32 character screen and the keyboard on an NMI. It has no cassette or floppy disc; programs that came on tape are loaded straight into memory.</footer>
+</div>
+<!--DATA-->
+<!--SCRIPTS-->

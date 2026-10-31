@@ -59,8 +59,9 @@ class Screen:
     def gfx(self, row, col, code):
         self.cells[row][col] = 0x40 | code
 
-    def from_bitmap(self, img, keep=None):
-        """Pick the best-matching graphics glyph for every cell of a 384x320 1-bit image."""
+    def from_bitmap(self, img, keep=None, codes=None):
+        """Pick the best-matching graphics glyph for every cell of a 384x320 1-bit image.
+        codes limits the choice (e.g. range(16) for just the quarter blocks)."""
         px = img.convert("1").load()
         for r in range(ROWS):
             for c in range(COLS):
@@ -76,7 +77,7 @@ class Screen:
                 if not any(target):
                     continue
                 best, bestd = None, 99
-                for code in range(64):
+                for code in (codes if codes is not None else range(64)):
                     if code in (0x1C, 0x1D, 0x1E, 0x1F):  # BURP letters
                         continue
                     g = GFX_FONT[code]

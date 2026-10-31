@@ -1,5 +1,6 @@
 """Write each picture as a COMP80 program image: loader at $1000, screen at $1010."""
 import boat
+import cover
 import schmitt
 
 BASE = 0x1000
@@ -11,7 +12,7 @@ LOADER = bytes([
     0x18, 0xFE,         # JR $          wait; any key returns to the monitor
 ]).ljust(0x10, b"\x00")
 
-for name, mod in (("schmitt", schmitt), ("boat", boat)):
+for name, mod in (("schmitt", schmitt), ("boat", boat), ("cover", cover)):
     s = mod.build()
     s.render(f"{name}_preview.png")
     data = LOADER + s.bytes()

@@ -76,6 +76,7 @@ after the name.
 ~/localdev/psicomp80/c80.sh life       # Game of Life
 ~/localdev/psicomp80/c80.sh boat       # Fig. 22(b) sailing boat
 ~/localdev/psicomp80/c80.sh schmitt    # Fig. 22(a) Schmitt trigger circuit
+~/localdev/psicomp80/c80.sh cover      # the screen on the kit leaflet's cover
 ~/localdev/psicomp80/c80.sh alph       # monitor ALPH character set test
 ~/localdev/psicomp80/c80.sh list       # LIST 1000 with Life loaded
 ~/localdev/psicomp80/c80.sh disk       # floppy disc software, program disc in the drive
@@ -167,6 +168,10 @@ cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/boat
 Fig. 22(a) Schmitt trigger circuit
 ```
 cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/schmitt.wav -autoboot_script ~/localdev/psicomp80/autorun.lua
+```
+The screen on the cover of the Powertran kit leaflet
+```
+cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/cover.wav -autoboot_script ~/localdev/psicomp80/autorun.lua
 ```
 For the pictures, press any key to go back to the monitor.
 

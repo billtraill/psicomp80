@@ -7,11 +7,18 @@ Recreations of the two pictorial displays in Fig. 22 of the PSI COMP80 articles
 |---|---|
 | `schmitt.wav` | (a) Schmitt trigger circuit diagram |
 | `boat.wav` | (b) sailing boat, "THE HMS SEA HAWK" |
+| `cover.wav` | the screen on the cover of the kit leaflet (see below) |
 
 The photos are too blurry to copy exactly, so these were laid out by hand from
 measurements of the photos, using the COMP80 graphics character set.
 Panel (c) is the monitor's own `ALPH` test pattern. The program listing in (d)
 can't be read, so (d) and (e) aren't reproduced.
+
+`cover.wav` is a third picture, not from the articles: the screen on the
+cover of the Powertran kit leaflet (`../info/pictures/kit-leaflet.webp`),
+where the television shows "ψCOMP 80" in block letters. `cover.py` draws the
+letters, measured from the photo, on the quarter-block grid; `cover_screen.png`
+is the emulator showing it.
 
 ## Loading a picture
 
@@ -20,7 +27,7 @@ One line (loads the tape, checks it, and runs it):
     cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/boat.wav \
       -autoboot_script ~/localdev/psicomp80/autorun.lua
 
-Use `schmitt.wav` for the circuit. Or by hand:
+Use `schmitt.wav` for the circuit, or `cover.wav` for the leaflet's screen. Or by hand:
 
 1. Start MAME, open File Manager → cassette and mount `schmitt.wav` (or
    `boat.wav`), or start with `-cass pictures/schmitt.wav`.
@@ -33,7 +40,7 @@ $1010 to video RAM ($8000) and then waits.
 
 ## Rebuilding
 
-    python3 make_programs.py        # writes *.bin and *_preview.png
+    python3 make_programs.py        # writes *.bin and *_preview.png (schmitt, boat, cover)
 
 Then record each .bin to tape with MAME (run from the MAME directory):
 

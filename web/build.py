@@ -54,6 +54,7 @@ def data():
             "life": b64("life/life.bin"),
             "boat": b64("pictures/boat.bin"),
             "schmitt": b64("pictures/schmitt.bin"),
+            "cover": b64("pictures/cover.bin"),
         },
         "sources": {
             "life.fs": (REPO / "forth/examples/life.fs").read_text(),

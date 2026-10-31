@@ -33,6 +33,12 @@ const EXAMPLES = [
     steps: [{ fs: true }, { bin: "schmitt", at: 0x1000 }, { keys: "RUN 1000" }],
   },
   {
+    id: "cover", lang: "monitor", rom: null, title: "The kit leaflet’s screen",
+    text: "The cover of the Powertran kit leaflet shows a COMP80 with its television displaying “ψCOMP 80” in block letters. This redraws it from the photo, with the quarter-block graphics characters, and shows it the same way as the Fig. 22 pictures.",
+    keys: "any key: back to the monitor",
+    steps: [{ fs: true }, { bin: "cover", at: 0x1000 }, { keys: "RUN 1000" }],
+  },
+  {
     id: "alph", lang: "monitor", rom: null, title: "ALPH test pattern",
     text: "The monitor’s own character test: every letter, digit and sign, and all 64 graphics characters.",
     steps: [{ fs: true }, { keys: "ALPH " }],

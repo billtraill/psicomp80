@@ -1,9 +1,12 @@
--- Load the mounted tape into 1000h (READ, fast-forwarded), check it against
--- the .bin file next to the .wav, and RUN 1000. Retries the load if it's wrong.
+-- Load the mounted tape into 1000h (or C80_ADDR) (READ, fast-forwarded), check it against
+-- the .bin file next to the .wav, and RUN it. Retries the load if it's wrong.
 -- Usage: mamed psicomp80 -cass some/tape.wav -autoboot_script autorun.lua
+-- A program that loads elsewhere sets C80_ADDR (hex), e.g. C80_ADDR=1D00.
 local m = manager.machine
 local cass = m.cassettes[":cassette"]
 local mem = m.devices[":maincpu"].spaces["program"]
+local addr = tonumber(os.getenv("C80_ADDR") or "1000", 16)
+local addr_hex = string.format("%04X", addr)
 
 local wav = m.images[":cassette"].filename
 local f = assert(io.open(wav:gsub("%.wav$", ".bin"), "rb"), "no .bin next to " .. wav)
@@ -12,7 +15,7 @@ local data = f:read("a"); f:close()
 local function say(s) print(string.format("[autorun %5.1fs] %s", m.time:as_double(), s)) end
 local function loaded_ok()
   local bad = 0
-  for i = 1, #data do if mem:read_u8(0x1000 + i - 1) ~= data:byte(i) then bad = bad + 1 end end
+  for i = 1, #data do if mem:read_u8(addr + i - 1) ~= data:byte(i) then bad = bad + 1 end end
   return bad
 end
 
@@ -36,10 +39,10 @@ emu.register_frame_done(function()
     step, t0 = 4, t
   elseif step == 4 and t - t0 > 1.5 then
     tries = tries + 1
-    for i = 0, #data - 1 do mem:write_u8(0x1000 + i, 0) end
+    for i = 0, #data - 1 do mem:write_u8(addr + i, 0) end
     m.video.throttled = false
     cass:seek(0, "set"); cass:play()
-    m.natkeyboard:post("READ 1000")
+    m.natkeyboard:post("READ " .. addr_hex)
     say("loading from tape (attempt " .. tries .. ")")
     step, t0 = 1, t
   elseif step == 1 and t - t0 > cass.length + 0.5 then
@@ -53,7 +56,7 @@ emu.register_frame_done(function()
     if bad == 0 then
       say("loaded OK, running")
       m.video.throttled = true
-      m.natkeyboard:post("RUN 1000")
+      m.natkeyboard:post("RUN " .. addr_hex)
       step = 3
     elseif tries < 3 then
       say(bad .. " bytes wrong (was a key pressed during loading?), retrying")

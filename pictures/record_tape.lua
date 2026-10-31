@@ -1,11 +1,11 @@
 -- Load a program image into RAM and save it to the mounted cassette with TAPE.
--- Usage: C80_BIN=file.bin mamed psicomp80 -cass out.wav -autoboot_script record_tape.lua
+-- Usage: C80_BIN=file.bin [C80_BASE=1D00] mamed psicomp80 -cass out.wav -autoboot_script record_tape.lua
 local m = manager.machine
 local cass = m.cassettes[":cassette"]
 local mem = m.devices[":maincpu"].spaces["program"]
 local path = os.getenv("C80_BIN")
 local f = assert(io.open(path, "rb")); local data = f:read("a"); f:close()
-local base = 0x1000
+local base = tonumber(os.getenv("C80_BASE") or "1000", 16)
 local stop = base + #data
 local step, t0 = 0, 0
 emu.register_frame_done(function()

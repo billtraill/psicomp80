@@ -1,8 +1,10 @@
--- Start straight into a program: optionally copy C80_BIN into RAM at 1000h,
+-- Start straight into a program: optionally copy C80_BIN into RAM at C80_ADDR
+-- (hex, default 1000),
 -- then type C80_TYPE at the monitor (e.g. "RUN 1000"). Used by c80.sh.
 local m = manager.machine
 local mem = m.devices[":maincpu"].spaces["program"]
 local bin, typed = os.getenv("C80_BIN"), os.getenv("C80_TYPE") or ""
+local addr = tonumber(os.getenv("C80_ADDR") or "1000", 16)
 
 -- Ctrl+\ on the emulated keyboard gives FS, which puts the monitor back in
 -- command state in case a stray key (the Return that launched us) got in.
@@ -24,7 +26,7 @@ emu.register_frame_done(function()
   elseif step == 2 and t > 1.6 then
     if bin and bin ~= "" then
       local f = assert(io.open(bin, "rb")); local d = f:read("a"); f:close()
-      for i = 1, #d do mem:write_u8(0x1000 + i - 1, d:byte(i)) end
+      for i = 1, #d do mem:write_u8(addr + i - 1, d:byte(i)) end
     end
     m.natkeyboard:post(typed)
     step = 3

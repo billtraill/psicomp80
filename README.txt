@@ -78,9 +78,23 @@ after the name.
 ~/localdev/psicomp80/c80.sh schmitt    # Fig. 22(a) Schmitt trigger circuit
 ~/localdev/psicomp80/c80.sh alph       # monitor ALPH character set test
 ~/localdev/psicomp80/c80.sh list       # LIST 1000 with Life loaded
+~/localdev/psicomp80/c80.sh disk       # floppy disc software, program disc in the drive
 ~/localdev/psicomp80/c80.sh ready      # just the monitor
 ```
 screenshots.html shows what each one looks like.
+
+/h2 Floppy disc
+
+The floppy disc extension from the Oct/Dec 1980 articles: FD1771 controller,
+8in IBM 3740 drive (77 tracks x 26 sectors x 128 bytes). disk/programs.img is
+a disc with all the programs on it. Start with:
+```
+~/localdev/psicomp80/c80.sh disk
+```
+then READ space, destination (4 hex digits), track space, sector space,
+number of sectors space. E.g. READ 1000 1 1 6 then RUN 1000 for the Game of
+Life. READ 8000 0 1 16 shows the disc's catalogue. Type RUN 1D00 before each
+disc command. See disk/README.md.
 
 /h2 Tapes
 

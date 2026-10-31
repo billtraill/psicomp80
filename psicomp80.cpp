@@ -36,6 +36,9 @@ graphics set selected by VRAM bit 6.
 #include "machine/keyboard.h"
 #include "screen.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+#include "formats/wd177x_dsk.h"
 
 #include <array>
 #include <cmath>
@@ -60,6 +63,41 @@ graphics set selected by VRAM bit 6.
 // Mount/unmount (and therefore change filename at runtime) is handled by MAME's
 // File Manager because this is a device_image_interface.
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Floppy disc (Wireless World, Oct/Dec 1980): FD1771 controller, 8in drive,
+// IBM 3740 format: 77 tracks x 26 sectors (numbered 1-26) x 128 bytes, FM.
+// Images are raw sector dumps, track 0 sector 1 first (256,256 bytes).
+// ---------------------------------------------------------------------------
+class psicomp80_dsk_format : public wd177x_format
+{
+public:
+  psicomp80_dsk_format() : wd177x_format(formats) {}
+  virtual const char *name() const noexcept override { return "psicomp80"; }
+  virtual const char *description() const noexcept override { return "PSI COMP80 8\" IBM 3740 disc image"; }
+  virtual const char *extensions() const noexcept override { return "img"; }
+
+private:
+  static const format formats[];
+};
+
+const psicomp80_dsk_format::format psicomp80_dsk_format::formats[] = {
+  { floppy_image::FF_8, floppy_image::SSSD, floppy_image::FM,
+    2000, 26, 77, 1, 128, {}, 1, {}, 26, 11, 27 },
+  {}
+};
+
+const psicomp80_dsk_format FLOPPY_PSICOMP80_FORMAT;
+
+static void psicomp80_floppies(device_slot_interface &device)
+{
+  device.option_add("8sssd", FLOPPY_8_SSSD);
+}
+
+static void psicomp80_floppy_formats(format_registration &fr)
+{
+  fr.add(FLOPPY_PSICOMP80_FORMAT);
+}
 
 // ---------------------------------------------------------------------------
 // MM57109 tracing
@@ -250,7 +288,8 @@ public:
                   const char *tag)
       : driver_device(mconfig, type, tag), m_cpu(*this, "maincpu"),
         m_vram(*this, "vram"), m_keyboard(*this, "keyboard"),
-        m_cassette(*this, "cassette") {}
+        m_cassette(*this, "cassette"), m_fdc(*this, "fdc"),
+        m_floppy(*this, "fdc:0") {}
 
   void psicomp80(machine_config &config);
 
@@ -272,6 +311,21 @@ private:
   required_shared_ptr<u8> m_vram;
   required_device<generic_keyboard_device> m_keyboard;
   required_device<cassette_image_device> m_cassette;
+  required_device<fd1771_device> m_fdc;
+  required_device<floppy_connector> m_floppy;
+
+  // Interrupt controller (Oct 1980 Fig. 3): a 74LS147 priority encoder puts a
+  // mode 2 vector on the bus. DRQ is input 9 (F3), INTRQ input 8 (F1); the
+  // MM57109 is moved to a spare input (we use 1, E3). In IM1 the vector is
+  // ignored, so the monitor's MM57109 handling is unchanged.
+  bool m_irq_mm_line = false;   // MM57109 level (set/clear)
+  bool m_irq_mm_pulse = false;  // MM57109 data-ready pulse
+  bool m_fdc_intrq = false;
+  bool m_fdc_drq = false;
+  emu_timer *m_irq_pulse_timer = nullptr;
+  void update_irq();
+  TIMER_CALLBACK_MEMBER(irq_pulse_end);
+  IRQ_CALLBACK_MEMBER(irq_ack);
 
   // ROM is mapped read-only (like real hardware)
 
@@ -564,6 +618,16 @@ void psicomp80_state::machine_start() {
       timer_alloc(FUNC(psicomp80_state::mm57109_ready_tick), this);
   m_mm_branch_clear_timer =
       timer_alloc(FUNC(psicomp80_state::mm57109_branch_clear_tick), this);
+  m_irq_pulse_timer = timer_alloc(FUNC(psicomp80_state::irq_pulse_end), this);
+
+  // 8in drives spin all the time; the FD1771 only loads the head.
+  m_fdc->set_floppy(m_floppy->get_device());
+  if (m_floppy->get_device())
+    m_floppy->get_device()->mon_w(0);
+  save_item(NAME(m_irq_mm_line));
+  save_item(NAME(m_irq_mm_pulse));
+  save_item(NAME(m_fdc_intrq));
+  save_item(NAME(m_fdc_drq));
 
   // Default all opcodes to the same execution time for now; tweak per opcode
   // later as we learn the real MM57109 timing.
@@ -627,6 +691,33 @@ void psicomp80_state::io_map(address_map &map) {
   map(0x03, 0x03).r(FUNC(psicomp80_state::port03_r));
   map(0x20, 0x20).w(FUNC(psicomp80_state::port20_w));
   map(0x60, 0x60).w(FUNC(psicomp80_state::port60_w));
+
+  // Floppy disc controller (Oct 1980 Table 2): register select is A3/A4.
+  //   IN 05/0D/15/1D = status/track/sector/data
+  //   OUT A0/A8/B0/B8 = command/track/sector/data
+  map(0x05, 0x05).select(0x18).lr8(NAME([this](offs_t o) { return m_fdc->read(o >> 3); }));
+  map(0xa0, 0xa0).select(0x18).lw8(NAME([this](offs_t o, u8 d) { m_fdc->write(o >> 3, d); }));
+}
+
+void psicomp80_state::update_irq()
+{
+  const bool irq = m_irq_mm_line || m_irq_mm_pulse || m_fdc_intrq || m_fdc_drq;
+  m_cpu->set_input_line(INPUT_LINE_IRQ0, irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(psicomp80_state::irq_pulse_end)
+{
+  m_irq_mm_pulse = false;
+  update_irq();
+}
+
+IRQ_CALLBACK_MEMBER(psicomp80_state::irq_ack)
+{
+  if (m_fdc_drq)
+    return 0xf3;
+  if (m_fdc_intrq)
+    return 0xf1;
+  return 0xe3;
 }
 
 u8 psicomp80_state::port00_r()
@@ -711,7 +802,8 @@ u8 psicomp80_state::port03_r() {
   // read acknowledges the current nibble, so we deassert IRQ0 and (if more
   // digits are queued) arm the next.
   if (m_mm_irq0_asserted) {
-    m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+    m_irq_mm_line = false;
+    update_irq();
     m_mm_irq0_asserted = false;
     if (m_mm_nibble_timer && !m_mm_nibble_q.empty())
       m_mm_nibble_timer->adjust(attotime::zero);
@@ -839,7 +931,8 @@ TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick) {
   }
   m_mm_one_shot_clear = false;
   if (!m_mm_irq0_asserted) {
-    m_cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+    m_irq_mm_line = true;
+    update_irq();
     m_mm_irq0_asserted = true;
   }
 }
@@ -1647,7 +1740,9 @@ void psicomp80_state::mm_set_data_ready(u8 code) {
   m_mm_one_shot_clear = false;
 
   // Pulse IRQ0 so each delivered nibble becomes a distinct IM 1 interrupt.
-  m_cpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(1));
+  m_irq_mm_pulse = true;
+  update_irq();
+  m_irq_pulse_timer->adjust(attotime::from_usec(1));
 }
 
 void psicomp80_state::kbd_put(u8 data) {
@@ -1788,6 +1883,15 @@ m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED);
 
   GENERIC_KEYBOARD(config, m_keyboard, 0);
   m_keyboard->set_keyboard_callback(FUNC(psicomp80_state::kbd_put));
+
+  m_cpu->set_irq_acknowledge_callback(FUNC(psicomp80_state::irq_ack));
+
+  // Floppy disc: FD1771 clocked at 2 MHz for an 8in drive
+  FD1771(config, m_fdc, 2'000'000);
+  m_fdc->intrq_wr_callback().set([this](int state) { m_fdc_intrq = state; update_irq(); });
+  m_fdc->drq_wr_callback().set([this](int state) { m_fdc_drq = state; update_irq(); });
+  m_fdc->set_force_ready(true);
+  FLOPPY_CONNECTOR(config, m_floppy, psicomp80_floppies, "8sssd", psicomp80_floppy_formats);
 
   screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
   screen.set_refresh_hz(50);

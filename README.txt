@@ -79,6 +79,7 @@ after the name.
 ~/localdev/psicomp80/c80.sh alph       # monitor ALPH character set test
 ~/localdev/psicomp80/c80.sh list       # LIST 1000 with Life loaded
 ~/localdev/psicomp80/c80.sh disk       # floppy disc software, program disc in the drive
+~/localdev/psicomp80/c80.sh forth      # FORTH ROM (FORTH in place of BURP)
 ~/localdev/psicomp80/c80.sh ready      # just the monitor
 ```
 screenshots.html shows what each one looks like.
@@ -101,6 +102,16 @@ expansion. That machine is psicomp80x ("COMP80 with 32K expansion"):
 ```
 ~/localdev/psicomp80/c80.sh 32k disk
 ```
+
+/h2 FORTH
+
+psicomp80_forth.rom is the ROM with a small FORTH in place of BURP (the
+monitor is unchanged). The driver offers it as a BIOS option; BURP stays the
+default:
+```
+cd ~/localdev/mame && ./mamed psicomp80 -bios forth
+```
+then press ^ (RS) at READY, as you would for BURP. See forth/README.md.
 
 /h2 Tapes
 

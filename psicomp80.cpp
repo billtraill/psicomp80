@@ -613,6 +613,10 @@ std::array<std::array<u8, 10>, 64> psicomp80_state::gfx_font_64x10x6 = {{
 // ------------------ machine lifecycle ------------------
 
 void psicomp80_state::machine_start() {
+  // Power on with a blank screen (the monitor never clears line 0, and code
+  // 00h is @, not a space).
+  std::fill_n(&m_vram[0], m_vram.bytes(), 0x20);
+
   m_mm_stream.reserve(256);
   m_mm_nibble_timer =
       timer_alloc(FUNC(psicomp80_state::mm57109_nibble_tick), this);
@@ -1768,6 +1772,12 @@ void psicomp80_state::kbd_put(u8 data) {
     return;
   }
 
+  // With the FORTH ROM, RS (^) is rubout, but the monitor's NMI handler
+  // folds Backspace (08h) into the same code as H.  Let the host Backspace
+  // key send RS instead.
+  if (data == 0x08 && system_bios() == 2)
+    data = 0x1e;
+
   // The COMP80 keyboard interface is a latched ASCII byte with a single strobe
   // to NMI. The monitor's NMI routine will reset if NMI arrives while the CPU
   // is not in HALT, so we must avoid generating extra strobes (e.g. key-up
@@ -1795,19 +1805,8 @@ void psicomp80_state::kbd_put(u8 data) {
 
 static inline u8 map_code6_to_ascii_index(u8 code6) {
   // Returns index into ascii_font_64x8x5 (0..63 corresponding to ASCII
-  // 0x20..0x5F), or 0 for space if unknown.
-  if (code6 == 0x00)
-    return 0; // space
-
-  if (code6 >= 0x01 && code6 <= 0x1A) {
-    // 'A' is ASCII 0x41, so (0x41 - 0x20) = 0x21 is the index for 'A'.
-    return u8(0x21 + (code6 - 1));
-  }
-
-  if (code6 >= 0x20 && code6 <= 0x3F)
-    return u8(code6 - 0x20);
-
-  return 0;
+  // 0x20..0x5F): codes 00h-1Fh are @, A-Z, [ \ ] ^ _ and 20h-3Fh are as ASCII.
+  return code6 ^ 0x20;
 }
 
 u8 psicomp80_state::glyph_row(u8 vram_byte, int row) {
@@ -1925,8 +1924,14 @@ void psicomp80_state::psicomp80x(machine_config &config) {
 
 ROM_START(psicomp80)
 ROM_REGION(0x10000, "maincpu", 0)
-ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00,
-         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df))
+ROM_DEFAULT_BIOS("burp")
+ROM_SYSTEM_BIOS(0, "burp", "Monitor + BURP")
+ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
+         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df), ROM_BIOS(0))
+// Monitor + COMP80 FORTH in place of BURP (forth/, built by forth/build.sh)
+ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
+ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
+         CRC(a6681425) SHA1(0f0804fd4a9f0048feffe6b47b18bf8fdd91f232), ROM_BIOS(1))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1934,8 +1939,14 @@ COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
 
 ROM_START(psicomp80x)
 ROM_REGION(0x10000, "maincpu", 0)
-ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00,
-         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df))
+ROM_DEFAULT_BIOS("burp")
+ROM_SYSTEM_BIOS(0, "burp", "Monitor + BURP")
+ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
+         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df), ROM_BIOS(0))
+// Monitor + COMP80 FORTH in place of BURP (forth/, built by forth/build.sh)
+ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
+ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
+         CRC(a6681425) SHA1(0f0804fd4a9f0048feffe6b47b18bf8fdd91f232), ROM_BIOS(1))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

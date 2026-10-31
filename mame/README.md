@@ -11,8 +11,8 @@ https://github.com/mamedev/mame), kept here so they're backed up.
 | `mame.ini` | MAME root | start windowed with MAME's menu keys on |
 | `BUILD.md` | — | full build notes (SDL2, regenerating project files) |
 
-`install.sh` copies all of these, plus `../psicomp80.cpp` and `../psicomp80.rom`,
-into the checkout:
+`install.sh` copies all of these, plus `../psicomp80.cpp`, `../psicomp80.rom` and
+`../psicomp80_forth.rom`, into the checkout:
 
     mame/install.sh              # default ~/localdev/mame
     mame/install.sh /path/to/mame

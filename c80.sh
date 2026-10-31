@@ -1,10 +1,11 @@
 #!/bin/sh
 # Start the PSI COMP80 emulator straight into a program.
-#   ./c80.sh [32k] life | boat | schmitt | alph | list | disk | ready   [extra MAME options]
+#   ./c80.sh [32k] life | boat | schmitt | alph | list | disk | forth | ready   [extra MAME options]
 # 32k runs the machine with the 32 KB memory expansion (psicomp80x), which the
 # disc FORMAT command needs.
 # life/boat/schmitt are copied into memory and run (no tape load needed).
 # disk loads the disc software at 1D00 with disk/programs.img in the drive.
+# forth boots the FORTH ROM (FORTH in place of BURP) and enters FORTH.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
 MAME=${MAME_DIR:-$HOME/localdev/mame}
@@ -21,8 +22,10 @@ case "$prog" in
   list)    bin=$HERE/life/life.bin;        typed="LIST 1000" ;;
   disk)    bin=$HERE/disk/fdos.bin;        typed="RUN 1D00"; addr=1D00
            set -- -flop "$HERE/disk/programs.img" "$@" ;;
+  forth)   bin=;                           typed="^"
+           set -- -bios forth "$@" ;;
   ready)   bin=;                           typed= ;;
-  *) echo "usage: $0 [32k] life|boat|schmitt|alph|list|disk|ready [MAME options]" >&2; exit 1 ;;
+  *) echo "usage: $0 [32k] life|boat|schmitt|alph|list|disk|forth|ready [MAME options]" >&2; exit 1 ;;
 esac
 
 cd "$MAME"

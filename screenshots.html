@@ -71,7 +71,8 @@ kbd { font: 600 .8125rem/1 var(--mono); min-width: 1.6rem; text-align: center; p
 h3 { font: 700 1.125rem/1.2 var(--display); font-stretch: 85%; margin: 0; }
 .photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1.5rem; }
 .photo { margin: 0; display: grid; gap: .6rem; align-content: start; min-width: 0; }
-.photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain;
+  background: color-mix(in srgb, var(--muted) 12%, transparent); border-radius: 8px; }
 .tablewrap { overflow-x: auto; max-width: 52rem; }
 .arts { border-collapse: collapse; width: 100%; font-size: .9375rem; }
 .arts th { text-align: left; font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);

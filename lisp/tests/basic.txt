@@ -1,0 +1,33 @@
+^
+#wait 0.5
+(+ 2 3)\r
+'(A B C)\r
+(CONS 'A '(B C))\r
+(CAR '(X Y)) (CDR '(X Y))\r
+(DEFUN SQ (X) (* X X))\r
+(SQ 12)\r
+(DEFUN FACT (N) (COND ((EQ N 0) 1) (T (* N (FACT (- N 1))))))\r
+(FACT 7)\r
+(- 3 10) (/ -7 2) (REM -7 2) (* -3 4)\r
+(< 1 2) (> 1 2) (ATOM 'A) (ATOM '(A)) (NULL NIL)\r
+(SETQ L '(1 2 3))\r
+(CADR L) (CADDR L) (LIST 1 'A L)\r
+(NUMBERP 3) (NUMBERP 'A)\r
+(CONS 1 2)\r
+(AND 1 2) (OR NIL 3) (AND 1 NIL)\r
+#screen
+(GC)\r
+((LAMBDA (A B) (CONS B A)) 1 2)\r
+(DEFUN LEN (L) (COND ((NULL L) 0) (T (+ 1 (LEN (CDR L))))))\r
+(LEN '(A B C D E))\r
+(PRINT 'HELLO)\r
+(PRIN1 'A) (TYO 42) (TERPRI)\r
+(EVAL '(+ 1 2))\r
+(+ 1\r
+2)\r
+(CAR ; COMMENT\r
+'(Q))\r
+(SETQ X 5)\r
+(SQ 3)\r
+X\r
+#screen

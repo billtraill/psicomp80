@@ -5,3 +5,4 @@
 fp-info-cache
 __pycache__/
 forth/forth.lbl
+lisp/lisp.lbl

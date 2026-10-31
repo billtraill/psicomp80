@@ -8,7 +8,8 @@ MAME=${1:-$HOME/localdev/mame}
 
 mkdir -p "$MAME/src/mame/drivers" "$MAME/roms/psicomp80"
 cp "$REPO/psicomp80.cpp" "$MAME/src/mame/drivers/psicomp80.cpp"
-cp "$REPO/psicomp80.rom" "$REPO/psicomp80_forth.rom" "$MAME/roms/psicomp80/"
+cp "$REPO/psicomp80.rom" "$REPO/psicomp80_forth.rom" "$REPO/psicomp80_lisp.rom" \
+   "$MAME/roms/psicomp80/"
 cp "$HERE/build.sh" "$HERE/run.sh" "$HERE/mame.ini" "$MAME/"
 
 if ! grep -q "@source:drivers/psicomp80.cpp" "$MAME/src/mame/mame.lst"; then

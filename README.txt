@@ -82,6 +82,10 @@ after the name.
 ~/localdev/psicomp80/c80.sh forth      # FORTH ROM (FORTH in place of BURP)
 ~/localdev/psicomp80/c80.sh forthlife  # Game of Life typed into FORTH
 ~/localdev/psicomp80/c80.sh mandel     # Mandelbrot set typed into FORTH
+~/localdev/psicomp80/c80.sh lisp       # LISP ROM (LISP in place of BURP)
+~/localdev/psicomp80/c80.sh deriv      # symbolic differentiation typed into LISP
+~/localdev/psicomp80/c80.sh hanoi      # Towers of Hanoi typed into LISP
+~/localdev/psicomp80/c80.sh queens     # eight queens typed into LISP
 ~/localdev/psicomp80/c80.sh ready      # just the monitor
 ```
 screenshots.html shows what each one looks like.
@@ -114,6 +118,16 @@ default:
 cd ~/localdev/mame && ./mamed psicomp80 -bios forth
 ```
 then press ^ (RS) at READY, as you would for BURP. See forth/README.md.
+
+/h2 LISP
+
+psicomp80_lisp.rom is the ROM with a small LISP in place of BURP, built the
+same way as the FORTH one and offered as another BIOS option:
+```
+cd ~/localdev/mame && ./mamed psicomp80 -bios lisp
+```
+then press ^ (RS) at READY. See lisp/README.md, and lisp.html for examples
+and screenshots.
 
 /h2 Tapes
 

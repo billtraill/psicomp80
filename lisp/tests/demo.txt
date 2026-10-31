@@ -1,0 +1,21 @@
+^
+#wait 0.5
+(CONS 'A '(B C))\r
+(DEFUN SQ (X) (* X X))\r
+(SQ 12)\r
+(DEFUN FACT (N)\r
+  (COND ((EQ N 0) 1) (T (* N (FACT (- N 1))))))\r
+(FACT 7)\r
+(DEFUN APP (A B)\r
+  (COND ((NULL A) B) (T (CONS (CAR A) (APP (CDR A) B)))))\r
+(DEFUN REV (L)\r
+  (COND (L (APP (REV (CDR L)) (LIST (CAR L))))))\r
+(REV '(A B C D E))\r
+(DEFUN MAPCAR (F L)\r
+  (COND (L (CONS (F (CAR L)) (MAPCAR F (CDR L))))))\r
+(MAPCAR SQ '(1 2 3 4 5))\r
+(MAPCAR '(LAMBDA (X) (CONS X X)) '(A B))\r
+(GC)\r
+#ready
+#screen
+#snap

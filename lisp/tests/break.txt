@@ -1,0 +1,24 @@
+^
+#wait 0.5
+(DEFUN D (N) (COND ((EQ N 0) 0) (T (+ 1 (D (- N 1))))))\r
+(D 40)\r
+(D 50)\r
+(D 55)\r
+(D 60)\r
+(DEFUN FIB (N) (COND ((< N 2) N) (T (+ (FIB (- N 1)) (FIB (- N 2))))))\r
+(SETQ N 'KEEP)\r
+(FIB 30)\r
+#wait 1
+X
+#wait 0.5
+#screen
+^
+#wait 0.5
+N\r
+(FIB 15)\r
+#wait 3
+(DEFUN BIG (K) (COND ((EQ K 0) 'DONE) (T (D 30) (BIG (- K 1)))))\r
+(BIG 20)\r
+#wait 2
+(GC)\r
+#screen

@@ -80,6 +80,8 @@ after the name.
 ~/localdev/psicomp80/c80.sh list       # LIST 1000 with Life loaded
 ~/localdev/psicomp80/c80.sh disk       # floppy disc software, program disc in the drive
 ~/localdev/psicomp80/c80.sh forth      # FORTH ROM (FORTH in place of BURP)
+~/localdev/psicomp80/c80.sh forthlife  # Game of Life typed into FORTH
+~/localdev/psicomp80/c80.sh mandel     # Mandelbrot set typed into FORTH
 ~/localdev/psicomp80/c80.sh ready      # just the monitor
 ```
 screenshots.html shows what each one looks like.

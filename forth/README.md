@@ -19,6 +19,21 @@ or by hand:
 then press `^` (RS) at READY. The top line changes to FORTH and a `_` cursor
 appears. Type a line and press Return; the line runs and FORTH prints `OK`.
 
+## Example programs
+
+`examples/` has two programs to type in (or let `c80.sh` type them):
+
+| | |
+|---|---|
+| `life.fs` | Game of Life, 64 × 31 cells, one per character. `1000 LIFE` runs 1000 generations from a random board; about 3 s a generation in the emulator. `~/localdev/psicomp80/c80.sh forthlife` |
+| `mandel.fs` | The Mandelbrot set, one point per character, shaded by escape time, in fixed point (90 = 1.0). `MANDEL` draws it in about 95 s. `~/localdev/psicomp80/c80.sh mandel` |
+
+`load.lua` does the typing: it enters FORTH, types the file a line at a time
+(waiting for FORTH's cursor between lines, since a key while FORTH is busy
+resets to the monitor) with the emulator running flat out, then types the
+run command at normal speed. `screens/` has screenshots of both, also on
+`screenshots.html`.
+
 ## Keys
 
 | Key | What it does |

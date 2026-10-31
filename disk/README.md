@@ -91,12 +91,33 @@ Reading track 0 to 8000 shows the catalogue. The Game of Life uses RAM up to
 `c80.sh disk` uses `programs.img` itself, so WRITE changes it. Run
 `python3 make_disk.py` to rebuild the original.
 
-## Limits
+## Formatting a track (32 KB machine)
 
-- **FORMAT** builds a whole track image at C000, which needs the 32 KB memory
-  expansion. This emulation only has the 5 KB of RAM at 0C00 (C000 is a mirror
-  of the screen), so FORMAT doesn't work. Discs created in MAME's File Manager
-  come ready formatted.
+FORMAT builds a whole track image (about 5 KB) at C000, which needs the 32 KB
+memory expansion. Use the `psicomp80x` machine:
+
+```bash
+~/localdev/psicomp80/c80.sh 32k disk
+```
+
+Then, following the December article:
+
+1. `FORMAT ` and the track number with a space, e.g. `FORMAT 5 `. The track
+   image is built at C000 and the computer goes back to READY.
+2. Change two controller commands: `ALT 1D630B1E47EF`, then **Ctrl+\** (FS)
+   to leave ALT. 1D63 becomes Write Track, and 1E47 a seek without verify.
+3. `RUN 1D00`, then `WRITE C000`, then the **same track**, `1 `, `1 `.
+4. When the head releases the computer waits. Press **Ctrl+Z**, as the
+   article says: the track is checked and READY appears.
+5. Put the two commands back: `ALT 1D63571E47EB`, then Ctrl+\. (Or load the
+   disc software again.)
+
+The track now holds 26 empty sectors of E5. In the 32 KB machine the
+expansion fills 8000–FFFF behind the screen, so 8800–FFFF is RAM; the
+articles don't give its address decoding. Discs created in MAME's File
+Manager come ready formatted, so FORMAT is only needed to clear a track.
+
+## Limits
 - **Track 77**: the article suggests reading track 77 to see the error
   message. With this listing the seek can never be verified, so it retries the
   seek forever instead. Press Esc to reset.

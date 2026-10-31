@@ -292,6 +292,7 @@ public:
         m_floppy(*this, "fdc:0") {}
 
   void psicomp80(machine_config &config);
+  void psicomp80x(machine_config &config);
 
 private:
   // -------- VDU geometry --------
@@ -422,6 +423,7 @@ private:
 
   // maps
   void mem_map(address_map &map);
+  void mem_map_32k(address_map &map);
   void io_map(address_map &map);
 
   // I/O handlers
@@ -672,6 +674,17 @@ void psicomp80_state::machine_reset() {
 }
 
 // ------------------ memory & I/O ------------------
+
+// With the 32 KB memory expansion (used by the floppy disc FORMAT command,
+// which builds a track image at C000). The articles don't give its address
+// decoding; here it fills 8000-FFFF behind the screen, so 8800-FFFF is RAM
+// and the screen no longer mirrors through the top half of memory.
+void psicomp80_state::mem_map_32k(address_map &map) {
+  map(0x0000, 0x0bff).rom();
+  map(0x0c00, 0x1fff).ram();
+  map(0x8000, 0x87ff).ram().share("vram");
+  map(0x8800, 0xffff).ram();
+}
 
 void psicomp80_state::mem_map(address_map &map) {
   map(0x0000, 0x0bff).rom();
@@ -1903,6 +1916,11 @@ m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED);
   PALETTE(config, "palette", palette_device::MONOCHROME);
 }
 
+void psicomp80_state::psicomp80x(machine_config &config) {
+  psicomp80(config);
+  m_cpu->set_addrmap(AS_PROGRAM, &psicomp80_state::mem_map_32k);
+}
+
 } // anonymous namespace
 
 ROM_START(psicomp80)
@@ -1913,3 +1931,12 @@ ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
      "PSI/Powertran", "COMP80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+
+ROM_START(psicomp80x)
+ROM_REGION(0x10000, "maincpu", 0)
+ROM_LOAD("psicomp80.rom", 0x0000, 0x0c00,
+         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df))
+ROM_END
+
+COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,
+     "PSI/Powertran", "COMP80 with 32K expansion", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

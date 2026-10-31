@@ -96,6 +96,12 @@ number of sectors space. E.g. READ 1000 1 1 6 then RUN 1000 for the Game of
 Life. READ 8000 0 1 16 shows the disc's catalogue. Type RUN 1D00 before each
 disc command. See disk/README.md.
 
+The FORMAT command builds a track image at C000, which needs the 32 KB memory
+expansion. That machine is psicomp80x ("COMP80 with 32K expansion"):
+```
+~/localdev/psicomp80/c80.sh 32k disk
+```
+
 /h2 Tapes
 
 Each tape loads at 1000 and runs with RUN 1000. autorun.lua loads the mounted

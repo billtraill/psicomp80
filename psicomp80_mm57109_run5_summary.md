@@ -169,7 +169,7 @@ Some earlier uploads may have expired. Please re-upload:
 
 - Last known-good `psicomp80.cpp`
 - `ROM_listing_fixedup.txt`
-- `comp80_monitor_plus_burp_0000_0BFF_annotated_v12.asm`
+- `comp80_monitor_plus_burp_0000_0BFF_annotated_v12.asm` (now `old/comp80_monitor_plus_burp_0000_0BFF_annotated.asm`, superseded by `rom/psicomp80.asm`)
 - One representative trace (e.g. `run5_v7.trc`)
 - One MAME log (`error.log`)
 

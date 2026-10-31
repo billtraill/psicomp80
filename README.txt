@@ -107,6 +107,15 @@ programs (typing them in for you) and has a help page for each language.
 It has no tape or disc. See web/README.md; rebuild it with
 python3 web/build.py.
 
+/h2 ROM listings
+
+rom/psicomp80.asm is the annotated disassembly of psicomp80.rom (monitor and
+BURP); it assembles back to the ROM byte for byte. roms.html shows it with
+the FORTH and LISP sources as listings, each name and jump a link, and hex
+dumps of all three ROMs. rom/build.sh checks the sources against the ROMs and
+rebuilds the page. The earlier disassemblies it was made from are in old/.
+See rom/README.md.
+
 /h2 Floppy disc
 
 The floppy disc extension from the Oct/Dec 1980 articles: FD1771 controller,

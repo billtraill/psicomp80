@@ -10,3 +10,4 @@ hardware/kicad/*.dsn
 hardware/kicad/*.ses
 lisp/lisp.lbl
 web/build/
+rom/build/

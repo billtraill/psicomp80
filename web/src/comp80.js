@@ -2,10 +2,19 @@
 // 0000, RAM 0C00-1FFF, a 2 KB screen at 8000 (mirrored up to FFFF unless the
 // 32 KB expansion fills 8800-FFFF), the keyboard as a latched byte on port
 // 01 with an NMI per key, and the MM57109 number cruncher on ports 60 and 03
-// that BURP uses.  No tape or floppy disc.
+// that BURP uses, interrupting through IM 1.  No tape or floppy disc.
 "use strict";
 
 const CLOCK = 4000000;
+
+// MM57109 execution times in microcycles (data sheet averages), by opcode.
+const MM_TIMES = [
+  238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 152, 151, 166, 1312, 284, 134,   // 0-9 DP EE CS PI AIN HALT
+  208, 278, 197, 271, 191, 186, 583, 395, 163, 2314, 2314, 812, 839, 1385, 168, 173,  // TJC .. RSH
+  166, 552, 157, 905, 56200, 56200, 35000, 163, 185, 163, 185, 163, 30700, 30700, 448, 734,   // INV EN TOGM ROLL SIN COS TAN flags ECLR RTD DTR POP MCLR
+  652, 30800, 27400, 3000, 7000, 24800, 30700, 4500, 55400, 2200, 2200, 3200, 7800, 130, 130, 122,   // XEY EX 10X SQ SQRT LN LOG 1/X YX + - x / PRW1 PRW2 NOP
+];
+const MM_INV_TIMES = { 0x24: 54000, 0x25: 54000, 0x26: 30200, 0x39: 1700, 0x3a: 1700, 0x3b: 2700, 0x3c: 7300 };
 
 class COMP80 {
   // fonts: { ascii: [64][8] 5-bit rows, gfx: [64][10] 6-bit rows }
@@ -40,7 +49,6 @@ class COMP80 {
     this.keyLatch = 0xff;
     this.keyTime = -1e9;
     this.irqMmLine = false;
-    this.irqMmPulse = false;
     this.mmReset();
     this.updateIrq();
   }
@@ -99,8 +107,7 @@ class COMP80 {
     if ((port & 0xff) === 0x60) this.port60(v);
   }
 
-  updateIrq() { this.cpu.irq = this.irqMmLine || this.irqMmPulse; }
-  tick_pulse() { this.irqMmPulse = false; this.updateIrq(); }
+  updateIrq() { this.cpu.irq = this.irqMmLine; }
 
   // ---------------------------------------------------------------- keyboard
 
@@ -118,25 +125,7 @@ class COMP80 {
     this.keyLatch = ~c & 0xff;
     this.keyTime = this.cycles;
     this.cpu.nmi();
-    this.mmSetDataReady(this.asciiToMmCode(c));
     return true;
-  }
-
-  asciiToMmCode(c) {
-    if (c >= 0x30 && c <= 0x39) return c - 0x30;
-    if (c >= 0x61 && c <= 0x66) return c - 0x61 + 10;
-    if (c >= 0x41 && c <= 0x46) return c - 0x41 + 10;
-    if (c === 0x0d || c === 0x0a) return 0x10;
-    if (c === 0x1b) return 0x11;
-    if (c === 0x20) return 0x12;
-    return 0x1f;
-  }
-
-  mmSetDataReady(code) {
-    this.mmCode = code & 0x0f;
-    this.irqMmPulse = true;
-    this.updateIrq();
-    this.setTimer("pulse", 4);                   // 1 us
   }
 
   // ---------------------------------------------------------------- screen
@@ -176,224 +165,244 @@ class COMP80 {
   }
 
   // ---------------------------------------------------------------- MM57109
-  // A coarse model of the National MM57109 calculator chip, as in the MAME
-  // driver: BURP writes instructions to port 60 (bit 7 set first as HOLD,
-  // then the instruction), polls RDY and BR on port 03, and reads results a
-  // digit at a time through IM 1 interrupts.
+  // The National MM57109 calculator chip that BURP does its arithmetic on.
+  // Port 60 drives its instruction lines (bits 0-5) and HOLD (bit 7); port
+  // 03 reads its RDY (bit 5: 1 while it executes), BR (bit 6: 0 when a test
+  // is true) and digit outputs (bits 0-3).  Its R/W output, which pulses
+  // once for each digit of an OUT instruction, is the Z80's INT.
+  //
+  // With HOLD low the chip fetches the instruction on its lines and RDY
+  // goes low; BURP then raises HOLD so the chip stops when it has finished.
+  // Two-word instructions (INV, SMDC, OUT, IN and the branches) take their
+  // second word the same way.  A branch whose test is true pulses BR and
+  // waits for its second word (BURP sends a NOP); a false one skips it.
+  // Execution times are the data sheet's averages, a microcycle being about
+  // 10 us.
 
   mmReset() {
-    this.mmCode = 0x1f;
-    this.mmRDY = true;
-    this.mmBR = false;
-    this.mmInv = false;
-    this.mmIrq0 = false;
     this.mmX = 0; this.mmY = 0; this.mmZ = 0; this.mmT = 0; this.mmM = 0;
-    this.mmDeg = false;
-    this.mmMantDigits = 8;
-    this.mmEntry = false;
-    this.mmTwoWord = false;
-    this.mmTwoWordOp = 0;
+    this.mmSci = false;           // TOGM: scientific notation for IN and OUT
+    this.mmMDC = 8;               // mantissa digits for IN and OUT (SMDC)
     this.mmError = false;
-    this.mmNibbles = [];
-    this.mmPendingBranch = false;
-    this.mmPendingBranchState = false;
+    this.mmEntry = false;         // in number entry
+    this.mmAfterEnter = false;    // the last instruction was EN
+    this.mmHold = true;
+    this.mmBusy = false;
+    this.mmBR = false;
+    this.mmWord2 = null;          // what to do with a second word
+    this.mmDigits = [];
+    this.mmCode = 0;
     this.entryReset();
+    this.setTimer("mm", null);
+    this.setTimer("mmdigit", null);
   }
 
   entryReset() {
     this.enExp = false; this.enDp = false; this.enDpIndex = 0;
-    this.enMantCount = 0; this.enExpCount = 0; this.enMantSign = 1; this.enExpSign = 1;
-    this.enMant = [0, 0, 0, 0, 0, 0, 0, 0]; this.enExpDigits = [0, 0];
+    this.enMant = []; this.enExpDigits = []; this.enMantSign = 1; this.enExpSign = 1;
   }
 
   port03() {
-    const v = (this.mmRDY ? 0 : 0x20) | (this.mmBR ? 0 : 0x40) | (this.mmCode & 0x1f);
-    if (this.mmIrq0) {
-      this.irqMmLine = false;
-      this.updateIrq();
-      this.mmIrq0 = false;
-      if (this.mmNibbles.length) this.setTimer("nibble", 0);
-    }
-    return v;
+    return (this.mmBusy ? 0x20 : 0) | (this.mmBR ? 0 : 0x40) | (this.mmCode & 0x0f);
   }
 
+  // The R/W interrupt is latched until the Z80 takes it.
+  irqAck() { this.irqMmLine = false; this.updateIrq(); }
+
   port60(v) {
-    if (v & 0x80) return;                        // HOLD
-    this.mmIrq0 = false;
-    this.mmExecute(v);
+    this.mmHold = (v & 0x80) !== 0;
+    if (this.mmHold) return;
+    const op = v & 0x3f;
+    if (this.mmWord2) {
+      const f = this.mmWord2;
+      this.mmWord2 = null;
+      this.mmBusy = true;
+      this.mmBR = false;
+      f(op);
+      if (!this.timerOn("mm")) this.mmFinish(130);
+      return;
+    }
+    if (this.mmBusy) return;
+    this.mmBusy = true;
+    this.mmBR = false;
+    this.mmExecute(op);
+  }
+
+  // RDY comes back after t microcycles; then() runs at that point.
+  mmFinish(t, then) { this.mmThen = then || null; this.setTimer("mm", t * 40); }
+  tick_mm() {
+    const f = this.mmThen;
+    this.mmThen = null;
+    if (f) f(); else this.mmBusy = false;
+  }
+
+  // OUT: one digit per R/W pulse, each an interrupt; then wait for the
+  // second word.
+  tick_mmdigit() {
+    if (this.mmDigits.length) {
+      this.mmCode = this.mmDigits.shift();
+      this.irqMmLine = true;
+      this.updateIrq();
+      this.setTimer("mmdigit", 48 * 40);
+    } else {
+      this.mmBusy = false;
+      this.mmWord2 = () => {};
+    }
+  }
+
+  // Round to the chip's 8 significant digits.
+  mmRound(v) {
+    if (!isFinite(v)) { this.mmError = true; return 0; }
+    if (v === 0) return 0;
+    const r = Number(v.toPrecision(8));
+    const e = Math.floor(Math.log10(Math.abs(r)));
+    if (e > 99) { this.mmError = true; return Math.sign(r) * 9.9999999e99; }
+    if (e < -99) return 0;
+    return r;
   }
 
   mmPush(v) { this.mmT = this.mmZ; this.mmZ = this.mmY; this.mmY = this.mmX; this.mmX = v; }
-  mmPop() { const v = this.mmX; this.mmX = this.mmY; this.mmY = this.mmZ; this.mmZ = this.mmT; return v; }
-
-  mmQueueNibble(n) {
-    this.mmNibbles.push(n & 0x0f);
-    if (!this.timerOn("nibble")) this.setTimer("nibble", 0);
-  }
-
-  tick_nibble() {
-    if (!this.mmNibbles.length) return;
-    this.mmCode = this.mmNibbles.shift();
-    if (!this.mmNibbles.length) this.setTimer("ready", 300);
-    else if (!this.timerOn("ready")) this.mmRDY = true;
-    if (!this.mmIrq0) { this.irqMmLine = true; this.updateIrq(); this.mmIrq0 = true; }
-  }
-
-  tick_ready() {
-    if (this.mmPendingBranch) {
-      this.mmBR = this.mmPendingBranchState;
-      this.mmRDY = !this.mmPendingBranchState;
-      this.setTimer("branch", this.mmRDY ? 20 : 100);
-    } else {
-      this.mmRDY = true;
-    }
-  }
-
-  tick_branch() { this.mmBR = false; this.mmRDY = true; }
-
-  mmBegin(isBranch, branchState) {
-    this.mmRDY = false;
-    this.mmBR = false;
-    this.mmPendingBranch = isBranch;
-    this.mmPendingBranchState = branchState;
-    this.setTimer("ready", null);
-    this.setTimer("branch", null);
-    this.setTimer("ready", isBranch ? 150 : 40);
-  }
-
-  // OUT*: X as a digit stream: exponent MSD, LSD, sign bits, decimal point
-  // position, then the mantissa digits.
-  mmOutX() {
-    this.setTimer("ready", null);
-    const x = this.mmX, mdc = this.mmMantDigits || 8, dp = 0x0b;
-    if (x === 0) {
-      [0, 0, 0, dp].forEach((n) => this.mmQueueNibble(n));
-      for (let i = 0; i < mdc; i++) this.mmQueueNibble(0);
-      return;
-    }
-    const neg = x < 0, ax = Math.abs(x);
-    let e = Math.floor(Math.log10(ax)), norm = ax / Math.pow(10, e);
-    if (norm >= 10) { norm /= 10; e++; }
-    if (norm < 1) { norm *= 10; e--; }
-    const ae = Math.min(Math.abs(e), 99);
-    this.mmQueueNibble(Math.floor(ae / 10) % 10);
-    this.mmQueueNibble(ae % 10);
-    this.mmQueueNibble((neg ? 0x08 : 0) | (e < 0 ? 0x01 : 0));
-    this.mmQueueNibble(dp);
-    let t = norm;
-    for (let i = 0; i < mdc; i++) {
-      const d = Math.max(0, Math.min(9, Math.floor(t)));
-      this.mmQueueNibble(d);
-      t = (t - d) * 10;
-    }
-  }
+  mmPop() { this.mmY = this.mmZ; this.mmZ = this.mmT; }
 
   mmEntryValue() {
     let mant = 0;
-    for (let i = 0; i < this.enMantCount; i++) mant = mant * 10 + (this.enMant[i] % 10);
-    const dpIndex = this.enDp ? this.enDpIndex : this.enMantCount;
-    let v = mant;
-    if (dpIndex !== this.enMantCount) v *= Math.pow(10, dpIndex - this.enMantCount);
-    v *= this.enMantSign;
-    if (this.enExpCount > 0) {
-      let ev = this.enExpCount === 1 ? this.enExpDigits[0] % 10 : (this.enExpDigits[0] % 10) * 10 + (this.enExpDigits[1] % 10);
-      v *= Math.pow(10, ev * this.enExpSign);
-    }
+    for (const d of this.enMant) mant = mant * 10 + d;
+    const dp = this.enDp ? this.enDpIndex : this.enMant.length;
+    let v = mant * Math.pow(10, dp - this.enMant.length) * this.enMantSign;
+    let e = 0;
+    for (const d of this.enExpDigits) e = e * 10 + d;
+    if (this.enExpDigits.length) v *= Math.pow(10, e * this.enExpSign);
     return v;
   }
 
-  mmExecute(op) {
-    const opcode = op & 0x3f;
-    const isBranch = opcode === 0x13;            // TXF*
-    this.mmBegin(isBranch, isBranch ? Math.abs(this.mmX) < 1 : false);
-    if (this.mmTwoWord) {
-      const two = this.mmTwoWordOp;
-      this.mmTwoWord = false;
-      this.mmTwoWordOp = 0;
-      if (two === 0x16) this.mmOutX();
-      return;
+  // The digits of an OUT instruction in scientific notation: exponent
+  // tens and units, the signs (8 mantissa, 1 exponent), the decimal point
+  // position (0Bh: after the first digit), then the mantissa digits.
+  mmOutDigits() {
+    const x = this.mmRound(this.mmX), digits = [];
+    let e = 0, mant = "0".repeat(8);
+    if (x !== 0) {
+      const s = Math.abs(x).toExponential(7);       // d.ddddddde±n
+      mant = s[0] + s.slice(2, 9);
+      e = parseInt(s.slice(s.indexOf("e") + 1), 10);
     }
-    if (!this.mmInv && opcode === 0x20) { this.mmInv = true; return; }
-    if ([0x10, 0x11, 0x12, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a].includes(opcode)) {
-      this.mmTwoWord = true;
-      this.mmTwoWordOp = opcode;
-      return;
-    }
-    this.mmExecuteSingle(opcode);
+    const ae = Math.min(Math.abs(e), 99);
+    digits.push(Math.floor(ae / 10), ae % 10, (x < 0 ? 8 : 0) | (e < 0 ? 1 : 0), 0x0b);
+    for (let i = 0; i < this.mmMDC; i++) digits.push(+mant[i]);
+    return digits;
   }
 
-  mmExecuteSingle(opcode) {
-    const DEG = 180 / Math.PI;
-    this.mmBR = false;
-    const isEntry = opcode <= 0x0f, isEn = opcode === 0x21;
-    if (this.mmEntry && !isEntry) {
-      this.mmX = this.mmEntryValue();
+  mmExecute(op) {
+    const T = MM_TIMES[op] || 200;
+    const entryOp = op <= 0x0f;
+    // Any instruction but these ends number entry.
+    if (this.mmEntry && !entryOp) {
+      this.mmX = this.mmRound(this.mmEntryValue());
       this.mmEntry = false;
+    }
+    const afterEnter = this.mmAfterEnter;
+    this.mmAfterEnter = false;
+    const startEntry = () => {
+      if (this.mmEntry) return;
+      if (afterEnter) this.mmX = 0; else this.mmPush(0);
+      this.mmEntry = true;
       this.entryReset();
-    }
-    if (isEn) return;
-    const start = () => {
-      if (!this.mmEntry) {
-        this.mmT = this.mmZ; this.mmZ = this.mmY; this.mmY = this.mmX; this.mmX = 0;
-        this.mmEntry = true;
-        this.entryReset();
-      }
     };
-    if (opcode <= 0x09) {
-      start();
-      if (!this.enExp) { if (this.enMantCount < 8) this.enMant[this.enMantCount++] = opcode; }
-      else if (this.enExpCount < 2) this.enExpDigits[this.enExpCount++] = opcode;
-      this.mmX = this.mmEntryValue();
-      return;
+    const x = this.mmX, y = this.mmY, R = (v) => this.mmRound(v);
+    const fn = (f, bad) => { if (bad) { this.mmError = true; this.mmX = 0; } else this.mmX = R(f()); };
+    const two = (f) => { const v = R(f()); this.mmPop(); this.mmX = v; };
+    const branch = (cond) => {
+      // the test result shows when the instruction has executed
+      this.mmFinish(T, () => {
+        if (cond) { this.mmBR = true; this.mmWord2 = () => {}; }
+        else this.mmBusy = false;
+      });
+    };
+    switch (op) {
+      case 0x0a: startEntry(); if (!this.enDp) { this.enDp = true; this.enDpIndex = this.enMant.length; } break;
+      case 0x0b: startEntry(); this.enExp = true; break;
+      case 0x0c:
+        if (!this.mmEntry) { this.mmX = -this.mmX; break; }
+        if (this.enExp) this.enExpSign = -this.enExpSign; else this.enMantSign = -this.enMantSign;
+        this.mmX = this.mmEntryValue();
+        break;
+      case 0x0d: startEntry(); this.mmX = Math.PI; this.enMant = [3, 1, 4, 1, 5, 9, 2, 7]; this.enDp = true; this.enDpIndex = 1; break;
+      case 0x0e: startEntry(); break;                  // AIN: no digit input here
+      case 0x0f: break;                                // HALT: a NOP that keeps number entry going
+      case 0x10: branch(false); return;                // TJC: the JC input isn't connected
+      case 0x11: branch(x === 0); return;              // TX=0
+      case 0x12: branch(x < 0); return;                // TXLT0
+      case 0x13: branch(Math.abs(x) < 1); return;      // TXF
+      case 0x14: branch(this.mmError); return;         // TERR
+      case 0x15: branch(true); return;                 // JMP
+      case 0x16:                                       // OUT
+        this.mmDigits = this.mmOutDigits();
+        this.setTimer("mmdigit", 40 * 40);
+        return;
+      case 0x17: this.mmFinish(T, () => { this.mmBusy = false; this.mmWord2 = () => {}; }); return;   // IN
+      case 0x18: this.mmFinish(T, () => { this.mmBusy = false; this.mmWord2 = (w) => { if (w >= 1 && w <= 8) this.mmMDC = w; }; }); return;
+      case 0x19: this.mmM = R(this.mmM + 1); branch(this.mmM !== 0); return;   // IBNZ
+      case 0x1a: this.mmM = R(this.mmM - 1); branch(this.mmM !== 0); return;   // DBNZ
+      case 0x1b: this.mmX = this.mmM; this.mmM = x; break;                     // XEM
+      case 0x1c: this.mmM = x; break;                                          // MS
+      case 0x1d: this.mmPush(this.mmM); break;                                 // MR
+      case 0x1e: this.mmX = R(x * 10); break;                                  // LSH
+      case 0x1f: this.mmX = R(x / 10); break;                                  // RSH
+      case 0x20:                                                               // INV
+        this.mmFinish(T, () => { this.mmBusy = false; this.mmWord2 = (w) => this.mmInverse(w); });
+        return;
+      case 0x21: this.mmPush(x); this.mmAfterEnter = true; break;              // EN
+      case 0x22: this.mmSci = !this.mmSci; break;                              // TOGM
+      case 0x23: { const t = this.mmX; this.mmX = this.mmY; this.mmY = this.mmZ; this.mmZ = this.mmT; this.mmT = t; break; }   // ROLL
+      case 0x24: fn(() => Math.sin(x)); break;
+      case 0x25: fn(() => Math.cos(x)); break;
+      case 0x26: fn(() => Math.tan(x)); break;
+      case 0x2b: this.mmError = false; break;                                  // ECLR
+      case 0x2c: fn(() => x * 180 / Math.PI); break;                           // RTD
+      case 0x2d: fn(() => x * Math.PI / 180); break;                           // DTR
+      case 0x2e: this.mmX = y; this.mmPop(); break;                            // POP
+      case 0x2f:                                                               // MCLR
+        this.mmX = this.mmY = this.mmZ = this.mmT = this.mmM = 0;
+        this.mmError = false;
+        break;
+      case 0x30: this.mmX = y; this.mmY = x; break;                            // XEY
+      case 0x31: fn(() => Math.exp(x)); break;
+      case 0x32: fn(() => Math.pow(10, x)); break;
+      case 0x33: fn(() => x * x); break;
+      case 0x34: fn(() => Math.sqrt(x), x < 0); break;
+      case 0x35: fn(() => Math.log(x), x <= 0); break;
+      case 0x36: fn(() => Math.log10(x), x <= 0); break;
+      case 0x37: fn(() => 1 / x, x === 0); break;
+      case 0x38: if (y < 0 && x !== Math.round(x)) { this.mmError = true; two(() => 0); } else two(() => Math.pow(y, x)); break;
+      case 0x39: two(() => y + x); break;
+      case 0x3a: two(() => y - x); break;
+      case 0x3b: two(() => y * x); break;
+      case 0x3c: if (x === 0) { this.mmError = true; two(() => 0); } else two(() => y / x); break;
+      default:
+        if (op <= 0x09) {                                                      // digits
+          startEntry();
+          if (!this.enExp) { if (this.enMant.length < 8) this.enMant.push(op); }
+          else if (this.enExpDigits.length < 2) this.enExpDigits.push(op);
+          this.mmX = this.mmEntryValue();
+        }
+        // NOP, flags and R/W pulses do nothing here
     }
-    switch (opcode) {
-      case 0x0a: start(); if (!this.enDp) { this.enDp = true; this.enDpIndex = this.enMantCount; } return;
-      case 0x0b: start(); this.enExp = true; return;
-      case 0x0c: start(); if (this.enExp) this.enExpSign = -this.enExpSign; else this.enMantSign = -this.enMantSign; return;
-      case 0x0d: start(); this.mmX = Math.PI; return;
-      case 0x0e: start(); return;
-      case 0x0f: return;
+    this.mmFinish(T);
+  }
+
+  // The second word after INV.
+  mmInverse(w) {
+    const x = this.mmX, R = (v) => this.mmRound(v);
+    switch (w) {
+      case 0x24: if (x < -1 || x > 1) this.mmError = true; else this.mmX = R(Math.asin(x)); break;
+      case 0x25: if (x < -1 || x > 1) this.mmError = true; else this.mmX = R(Math.acos(x)); break;
+      case 0x26: this.mmX = R(Math.atan(x)); break;
+      case 0x39: this.mmM = R(this.mmM + x); break;
+      case 0x3a: this.mmM = R(this.mmM - x); break;
+      case 0x3b: this.mmM = R(this.mmM * x); break;
+      case 0x3c: if (x === 0) this.mmError = true; else this.mmM = R(this.mmM / x); break;
     }
-    if (this.mmInv) {
-      this.mmInv = false;
-      const x = this.mmX;
-      switch (opcode) {
-        case 0x24: if (x < -1 || x > 1) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.asin(x) * (this.mmDeg ? DEG : 1); return;
-        case 0x25: if (x < -1 || x > 1) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.acos(x) * (this.mmDeg ? DEG : 1); return;
-        case 0x26: this.mmX = Math.atan(x) * (this.mmDeg ? DEG : 1); return;
-        case 0x39: this.mmM += x; return;
-        case 0x3a: this.mmM -= x; return;
-        case 0x3b: this.mmM *= x; return;
-        case 0x3c: if (x === 0) this.mmError = true; else this.mmM /= x; return;
-      }
-    }
-    const x = this.mmX, rad = this.mmDeg ? x / DEG : x;
-    switch (opcode) {
-      case 0x1c: this.mmM = x; return;
-      case 0x1d: this.mmPush(this.mmM); return;
-      case 0x39: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b + a); return; }
-      case 0x3a: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b - a); return; }
-      case 0x3b: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(b * a); return; }
-      case 0x3c: { const a = this.mmPop(), b = this.mmPop(); if (a === 0) { this.mmError = true; this.mmPush(0); } else this.mmPush(b / a); return; }
-      case 0x2b: this.mmError = false; return;
-      case 0x2f: this.mmM = 0; return;
-      case 0x2c: this.mmX = x * DEG; return;
-      case 0x2d: this.mmX = x / DEG; return;
-      case 0x2e: this.mmPop(); return;
-      case 0x30: this.mmX = this.mmY; this.mmY = x; return;
-      case 0x31: this.mmX = Math.exp(x); return;
-      case 0x32: this.mmX = Math.pow(10, x); return;
-      case 0x33: this.mmX = x * x; return;
-      case 0x34: if (x < 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.sqrt(x); return;
-      case 0x35: if (x <= 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.log(x); return;
-      case 0x36: if (x <= 0) { this.mmError = true; this.mmX = 0; } else this.mmX = Math.log10(x); return;
-      case 0x37: if (x === 0) { this.mmError = true; this.mmX = 0; } else this.mmX = 1 / x; return;
-      case 0x38: { const a = this.mmPop(), b = this.mmPop(); this.mmPush(Math.pow(b, a)); return; }
-      case 0x24: this.mmX = Math.sin(rad); return;
-      case 0x25: this.mmX = Math.cos(rad); return;
-      case 0x26: this.mmX = Math.tan(rad); return;
-      case 0x22: this.mmDeg = !this.mmDeg; return;
-    }
+    this.mmFinish(MM_INV_TIMES[w] || 1700);
   }
 }
 

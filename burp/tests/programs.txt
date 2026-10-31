@@ -1,0 +1,44 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 LET X=2 \r
+20 LET Y=X ROOT \r
+30 PRINT "ROOT OF " X0, " IS " Y6 \r
+40 LET X=X 1 + \r
+50 IF X<6 THEN 20 \r
+60 END :
+#ready
+RUN 10 
+#ready
+#screen
+LOAD 
+10 FOR A=0 STEP 0.5 UNTIL 2 \r
+20 GOSUB 100 \r
+30 NEXT A \r
+40 LET N=0 3 - \r
+50 LET Q=N 4 / \r
+60 PRINT "N=" N2, " N/4=" Q4 \r
+70 END \r
+100 LET S=A SIN \r
+110 LET C=A COS \r
+120 PRINT A2 S6 C6 \r
+130 RETURN :
+#ready
+RUN 10 
+#ready
+#screen
+LOAD 
+10 INPUT A B \r
+20 LET C=A B * \r
+30 LET D=1 C / \r
+40 PRINT A2 B2 C2 D4 \r
+50 END :
+#ready
+RUN 10 
+#wait 1
+1234 
+#wait 0.5
+5678 
+#ready
+#screen

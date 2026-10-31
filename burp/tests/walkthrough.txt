@@ -1,0 +1,32 @@
+#wait 0.5
+MOV 0BB50C000C00
+#wait 0.3
+^
+#wait 0.3
+DEL 6 
+#ready
+ADD 
+6 LET L=A ROOT :
+#ready
+RUN 5 
+#ready
+#screen
+DEL 6 
+#ready
+ADD 
+6 LET L=A EX :
+#ready
+ADD 
+4 PRINT " X           EXP X" :
+#ready
+RUN 4 
+#ready
+#screen
+DEL 7 
+#ready
+ADD 
+7 PRINT "THE NATURAL ANTI-LOG OF" A0, " IS" L4 :
+#ready
+RUN 5 
+#ready
+#screen

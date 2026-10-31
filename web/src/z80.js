@@ -1,7 +1,8 @@
 // A Z80 CPU for the COMP80 emulator.
 //
 // new Z80(bus) where bus has read(addr), write(addr, v), input(port16),
-// output(port16, v).  step() runs one instruction (or one HALT cycle, or
+// output(port16, v), and optionally irqAck(), called when an interrupt is
+// taken.  step() runs one instruction (or one HALT cycle, or
 // takes a pending interrupt) and returns the T-states it took.  nmi() and
 // irq = true/false raise the interrupt lines.  Documented behaviour and
 // flags; the undocumented X/Y flag bits follow the usual rules but nothing
@@ -221,6 +222,7 @@ class Z80 {
       this.halted = false;
       this.iff1 = this.iff2 = 0;
       this.incr();
+      if (this.bus.irqAck) this.bus.irqAck();
       if (this.im === 2) {
         this.push(this.pc);
         this.pc = this.rw((this.i << 8) | 0xff);

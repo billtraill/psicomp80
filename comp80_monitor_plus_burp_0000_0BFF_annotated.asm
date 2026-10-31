@@ -1774,7 +1774,7 @@ PRINT_HEX_WORD_HL:
 06A9: E7          RST $20
 
 ; optional 3-byte suffix if record[+2A] == 05
-06AA: 2E 2A       LD L,$2A         ; **(byte here should be 2A, not xA)**
+06AA: 2E 0A       LD L,$0A         ; buffer[0A] again: 05 ('E') means scientific notation. **Was read as 2A, which never found the E, so exponents weren't printed; corrected to 0A (same test as 06A0).**
 06AC: 7E          LD A,(HL)
 06AD: FE 05       CP $05
 06AF: 20 08       JR NZ,$06B9
@@ -1838,7 +1838,8 @@ PRINT_HEX_WORD_HL:
 ;
 ; Open questions / likely dump ambiguities:
 ;   - The many $76 bytes are semantically "wait/consume next token"; confirm against scan.
-;   - 06AA: 'LD L,$2A' looks intentional (offset $2A), but scan quality could confuse '2A' with 'xA'.
+;   - 06AA: 'LD L,$0A' (was transcribed as 2A): it tests buffer[0A] for 05 ('E') like 06A0, then copies the
+;     exponent sign and digits after it. With 2A the exponent of a number in scientific notation was never printed.
 ; -----------------------------------------------------------------------------
 06BB: E5          PUSH HL
 06BC: CD 14 07    CALL $0714

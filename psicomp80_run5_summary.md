@@ -1,5 +1,12 @@
 # PSI COMP‑80 / BURP – RUN 5 investigation summary (as of 2026‑01‑31)
 
+> **Resolved (October 2026).** BURP runs: see `burp/README.md`. The causes were
+> the MM57109 model (OUT\*'s digits came after the second word instead of the
+> first, the busy/ready handshake and branches didn't follow the chip, and the
+> digit interrupt was cleared by BURP's own status polling), a floppy
+> controller interrupt left asserted after reset, and one misread ROM byte at
+> 06AB. This note is kept as a record of the investigation.
+
 This note captures what we’ve established so far about **why `RUN 5` returns to the Monitor (READY prompt)**, plus the most productive next debugging steps.
 
 ## Current state

@@ -7,9 +7,10 @@ help page for each language. Open it in a browser; it needs no server.
 - Switch ROM between BURP, FORTH and LISP, and memory between 5 KB and the
   32 KB expansion (both power the machine off and on).
 - Run any of the examples: Life, the two Fig. 22 pictures, ALPH and LIST in
-  the monitor, BURP's sample program, the FORTH session, Life and Mandelbrot,
-  and the LISP session, differentiation, Hanoi and the queens. The page types
-  each one in, flat out, then runs it at the real 4 MHz.
+  the monitor, BURP's sample program, e^x and a sine table, the FORTH
+  session, Life and Mandelbrot, and the LISP session, differentiation, Hanoi
+  and the queens. The page types each one in, flat out, then runs it at the
+  real 4 MHz.
 - Paste a program to have it typed in a line at a time.
 - Keys: Return, `^` (RS), Backspace (rubout in FORTH and LISP), Ctrl+`\` (FS),
   Esc (RESET). A key while a program runs resets to the monitor, as on the
@@ -26,7 +27,6 @@ help page for each language. Open it in a browser; it needs no server.
 | `src/page.html`, `src/help.html` | the page and the help pages |
 | `build.py` | puts it all together, with the fonts read from the driver |
 | `tools/session.js` | runs a session from a test file in Node and prints the screen |
-| `tests/burp.txt` | BURP's sample program: MOV, RS, LIST, RUN |
 
     python3 web/build.py
 
@@ -43,16 +43,11 @@ ROMs, fonts and programs, for the Node tools).
 
 The screens it prints match MAME's, line for line, for all the LISP tests
 and the FORTH tests (FORTH's are written for a harness that doesn't wait for
-the cursor, hence `NOWAIT=1`). A register trace of BURP from the start of
-`RUN 5` matched MAME instruction for instruction until MAME took an
-interrupt that the driver means to have cleared.
+the cursor, hence `NOWAIT=1`). BURP's MM57109 model is the same as the
+driver's (see `../burp/README.md`), and the BURP examples print what the
+driver does.
 
 ## What it doesn't do
 
 - No cassette or floppy disc: programs that came on tape are copied into
   memory, as `../c80.sh` does.
-- BURP lists and edits programs but can't run them: like the MAME driver,
-  it doesn't model the MM57109 calculator chip fully. In MAME `RUN 5`
-  floods the screen with B (the key interrupt stays on and BURP's handler
-  stores the key code over and over); here it stops in BURP's handshake
-  with the chip.

@@ -90,6 +90,14 @@ after the name.
 ```
 screenshots.html shows what each one looks like.
 
+/h2 BURP
+
+BURP, the original high-level language, runs: at READY type
+MOV 0BB50C000C00, then ^ (RS), then RUN 5 and a space for the articles'
+sample program. See burp/README.md for the walkthrough, the tests and what
+was fixed (the MM57109 calculator chip model, interrupts, and one misread ROM
+byte).
+
 /h2 In a web browser
 
 emulator.html is the COMP80 as a single web page: open it in any browser. It

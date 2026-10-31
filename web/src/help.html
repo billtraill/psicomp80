@@ -30,7 +30,7 @@
       <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for FORTH or LISP to be ready for each line.</li>
     </ul>
     <h3>What isn’t emulated</h3>
-    <p>There is no cassette interface or floppy disc, so READ, TAPE and the disc commands do nothing useful. Programs that came on tape are loaded straight into memory by the examples. BURP’s calculations go through the MM57109 calculator chip, and that chip’s emulation isn’t finished, so BURP programs list and edit but don’t run (see <a href="#burp" data-goto="burp">BURP</a>).</p>
+    <p>There is no cassette interface or floppy disc, so READ, TAPE and the disc commands do nothing useful. Programs that came on tape are loaded straight into memory by the examples.</p>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-monitor" aria-labelledby="tab-monitor" hidden>
@@ -65,23 +65,23 @@
   <div class="panel" role="tabpanel" id="panel-burp" aria-labelledby="tab-burp" hidden>
     <h2>BURP</h2>
     <p>BURP is the high-level language of the original ROM, from the Wireless World articles: a small BASIC-like language whose arithmetic is done by a National MM57109 scientific calculator chip. Press RS at READY and the top line changes to BURP. Commands end with a space.</p>
-    <p class="note">In this emulator (and in the MAME driver it follows) the MM57109 isn’t emulated well enough yet for programs to run: RUN stops part way. Entering, listing and editing programs works.</p>
+    <p>The chip takes its time, as the real one did: an addition takes about 20 ms, a logarithm 0.3 s and a sine half a second. Type a key only when BURP is waiting for one; a key while it is busy restarts the monitor.</p>
     <h3>Commands</h3>
     <div class="tablewrap"><table>
       <thead><tr><th>Command</th><th>What it does</th></tr></thead>
       <tbody>
         <tr><td><code>LIST n</code></td><td>Lists the program from line n, then shows the end address of the program in memory (programs live from 0C00 to 1DC0).</td></tr>
         <tr><td><code>RUN n</code></td><td>Runs from line n. Any key stops it, back to READY; RS returns to BURP.</td></tr>
-        <tr><td><code>ADD</code></td><td>Adds lines, each typed with its number and ended with Return. A colon at the end leaves ADD; it marks the end of the program.</td></tr>
+        <tr><td><code>ADD</code></td><td>Adds lines, each typed with its number and ended with Return. End the last line with a colon instead of Return: that leaves ADD and marks the end of the program.</td></tr>
         <tr><td><code>DEL n</code></td><td>Deletes line n and lists what is left.</td></tr>
-        <tr><td><code>LOAD</code></td><td>Starts a new program, ended with a colon like ADD.</td></tr>
+        <tr><td><code>LOAD</code></td><td>Starts a new program, typed and ended like ADD.</td></tr>
       </tbody>
     </table></div>
     <h3>Statements</h3>
     <div class="tablewrap"><table>
       <thead><tr><th>Statement</th><th>What it does</th></tr></thead>
       <tbody>
-        <tr><td><code>LET X=A SIN SQ</code></td><td>Assigns an expression, written in calculator order: the value, then the operations on it.</td></tr>
+        <tr><td><code>LET X=A SIN SQ</code></td><td>Assigns an expression, written in calculator order with a space after each term: the value, then the operations on it. <code>LET X=X 1 +</code> adds 1. Functions include ROOT, SQ, LOG, LN, EX, SIN, COS and TAN (radians).</td></tr>
         <tr><td><code>INPUT A B</code></td><td>Reads values into variables.</td></tr>
         <tr><td><code>PRINT "TEXT" A4</code></td><td>Prints text and numbers. A number with a digit after it is printed to that many decimal places; a comma after it closes up the gaps.</td></tr>
         <tr><td><code>IF X=Y THEN 50</code></td><td>Goes to line 50 if the condition (&lt;, = or &gt;) holds.</td></tr>
@@ -98,7 +98,13 @@
 008 NEXT A
 009 END
 0C4A</code></pre>
-    <p>On a real COMP80, <code>RUN 5 </code> prints the common logarithms of 1 to 25. The articles go on to change line 6 to <code>LET L=A ROOT</code> or <code>LET L=A EX</code> with DEL and ADD.</p>
+    <p><code>RUN 5 </code> prints the common logarithms of 1 to 25. The articles go on to change line 6 with <code>DEL 6 </code>, then <code>ADD </code> and <code>6 LET L=A ROOT :</code> for square roots, or <code>6 LET L=A EX :</code> for e<sup>x</sup>. From e<sup>19</sup> the results no longer fit in 8 digits and BURP prints them in scientific notation, the exponent at the end: <code>7.2004899 10</code> for e<sup>25</sup>.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>BURP sample program</strong> copies the program from ROM, lists it and runs it.</li>
+      <li><strong>e to the x</strong> follows the articles: it changes line 6, adds a heading line and runs from line 4.</li>
+      <li><strong>Sines and cosines</strong> types in a new program with LOAD: a FOR loop with STEP 0.5 calling a subroutine, then a negative number and a division.</li>
+    </ul>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-forth" aria-labelledby="tab-forth" hidden>

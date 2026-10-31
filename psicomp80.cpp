@@ -110,7 +110,7 @@ static void psicomp80_floppy_formats(format_registration &fr)
 #define LOG_MM_ACK (1U << 2)    // $3F ACK handling
 
 // #define VERBOSE (LOG_MM57109 | LOG_MM_ACK)
-#define VERBOSE (LOG_MM57109 | LOG_MM_ACK | LOG_MM_STATUS)
+#define VERBOSE 0
 
 // Timestamp for MM57109 logs (seconds since start)
 #define MM_TS() (machine().time().as_double())
@@ -319,13 +319,16 @@ private:
   // mode 2 vector on the bus. DRQ is input 9 (F3), INTRQ input 8 (F1); the
   // MM57109 is moved to a spare input (we use 1, E3). In IM1 the vector is
   // ignored, so the monitor's MM57109 handling is unchanged.
-  bool m_irq_mm_line = false;   // MM57109 level (set/clear)
-  bool m_irq_mm_pulse = false;  // MM57109 data-ready pulse
+  bool m_irq_mm_line = false;   // MM57109 R/W: a digit is waiting
   bool m_fdc_intrq = false;
   bool m_fdc_drq = false;
-  emu_timer *m_irq_pulse_timer = nullptr;
+  // The FD1771 does a RESTORE when it is reset, which leaves INTRQ set until
+  // its status is read. The monitor and BURP never touch the controller, and
+  // BURP's IM 1 handler takes every interrupt for an MM57109 digit, so the
+  // controller's interrupts only reach the Z80 once software has used it
+  // since the last reset. The disc software reads the status first.
+  bool m_fdc_used = false;
   void update_irq();
-  TIMER_CALLBACK_MEMBER(irq_pulse_end);
   IRQ_CALLBACK_MEMBER(irq_ack);
 
   // ROM is mapped read-only (like real hardware)
@@ -339,79 +342,36 @@ private:
   u8 m_tape_in = 1;
 
 
-  u8 m_mm_code = 0x1f;
-  bool m_mm_one_shot_clear = false;
-
-  // --- MM57109 port $60 write / port $03 status modelling (BURP relies on
-  // this) ---
-  u8 m_mm_last_port03 = 0xff; // last value read from port $03 (for change-only logging)
-  bool m_mm_RDY = true; // RDY (bit5) for $042E busy/ack loops, RDY=0 means its READY (ie true), RDY=1 means its BUSY (ie false) . BURP waits for RDY=1 after each instruction. Except for BR instuctions which use BR and RDY to indicate branch or not.
-  bool m_mm_was_branch_instruction = false; // Used to indicate that the last instruction was a branch instruction
-  bool m_mm_instuction_after_branch = false; // Used to indicate that the next instruction is after a branch ... so it should clear ready flag...
-  bool m_mm_BR_state = false; // BR (bit6) for $058A; true=branch taken, false=not taken. BR bit = 0 when true, 1 when false (same convention as RDY).
-  bool m_mm_HOLD = false; // HOLD (bit 7) Reading a hold bit means the MM57109 is to be put on hold no interrupts, 0 its good to go... 
-//   u8 m_mm_latch = 0x00; // phase-1 latched byte (bit7 clear)
-//   bool m_mm_expect_latch = true; // handshake phase tracker for $042E (ignore data bit7)
-  bool m_mm_inv_pending = false; // last executed opcode was INV (0x20); next selects INV function
-  std::vector<u8> m_mm_stream; // committed byte stream (bit7 stripped)
-  u64 m_mm_tx_seq = 0;         // transaction counter
-
-  // --- MM57109 register/state model (WIP) ---
-  // These fields model the MM57109 internal state at a coarse level so we can
-  // progressively implement the instruction set that BURP uses.
-  double m_mm_x = 0.0; // X register (top of stack)
-  double m_mm_y = 0.0; // Y register
-  double m_mm_z = 0.0; // Z register
-  double m_mm_t = 0.0; // T register
-  double m_mm_m = 0.0; // Memory register M
-  bool m_mm_deg_mode =
-      false; // angular mode (false=radians, true=degrees) - rough model
-  u8 m_mm_mant_digits = 8;       // mantissa digit count (SMDC*)
-  bool m_mm_digit_entry = false; // currently collecting digits into X
-  std::string m_mm_digit_buf;    // digit-entry buffer (ASCII, e.g. "-12.34E+5")
-  // MM57109 number-entry state (digits/DP/EE/CS)
-  bool m_mm_entry_exp_mode = false;
-  bool m_mm_entry_dp_set = false;
-  int m_mm_entry_dp_index = 0; // number of mantissa digits before decimal point
-  int m_mm_entry_mant_count = 0; // digits entered into mantissa (0..8)
-  int m_mm_entry_exp_count = 0;  // digits entered into exponent (0..2)
-  int m_mm_entry_mant_sign = 1;
-  int m_mm_entry_exp_sign = 1;
-  std::array<u8, 8> m_mm_entry_mant{};
-  std::array<u8, 2> m_mm_entry_exp{};
-  bool m_mm_two_word_pending = false;
-  bool m_mm_irq0_asserted = false;
-  u8 m_mm_two_word_op = 0x00;
+  // --- MM57109 calculator chip (BURP does its arithmetic on it) ---
+  // Port 60 drives its instruction lines (bits 0-5) and HOLD (bit 7); port 03
+  // reads RDY (bit 5: 1 while it executes), BR (bit 6: 0 when a test is true)
+  // and its digit outputs (bits 0-3). Its R/W output, pulsed once for each
+  // digit of an OUT instruction, is the Z80's INT.
+  enum : u8 { MM_WORD2_NONE, MM_WORD2_IGNORE, MM_WORD2_SMDC, MM_WORD2_INV };
+  enum : u8 { MM_THEN_READY, MM_THEN_WORD2, MM_THEN_BRANCH_TRUE, MM_THEN_BRANCH_FALSE };
+  double m_mm_x = 0.0, m_mm_y = 0.0, m_mm_z = 0.0, m_mm_t = 0.0, m_mm_m = 0.0;
+  bool m_mm_sci = false;        // TOGM: scientific notation for IN and OUT
+  u8 m_mm_mdc = 8;              // mantissa digits for IN and OUT (SMDC)
   bool m_mm_error = false;
-
-  // queue for IM1 nibble delivery (port $03 low nibble + IRQ0 pulses)
-  std::vector<u8> m_mm_nibble_q;
-  emu_timer *m_mm_nibble_timer = nullptr;
-  // Timed RDY/BR modelling: each committed MM57109 byte makes the device "busy"
-  // for a programmable number of Z80 clock cycles, then becomes ready and (for
-  // branch-type ops) presents the branch result for a short window.
-  emu_timer *m_mm_ready_timer = nullptr;
-  emu_timer *m_mm_branch_clear_timer = nullptr;
-  // Default delays (in Z80 clock cycles). Must be > OUT(11)+IN(10) so $042E
-  // loop at 0439 sees RDY=1 (busy) on first poll after OUT $60.
-  u32 m_mm_default_exec_cycles = 40;
-  u32 m_mm_branch_clear_cycles = 20;
-  // When branch result leaves RDY false, delay this many cycles before setting RDY true (for $058A 059E loop).
-  u32 m_mm_branch_rdy_delay_cycles = 100;
-  // Branch "executing" period: hold m_mm_RDY=0 + m_mm_BR_state=1 (port 0x60) this long so $058A loop at 058E sees it.
-  u32 m_mm_branch_exec_cycles = 150;
-  // After OUT* last nibble: delay before m_mm_RDY=true so Z80 can finish the
-  // last IRQ handler (~65 cy) and run IN at 0439.
-  u32 m_mm_out_stream_complete_cycles = 300;
-  // Per-opcode execution delay table (index = opcode & 0x3f). Defaults to
-  // m_mm_default_exec_cycles; can be tuned per instruction later.
-  std::array<u32, 64> m_mm_op_exec_cycles{};
-
-  // State latched at "instruction start" for the ready timer callback.
-  bool m_mm_pending_is_branch = false;
-  bool m_mm_pending_branch_state = false;
-  u8 m_mm_pending_opcode = 0x00;
-
+  bool m_mm_hold = true;
+  bool m_mm_busy = false;       // executing an instruction: RDY low
+  bool m_mm_br = false;         // a test was true: BR low
+  u8 m_mm_word2 = MM_WORD2_NONE;      // what the next word is for
+  u8 m_mm_then = MM_THEN_READY;       // what happens when the instruction ends
+  u8 m_mm_then_word2 = MM_WORD2_NONE;
+  u8 m_mm_code = 0;             // digit outputs
+  u8 m_mm_digits[12];           // OUT: digits still to come
+  u8 m_mm_ndigits = 0, m_mm_digit_pos = 0;
+  // number entry (digits, DP, EE and CS instructions)
+  bool m_mm_entry = false;      // in number entry
+  bool m_mm_after_enter = false;// the last instruction was EN
+  bool m_mm_en_exp = false, m_mm_en_dp = false;
+  u8 m_mm_en_dp_index = 0;
+  u8 m_mm_en_mant[8], m_mm_en_nmant = 0;
+  u8 m_mm_en_expd[2], m_mm_en_nexp = 0;
+  s8 m_mm_en_mant_sign = 1, m_mm_en_exp_sign = 1;
+  emu_timer *m_mm_exec_timer = nullptr;
+  emu_timer *m_mm_digit_timer = nullptr;
 
   // -------- character generator tables --------
   // Each glyph: 8 rows, 5 bits per row (packed in bits 0..4).
@@ -432,34 +392,26 @@ private:
   u8 port03_r();
   void port20_w(u8 data);
   void port60_w(u8 data);
-  void mm57109_dump_stream(const char *tag, u8 cmd);
 
-  // keyboard -> strobe (NMI) + MM data ready (IRQ0)
+  // keyboard -> latch and NMI
   void kbd_put(u8 data);
   // display
   u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
                     const rectangle &cliprect);
 
-  // helpers
-  static u8 ascii_to_mm_code(u8 data);
-  void mm_set_data_ready(u8 code);
-  // MM57109 model helpers
+  // MM57109 model
   void mm57109_reset();
   void mm57109_execute(u8 op);
-  void mm57109_execute_single(u8 op);
-  bool mm57109_is_two_word(u8 op) const;
-  const char *mm57109_opcode_mn(u8 op) const;
+  void mm57109_second_word(u8 kind, u8 op);
+  void mm57109_finish(u32 microcycles, u8 then = MM_THEN_READY, u8 word2 = MM_WORD2_NONE);
+  double mm57109_round(double v);
   void mm57109_push(double v);
-  double mm57109_pop();
-  void mm57109_set_x(double v);
-  void mm57109_queue_nibble(u8 nib);
-  void mm57109_emit_out_scientific_stream_from_x();
-  TIMER_CALLBACK_MEMBER(mm57109_nibble_tick);
-  TIMER_CALLBACK_MEMBER(mm57109_ready_tick);
-  TIMER_CALLBACK_MEMBER(mm57109_branch_clear_tick);
-  void mm57109_begin_processing(u8 opcode, bool is_branch, bool branch_state);
-
-  void mm57109_log_regs(const char *phase, u8 op);
+  void mm57109_pop();
+  void mm57109_entry_clear();
+  double mm57109_entry_value() const;
+  void mm57109_out_digits();
+  TIMER_CALLBACK_MEMBER(mm57109_exec_done);
+  TIMER_CALLBACK_MEMBER(mm57109_digit_tick);
 
   static u8 glyph_row(u8 vram_byte, int row); // returns 5-bit pattern
 
@@ -617,63 +569,56 @@ void psicomp80_state::machine_start() {
   // 00h is @, not a space).
   std::fill_n(&m_vram[0], m_vram.bytes(), 0x20);
 
-  m_mm_stream.reserve(256);
-  m_mm_nibble_timer =
-      timer_alloc(FUNC(psicomp80_state::mm57109_nibble_tick), this);
-  m_mm_ready_timer =
-      timer_alloc(FUNC(psicomp80_state::mm57109_ready_tick), this);
-  m_mm_branch_clear_timer =
-      timer_alloc(FUNC(psicomp80_state::mm57109_branch_clear_tick), this);
-  m_irq_pulse_timer = timer_alloc(FUNC(psicomp80_state::irq_pulse_end), this);
+  m_mm_exec_timer = timer_alloc(FUNC(psicomp80_state::mm57109_exec_done), this);
+  m_mm_digit_timer = timer_alloc(FUNC(psicomp80_state::mm57109_digit_tick), this);
 
   // 8in drives spin all the time; the FD1771 only loads the head.
   m_fdc->set_floppy(m_floppy->get_device());
   if (m_floppy->get_device())
     m_floppy->get_device()->mon_w(0);
   save_item(NAME(m_irq_mm_line));
-  save_item(NAME(m_irq_mm_pulse));
   save_item(NAME(m_fdc_intrq));
   save_item(NAME(m_fdc_drq));
-
-  // Default all opcodes to the same execution time for now; tweak per opcode
-  // later as we learn the real MM57109 timing.
-  m_mm_op_exec_cycles.fill(m_mm_default_exec_cycles);
-
+  save_item(NAME(m_fdc_used));
 
   save_item(NAME(m_key_latch));
   save_item(NAME(m_tape_in));
   save_item(NAME(m_key_time));
-  save_item(NAME(m_mm_code));
-  save_item(NAME(m_mm_one_shot_clear));
-  save_item(NAME(m_mm_last_port03));
-
-  save_item(NAME(m_mm_RDY));
-  save_item(NAME(m_mm_BR_state));
-  save_item(NAME(m_mm_HOLD));
-//   save_item(NAME(m_mm_latch));
-  save_item(NAME(m_mm_was_branch_instruction));
-  save_item(NAME(m_mm_instuction_after_branch));
-  //save_item(NAME(m_mm_expect_latch));
-  save_item(NAME(m_mm_inv_pending));
-  save_item(NAME(m_mm_tx_seq));
 
   save_item(NAME(m_mm_x));
   save_item(NAME(m_mm_y));
   save_item(NAME(m_mm_z));
   save_item(NAME(m_mm_t));
   save_item(NAME(m_mm_m));
-  save_item(NAME(m_mm_deg_mode));
-  save_item(NAME(m_mm_mant_digits));
-  save_item(NAME(m_mm_digit_entry));
-  save_item(NAME(m_mm_two_word_pending));
-  save_item(NAME(m_mm_irq0_asserted));
-  save_item(NAME(m_mm_two_word_op));
+  save_item(NAME(m_mm_sci));
+  save_item(NAME(m_mm_mdc));
   save_item(NAME(m_mm_error));
+  save_item(NAME(m_mm_hold));
+  save_item(NAME(m_mm_busy));
+  save_item(NAME(m_mm_br));
+  save_item(NAME(m_mm_word2));
+  save_item(NAME(m_mm_then));
+  save_item(NAME(m_mm_then_word2));
+  save_item(NAME(m_mm_code));
+  save_item(NAME(m_mm_digits));
+  save_item(NAME(m_mm_ndigits));
+  save_item(NAME(m_mm_digit_pos));
+  save_item(NAME(m_mm_entry));
+  save_item(NAME(m_mm_after_enter));
+  save_item(NAME(m_mm_en_exp));
+  save_item(NAME(m_mm_en_dp));
+  save_item(NAME(m_mm_en_dp_index));
+  save_item(NAME(m_mm_en_mant));
+  save_item(NAME(m_mm_en_nmant));
+  save_item(NAME(m_mm_en_expd));
+  save_item(NAME(m_mm_en_nexp));
+  save_item(NAME(m_mm_en_mant_sign));
+  save_item(NAME(m_mm_en_exp_sign));
 }
 
 void psicomp80_state::machine_reset() {
   m_key_latch = 0xff;
-  
+  m_fdc_used = false;
   mm57109_reset();
 }
 
@@ -712,28 +657,28 @@ void psicomp80_state::io_map(address_map &map) {
   // Floppy disc controller (Oct 1980 Table 2): register select is A3/A4.
   //   IN 05/0D/15/1D = status/track/sector/data
   //   OUT A0/A8/B0/B8 = command/track/sector/data
-  map(0x05, 0x05).select(0x18).lr8(NAME([this](offs_t o) { return m_fdc->read(o >> 3); }));
-  map(0xa0, 0xa0).select(0x18).lw8(NAME([this](offs_t o, u8 d) { m_fdc->write(o >> 3, d); }));
+  map(0x05, 0x05).select(0x18).lr8(NAME([this](offs_t o) { if (!machine().side_effects_disabled()) m_fdc_used = true; return m_fdc->read(o >> 3); }));
+  map(0xa0, 0xa0).select(0x18).lw8(NAME([this](offs_t o, u8 d) { m_fdc_used = true; m_fdc->write(o >> 3, d); }));
 }
 
 void psicomp80_state::update_irq()
 {
-  const bool irq = m_irq_mm_line || m_irq_mm_pulse || m_fdc_intrq || m_fdc_drq;
+  const bool irq = m_irq_mm_line || (m_fdc_used && (m_fdc_intrq || m_fdc_drq));
   m_cpu->set_input_line(INPUT_LINE_IRQ0, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-TIMER_CALLBACK_MEMBER(psicomp80_state::irq_pulse_end)
-{
-  m_irq_mm_pulse = false;
-  update_irq();
 }
 
 IRQ_CALLBACK_MEMBER(psicomp80_state::irq_ack)
 {
-  if (m_fdc_drq)
+  if (m_fdc_used && m_fdc_drq)
     return 0xf3;
-  if (m_fdc_intrq)
+  if (m_fdc_used && m_fdc_intrq)
     return 0xf1;
+  // The MM57109's R/W interrupt is latched until the Z80 takes it. (Clearing
+  // it when port 03 is read loses digits: BURP polls port 03 while the digits
+  // come in, and a digit arriving during one of those INs would be cleared
+  // before the Z80 could take it.)
+  m_irq_mm_line = false;
+  update_irq();
   return 0xe3;
 }
 
@@ -784,109 +729,98 @@ u8 psicomp80_state::port01_r() {
 }
 
 u8 psicomp80_state::port03_r() {
-  // Port $03: combined MM57109 status + 4-bit data.
-  //
-  // BURP uses bit5 ($20) as the RDY line, it needs to see RDY go high to indicate its busy, the RDY to low 
-  // $042E:
-  //   - it waits for RDY=0 before (its ready for an instuction), then waits for RDY=1  (its busy executing the instuction) before putting it in HOLD.
-  //
-  // BURP also uses bit6 ($40) BR (branch). Same convention as RDY: state true -> bit 0, state false -> bit 1.
-  //   - bit5 RDY: m_mm_RDY=true -> 0, m_mm_RDY=false -> 1
-  //   - bit6 BR:  m_mm_BR_state=true -> 0, m_mm_BR_state=false -> 1
-  //
-  // Low bits contain the current 4-bit (or 5-bit) code sample; only the low
-  // nibble is meaningful for IM1 capture (A & $0F).
-  bool RDY = m_mm_RDY;
-  bool BR_state = m_mm_BR_state;
+  // RDY (bit 5) and BR (bit 6) as the ROM sees them, and the digit outputs.
+  return (m_mm_busy ? 0x20 : 0x00) | (m_mm_br ? 0x00 : 0x40) | (m_mm_code & 0x0f);
+}
 
-  u8 v = (RDY ? 0x00 : 0x20) | (BR_state ? 0x00 : 0x40) | (m_mm_code & 0x1f);
+// ---------------------------------------------------------------------------
+// MM57109 model
+//
+// The Z80 sends an instruction by putting it on port 60 with HOLD (bit 7)
+// low: the chip fetches it and RDY goes low (port 03 bit 5 reads 1). BURP
+// then raises HOLD, so the chip stops when the instruction has finished and
+// RDY comes back. Two-word instructions (INV, SMDC, OUT, IN and the
+// branches) take their second word the same way. A branch whose test is true
+// pulses BR and waits for its second word (BURP sends a NOP); a false one
+// skips it. OUT puts out twelve digits, each with a R/W pulse that interrupts
+// the Z80 (IM 1, handler at 0038), before it is ready for its second word.
+// Execution times are the data sheet's averages; a microcycle is about 10 us.
+// Results are rounded to the chip's 8 significant digits.
+// ---------------------------------------------------------------------------
 
-  // Log when value changed, or always when PC=003B (IRQ handler IN) to see every interrupt.
-  const bool log_read = (v != m_mm_last_port03) || ((u16)m_cpu->pc() == 0x003B);
-  if (log_read) {
-    const int rdy_bit = (v >> 5) & 1;
-    const int br_bit = (v >> 6) & 1;
-    LOGMASKED(LOG_MM_STATUS,
-              "[t=%.6f] MM57109 R: IN ($03) @PC=%04X -> %02X (m_mm_RDY=%s m_mm_BR_state=%s RDY bit=%d BR bit=%d code=%02X)\n",
-              MM_TS(), (u16)m_cpu->pc(), v,
-              RDY ? "true" : "false", BR_state ? "true" : "false", rdy_bit, br_bit, m_mm_code);
-    if (v != m_mm_last_port03)
-      m_mm_last_port03 = v;
+// Execution times in microcycles, by opcode.
+static const u16 mm57109_exec_time[64] = {
+  238, 238, 238, 238, 238, 238, 238, 238, 238, 238, 152, 151, 166, 1312, 284, 134,       // 0-9 DP EE CS PI AIN HALT
+  208, 278, 197, 271, 191, 186, 583, 395, 163, 2314, 2314, 812, 839, 1385, 168, 173,     // TJC .. RSH
+  166, 552, 157, 905, 56200, 56200, 35000, 163, 185, 163, 185, 163, 30700, 30700, 448, 734,   // INV EN TOGM ROLL SIN COS TAN flags ECLR RTD DTR POP MCLR
+  652, 30800, 27400, 3000, 7000, 24800, 30700, 4500, 55400, 2200, 2200, 3200, 7800, 130, 130, 122  // XEY EX 10X SQ SQRT LN LOG 1/X YX + - x / PRW1 PRW2 NOP
+};
+
+void psicomp80_state::mm57109_reset() {
+  m_mm_x = m_mm_y = m_mm_z = m_mm_t = m_mm_m = 0.0;
+  m_mm_sci = false;
+  m_mm_mdc = 8;
+  m_mm_error = false;
+  m_mm_hold = true;
+  m_mm_busy = false;
+  m_mm_br = false;
+  m_mm_word2 = MM_WORD2_NONE;
+  m_mm_then = MM_THEN_READY;
+  m_mm_then_word2 = MM_WORD2_NONE;
+  m_mm_code = 0;
+  m_mm_ndigits = m_mm_digit_pos = 0;
+  m_mm_entry = false;
+  m_mm_after_enter = false;
+  mm57109_entry_clear();
+  m_irq_mm_line = false;
+  if (m_mm_exec_timer)
+    m_mm_exec_timer->adjust(attotime::never);
+  if (m_mm_digit_timer)
+    m_mm_digit_timer->adjust(attotime::never);
+  update_irq();
+}
+
+void psicomp80_state::mm57109_entry_clear() {
+  m_mm_en_exp = m_mm_en_dp = false;
+  m_mm_en_dp_index = 0;
+  m_mm_en_nmant = m_mm_en_nexp = 0;
+  m_mm_en_mant_sign = m_mm_en_exp_sign = 1;
+}
+
+double psicomp80_state::mm57109_entry_value() const {
+  double mant = 0.0;
+  for (int i = 0; i < m_mm_en_nmant; i++)
+    mant = mant * 10.0 + m_mm_en_mant[i];
+  const int dp = m_mm_en_dp ? m_mm_en_dp_index : m_mm_en_nmant;
+  double v = mant * std::pow(10.0, double(dp - m_mm_en_nmant)) * m_mm_en_mant_sign;
+  if (m_mm_en_nexp) {
+    int e = 0;
+    for (int i = 0; i < m_mm_en_nexp; i++)
+      e = e * 10 + m_mm_en_expd[i];
+    v *= std::pow(10.0, double(e * m_mm_en_exp_sign));
   }
-
-  // If we're currently presenting a queued digit nibble via IRQ0, the ROM IM1
-  // handler will read port $03 to sample it. Model this as a handshake: the
-  // read acknowledges the current nibble, so we deassert IRQ0 and (if more
-  // digits are queued) arm the next.
-  if (m_mm_irq0_asserted) {
-    m_irq_mm_line = false;
-    update_irq();
-    m_mm_irq0_asserted = false;
-    if (m_mm_nibble_timer && !m_mm_nibble_q.empty())
-      m_mm_nibble_timer->adjust(attotime::zero);
-  }
-
   return v;
 }
 
-// ---------------------------------------------------------------------------
-// MM57109 coarse state model (registers + instruction dispatcher)
-// ---------------------------------------------------------------------------
-
-void psicomp80_state::mm57109_reset() {
-
-  m_mm_was_branch_instruction = false;
-  m_mm_instuction_after_branch = false;
-  m_mm_code = 0x1f;
-  m_mm_one_shot_clear = false;
-  m_mm_last_port03 = 0xff;
-
-  m_mm_HOLD = false;
-  m_mm_RDY = true;
-  m_mm_BR_state = false;
-//   m_mm_latch = 0x00;
-  // m_mm_expect_latch = true;
-  m_mm_inv_pending = false;
-  m_mm_irq0_asserted = false;
-  m_mm_stream.clear();
-  m_mm_tx_seq = 0;
-
-  m_mm_x = m_mm_y = m_mm_z = m_mm_t = 0.0;
-  m_mm_m = 0.0;
-  m_mm_deg_mode = false;
-  m_mm_mant_digits = 8;
-  m_mm_digit_entry = false;
-  m_mm_digit_buf.clear();
-  m_mm_two_word_pending = false;
-  m_mm_two_word_op = 0x00;
-  m_mm_error = false;
-  m_mm_nibble_q.clear();
-}
-
-bool psicomp80_state::mm57109_is_two_word(u8 op) const {
-  // Per MM57109 datasheet: several instructions are 2-word (opcode +
-  // parameter/addr). We don't implement their behaviour yet, but we track the
-  // second word so we can correlate BURP byte streams with required
-  // functionality.
-  switch (op & 0x3f) {
-  case 0x10: // TJC*
-  case 0x11: // TX=0*
-  case 0x12: // TX<0*
-  case 0x15: // JMP*
-  case 0x17: // IN*
-  case 0x18: // SMDC*
-  case 0x19: // IBNZ*
-  case 0x1a: // DBNZ*
-  case 0x16: // OUT* (note: also appears as 0x16)
-    return true;
-  default:
-    return false;
+// Round to 8 significant digits; the exponent must stay within +-99.
+double psicomp80_state::mm57109_round(double v) {
+  if (!std::isfinite(v)) {
+    m_mm_error = true;
+    return 0.0;
   }
-}
-
-const char *psicomp80_state::mm57109_opcode_mn(u8 op) const {
-  // Prefer the existing mnemonic mapping (already used for logging).
-  return mm57109_opcode_name(op & 0x3f);
+  if (v == 0.0)
+    return 0.0;
+  char buf[32];
+  snprintf(buf, sizeof(buf), "%.7e", v);
+  const double r = strtod(buf, nullptr);
+  const int e = int(std::floor(std::log10(std::fabs(r))));
+  if (e > 99) {
+    m_mm_error = true;
+    return r < 0.0 ? -9.9999999e99 : 9.9999999e99;
+  }
+  if (e < -99)
+    return 0.0;
+  return r;
 }
 
 void psicomp80_state::mm57109_push(double v) {
@@ -896,871 +830,275 @@ void psicomp80_state::mm57109_push(double v) {
   m_mm_x = v;
 }
 
-double psicomp80_state::mm57109_pop() {
-  double v = m_mm_x;
-  m_mm_x = m_mm_y;
+// Drop Y (after a two-operand operation has put its result in X).
+void psicomp80_state::mm57109_pop() {
   m_mm_y = m_mm_z;
   m_mm_z = m_mm_t;
-  // m_mm_t holds last T; keep as-is
-  return v;
 }
 
-void psicomp80_state::mm57109_set_x(double v) { m_mm_x = v; }
-
-void psicomp80_state::mm57109_queue_nibble(u8 nib) {
-  m_mm_nibble_q.push_back(nib & 0x0f);
-
-  // Start (or restart) the paced nibble delivery timer. Delivering multiple
-  // IRQ0 pulses in a single timeslice can collapse into a single interrupt
-  // edge; BURP expects a distinct interrupt per digit.
-  if (m_mm_nibble_timer && !m_mm_nibble_timer->enabled())
-    m_mm_nibble_timer->adjust(attotime::zero);
+// OUT in scientific notation: exponent tens and units, the signs (8:
+// mantissa, 1: exponent), the decimal point position (0Bh: after the first
+// digit, which the ROM turns into 1), then the mantissa digits.
+void psicomp80_state::mm57109_out_digits() {
+  const double x = mm57109_round(m_mm_x);
+  int e = 0;
+  char mant[9] = "00000000";
+  if (x != 0.0) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%.7e", std::fabs(x));  // d.ddddddde+XX
+    mant[0] = buf[0];
+    memcpy(mant + 1, buf + 2, 7);
+    e = atoi(strchr(buf, 'e') + 1);
+  }
+  const int ae = std::min(std::abs(e), 99);
+  u8 n = 0;
+  m_mm_digits[n++] = ae / 10;
+  m_mm_digits[n++] = ae % 10;
+  m_mm_digits[n++] = (x < 0.0 ? 0x08 : 0x00) | (e < 0 ? 0x01 : 0x00);
+  m_mm_digits[n++] = 0x0b;
+  for (int i = 0; i < m_mm_mdc && i < 8; i++)
+    m_mm_digits[n++] = mant[i] - '0';
+  m_mm_ndigits = n;
+  m_mm_digit_pos = 0;
 }
 
-TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_nibble_tick) {
-  if (m_mm_nibble_q.empty())
-    return;
-
-  const u8 nib = m_mm_nibble_q.front();
-  m_mm_nibble_q.erase(m_mm_nibble_q.begin());
-
-  // Present nibble on port $03 and pulse IRQ0 so the ROM IM 1 handler at $0038
-  // stores it.
-  m_mm_code = nib & 0x0f;
-  // OUT*: when last nibble delivered, start 40-cycle timer then go ready so the
-  // Z80 (which may still be in/returning from IRQ storm) sees RDY=1 (busy) at 0439.
-  // Other nibble sources: only set RDY when not in instruction busy window.
-  if (m_mm_nibble_q.empty()) {
-    if (m_mm_ready_timer) {
-      const u32 cycles = m_mm_out_stream_complete_cycles;
-      m_mm_ready_timer->adjust(attotime::from_ticks(cycles, m_cpu->clock()));
-      LOGMASKED(LOG_MM57109,
-                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%s -> true, timer set for %u cycles\n",
-                MM_TS(), m_mm_RDY ? "true" : "false", cycles);
-    } else {
-      LOGMASKED(LOG_MM57109,
-                "[t=%.6f] MM57109: [OUT*] interrupts complete, m_mm_RDY=%s -> true (no timer)\n",
-                MM_TS(), m_mm_RDY ? "true" : "false");
-      m_mm_RDY = true;
-    }
-  } else if (!m_mm_ready_timer || !m_mm_ready_timer->enabled()) {
-    m_mm_RDY = true;
-  }
-  m_mm_one_shot_clear = false;
-  if (!m_mm_irq0_asserted) {
-    m_irq_mm_line = true;
-    update_irq();
-    m_mm_irq0_asserted = true;
-  }
+// The instruction ends after the given time; then decides what follows.
+void psicomp80_state::mm57109_finish(u32 microcycles, u8 then, u8 word2) {
+  m_mm_then = then;
+  m_mm_then_word2 = word2;
+  m_mm_exec_timer->adjust(attotime::from_usec(microcycles * 10));
 }
 
-
-TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_ready_tick)
-{
-  // End of "busy" window for the last committed byte.
-  if (m_mm_pending_is_branch) {
-    // Present branch result (ROM samples it via bits 5/6 on the next status read).
-    m_mm_was_branch_instruction = true;
-    m_mm_BR_state = m_mm_pending_branch_state;
-    m_mm_RDY = !m_mm_pending_branch_state;
-
-    // Clear BR and set RDY true after a window. If result left RDY false, use longer delay so $058A completes.
-    if (m_mm_branch_clear_timer) {
-      const u32 cy = m_mm_RDY ? m_mm_branch_clear_cycles : m_mm_branch_rdy_delay_cycles;
-      m_mm_branch_clear_timer->adjust(attotime::from_ticks(cy, m_cpu->clock()));
-    }
-	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished (branch), m_mm_RDY=%s m_mm_BR_state=%s\n", MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false");
-  } else {
-	LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] finished, m_mm_RDY=true\n", MM_TS());
-    m_mm_RDY = true;
-  }
-}
-
-TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_branch_clear_tick)
-{
-  // After the branch-result window, drop BR and leave the device ready.
-  m_mm_BR_state = false;
-  m_mm_RDY = true;
-  LOGMASKED(LOG_MM57109, "[t=%.6f] MM57109: [timer] branch_clear finished, m_mm_RDY=true\n", MM_TS());
-}
-
-void psicomp80_state::mm57109_begin_processing(u8 opcode, bool is_branch, bool branch_state)
-{
-  // "Start of execution": not ready. Both port bits 1 during execution => m_mm_RDY=false, m_mm_BR_state=false.
-  m_mm_RDY = false;
-  m_mm_BR_state = false;
-
-  m_mm_pending_opcode = opcode & 0x3f;
-  m_mm_pending_is_branch = is_branch;
-  m_mm_pending_branch_state = branch_state;
-
-  if (m_mm_ready_timer)
-    m_mm_ready_timer->adjust(attotime::never);
-
-  if (m_mm_branch_clear_timer)
-    m_mm_branch_clear_timer->adjust(attotime::never);
-
-  const u32 cycles = is_branch ? m_mm_branch_exec_cycles
-                               : (m_mm_op_exec_cycles[m_mm_pending_opcode] ? m_mm_op_exec_cycles[m_mm_pending_opcode] : m_mm_default_exec_cycles);
-  const attotime dt = attotime::from_ticks(cycles, m_cpu->clock());
-  if (m_mm_ready_timer)
-    m_mm_ready_timer->adjust(dt);
-  LOGMASKED(LOG_MM57109,
-            "[t=%.6f] MM57109: [executing] m_mm_RDY=%s m_mm_BR_state=%s (RDY bit=%d BR bit=%d port 0x%02X), timer %u cycles (op %02X)\n",
-            MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false",
-            m_mm_RDY ? 0 : 1, m_mm_BR_state ? 0 : 1,
-            (m_mm_RDY ? 0x00 : 0x20) | (m_mm_BR_state ? 0x00 : 0x40), cycles, m_mm_pending_opcode);
-  if (is_branch)
-    LOGMASKED(LOG_MM57109,
-              "[t=%.6f] MM57109: [timer] branch started: m_mm_RDY=%s m_mm_BR_state=%s, timer %u cycles, then m_mm_RDY=%s m_mm_BR_state=%s\n",
-              MM_TS(), m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false", cycles,
-              (!branch_state) ? "true" : "false", branch_state ? "true" : "false");
-}
-
-void psicomp80_state::mm57109_emit_out_scientific_stream_from_x() {
-  // OUT*: keep RDY=1 (busy) until all nibbles are delivered (nibble_tick sets
-  // RDY when queue becomes empty). Cancel the per-instruction timer so we don't
-  // go ready early.
-  LOGMASKED(LOG_MM57109,
-            "[t=%.6f] MM57109: [OUT*] stream start, m_mm_RDY=false (RDY bit=1), timer cancelled, queueing nibbles\n",
-            MM_TS());
-  if (m_mm_ready_timer)
-    m_mm_ready_timer->adjust(attotime::never);
-
-  double x = m_mm_x;
-
-  // MDC=8 is the default on COMP80 (SMDC*). BURP/ROM assumes 8-digit mantissa
-  // formatting.
-  const int mdc = int(m_mm_mant_digits ? m_mm_mant_digits : 8);
-
-  // Scientific OUT format digit order (DA0..DA(MDC+3)):
-  //  DA0 exponent MSD, DA1 exponent LSD, DA2 signbits (Sm bit3, Se bit0),
-  //  DA3 decimal-point position indicator, DA4..DA(MDC+3) mantissa digits.
-  //
-  // First attempt at DA3: choose 0x0B so ROM routine at $0460 computes n=1
-  // (decimal after 1 digit):
-  //   n = ((~DA3)&0x0F) - 3  => n=1 when (~DA3)&0x0F == 4  => DA3 == 0x0B.
-  const u8 dp_pos = 0x0B;
-
-  if (x == 0.0) {
-    mm57109_queue_nibble(0);      // exp MSD
-    mm57109_queue_nibble(0);      // exp LSD
-    mm57109_queue_nibble(0);      // signbits
-    mm57109_queue_nibble(dp_pos); // dp position
-    for (int i = 0; i < mdc; i++)
-      mm57109_queue_nibble(0);
-    return;
-  }
-
-  const bool mant_neg = (x < 0.0);
-  double ax = std::fabs(x);
-
-  int exp10 = int(std::floor(std::log10(ax)));
-  double norm = ax / std::pow(10.0, exp10); // 1..10
-
-  // Clamp against rounding drift
-  if (norm >= 10.0) {
-    norm /= 10.0;
-    exp10++;
-  }
-  if (norm < 1.0) {
-    norm *= 10.0;
-    exp10--;
-  }
-
-  const bool exp_neg = (exp10 < 0);
-  int aexp = std::abs(exp10);
-  if (aexp > 99)
-    aexp = 99;
-
-  const int exp_msd = (aexp / 10) % 10;
-  const int exp_lsd = (aexp / 1) % 10;
-
-  u8 signbits = 0;
-  if (mant_neg)
-    signbits |= 0x08; // Sm
-  if (exp_neg)
-    signbits |= 0x01; // Se
-
-  mm57109_queue_nibble(u8(exp_msd));
-  mm57109_queue_nibble(u8(exp_lsd));
-  mm57109_queue_nibble(signbits);
-  mm57109_queue_nibble(dp_pos);
-
-  double t = norm;
-  for (int i = 0; i < mdc; i++) {
-    int d = int(std::floor(t));
-    if (d < 0)
-      d = 0;
-    if (d > 9)
-      d = 9;
-    mm57109_queue_nibble(u8(d));
-    t = (t - double(d)) * 10.0;
-  }
-}
-
-void psicomp80_state::mm57109_log_regs(const char *phase, u8 op) {
-  const u8 opcode = op & 0x3f;
-  LOGMASKED(LOG_MM57109,
-            "MM57109: regs(%s) op=%02X(%03o) %-10s X=%g Y=%g Z=%g T=%g M=%g "
-            "deg=%d mant=%u err=%d\n",
-            phase, opcode, unsigned(opcode), mm57109_opcode_mn(opcode), m_mm_x,
-            m_mm_y, m_mm_z, m_mm_t, m_mm_m, m_mm_deg_mode ? 1 : 0,
-            unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0);
-}
-
-void psicomp80_state::mm57109_execute_single(u8 op) {
-  m_mm_BR_state = false; 
- 
-  const u8 opcode = op & 0x3f;
-
-  // Digit-entry class per MM57109 docs: 0-9, DP, EE, CS, PI, AIN, HALT
-  const bool is_digit = (opcode <= 0x09);
-  const bool is_dp = (opcode == 0x0a);
-  const bool is_ee = (opcode == 0x0b);
-  const bool is_cs = (opcode == 0x0c);
-  const bool is_pi = (opcode == 0x0d);
-  const bool is_ain = (opcode == 0x0e);
-  const bool is_halt = (opcode == 0x0f);
-  const bool is_en = (opcode == 0x21);
-
-  const bool is_entry_class =
-      is_digit || is_dp || is_ee || is_cs || is_pi || is_ain || is_halt;
-
-  auto update_x_from_entry = [&]() {
-    long long mant_int = 0;
-    for (int i = 0; i < m_mm_entry_mant_count; i++)
-      mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
-
-    const int dp_index =
-        m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
-    const int frac_pow = dp_index - m_mm_entry_mant_count;
-
-    double v = double(mant_int);
-    if (frac_pow != 0)
-      v *= std::pow(10.0, double(frac_pow));
-    v *= double(m_mm_entry_mant_sign);
-
-    if (m_mm_entry_exp_count > 0) {
-      int expv = 0;
-      if (m_mm_entry_exp_count == 1)
-        expv = (m_mm_entry_exp[0] % 10);
-      else
-        expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
-
-      expv *= m_mm_entry_exp_sign;
-      v *= std::pow(10.0, double(expv));
-    }
-
-    mm57109_set_x(v);
-  };
-  // If we're in number-entry and a non-entry instruction arrives, terminate
-  // number-entry now.
-  // (HALT is explicitly "does not terminate number entry".)
-  if (m_mm_digit_entry && !is_entry_class && !is_en) {
-    // Build X from entered digits.
-    // Mantissa integer from entered digits
-    long long mant_int = 0;
-    for (int i = 0; i < m_mm_entry_mant_count; i++)
-      mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
-
-    const int dp_index =
-        m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
-    const int frac_pow =
-        dp_index -
-        m_mm_entry_mant_count; // negative if there are fraction digits
-
-    double v = double(mant_int);
-    if (frac_pow != 0)
-      v *= std::pow(10.0, double(frac_pow));
-    v *= double(m_mm_entry_mant_sign);
-
-    // Apply exponent if any digits were entered after EE
-    if (m_mm_entry_exp_count > 0) {
-      int expv = 0;
-      if (m_mm_entry_exp_count == 1)
-        expv = (m_mm_entry_exp[0] % 10);
-      else
-        expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
-
-      expv *= m_mm_entry_exp_sign;
-      v *= std::pow(10.0, double(expv));
-    }
-
-    mm57109_set_x(v);
-
-    // Reset entry state
-    m_mm_digit_entry = false;
-    m_mm_digit_buf.clear();
-    m_mm_entry_exp_mode = false;
-    m_mm_entry_dp_set = false;
-    m_mm_entry_dp_index = 0;
-    m_mm_entry_mant_count = 0;
-    m_mm_entry_exp_count = 0;
-    m_mm_entry_mant_sign = 1;
-    m_mm_entry_exp_sign = 1;
-    m_mm_entry_mant.fill(0);
-    m_mm_entry_exp.fill(0);
-  }
-
-  // Handle EN (ENTER). If number-entry active, finalize as above (by falling
-  // through the termination path). EN itself typically ends number entry; treat
-  // it as "finalize if needed" without extra stack motion here.
-  if (is_en) {
-    if (m_mm_digit_entry) {
-      // Force termination by re-invoking this function's termination logic
-      // using a fake non-entry op: easiest is to reuse the code above by
-      // temporarily clearing the entry-class condition. We'll just finalize
-      // inline (duplicate small block).
-      long long mant_int = 0;
-      for (int i = 0; i < m_mm_entry_mant_count; i++)
-        mant_int = mant_int * 10 + (m_mm_entry_mant[i] % 10);
-
-      const int dp_index =
-          m_mm_entry_dp_set ? m_mm_entry_dp_index : m_mm_entry_mant_count;
-      const int frac_pow = dp_index - m_mm_entry_mant_count;
-
-      double v = double(mant_int);
-      if (frac_pow != 0)
-        v *= std::pow(10.0, double(frac_pow));
-      v *= double(m_mm_entry_mant_sign);
-
-      if (m_mm_entry_exp_count > 0) {
-        int expv = 0;
-        if (m_mm_entry_exp_count == 1)
-          expv = (m_mm_entry_exp[0] % 10);
-        else
-          expv = (m_mm_entry_exp[0] % 10) * 10 + (m_mm_entry_exp[1] % 10);
-
-        expv *= m_mm_entry_exp_sign;
-        v *= std::pow(10.0, double(expv));
-      }
-
-      mm57109_set_x(v);
-
-      m_mm_digit_entry = false;
-      m_mm_digit_buf.clear();
-      m_mm_entry_exp_mode = false;
-      m_mm_entry_dp_set = false;
-      m_mm_entry_dp_index = 0;
-      m_mm_entry_mant_count = 0;
-      m_mm_entry_exp_count = 0;
-      m_mm_entry_mant_sign = 1;
-      m_mm_entry_exp_sign = 1;
-      m_mm_entry_mant.fill(0);
-      m_mm_entry_exp.fill(0);
-    }
-    return;
-  }
-
-  // Helper: start number-entry if needed (push stack, clear X, reset state)
-  auto start_entry_if_needed = [&]() {
-    if (!m_mm_digit_entry) {
-      // Initiate number entry: Z->T, Y->Z, X->Y, 0->X
-      m_mm_t = m_mm_z;
-      m_mm_z = m_mm_y;
-      m_mm_y = m_mm_x;
-      mm57109_set_x(0.0);
-
-      m_mm_digit_entry = true;
-      m_mm_digit_buf.clear();
-
-      m_mm_entry_exp_mode = false;
-      m_mm_entry_dp_set = false;
-      m_mm_entry_dp_index = 0;
-      m_mm_entry_mant_count = 0;
-      m_mm_entry_exp_count = 0;
-      m_mm_entry_mant_sign = 1;
-      m_mm_entry_exp_sign = 1;
-      m_mm_entry_mant.fill(0);
-      m_mm_entry_exp.fill(0);
-    }
-  };
-
-  // Number-entry opcodes
-  if (is_digit) {
-    start_entry_if_needed();
-
-    const int d = int(opcode);
-    if (!m_mm_entry_exp_mode) {
-      // Mantissa digit
-      if (m_mm_entry_mant_count < int(m_mm_entry_mant.size())) {
-        m_mm_entry_mant[m_mm_entry_mant_count++] = u8(d);
-        m_mm_digit_buf.push_back(char('0' + d));
-      }
-    } else {
-      // Exponent digit (2 digits max)
-      if (m_mm_entry_exp_count < int(m_mm_entry_exp.size())) {
-        m_mm_entry_exp[m_mm_entry_exp_count++] = u8(d);
-        m_mm_digit_buf.push_back(char('0' + d));
-      }
-    }
-    update_x_from_entry();
-    return;
-  }
-
-  if (is_dp) {
-    start_entry_if_needed();
-    if (!m_mm_entry_dp_set) {
-      m_mm_entry_dp_set = true;
-      m_mm_entry_dp_index = m_mm_entry_mant_count;
-      if (m_mm_digit_buf.find('.') == std::string::npos)
-        m_mm_digit_buf.push_back('.');
-    }
-    return;
-  }
-
-  if (is_ee) {
-    start_entry_if_needed();
-    m_mm_entry_exp_mode = true;
-    if (m_mm_digit_buf.find('E') == std::string::npos)
-      m_mm_digit_buf.push_back('E');
-    return;
-  }
-
-  if (is_cs) {
-    start_entry_if_needed();
-    if (m_mm_entry_exp_mode)
-      m_mm_entry_exp_sign = -m_mm_entry_exp_sign;
-    else
-      m_mm_entry_mant_sign = -m_mm_entry_mant_sign;
-
-    // Keep digit_buf vaguely readable for debugging
-    if (!m_mm_digit_buf.empty() && m_mm_digit_buf[0] == '-')
-      m_mm_digit_buf.erase(0, 1);
-    else
-      m_mm_digit_buf.insert(0, 1, '-');
-    return;
-  }
-
-  if (is_pi) {
-    // PI is in the entry-class set, but behaves like "push stack then load pi"
-    start_entry_if_needed();
-    mm57109_set_x(3.14159265358979323846);
-    return;
-  }
-
-  if (is_ain) {
-    // Not used for COMP-80 monitor yet; treat as no-op placeholder.
-    start_entry_if_needed();
-    return;
-  }
-
-  if (is_halt) {
-    // HALT behaves like NOP and does not terminate number entry.
-    // Leave entry_active unchanged.
-    return;
-  }
-
-  // If INV prefix was seen, interpret the next opcode as an inverse/memory
-  // variant. This is required for BURP/monitor math functions.
-  if (m_mm_inv_pending) {
-
-    LOGMASKED(LOG_MM57109,
-              "MM57109: m_mm_inv_pending is true, opcode is %02X(%03o)\n", opcode, unsigned(opcode));
-    m_mm_inv_pending = false;
-    switch (opcode) {
-    case 0x24: // INV SIN  -> ASIN
-    {
-      double v = m_mm_x;
-      if (v < -1.0 || v > 1.0) {
-        m_mm_error = true;
-        mm57109_set_x(0.0);
-      } else {
-        double r = std::asin(v);
-        if (m_mm_deg_mode)
-          r = r * 180.0 / 3.14159265358979323846;
-        mm57109_set_x(r);
-      }
-      return;
-    }
-    case 0x25: // INV COS  -> ACOS
-    {
-      double v = m_mm_x;
-      if (v < -1.0 || v > 1.0) {
-        m_mm_error = true;
-        mm57109_set_x(0.0);
-      } else {
-        double r = std::acos(v);
-        if (m_mm_deg_mode)
-          r = r * 180.0 / 3.14159265358979323846;
-        mm57109_set_x(r);
-      }
-      return;
-    }
-    case 0x26: // INV TAN  -> ATAN
-    {
-      double r = std::atan(m_mm_x);
-      if (m_mm_deg_mode)
-        r = r * 180.0 / 3.14159265358979323846;
-      mm57109_set_x(r);
-      return;
-    }
-    case 0x39: // INV + -> M+
-      m_mm_m += m_mm_x;
-      return;
-    case 0x3a: // INV - -> M-
-      LOGMASKED(LOG_MM57109, "MM57109: INV - -> M- (m_mm_x=%f)\n", m_mm_x);
-      m_mm_m -= m_mm_x;
-      return;
-    case 0x3b: // INV * -> MX
-      m_mm_m *= m_mm_x;
-      return;
-    case 0x3c: // INV / -> M/
-      if (m_mm_x == 0.0) {
-        m_mm_error = true;
-      } else
-        m_mm_m /= m_mm_x;
-      return;
-    default:
-      break;
-    }
-    // If we get here, the INV variant isn't implemented yet; fall through to
-    // normal decode.
-  }
-
-  // Non-entry operations
-  switch (opcode) {
-  case 0x1c: // MS
-    m_mm_m = m_mm_x;
-    return;
-
-  case 0x1d: // MR
-    mm57109_push(m_mm_m);
-    return;
-
-  case 0x39: // +
-  {
-    double x = mm57109_pop();
-    double y = mm57109_pop();
-    mm57109_push(y + x);
-    return;
-  }
-  case 0x3a: // -
-  {
-    double x = mm57109_pop();
-    double y = mm57109_pop();
-    mm57109_push(y - x);
-    return;
-  }
-  case 0x3b: // *
-  {
-    double x = mm57109_pop();
-    double y = mm57109_pop();
-    mm57109_push(y * x);
-    return;
-  }
-  case 0x3c: // /
-  {
-    double x = mm57109_pop();
-    double y = mm57109_pop();
-    if (x == 0.0) {
-      m_mm_error = true;
-      mm57109_push(0.0);
-    } else {
-      mm57109_push(y / x);
-    }
-    return;
-  }
-
-  case 0x2b: // ECLR
-    m_mm_error = false;
-    return;
-
-  case 0x2f: // MCLR
-    m_mm_m = 0.0;
-    return;
-
-  case 0x2c: // RTD (radians to degrees)
-    mm57109_set_x(m_mm_x * 180.0 / 3.14159265358979323846);
-    return;
-
-  case 0x2d: // DTR (degrees to radians)
-    mm57109_set_x(m_mm_x * 3.14159265358979323846 / 180.0);
-    return;
-
-  case 0x2e: // POP (drop X)
-    mm57109_pop();
-    return;
-
-  case 0x30: // XEY (swap X and Y)
-  {
-    double t = m_mm_x;
-    m_mm_x = m_mm_y;
-    m_mm_y = t;
-    return;
-  }
-
-  case 0x31: // EX (e^x)
-    mm57109_set_x(std::exp(m_mm_x));
-    return;
-
-  case 0x32: // 10X
-    mm57109_set_x(std::pow(10.0, m_mm_x));
-    return;
-
-  case 0x33: // SQ
-    mm57109_set_x(m_mm_x * m_mm_x);
-    return;
-
-  case 0x34: // SQRT
-    if (m_mm_x < 0.0) {
-      m_mm_error = true;
-      mm57109_set_x(0.0);
-    } else
-      mm57109_set_x(std::sqrt(m_mm_x));
-    return;
-
-  case 0x35: // LN (natural log)
-    if (m_mm_x <= 0.0) {
-      m_mm_error = true;
-      mm57109_set_x(0.0);
-    } else
-      mm57109_set_x(std::log(m_mm_x));
-    return;
-
-  case 0x36: // LOG (common log, base 10)
-    if (m_mm_x <= 0.0) {
-      m_mm_error = true;
-      mm57109_set_x(0.0);
-    } else
-      mm57109_set_x(std::log10(m_mm_x));
-    return;
-
-  case 0x37: // 1/X
-    if (m_mm_x == 0.0) {
-      m_mm_error = true;
-      mm57109_set_x(0.0);
-    } else
-      mm57109_set_x(1.0 / m_mm_x);
-    return;
-
-  case 0x38: // YX (Y^X)
-  {
-    double x = mm57109_pop();
-    double y = mm57109_pop();
-    mm57109_push(std::pow(y, x));
-    return;
-  }
-
-  case 0x24: // SIN
-  {
-    double a = m_mm_x;
-    if (m_mm_deg_mode)
-      a = a * 3.14159265358979323846 / 180.0;
-    mm57109_set_x(std::sin(a));
-    return;
-  }
-  case 0x25: // COS
-  {
-    double a = m_mm_x;
-    if (m_mm_deg_mode)
-      a = a * 3.14159265358979323846 / 180.0;
-    mm57109_set_x(std::cos(a));
-    return;
-  }
-  case 0x26: // TAN
-  {
-    double a = m_mm_x;
-    if (m_mm_deg_mode)
-      a = a * 3.14159265358979323846 / 180.0;
-    mm57109_set_x(std::tan(a));
-    return;
-  }
-
-  case 0x13: // TXF*  (test |X| < 1 -> expose BR/RDY for BURP $058A)
-  {
-    const bool abs_x_lt_1 = (std::fabs(m_mm_x) < 1.0);
-    // m_mm_RDY = !abs_x_lt_1; // don't interfere with $042E handshake READY
-    // m_mm_BR_state = abs_x_lt_1;  // RDY bit for $058A (bit5)
-    LOGMASKED(LOG_MM57109, "MM57109: TXF* (|X|<1=%d) m_mm_x=%f @PC=%04X\n", abs_x_lt_1,
-              m_mm_x, (u16)m_cpu->pc());
-    return;
-  }
-
-  case 0x22: // TOGM
-    m_mm_deg_mode = !m_mm_deg_mode;
-    return;
-
-  case 0x3f: // NOP
-    return;
-
-  default:
+TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_exec_done) {
+  switch (m_mm_then) {
+  case MM_THEN_WORD2:         // ready for the second word
+    m_mm_busy = false;
+    m_mm_word2 = m_mm_then_word2;
+    break;
+  case MM_THEN_BRANCH_TRUE:   // BR low, and wait for the second word
+    m_mm_br = true;
+    m_mm_word2 = MM_WORD2_IGNORE;
+    break;
+  default:                    // done (a false branch skips its second word)
+    m_mm_busy = false;
     break;
   }
-
-  LOGMASKED(
-      LOG_MM57109,
-      "MM57109: UNIMPLEMENTED op=%02X(%03o) %-10s @PC=%04X (inv_pending=%d)\n",
-      opcode, unsigned(opcode), mm57109_opcode_mn(opcode), (u16)m_cpu->pc(),
-      m_mm_inv_pending ? 1 : 0);
 }
 
-void psicomp80_state::mm57109_execute(u8 op) {
-
-  const u8 opcode = op & 0x3f;
-  const bool is_branch = (opcode == 0x13); // TXF*
-  const bool branch_state = is_branch ? (std::fabs(m_mm_x) < 1.0) : false;
-  mm57109_begin_processing(opcode, is_branch, branch_state);
-
-
-  LOGMASKED(LOG_MM57109,
-	"MM57109: execute regs op=%02X(%03o) %-10s X=%g Y=%g Z=%g T=%g M=%g "
-	"deg=%d mant=%u err=%d m_mm_RDY=%s m_mm_BR_state=%s\n",
-    op, unsigned(op), mm57109_opcode_mn(op), m_mm_x,
-	m_mm_y, m_mm_z, m_mm_t, m_mm_m, m_mm_deg_mode ? 1 : 0,
-	unsigned(m_mm_mant_digits), m_mm_error ? 1 : 0,
-	m_mm_RDY ? "true" : "false", m_mm_BR_state ? "true" : "false");
-
-
-  
-
-  // Handle pending 2nd word for prior 2-word op
-  if (m_mm_two_word_pending) {
-    const u8 twoop = m_mm_two_word_op;
-    LOGMASKED(LOG_MM57109,
-              "MM57109: 2ndword for %02X(%03o) %-10s = %02X(%03o) @PC=%04X\n",
-              twoop, unsigned(twoop), mm57109_opcode_mn(twoop), opcode,
-              unsigned(opcode), (u16)m_cpu->pc());
-
-    m_mm_two_word_pending = false;
-    m_mm_two_word_op = 0x00;
-
-    // OUT* (0x16) is used by BURP to read X in scientific notation. Treat the
-    // param word as the completion trigger and emit the digit stream via paced
-    // IM 1 interrupts.
-    if (twoop == 0x16) {
-      mm57109_emit_out_scientific_stream_from_x();
-      mm57109_log_regs("after OUT*", twoop);
-     
-      return;
-    }
-
-    return;
+// OUT: one digit per R/W pulse, then ready for the second word.
+TIMER_CALLBACK_MEMBER(psicomp80_state::mm57109_digit_tick) {
+  if (m_mm_digit_pos < m_mm_ndigits) {
+    m_mm_code = m_mm_digits[m_mm_digit_pos++];
+    m_irq_mm_line = true;
+    update_irq();
+    m_mm_digit_timer->adjust(attotime::from_usec(48 * 10));
+  } else {
+    m_mm_busy = false;
+    m_mm_word2 = MM_WORD2_IGNORE;
   }
-
-  // INV prefix affects interpretation of the next opcode; keep tracking for
-  // logging.
-  if (!m_mm_inv_pending && opcode == 0x20) {
-    m_mm_inv_pending = true;
-    LOGMASKED(LOG_MM57109, "MM57109: INV prefix armed\n");
-    return;
-  }
-
-  if (mm57109_is_two_word(opcode)) {
-    m_mm_two_word_pending = true;
-    m_mm_two_word_op = opcode;
-    LOGMASKED(LOG_MM57109,
-              "MM57109: 2-word op %02X(%03o) %-10s awaiting param\n", opcode,
-              unsigned(opcode), mm57109_opcode_mn(opcode));
-    return;
-  }
-
-  mm57109_execute_single(opcode);
-  mm57109_log_regs("after", opcode);
-
-}
-
-void psicomp80_state::mm57109_dump_stream(const char *tag, u8 cmd) {
-  LOGMASKED(LOG_MM57109,
-            "MM57109[%s] #%llu cmd=%02X(%03o) %-10s stream_len=%zu: ", tag,
-            (unsigned long long)m_mm_tx_seq, cmd, unsigned(cmd),
-            mm57109_opcode_name(cmd), m_mm_stream.size());
-  for (u8 b : m_mm_stream)
-    LOGMASKED(LOG_MM57109, "%02X(%03o) ", b, unsigned(b));
-  LOGMASKED(LOG_MM57109, "\n");
-
-  m_mm_stream.clear();
-  ++m_mm_tx_seq;
 }
 
 void psicomp80_state::port60_w(u8 data) {
-  // const u8 op = data & 0x7f;
-
-  // const char *opname = mm57109_opcode_name(op);
-  // LOGMASKED(LOG_MM57109, "MM57109 W: OUT ($60),%02X(%03o) %-10s @PC=%04X
-  // (bit7=%d)\n", 	data, unsigned(data), opname, (u16)m_cpu->pc(), (data >> 7) &
-  // 1);
-
-  // Two-phase HOLD/RDY handshake as used by BURP routine $042E.
-  //
-  // NOTE: The byte passed into $042E can legitimately have bit7 set (it is BURP
-  // "bytecode"), and $042E itself generates the phase2 write by OR'ing bit7.
-  // Real hardware uses the handshake semantics rather than treating bit7 as
-  // part of the payload, so model this as a simple two-step state machine:
-  //   1) first OUT -> latch payload (data&0x7f), assert RDY (bit5) so $0439
-  //   loop can exit 2) second OUT -> commit latched payload, drop RDY so $0430
-  //   loop can exit next time
-  //
-  // This prevents hangs at $0439 if the *first* write happens to have bit7=1.
-//   if (m_mm_expect_latch) {
-//     m_mm_latch = data & 0x7f;
-//     // LOGMASKED(LOG_MM57109, "MM57109: phase1 latch=%02X(%03o) %-10s
-//     // (raw=%02X(%03o))\n", 	m_mm_latch, unsigned(m_mm_latch),
-//     // mm57109_opcode_name(m_mm_latch), data, unsigned(data));
-
-//     m_mm_RDY = true;
-//     m_mm_expect_latch = false;
-//     return;
-//   }
-
-if (BIT(data, 7)) {
-  m_mm_HOLD = true;
-  return;
-} else {
-	m_mm_HOLD = false;
+  m_mm_hold = BIT(data, 7);
+  if (m_mm_hold)
+    return;
+  const u8 op = data & 0x3f;
+  if (m_mm_word2 != MM_WORD2_NONE) {
+    const u8 kind = m_mm_word2;
+    m_mm_word2 = MM_WORD2_NONE;
+    m_mm_busy = true;
+    m_mm_br = false;
+    mm57109_second_word(kind, op);
+    return;
+  }
+  if (m_mm_busy)
+    return;
+  m_mm_busy = true;
+  m_mm_br = false;
+  mm57109_execute(op);
 }
 
-  // Execute phase
-  //const u8 committed = m_mm_latch;
-  const char *mn = m_mm_inv_pending ? mm57109_inv_second_name(data)
-                                    : mm57109_opcode_name(data);
-  LOGMASKED(LOG_MM57109,
-            "[t=%.6f] MM57109: [OUT] instruction executed byte=%02X %-10s @PC=%04X\n",
-            MM_TS(), data & 0x7f, mn, (u16)m_cpu->pc());
-  m_mm_irq0_asserted = false;
-  m_mm_stream.push_back(data);
-  mm57109_execute(data);
-
-//   m_mm_RDY = false;
-//   m_mm_expect_latch = true;
-
-  // Status bits are handled by mm57109_execute() for now.
+void psicomp80_state::mm57109_second_word(u8 kind, u8 op) {
+  const double x = m_mm_x;
+  u32 t = 130;
+  if (kind == MM_WORD2_SMDC) {
+    if (op >= 1 && op <= 8)
+      m_mm_mdc = op;
+  } else if (kind == MM_WORD2_INV) {
+    LOGMASKED(LOG_MM57109, "MM57109: %s X=%g M=%g\n", mm57109_inv_second_name(op), m_mm_x, m_mm_m);
+    switch (op) {
+    case 0x24: if (x < -1.0 || x > 1.0) m_mm_error = true; else m_mm_x = mm57109_round(std::asin(x)); t = 54000; break;
+    case 0x25: if (x < -1.0 || x > 1.0) m_mm_error = true; else m_mm_x = mm57109_round(std::acos(x)); t = 54000; break;
+    case 0x26: m_mm_x = mm57109_round(std::atan(x)); t = 30200; break;
+    case 0x39: m_mm_m = mm57109_round(m_mm_m + x); t = 1700; break;
+    case 0x3a: m_mm_m = mm57109_round(m_mm_m - x); t = 1700; break;
+    case 0x3b: m_mm_m = mm57109_round(m_mm_m * x); t = 2700; break;
+    case 0x3c: if (x == 0.0) m_mm_error = true; else m_mm_m = mm57109_round(m_mm_m / x); t = 7300; break;
+    default: break;
+    }
+  }
+  mm57109_finish(t);
 }
 
+void psicomp80_state::mm57109_execute(u8 op) {
+  const u32 t = mm57109_exec_time[op & 0x3f];
+  LOGMASKED(LOG_MM57109, "MM57109: %02X %-6s X=%g Y=%g M=%g\n", op, mm57109_opcode_name(op), m_mm_x, m_mm_y, m_mm_m);
+
+  // Any instruction but the number entry ones (00-0F) ends number entry.
+  if (m_mm_entry && op > 0x0f) {
+    m_mm_x = mm57109_round(mm57109_entry_value());
+    m_mm_entry = false;
+  }
+  const bool after_enter = m_mm_after_enter;
+  m_mm_after_enter = false;
+  // Starting number entry pushes the stack (unless the last instruction was
+  // EN) and clears X.
+  auto start_entry = [&]() {
+    if (m_mm_entry)
+      return;
+    if (after_enter)
+      m_mm_x = 0.0;
+    else
+      mm57109_push(0.0);
+    m_mm_entry = true;
+    mm57109_entry_clear();
+  };
+  const double x = m_mm_x, y = m_mm_y;
+  auto fn = [&](double v, bool bad = false) {
+    if (bad) {
+      m_mm_error = true;
+      m_mm_x = 0.0;
+    } else
+      m_mm_x = mm57109_round(v);
+  };
+  auto two = [&](double v) {
+    const double r = mm57109_round(v);
+    mm57109_pop();
+    m_mm_x = r;
+  };
+  auto branch = [&](bool cond) {
+    mm57109_finish(t, cond ? MM_THEN_BRANCH_TRUE : MM_THEN_BRANCH_FALSE);
+  };
+
+  switch (op) {
+  case 0x0a: // DP
+    start_entry();
+    if (!m_mm_en_dp) {
+      m_mm_en_dp = true;
+      m_mm_en_dp_index = m_mm_en_nmant;
+    }
+    break;
+  case 0x0b: // EE
+    start_entry();
+    m_mm_en_exp = true;
+    break;
+  case 0x0c: // CS
+    if (!m_mm_entry) {
+      m_mm_x = -m_mm_x;
+      break;
+    }
+    if (m_mm_en_exp)
+      m_mm_en_exp_sign = -m_mm_en_exp_sign;
+    else
+      m_mm_en_mant_sign = -m_mm_en_mant_sign;
+    m_mm_x = mm57109_entry_value();
+    break;
+  case 0x0d: { // PI
+    start_entry();
+    static const u8 pi[8] = { 3, 1, 4, 1, 5, 9, 2, 7 };
+    memcpy(m_mm_en_mant, pi, 8);
+    m_mm_en_nmant = 8;
+    m_mm_en_dp = true;
+    m_mm_en_dp_index = 1;
+    m_mm_x = M_PI;
+    break;
+  }
+  case 0x0e: start_entry(); break;                     // AIN: no digit input lines here
+  case 0x0f: break;                                    // HALT: a NOP that doesn't end number entry
+  case 0x10: branch(false); return;                    // TJC: the JC input isn't connected
+  case 0x11: branch(x == 0.0); return;                 // TX=0
+  case 0x12: branch(x < 0.0); return;                  // TXLT0
+  case 0x13: branch(std::fabs(x) < 1.0); return;       // TXF
+  case 0x14: branch(m_mm_error); return;               // TERR
+  case 0x15: branch(true); return;                     // JMP
+  case 0x16:                                           // OUT
+    mm57109_out_digits();
+    m_mm_digit_timer->adjust(attotime::from_usec(40 * 10));
+    return;
+  case 0x17: mm57109_finish(t, MM_THEN_WORD2, MM_WORD2_IGNORE); return;   // IN: no digit input
+  case 0x18: mm57109_finish(t, MM_THEN_WORD2, MM_WORD2_SMDC); return;     // SMDC
+  case 0x19: m_mm_m = mm57109_round(m_mm_m + 1.0); branch(m_mm_m != 0.0); return;  // IBNZ
+  case 0x1a: m_mm_m = mm57109_round(m_mm_m - 1.0); branch(m_mm_m != 0.0); return;  // DBNZ
+  case 0x1b: m_mm_x = m_mm_m; m_mm_m = x; break;       // XEM
+  case 0x1c: m_mm_m = x; break;                        // MS
+  case 0x1d: mm57109_push(m_mm_m); break;              // MR
+  case 0x1e: fn(x * 10.0); break;                      // LSH
+  case 0x1f: fn(x / 10.0); break;                      // RSH
+  case 0x20: mm57109_finish(t, MM_THEN_WORD2, MM_WORD2_INV); return;      // INV
+  case 0x21: mm57109_push(x); m_mm_after_enter = true; break;              // EN
+  case 0x22: m_mm_sci = !m_mm_sci; break;              // TOGM
+  case 0x23: {                                         // ROLL
+    const double old_x = m_mm_x;
+    m_mm_x = m_mm_y;
+    m_mm_y = m_mm_z;
+    m_mm_z = m_mm_t;
+    m_mm_t = old_x;
+    break;
+  }
+  case 0x24: fn(std::sin(x)); break;
+  case 0x25: fn(std::cos(x)); break;
+  case 0x26: fn(std::tan(x)); break;
+  case 0x2b: m_mm_error = false; break;                // ECLR
+  case 0x2c: fn(x * 180.0 / M_PI); break;              // RTD
+  case 0x2d: fn(x * M_PI / 180.0); break;              // DTR
+  case 0x2e: m_mm_x = y; mm57109_pop(); break;         // POP
+  case 0x2f:                                           // MCLR
+    m_mm_x = m_mm_y = m_mm_z = m_mm_t = m_mm_m = 0.0;
+    m_mm_error = false;
+    break;
+  case 0x30: m_mm_x = y; m_mm_y = x; break;            // XEY
+  case 0x31: fn(std::exp(x)); break;
+  case 0x32: fn(std::pow(10.0, x)); break;
+  case 0x33: fn(x * x); break;
+  case 0x34: fn(std::sqrt(std::fabs(x)), x < 0.0); break;
+  case 0x35: fn(x > 0.0 ? std::log(x) : 0.0, x <= 0.0); break;
+  case 0x36: fn(x > 0.0 ? std::log10(x) : 0.0, x <= 0.0); break;
+  case 0x37: fn(x != 0.0 ? 1.0 / x : 0.0, x == 0.0); break;
+  case 0x38:                                           // YX
+    if (y < 0.0 && x != std::floor(x)) {
+      m_mm_error = true;
+      two(0.0);
+    } else
+      two(std::pow(y, x));
+    break;
+  case 0x39: two(y + x); break;
+  case 0x3a: two(y - x); break;
+  case 0x3b: two(y * x); break;
+  case 0x3c:
+    if (x == 0.0) {
+      m_mm_error = true;
+      two(0.0);
+    } else
+      two(y / x);
+    break;
+  default:
+    if (op <= 0x09) {                                  // digits
+      start_entry();
+      if (!m_mm_en_exp) {
+        if (m_mm_en_nmant < 8)
+          m_mm_en_mant[m_mm_en_nmant++] = op;
+      } else if (m_mm_en_nexp < 2)
+        m_mm_en_expd[m_mm_en_nexp++] = op;
+      m_mm_x = mm57109_entry_value();
+    }
+    // NOP, the flag and R/W pulse instructions change nothing here
+    break;
+  }
+  mm57109_finish(t);
+}
+
+// ---------------------------------------------------------------------------
 // ------------------ keyboard / interrupts ------------------
-
-u8 psicomp80_state::ascii_to_mm_code(u8 data) {
-  if (data >= '0' && data <= '9')
-    return u8(data - '0');
-
-  if (data >= 'a' && data <= 'f')
-    return u8(10 + (data - 'a'));
-
-  if (data >= 'A' && data <= 'F')
-    return u8(10 + (data - 'A'));
-
-  if (data == 0x0d || data == 0x0a)
-    return 0x10;
-
-  if (data == 0x1b)
-    return 0x11;
-
-  if (data == ' ')
-    return 0x12;
-
-  return 0x1f;
-}
-
-void psicomp80_state::mm_set_data_ready(u8 code) {
-  m_mm_code = code & 0x0f;
-  m_mm_one_shot_clear = false;
-
-  // Pulse IRQ0 so each delivered nibble becomes a distinct IM 1 interrupt.
-  m_irq_mm_pulse = true;
-  update_irq();
-  m_irq_pulse_timer->adjust(attotime::from_usec(1));
-}
 
 void psicomp80_state::kbd_put(u8 data) {
   // The real COMP80 has a dedicated RESET key. For convenience in the
@@ -1797,8 +1135,6 @@ void psicomp80_state::kbd_put(u8 data) {
   m_key_time = machine().time();
 
   m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-
-  mm_set_data_ready(ascii_to_mm_code(data));
 }
 
 // ------------------ character mapping / display ------------------
@@ -1927,7 +1263,7 @@ ROM_REGION(0x10000, "maincpu", 0)
 ROM_DEFAULT_BIOS("burp")
 ROM_SYSTEM_BIOS(0, "burp", "Monitor + BURP")
 ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
-         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df), ROM_BIOS(0))
+         CRC(58d2ab1c) SHA1(1488f7c27d8142e5bbe6a45e2ae3e3dfd0c46562), ROM_BIOS(0))
 // Monitor + COMP80 FORTH in place of BURP (forth/, built by forth/build.sh)
 ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
 ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
@@ -1946,7 +1282,7 @@ ROM_REGION(0x10000, "maincpu", 0)
 ROM_DEFAULT_BIOS("burp")
 ROM_SYSTEM_BIOS(0, "burp", "Monitor + BURP")
 ROMX_LOAD("psicomp80.rom", 0x0000, 0x0c00,
-         CRC(b4641327) SHA1(ce29367b7379c8a37eebb73e457052e8a6f7b6df), ROM_BIOS(0))
+         CRC(58d2ab1c) SHA1(1488f7c27d8142e5bbe6a45e2ae3e3dfd0c46562), ROM_BIOS(0))
 // Monitor + COMP80 FORTH in place of BURP (forth/, built by forth/build.sh)
 ROM_SYSTEM_BIOS(1, "forth", "Monitor + FORTH")
 ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,

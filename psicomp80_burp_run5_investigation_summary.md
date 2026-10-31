@@ -1,5 +1,12 @@
 # PSI COMP-80 BURP `RUN 5` Failure — Investigation Summary
 
+> **Resolved (October 2026).** BURP runs: see `burp/README.md`. The causes were
+> the MM57109 model (OUT\*'s digits came after the second word instead of the
+> first, the busy/ready handshake and branches didn't follow the chip, and the
+> digit interrupt was cleared by BURP's own status polling), a floppy
+> controller interrupt left asserted after reset, and one misread ROM byte at
+> 06AB. This note is kept as a record of the investigation.
+
 ## Context
 - **System:** PSI COMP-80 (Z80-based), emulated in MAME  
 - **ROM layout:**

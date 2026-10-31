@@ -43,15 +43,26 @@
   const after = (s) => { const at = m.cycles + s * CLOCK; return () => m.cycles >= at; };
 
   // One key: wait until the machine is waiting for one (or half a second,
-  // so a key can still stop a running program), then press it.
-  function* typeKey(c) {
+  // so a key can still stop a running program; patient waits as long as it
+  // takes), then press it.
+  function* typeKey(c, patient) {
     const t0 = m.cycles;
-    yield () => m.waitingForKey() || m.cycles - t0 > CLOCK / 2;
+    yield () => m.waitingForKey() || (!patient && m.cycles - t0 > CLOCK / 2);
     yield () => m.key(c);
     yield after(0.02);
   }
-  function* typeText(text) {
-    for (const ch of text) yield* typeKey(ch === "\n" ? 13 : ch.toUpperCase().charCodeAt(0));
+  function* typeText(text, patient) {
+    for (const ch of text) yield* typeKey(ch === "\n" ? 13 : ch.toUpperCase().charCodeAt(0), patient);
+  }
+  // Waiting for a key, and still waiting a moment later.
+  function* idle() {
+    yield () => m.waitingForKey();
+    for (;;) {
+      const t0 = m.cycles;
+      yield after(0.3);
+      if (m.waitingForKey() && m.cycles - t0 >= 0.3 * CLOCK) return;
+      yield () => m.waitingForKey();
+    }
   }
   function waitingLine() {
     const a = CURS[m.romName];
@@ -76,10 +87,12 @@
   }
 
   function* exampleSteps(ex) {
+    const patient = ex.rom === "burp";
     yield after(1.0);
     for (const s of ex.steps) {
       if (s.fs) { yield* typeKey(0x1c); yield after(0.3); }
-      else if (s.keys) { yield* typeText(s.keys); yield after(0.3); }
+      else if (s.keys) { status = "Typing " + s.keys.trim(); yield* typeText(s.keys, patient); yield after(0.3); }
+      else if (s.ready) yield* idle();
       else if (s.bin) m.mem.set(b64(D.bins[s.bin]), s.at);
       else if (s.source) {
         const lines = sourceLines(D.sources[s.source], s.source.endsWith(".lsp"));
@@ -98,7 +111,7 @@
     for (let i = 0; i < lines.length; i++) {
       status = `Typing line ${i + 1} of ${lines.length}`;
       if (CURS[m.romName] !== undefined) yield* typeLine(lines[i]);
-      else { yield* typeText(lines[i] + "\r"); yield after(0.2); }
+      else { yield* typeText(lines[i] + "\r", true); yield* idle(); }
     }
   }
 

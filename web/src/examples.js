@@ -7,7 +7,10 @@
 //                              leaving out blank lines and LISP comments
 //   { line: "text" }           type a line once FORTH or LISP is waiting
 //   { fast: true | false }     run flat out, or at the real speed
-// "rom": null means any ROM: the monitor is the same in all three.
+//   { ready: true }            wait until the computer is waiting for a key
+// "rom": null means any ROM: the monitor is the same in all three.  With
+// BURP every key waits until BURP is ready for it: BURP is often busy with
+// its calculator chip, and a key then would reset the machine.
 "use strict";
 
 const EXAMPLES = [
@@ -41,8 +44,24 @@ const EXAMPLES = [
   },
   {
     id: "burp", lang: "burp", rom: "burp", title: "BURP sample program",
-    text: "The sample program from the articles, kept in the BURP ROM at 0BB5: MOV copies it to 0C00, RS enters BURP and LIST shows it. RUN does not work yet: the emulated MM57109 calculator chip, which does BURP’s arithmetic, is not complete.",
-    steps: [{ fs: true }, { keys: "MOV 0BB50C000C00" }, { keys: "^" }, { keys: "LIST 5 " }],
+    text: "The sample program from the articles, kept in the BURP ROM at 0BB5: MOV copies it to 0C00, RS enters BURP, LIST shows it and RUN prints the common logarithms of 1 to 25, worked out by the MM57109 chip in about 10 s.",
+    steps: [{ fs: true }, { keys: "MOV 0BB50C000C00" }, { keys: "^" }, { keys: "LIST 5 " }, { ready: true }, { keys: "RUN 5 " }],
+  },
+  {
+    id: "burpexp", lang: "burp", rom: "burp", title: "e to the x, in scientific notation",
+    text: "The articles’ next step: line 6 becomes LET L=A EX and a heading is added. From e¹⁹ the results no longer fit in 8 digits and BURP switches to scientific notation, with the exponent at the end.",
+    steps: [{ fs: true }, { keys: "MOV 0BB50C000C00" }, { keys: "^" },
+      { keys: "DEL 6 " }, { ready: true }, { keys: "ADD " }, { keys: "6 LET L=A EX :" }, { ready: true },
+      { keys: "ADD " }, { keys: '4 PRINT " X           EXP X" :' }, { ready: true }, { keys: "RUN 4 " }],
+  },
+  {
+    id: "burptrig", lang: "burp", rom: "burp", title: "Sines and cosines",
+    text: "A FOR loop with a fractional STEP calling a subroutine, then a negative number and a division. The chip works in radians; each sine takes it about half a second.",
+    steps: [{ fs: true }, { keys: "^" }, { keys: "LOAD " },
+      { keys: "10 FOR A=0 STEP 0.5 UNTIL 2 \r" }, { keys: "20 GOSUB 100 \r" }, { keys: "30 NEXT A \r" },
+      { keys: "40 LET N=0 3 - \r" }, { keys: "50 LET Q=N 4 / \r" }, { keys: '60 PRINT "N=" N2, " N/4=" Q4 \r' },
+      { keys: "70 END \r" }, { keys: "100 LET S=A SIN \r" }, { keys: "110 LET C=A COS \r" },
+      { keys: "120 PRINT A2 S6 C6 \r" }, { keys: "130 RETURN :" }, { ready: true }, { keys: "RUN 10 " }],
   },
   {
     id: "forth", lang: "forth", rom: "forth", title: "A FORTH session",

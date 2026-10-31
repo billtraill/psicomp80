@@ -278,6 +278,9 @@ private:
   // keyboard latch returned by port 01h (ROM does IN then CPL)
   u8 m_key_latch = 0xff;
 
+  // tape input after the Schmitt trigger (idle=1); held between crossings
+  u8 m_tape_in = 1;
+
 
   u8 m_mm_code = 0x1f;
   bool m_mm_one_shot_clear = false;
@@ -566,6 +569,7 @@ void psicomp80_state::machine_start() {
 
 
   save_item(NAME(m_key_latch));
+  save_item(NAME(m_tape_in));
   save_item(NAME(m_mm_code));
   save_item(NAME(m_mm_one_shot_clear));
   save_item(NAME(m_mm_last_port03));
@@ -629,13 +633,23 @@ u8 psicomp80_state::port00_r()
   // Use MAME cassette image device so the user can control play/record
   // and swap images at runtime (TAB → File Manager / Tape Control).
   //
-  // If not playing (or motor off), present idle high.
+  // If not playing, present idle high.
   const int state = m_cassette->get_state();
   if ((state & CASSETTE_MASK_UISTATE) != CASSETTE_PLAY)
+  {
+    m_tape_in = 1;
     return 0x01;
+  }
 
+  // Schmitt trigger: only change level on a clear crossing so silence
+  // (blank tape, end of image) holds the last level instead of reading as a
+  // stream of start bits.
   const double level = m_cassette->input(); // -1.0 .. +1.0
-  return (level > 0.0) ? 0x01 : 0x00;
+  if (level > 0.25)
+    m_tape_in = 1;
+  else if (level < -0.25)
+    m_tape_in = 0;
+  return m_tape_in;
 }
 
 
@@ -1761,7 +1775,9 @@ static INPUT_PORTS_START(psicomp80) INPUT_PORTS_END
 // "Tape Control" and "File Manager" entries.
 CASSETTE(config, m_cassette);
 m_cassette->set_formats(cassette_default_formats);
-m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED);
+// No motor-control relay on the COMP80: the tape runs whenever play/record
+// is selected. With the motor disabled MAME never advances the tape.
+m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED);
 
   GENERIC_KEYBOARD(config, m_keyboard, 0);
   m_keyboard->set_keyboard_callback(FUNC(psicomp80_state::kbd_put));

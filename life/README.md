@@ -6,6 +6,17 @@ quadrant graphics characters. The edges wrap around.
 
 ## Loading from tape
 
+The quickest way: let `autorun.lua` load the tape and start it.
+
+    cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/life/life.wav \
+      -autoboot_script ~/localdev/psicomp80/life/autorun.lua
+
+It clears any half-typed command, runs READ (fast-forwarded), checks the loaded
+bytes against `life.bin`, retries if they're wrong, then types `RUN 1000`.
+Don't touch the keyboard until the board appears.
+
+By hand:
+
 1. Start MAME with the tape mounted:
 
        cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/life/life.wav
@@ -46,6 +57,7 @@ uses no CALL, PUSH or POP. See the comments at the top of `life.asm`.
 | `life.asm` | source |
 | `life.bin` | assembled program, 1000h–12DFh |
 | `life.wav` | tape (`TAPE 100012E0`) |
+| `autorun.lua` | MAME autoboot script: load from tape and run |
 | `test_life.lua` | MAME test: checks 10 generations against a reference implementation, then P, Return, R and S |
 
 ## Rebuilding

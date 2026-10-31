@@ -1,0 +1,14 @@
+diff --git a/src/mame/mame.lst b/src/mame/mame.lst
+index d06d797546f..52d1a9b0597 100644
+--- a/src/mame/mame.lst
++++ b/src/mame/mame.lst
+@@ -40000,6 +40000,9 @@ gstream
+ x2222
+ x2222o
+ 
++@source:drivers/psicomp80.cpp
++psicomp80
++
+ @source:psikyo/psikyo.cpp
+ btlkroad
+ btlkroadk

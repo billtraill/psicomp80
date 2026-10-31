@@ -1,0 +1,5 @@
+^
+#wait 0.5
+1 2 +X\b .\r
+: SQ DUP * ; 9 SQ .\r
+#screen

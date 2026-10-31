@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copy the psicomp80 driver, ROM and local config into a MAME checkout.
+# Copy the psicomp80 driver, ROMs and local config into a MAME checkout.
 # Usage: mame/install.sh [path-to-mame]   (default ~/localdev/mame)
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -8,7 +8,7 @@ MAME=${1:-$HOME/localdev/mame}
 
 mkdir -p "$MAME/src/mame/drivers" "$MAME/roms/psicomp80"
 cp "$REPO/psicomp80.cpp" "$MAME/src/mame/drivers/psicomp80.cpp"
-cp "$REPO/psicomp80.rom" "$MAME/roms/psicomp80/psicomp80.rom"
+cp "$REPO/psicomp80.rom" "$REPO/psicomp80_forth.rom" "$MAME/roms/psicomp80/"
 cp "$HERE/build.sh" "$HERE/run.sh" "$HERE/mame.ini" "$MAME/"
 
 if ! grep -q "@source:drivers/psicomp80.cpp" "$MAME/src/mame/mame.lst"; then

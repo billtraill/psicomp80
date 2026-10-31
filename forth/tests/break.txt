@@ -1,0 +1,33 @@
+^
+#wait 0.5
+: SQ DUP * ;\r
+: SPIN BEGIN 0 UNTIL ;\r
+SPIN\r
+#wait 0.5
+X
+#wait 0.5
+#screen
+^
+#wait 0.5
+3 SQ .\r
+: STARS 0 DO 42 EMIT LOOP ;\r
+10 STARS CR 20 5 AT ." AT 20,5" CR\r
+: GFX 64 0 DO I 128 + EMIT LOOP ;\r
+GFX\r
+: K1 KEY . ;\r
+K1\r
+#wait 0.3
+A
+#wait 0.3
+K1\r
+#wait 0.3
+\r
+#wait 0.3
+#screen
+PAGE COLD\r
+#wait 0.5
+SQ\r
+#screen
+BYE\r
+#wait 0.5
+#screen

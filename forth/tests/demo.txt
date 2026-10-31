@@ -1,0 +1,14 @@
+^
+#wait 0.5
+: SQUARES 11 1 DO I DUP * . LOOP ;\r
+SQUARES\r
+: FACT DUP 1 > IF DUP 1- FACT * ELSE DROP 1 THEN ;\r
+7 FACT .\r
+VARIABLE N  10 N !  N @ 3 * .\r
+HEX FF . 1000 DECIMAL . \r
+: BOX 0 DO 143 EMIT LOOP ;\r
+: BAR 5 0 DO CR I 4 * 1+ BOX LOOP ;\r
+BAR\r
+1 2 3 .S\r
+#wait 0.5
+#snap

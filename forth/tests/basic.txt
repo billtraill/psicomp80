@@ -1,0 +1,40 @@
+^
+#wait 0.5
+2 3 + .\r
+: SQ DUP * ;\r
+7 SQ .\r
+: T1 5 0 DO I . LOOP ;\r
+T1\r
+: T2 0 10 DO I . -2 +LOOP ;\r
+T2\r
+: SG DUP 0< IF ." NEG " ELSE ." POS " THEN DROP ;\r
+-3 SG 4 SG\r
+: T3 1 BEGIN DUP . 2* DUP 100 > UNTIL DROP ;\r
+T3\r
+: T4 1 BEGIN DUP 50 < WHILE DUP . 3 * REPEAT DROP ;\r
+T4\r
+VARIABLE V 5 V ! 3 V +! V @ .\r
+42 CONSTANT K K K + .\r
+HEX FF . 1F 1+ . DECIMAL 255 .\r
+-7 2 /MOD . . -7 2 / . -7 2 MOD .\r
+1 2 3 .S\r
+DROP DROP DROP\r
+FOO\r
+DROP\r
+2 3 +X^ .\r
+." HELLO WORLD"\r
+3 4 < . 4 3 < . 3 4 > . 5 5 = . 0 0= . -1 0< .\r
+12 5 - . 6 7 * . 100 NEGATE . 1 1- . 6 2 AND . 6 3 OR . 6 3 XOR .\r
+: NEST 3 1 DO 2 0 DO J . I . LOOP LOOP ;\r
+NEST\r
+1 2 SWAP . . 1 2 OVER . . . 1 2 3 ROT . . .\r
+5 >R R> .\r
+HERE 10 ALLOT HERE SWAP - .\r
+: FACT DUP 1 > IF DUP 1- FACT * ELSE DROP 1 THEN ;\r
+5 FACT . 7 FACT .\r
+: BAD 1 2 NOSUCH ;\r
+BAD\r
+WORDS\r
+#screen
+#wait 0.5
+#screen

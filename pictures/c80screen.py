@@ -39,14 +39,7 @@ def glyph(byte):
     code = byte & 0x3F
     if byte & 0x40:
         return [r & 0x3F for r in GFX_FONT[code]]
-    if code == 0:
-        idx = 0
-    elif code <= 0x1A:
-        idx = 0x21 + code - 1
-    elif code >= 0x20:
-        idx = code - 0x20
-    else:
-        idx = 0
+    idx = code ^ 0x20           # 00h-1Fh: @ A-Z [ \ ] ^ _
     return [(r & 0x1F) << 1 for r in ASCII_FONT[idx]] + [0, 0]
 
 

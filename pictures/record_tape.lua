@@ -15,8 +15,9 @@ emu.register_frame_done(function()
     cass:record()
     m.natkeyboard:post(string.format("TAPE %04X%04X", base, stop))
     step, t0 = 1, t
-  -- leader + 10.5 bit times per byte + trailer, plus margin
-  elseif step == 1 and t - t0 > #data * 10.5 * 0.00146 + 8 then
+  -- done when TAPE has finished and the monitor is waiting for a key again
+  elseif step == 1 and t - t0 > 8 and m.devices[":maincpu"].state["PC"].value >= 0x0355
+         and m.devices[":maincpu"].state["PC"].value <= 0x0371 then
     cass:stop()
     print(string.format("RECORDED %s %d bytes, %.1fs of tape", path, #data, cass.length))
     m:exit()

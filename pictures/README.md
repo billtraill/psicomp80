@@ -15,6 +15,13 @@ can't be read, so (d) and (e) aren't reproduced.
 
 ## Loading a picture
 
+One line (loads the tape, checks it, and runs it):
+
+    cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/boat.wav \
+      -autoboot_script ~/localdev/psicomp80/autorun.lua
+
+Use `schmitt.wav` for the circuit. Or by hand:
+
 1. Start MAME, open File Manager → cassette and mount `schmitt.wav` (or
    `boat.wav`), or start with `-cass pictures/schmitt.wav`.
 2. Type `READ 1000`, then Tape Control → Play.

@@ -67,6 +67,35 @@ mame/src/mame/drivers/psicomp80.cpp
 
 There is a mame/build.sh and mame/run.sh files to run the emulator.
 
+/h2 Tapes
+
+Each tape loads at 1000 and runs with RUN 1000. autorun.lua loads the mounted
+tape (fast-forwarded), checks it against the .bin next to the .wav, retries if
+the load went wrong, and types RUN 1000. Don't touch the keyboard until the
+program starts. Run from anywhere:
+
+Game of Life
+```
+cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/life/life.wav -autoboot_script ~/localdev/psicomp80/autorun.lua
+```
+Keys: R = new random board, P = pause / resume (shows PAUSED), S = stop and
+go back to the monitor. Other keys are ignored. See life/README.md.
+
+Fig. 22(b) sailing boat
+```
+cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/boat.wav -autoboot_script ~/localdev/psicomp80/autorun.lua
+```
+
+Fig. 22(a) Schmitt trigger circuit
+```
+cd ~/localdev/mame && ./mamed psicomp80 -cass ~/localdev/psicomp80/pictures/schmitt.wav -autoboot_script ~/localdev/psicomp80/autorun.lua
+```
+For the pictures, press any key to go back to the monitor.
+
+To load a tape by hand instead: type READ 1000, then Tab -> Tape Control ->
+Play (Tab again to close the menu), wait for the tape to stop, press any key,
+then type RUN 1000.
+
 /h2 Things to Try
 
 /h3 Guessing game

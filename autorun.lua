@@ -1,11 +1,13 @@
--- Load life.wav from the mounted tape (fast-forwarded), check it loaded
--- correctly against life.bin, and RUN it. Retries the load if it didn't.
+-- Load the mounted tape into 1000h (READ, fast-forwarded), check it against
+-- the .bin file next to the .wav, and RUN 1000. Retries the load if it's wrong.
+-- Usage: mamed psicomp80 -cass some/tape.wav -autoboot_script autorun.lua
 local m = manager.machine
 local cass = m.cassettes[":cassette"]
 local mem = m.devices[":maincpu"].spaces["program"]
 
-local dir = debug.getinfo(1, "S").source:match("^@(.*/)") or "./"
-local f = assert(io.open(dir .. "life.bin", "rb")); local data = f:read("a"); f:close()
+local wav = m.images[":cassette"].filename
+local f = assert(io.open(wav:gsub("%.wav$", ".bin"), "rb"), "no .bin next to " .. wav)
+local data = f:read("a"); f:close()
 
 local function say(s) print(string.format("[autorun %5.1fs] %s", m.time:as_double(), s)) end
 local function loaded_ok()

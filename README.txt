@@ -67,6 +67,21 @@ mame/src/mame/drivers/psicomp80.cpp
 
 There is a mame/build.sh and mame/run.sh files to run the emulator.
 
+/h2 Starting a program directly
+
+c80.sh starts the emulator straight into a program: it copies the program into
+memory and types the command for you (no tape load). Extra MAME options can go
+after the name.
+```
+~/localdev/psicomp80/c80.sh life       # Game of Life
+~/localdev/psicomp80/c80.sh boat       # Fig. 22(b) sailing boat
+~/localdev/psicomp80/c80.sh schmitt    # Fig. 22(a) Schmitt trigger circuit
+~/localdev/psicomp80/c80.sh alph       # monitor ALPH character set test
+~/localdev/psicomp80/c80.sh list       # LIST 1000 with Life loaded
+~/localdev/psicomp80/c80.sh ready      # just the monitor
+```
+screenshots.html shows what each one looks like.
+
 /h2 Tapes
 
 Each tape loads at 1000 and runs with RUN 1000. autorun.lua loads the mounted

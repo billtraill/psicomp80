@@ -278,6 +278,8 @@ private:
   // keyboard latch returned by port 01h (ROM does IN then CPL)
   u8 m_key_latch = 0xff;
 
+  attotime m_key_time;
+
   // tape input after the Schmitt trigger (idle=1); held between crossings
   u8 m_tape_in = 1;
 
@@ -570,6 +572,7 @@ void psicomp80_state::machine_start() {
 
   save_item(NAME(m_key_latch));
   save_item(NAME(m_tape_in));
+  save_item(NAME(m_key_time));
   save_item(NAME(m_mm_code));
   save_item(NAME(m_mm_one_shot_clear));
   save_item(NAME(m_mm_last_port03));
@@ -1665,11 +1668,15 @@ void psicomp80_state::kbd_put(u8 data) {
     return;
 
   // Debounce / one-shot strobe: ignore further key events until the monitor
-  // reads port 0x01 (port01_r clears m_key_latch back to 0xFF).
-  if (m_key_latch != 0xff)
+  // reads port 0x01 (port01_r clears m_key_latch back to 0xFF). Let it lapse
+  // after a short time: a key that interrupts a running program (e.g. to end
+  // READ) makes the NMI handler jump to 0000 without reading port 0x01, which
+  // would otherwise leave the keyboard dead.
+  if (m_key_latch != 0xff && machine().time() - m_key_time < attotime::from_msec(50))
     return;
 
   m_key_latch = ~data;
+  m_key_time = machine().time();
 
   m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 

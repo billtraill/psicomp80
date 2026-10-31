@@ -1,0 +1,24 @@
+-- Load a program image into RAM and save it to the mounted cassette with TAPE.
+-- Usage: C80_BIN=file.bin mamed psicomp80 -cass out.wav -autoboot_script record_tape.lua
+local m = manager.machine
+local cass = m.cassettes[":cassette"]
+local mem = m.devices[":maincpu"].spaces["program"]
+local path = os.getenv("C80_BIN")
+local f = assert(io.open(path, "rb")); local data = f:read("a"); f:close()
+local base = 0x1000
+local stop = base + #data
+local step, t0 = 0, 0
+emu.register_frame_done(function()
+  local t = m.time:as_double()
+  if step == 0 and t > 2 then
+    for i = 1, #data do mem:write_u8(base + i - 1, data:byte(i)) end
+    cass:record()
+    m.natkeyboard:post(string.format("TAPE %04X%04X", base, stop))
+    step, t0 = 1, t
+  -- leader + 10.5 bit times per byte + trailer, plus margin
+  elseif step == 1 and t - t0 > #data * 10.5 * 0.00146 + 8 then
+    cass:stop()
+    print(string.format("RECORDED %s %d bytes, %.1fs of tape", path, #data, cass.length))
+    m:exit()
+  end
+end)

@@ -116,6 +116,14 @@ dumps of all three ROMs. rom/build.sh checks the sources against the ROMs and
 rebuilds the page. The earlier disassemblies it was made from are in old/.
 See rom/README.md.
 
+/h2 Hardware page
+
+hardware.html shows the main board from the KiCad project in hardware/:
+zoom and pan, either side's copper (routed, or traced from the kit artwork),
+click a part or a track to see what it is and what it connects to. It talks
+through each circuit and lists every part. Rebuild it with
+python3 hardware/tools/make_hardware_page.py.
+
 /h2 Floppy disc
 
 The floppy disc extension from the Oct/Dec 1980 articles: FD1771 controller,

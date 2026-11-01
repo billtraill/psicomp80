@@ -13,6 +13,7 @@ connections from the circuit diagrams in the Wireless World articles.
 | `kicad/psicomp80.kicad_pro`, `kicad/psicomp80.kicad_pcb` | A KiCad 10 project. Every part sits on a standard footprint with its nets, and the board is routed on two layers. The traced original copper stays on two user layers, **Artwork.Blue.Top** and **Artwork.Red.Bottom**, for comparison. |
 | `kicad/PSI_COMP80.pretty`, `kicad/fp-lib-table` | The project library: the two-pad key switch footprint and the wiring-pad footprints. |
 | `tools/netlist/` | The netlist, one file per article figure, plus the merged `psicomp80_netlist.json`. Its README covers sources, conventions and the points where a figure had to be interpreted. |
+| `../hardware.html` | A web page of the board: zoom and pan, each side's copper on and off (routed or traced kit artwork), click a part or track for its pins and signal, the circuits talked through, and the parts list. `tools/make_hardware_page.py` makes it from the KiCad board and the netlist, with `tools/hardware_template.html`; it needs only Python 3. |
 
 The board is 16 in × 12 in between the crop marks on the artwork. The scale comes from
 the 0.1 in DIP pad pitch. The board is double-sided. On the kit's artwork the "1" mark

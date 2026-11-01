@@ -274,7 +274,8 @@ SECTIONS = [
 
 ROMS = [("psicomp80.rom", "BURP", "b"), ("psicomp80_forth.rom", "FORTH", "f"), ("psicomp80_lisp.rom", "LISP", "l")]
 
-LINKS = {"screenshots.html": "screenshots.html", "lisp.html": "lisp.html", "emulator.html": "emulator.html"}
+LINKS = {"screenshots.html": "screenshots.html", "lisp.html": "lisp.html", "emulator.html": "emulator.html",
+         "hardware.html": "hardware.html"}
 
 
 def main():
@@ -441,7 +442,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
   <span class="kicker">PSI COMP80 · the 3 KB ROM · 0000–0BFF</span>
   <h1>COMP80 ROM Listings</h1>
   <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the three languages that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH and LISP were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
-  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a> and the <a href="emulator.html">emulator</a>, which runs all three ROMs.</p>
+  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all three ROMs.</p>
   <div class="map" aria-label="Memory map">
     <div><b>0000–03FF</b><span>Monitor ROM, 1 KB</span></div>
     <div><b>0400–0BFF</b><span>BURP, FORTH or LISP, 2 KB</span></div>

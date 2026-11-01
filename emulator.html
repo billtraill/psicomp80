@@ -237,7 +237,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
     </table></div>
     <h3>Memory</h3>
     <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
-    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all three languages, with each name and jump a link to the line it means.</p>
+    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all three languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
     <h3>The examples</h3>
     <ul>
       <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>

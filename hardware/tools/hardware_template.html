@@ -1,0 +1,876 @@
+<title>COMP80 Hardware</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&amp;family=Source+Sans+3:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+/* Layout: a light table. The board fills the width under its controls, the part you pick is described beside it;
+   the circuits read like the articles, each with a way back to its corner of the board. */
+:root {
+  --paper: #eceff2; --ink: #14181d; --muted: #59626c; --rule: #ccd2d9; --panel: #f6f8f9;
+  --accent: #1c6a86; --accent-ink: #ffffff;
+  --sub: #fbfaf5; --edge: #b9b3a2; --cuT: #2a5bd1; --cuB: #d0442f; --pad: #a7832b; --hole: #fbfaf5;
+  --silk: #20252b; --hl: #f08c00; --sel: #f08c00; --secfill: rgba(240, 140, 0, .10);
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e1114; --ink: #e5e9ed; --muted: #97a0aa; --rule: #252b32; --panel: #13171b;
+  --accent: #6bb4cd; --accent-ink: #0e1114;
+  --sub: #101418; --edge: #3a434c; --cuT: #6d98ff; --cuB: #ff7a66; --pad: #d9b65f; --hole: #07090b;
+  --silk: #dfe5ea; --hl: #ffc23d; --sel: #ffc23d; --secfill: rgba(255, 194, 61, .10); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0e1114; --ink: #e5e9ed; --muted: #97a0aa; --rule: #252b32; --panel: #13171b;
+  --accent: #6bb4cd; --accent-ink: #0e1114;
+  --sub: #101418; --edge: #3a434c; --cuT: #6d98ff; --cuB: #ff7a66; --pad: #d9b65f; --hole: #07090b;
+  --silk: #dfe5ea; --hl: #ffc23d; --sel: #ffc23d; --secfill: rgba(255, 194, 61, .10); color-scheme: dark; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font: 400 1.0625rem/1.55 var(--body); margin: 0; }
+.wrap { max-width: 84rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem; display: grid; gap: 3.25rem; }
+header { display: grid; gap: 1rem; max-width: 50rem; }
+.kicker { font: 600 .75rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 800 clamp(2.4rem, 6vw, 4rem)/.95 var(--display); font-stretch: 70%; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+header p { margin: 0; max-width: 64ch; }
+a { color: var(--accent); }
+header a, .prose a, footer a, .shead a { font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+code { font-family: var(--mono); font-size: .88em; }
+.spec { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: .25rem 0 0; padding: .75rem 0 0;
+  border-top: 1px solid var(--rule); font: 400 .8125rem/1.4 var(--mono); color: var(--muted); list-style: none; }
+.spec b { color: var(--ink); font-weight: 600; }
+section { display: grid; gap: 1.25rem; min-width: 0; }
+section > * { min-width: 0; }
+.filter .seg { max-width: 100%; overflow-x: auto; }
+.shead { display: grid; gap: .5rem; max-width: 50rem; }
+h2 { font: 700 1.75rem/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
+h3 { font: 700 1.25rem/1.15 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
+.shead p { margin: 0; color: var(--muted); max-width: 64ch; }
+.lbl { font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; color: inherit; }
+
+/* ---------------------------------------------------------------- the viewer */
+.viewer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); gap: 1rem; align-items: start; }
+@media (max-width: 62rem) { .viewer { grid-template-columns: minmax(0, 1fr); } }
+.stage { display: grid; gap: .6rem; min-width: 0; }
+.tools { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: .4rem; padding: .38rem .6rem; border: 1px solid var(--rule);
+  border-radius: 999px; background: var(--panel); font: 600 .8125rem/1 var(--body); cursor: pointer; user-select: none; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip i { width: .7rem; height: .7rem; border-radius: 50%; border: 2px solid currentColor; flex: none; }
+.chip:has(input:checked) i { background: currentColor; }
+.chip:has(input:not(:checked)) { color: var(--muted); }
+.chip:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+.chip.t i { color: var(--cuT); } .chip.b i { color: var(--cuB); } .chip.p i { color: var(--pad); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; padding: .42rem .7rem; font: 600 .8125rem/1 var(--body); cursor: pointer; white-space: nowrap; }
+.seg label + label span { border-left: 1px solid var(--rule); }
+.seg input:checked + span { background: var(--accent); color: var(--accent-ink); }
+.seg input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: -3px; }
+.btn { padding: .42rem .65rem; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 8px;
+  background: var(--panel); font: 600 .875rem/1 var(--body); cursor: pointer; white-space: nowrap; min-width: 2.2rem; }
+.btn:hover { border-color: var(--accent); }
+.btn:focus-visible, input[type=search]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+form.find { display: flex; gap: .35rem; align-items: center; margin-left: auto; }
+input[type=search] { font: 400 .875rem/1.2 var(--mono); padding: .42rem .6rem; border: 1px solid var(--rule);
+  border-radius: 8px; background: var(--panel); color: var(--ink); width: 11rem; }
+.box { position: relative; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: var(--paper); }
+#board { display: block; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; touch-action: none; cursor: grab;
+  user-select: none; -webkit-user-select: none; }
+#board.drag { cursor: grabbing; }
+.box .float { position: absolute; right: .6rem; top: .6rem; display: flex; flex-direction: column; gap: .35rem; }
+.box .float .btn { background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.box .scale { position: absolute; left: .7rem; bottom: .6rem; font: 400 .75rem/1 var(--mono); color: var(--muted);
+  background: color-mix(in srgb, var(--paper) 80%, transparent); padding: .25rem .4rem; border-radius: 4px; pointer-events: none; }
+.hint { font-size: .875rem; color: var(--muted); margin: 0; }
+.stage.expanded { position: fixed; inset: 0; z-index: 50; background: var(--paper); align-content: start;
+  padding: calc(.75rem + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+           calc(.75rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  grid-template-rows: auto minmax(0, 1fr) auto; height: 100dvh; box-sizing: border-box; }
+.stage.expanded .box { min-height: 0; }
+.stage.expanded #board { aspect-ratio: auto; height: 100%; }
+body.noscroll { overflow: hidden; }
+
+/* board drawing */
+#board .sub { fill: var(--sub); stroke: var(--edge); stroke-width: .4; }
+#L-hit rect { fill: transparent; pointer-events: all; }
+.cu path { fill: none; stroke-linecap: round; stroke-linejoin: round; pointer-events: stroke; }
+#L-top path { stroke: var(--cuT); }
+#L-bot path { stroke: var(--cuB); }
+.art path { pointer-events: none; }
+#L-artT path { fill: var(--cuT); }
+#L-artB path { fill: var(--cuB); }
+#board:not(.flip) #L-bot, #board:not(.flip) #L-artB { opacity: .78; }
+#board.flip #L-top, #board.flip #L-artT { opacity: .78; }
+#L-pads circle, #L-pads rect { fill: var(--pad); pointer-events: all; }
+#L-holes circle { fill: var(--hole); pointer-events: none; }
+#L-silk path { fill: none; stroke: var(--silk); stroke-width: .15; opacity: .8; pointer-events: none; }
+#L-sect path { fill: none; stroke: var(--muted); stroke-width: .35; stroke-dasharray: 2 1.2; pointer-events: none; }
+#L-sect text { fill: var(--muted); font-family: var(--mono); pointer-events: none; }
+#L-sect text.big { fill: var(--accent); font-weight: 600; letter-spacing: .08em; }
+#L-labels text, #L-sect text { text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+#L-sect .st text { text-anchor: start; }
+#L-labels text { fill: var(--silk); font-family: var(--mono); }
+#L-labels .r { font-weight: 600; }
+#L-labels .ic, #L-labels .sm { display: none; }
+#board.z1 #L-labels .ic, #board.z2 #L-labels .sm { display: inline; }
+#L-labels .key text { font-family: var(--body); font-weight: 600; }
+#board.flip .lb text { transform: scale(-1, 1); transform-box: fill-box; transform-origin: center; }
+#board.netsel .cu path, #board.netsel #L-pads circle, #board.netsel #L-pads rect { opacity: .22; }
+#board.netsel .cu path.hl { opacity: 1; stroke: var(--hl); vector-effect: non-scaling-stroke; stroke-width: 3.5px; }
+#board.netsel #L-pads .hl { opacity: 1; fill: var(--hl); }
+#L-sel rect { fill: none; stroke: var(--sel); stroke-width: 2.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
+#L-sel rect.s { fill: var(--secfill); stroke-width: 1px; }
+
+/* the info panel */
+.info { border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); padding: 1rem; display: grid;
+  gap: .75rem; align-content: start; min-width: 0; max-height: 44rem; overflow: auto; }
+.info h3 { display: flex; flex-wrap: wrap; gap: .25rem .6rem; align-items: baseline; }
+.info h3 span { font: 600 .9375rem/1.2 var(--mono); color: var(--muted); }
+.info p { margin: 0; font-size: .9375rem; }
+.info .role { color: var(--ink); }
+.info .desc { color: var(--muted); }
+.legend { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; font-size: .9rem; }
+.legend li { display: flex; gap: .55rem; align-items: center; }
+.legend i { width: 1.4rem; height: .35rem; border-radius: 2px; flex: none; }
+.pins { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .15rem .7rem; font: 400 .8125rem/1.45 var(--mono); }
+.pins b { font-weight: 400; color: var(--muted); text-align: right; }
+.link { all: unset; cursor: pointer; color: var(--accent); overflow-wrap: anywhere; }
+.link:hover { text-decoration: underline; }
+.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.conn { display: flex; flex-wrap: wrap; gap: .25rem .75rem; font: 400 .8125rem/1.5 var(--mono); }
+.clear { justify-self: start; }
+
+/* ---------------------------------------------------------------- the circuits */
+.circuits { display: grid; gap: 2.5rem; }
+.block { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: 1rem 2.5rem; align-items: start; }
+@media (max-width: 56rem) { .block { grid-template-columns: minmax(0, 1fr); } }
+.prose { display: grid; gap: .75rem; max-width: 64ch; min-width: 0; }
+.prose p { margin: 0; }
+.prose ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .35rem; }
+.side { display: grid; gap: .75rem; min-width: 0; }
+.show { justify-self: start; display: inline-flex; gap: .45rem; align-items: center; }
+.pl { all: unset; cursor: pointer; font: 600 .9em/1 var(--mono); color: var(--accent); border-bottom: 1px dotted currentColor; }
+.pl:hover { border-bottom-style: solid; }
+.pl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mini { border-collapse: collapse; width: 100%; font-size: .875rem; }
+.mini th { text-align: left; font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  padding: 0 .75rem .45rem 0; border-bottom: 1px solid var(--rule); }
+.mini td { padding: .4rem .75rem .4rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.mini td:first-child { font-family: var(--mono); white-space: nowrap; }
+.figure { margin: 0; display: grid; gap: .5rem; min-width: 0; }
+.figure svg { display: block; width: 100%; height: auto; }
+.figure figcaption { font-size: .875rem; color: var(--muted); }
+.diagram { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); padding: .75rem; }
+.diagram svg { min-width: 40rem; }
+.dg rect { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+.dg rect.cpu { fill: color-mix(in srgb, var(--accent) 16%, var(--paper)); }
+.dg rect.bus { fill: var(--ink); stroke: none; }
+.dg text { fill: var(--ink); font: 600 12px var(--body); text-anchor: middle; }
+.dg text.s { font: 400 10.5px var(--mono); fill: var(--muted); }
+.dg text.b { fill: var(--paper); font: 600 11px var(--mono); }
+.dg path { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+.dg path.ar { marker-end: url(#ar); }
+.dg path.clk { stroke: var(--accent); stroke-dasharray: 4 3; }
+.dg text.clk { fill: var(--accent); }
+.tl rect { stroke: var(--ink); stroke-width: 1; }
+.tl text { fill: var(--ink); font: 400 11px var(--mono); text-anchor: middle; }
+
+/* ---------------------------------------------------------------- the parts */
+.counts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: .3rem 1.5rem;
+  margin: 0; padding: 0; list-style: none; font-size: .9375rem; }
+.counts li { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .4rem; }
+.counts b { font: 600 .9375rem var(--mono); text-align: right; }
+.filter { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+.tablewrap { overflow-x: auto; max-height: 40rem; overflow-y: auto; border: 1px solid var(--rule); border-radius: 10px; }
+.parts { border-collapse: collapse; width: 100%; font-size: .9375rem; }
+.parts th { position: sticky; top: 0; background: var(--panel); text-align: left; font: 600 .6875rem/1 var(--mono);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: .7rem 1rem .6rem 0; border-bottom: 1px solid var(--rule); }
+.parts th:first-child, .parts td:first-child { padding-left: .9rem; }
+.parts td { padding: .5rem 1rem .5rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.parts td:nth-child(2) { font-family: var(--mono); font-size: .875rem; min-width: 6rem; max-width: 12rem; overflow-wrap: anywhere; }
+.parts .sub { display: block; color: var(--muted); font-size: .875rem; }
+.parts .sec { white-space: nowrap; color: var(--muted); }
+.ref { all: unset; cursor: pointer; font: 600 .875rem/1 var(--mono); color: var(--accent); white-space: nowrap; }
+.ref:hover { text-decoration: underline; }
+.ref:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.count { font: 400 .8125rem var(--mono); color: var(--muted); }
+
+.photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1.5rem; }
+.photo { margin: 0; display: grid; gap: .5rem; min-width: 0; }
+.photo img { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--panel); }
+.photo figcaption { font-size: .875rem; color: var(--muted); }
+.notes { margin: 0; padding-left: 1.2rem; display: grid; gap: .5rem; max-width: 64ch; }
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--muted); font-size: .875rem; max-width: 64ch; }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="kicker">PSI COMP80 · the main board · Wireless World, 1979</span>
+  <h1>COMP80 Hardware</h1>
+  <p>The PSI COMP80 is one double-sided board, 16 × 12 inches, with the keyboard along the front edge. The Powertran kit put every part on it but the transformer and one power transistor. This page redraws that board from the kit's layout sheet and the circuit diagrams in J. H. Adams's articles, and talks through the circuits section by section.</p>
+  <p>Zoom into the board below, turn either side's copper on and off, and click a part or a track to see what it is and what it connects to. See also the <a href="screenshots.html">screenshots</a>, the <a href="roms.html">ROM listings</a> and the <a href="emulator.html">emulator</a>.</p>
+  <ul class="spec">
+    <li><b>Z80</b> at 2 MHz</li>
+    <li><b>3 KB</b> EPROM, <b>5 KB</b> RAM</li>
+    <li><b>2 KB</b> video RAM, 64 × 32 characters</li>
+    <li><b>MM57109</b> calculator chip</li>
+    <li><b>{{NPARTS}}</b> parts</li>
+  </ul>
+</header>
+
+<section id="board-section" aria-labelledby="h-board">
+  <div class="shead">
+    <h2 id="h-board">The board</h2>
+    <p>Seen from the component side, as on the kit sheet: blue is the component side's copper and red the solder side's. Scroll or pinch to zoom, drag to move. Part numbers appear as you zoom in.</p>
+  </div>
+  <div class="viewer">
+    <div class="stage" id="stage">
+      <div class="tools">
+        <div class="group" role="group" aria-label="Layers">
+          <label class="chip t"><input type="checkbox" data-layer="top" checked><i></i>Component side</label>
+          <label class="chip b"><input type="checkbox" data-layer="bot" checked><i></i>Solder side</label>
+          <label class="chip p"><input type="checkbox" data-layer="pads" checked><i></i>Pads</label>
+          <label class="chip"><input type="checkbox" data-layer="silk" checked><i></i>Outlines</label>
+          <label class="chip"><input type="checkbox" data-layer="labels" checked><i></i>Labels</label>
+          <label class="chip"><input type="checkbox" data-layer="sect"><i></i>Sections</label>
+        </div>
+        <div class="group" role="radiogroup" aria-label="Copper">
+          <span class="lbl">Copper</span>
+          <span class="seg">
+            <label><input type="radio" name="cu" value="routed" checked><span>Routed</span></label>
+            <label><input type="radio" name="cu" value="art"><span>Kit artwork</span></label>
+          </span>
+        </div>
+        <div class="group" role="radiogroup" aria-label="View from">
+          <span class="lbl">From</span>
+          <span class="seg">
+            <label><input type="radio" name="side" value="top" checked><span>Component side</span></label>
+            <label><input type="radio" name="side" value="bot"><span>Solder side</span></label>
+          </span>
+        </div>
+        <form class="find" role="search">
+          <label class="lbl" for="find">Find</label>
+          <input type="search" id="find" placeholder="IC1, Z80, A15…" autocomplete="off" spellcheck="false">
+        </form>
+      </div>
+      <div class="box">
+        {{BOARD}}
+        <div class="float">
+          <button type="button" class="btn" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" class="btn" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" class="btn" id="zfit" aria-label="Whole board">⤢</button>
+          <button type="button" class="btn" id="zexp" aria-label="Expand" aria-pressed="false">⛶</button>
+        </div>
+        <span class="scale" id="scale"></span>
+      </div>
+      <p class="hint" id="status">Routed copper: the board as rebuilt from the article circuits. Kit artwork: the original 1979 tracks, traced from a photo of the artwork sheet.</p>
+    </div>
+    <aside class="info" id="info" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section aria-labelledby="h-circ">
+  <div class="shead">
+    <h2 id="h-circ">The circuits</h2>
+    <p>The board is laid out in the same sections as the articles' circuit diagrams. Each part below can take you to its corner of the board; the part numbers are links too.</p>
+  </div>
+
+  <figure class="figure diagram">
+    <svg class="dg" viewBox="0 0 760 345" role="img" aria-label="Block diagram: the Z80 drives buffered data, address and control buses that connect to the EPROMs, RAM, video RAM and the input and output ports for the keyboard, calculator chip and tape. An 8 MHz crystal in the display section clocks everything.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker></defs>
+      <rect class="cpu" x="20" y="120" width="110" height="80" rx="6"/><text x="75" y="155">Z80</text><text class="s" x="75" y="173">IC1 · 2 MHz</text>
+      <rect class="bus" x="150" y="112" width="590" height="16" rx="3"/><text class="b" x="445" y="124">DATA BUS D0–D7 · buffered by IC9–IC12</text>
+      <rect class="bus" x="150" y="152" width="590" height="16" rx="3"/><text class="b" x="445" y="164">ADDRESS BUS A0–A15 · A0–A9 buffered by IC15, IC16</text>
+      <rect class="bus" x="150" y="192" width="590" height="16" rx="3"/><text class="b" x="445" y="204">CONTROL · RD WR MREQ IORQ</text>
+      <path d="M130 120H150M130 160H150M130 200H150"/>
+      <rect x="165" y="20" width="120" height="62" rx="6"/><text x="225" y="45">EPROM 3K</text><text class="s" x="225" y="63">IC18–IC20 · 0000</text>
+      <rect x="300" y="20" width="120" height="62" rx="6"/><text x="360" y="45">RAM 5K</text><text class="s" x="360" y="63">40 × 21L02 · 0C00</text>
+      <rect x="435" y="20" width="135" height="62" rx="6"/><text x="502" y="45">Video RAM 2K</text><text class="s" x="502" y="63">14 × 21L02 · 8000</text>
+      <rect x="590" y="20" width="150" height="62" rx="6"/><text x="665" y="45">Character gen.</text><text class="s" x="665" y="63">2513 → shift reg. → TV</text>
+      <path d="M225 82V112M360 82V112M502 112V82"/><path class="ar" d="M570 51H588"/>
+      <rect x="165" y="242" width="120" height="66" rx="6"/><text x="225" y="266">Port decoders</text><text class="s" x="225" y="284">IC2 out · IC3 in</text>
+      <rect x="300" y="242" width="125" height="66" rx="6"/><text x="362" y="266">Keyboard</text><text class="s" x="362" y="284">2376 · port 01</text>
+      <rect x="440" y="242" width="140" height="66" rx="6"/><text x="510" y="266">MM57109</text><text class="s" x="510" y="284">ports 60, 03 · INT</text>
+      <rect x="595" y="242" width="145" height="66" rx="6"/><text x="667" y="266">Tape</text><text class="s" x="667" y="284">ports 20, 00</text>
+      <path d="M225 242V208M362 242V128M510 242V128M667 242V128"/>
+      <path class="clk ar" d="M690 82V97H75V118"/><text class="s clk" x="588" y="93">clocks from 8 MHz</text><path d="M225 308V326H667V308M362 326V308M510 326V308"/><text class="s" x="445" y="340">port enables</text><text class="s" x="75" y="225">NMI ← keyboard</text><text class="s" x="75" y="240">INT ← MM57109</text>
+    </svg>
+    <figcaption>The Z80 and its buses. The 8 MHz crystal in the display section is the source of every clock: 2 MHz for the Z80, 400 kHz for the MM57109, and the display's own timing.</figcaption>
+  </figure>
+
+  <div class="circuits">
+
+  <div class="block" id="c-cpu">
+    <div class="prose">
+      <span class="kicker">Part 1, Fig. 2</span>
+      <h3>The processor and its buses</h3>
+      <p>The <button class="pl" data-ref="IC1">Z80</button> runs at 2 MHz. It reads and writes through four control lines: RD and WR say which way the data goes, MREQ says it is a memory address and IORQ an input or output port. Most of these signals are active low.</p>
+      <p>The data bus is heavily loaded, so four 74LS367 buffers stand between it and the Z80, wired as a transceiver: <button class="pl" data-ref="IC9">IC9</button> and <button class="pl" data-ref="IC10">IC10</button> pass data towards the Z80 when it reads, <button class="pl" data-ref="IC11">IC11</button> and <button class="pl" data-ref="IC12">IC12</button> away from it when it writes. Their spare gates buffer the control lines.</p>
+      <p>Two 74LS138 decoders turn port numbers into enables. <button class="pl" data-ref="IC2">IC2</button>, enabled by IORQ and WR, picks an output device from A5–A7; <button class="pl" data-ref="IC3">IC3</button>, enabled by IORQ and RD, picks an input device from A0–A2. Using different address lines spreads the load on the address bus. The table shows the ports in use, the same numbers the monitor's IN and OUT instructions use.</p>
+      <p>The keyboard works by interrupt. Its strobe, inverted by <button class="pl" data-ref="IC14">IC14</button>, drives the Z80's non-maskable interrupt, so a program that wants a key just executes HALT. If a key arrives when the Z80 is not halted, the monitor's interrupt routine resets the machine, which is how you stop a runaway program.</p>
+      <p>The clock comes from the display section. The Z80 wants a fast rise to 4.4 V, which a TTL gate can't give, so <button class="pl" data-ref="TR1">TR1</button> pulls the clock up actively.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="cpu">Show the CPU section</button>
+      <table class="mini">
+        <thead><tr><th>Port</th><th>Device</th></tr></thead>
+        <tbody>
+          <tr><td>OUT 00</td><td>Teleprinter (D7); not built on this board</td></tr>
+          <tr><td>OUT 20</td><td>Tape: the bit to record (D7), <button class="pl" data-ref="IC51">IC51</button></td></tr>
+          <tr><td>OUT 60</td><td>MM57109 instruction (D0–D5), <button class="pl" data-ref="IC4">IC4</button>, <button class="pl" data-ref="IC5">IC5</button></td></tr>
+          <tr><td>IN 00</td><td>Tape: the bit read (D0), <button class="pl" data-ref="IC53">IC53</button></td></tr>
+          <tr><td>IN 01</td><td>Keyboard code (D0–D6), <button class="pl" data-ref="IC13">IC13</button></td></tr>
+          <tr><td>IN 03</td><td>MM57109 digit, RDY and branch, <button class="pl" data-ref="IC8">IC8</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block" id="c-mm">
+    <div class="prose">
+      <span class="kicker">Part 1, Figs. 2, 4 and 5</span>
+      <h3>The calculator chip</h3>
+      <p>BURP's arithmetic is done by a National <button class="pl" data-ref="IC6">MM57109</button>, a scientific calculator on a chip built to work as a small processor of its own. It takes a 6-bit instruction, mostly the code of a calculator key, which the Z80 writes to the latches <button class="pl" data-ref="IC4">IC4</button> and <button class="pl" data-ref="IC5">IC5</button> with an OUT to port 60.</p>
+      <p>Two lines pace it. RDY says it is ready for an instruction; HOLD, from the Z80, tells it to wait. The Z80 sets up the instruction, lowers HOLD and waits for RDY. Some instructions make the chip pulse RDY while they run, meant for external counters; the chip's ISEL output marks those moments, and the CMOS gates in <button class="pl" data-ref="IC7">IC7</button> use it to hide the pulses from the Z80.</p>
+      <p>The chip runs from +5 V and −4.5 V, so its HOLD and power-on reset inputs are not TTL levels: <button class="pl" data-ref="TR2">TR2</button> and <button class="pl" data-ref="TR3">TR3</button> shift them, and its open-drain outputs have pull-down resistors to −4.5 V.</p>
+      <p>Results come back a digit at a time. When the Z80 asks for the X register, the chip's R/W line pulses twelve times, for the two exponent digits, the signs, the decimal point position and eight mantissa digits. Each pulse interrupts the Z80, which reads the digit through <button class="pl" data-ref="IC8">IC8</button> at port 03, along with RDY and the branch line BR that pulses when a test comes out true.</p>
+      <p><button class="pl" data-ref="IC46">IC46</button> divides the display's clock down to 400 kHz for the chip, its rated maximum. Moving a link doubles it to 800 kHz, which the article says tested chips will take.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-refs="IC6 IC4 IC5 IC7 IC8 TR2 TR3 IC46">Show the calculator parts</button>
+    </div>
+  </div>
+
+  <div class="block" id="c-mem">
+    <div class="prose">
+      <span class="kicker">Part 2, Fig. 6</span>
+      <h3>Memory</h3>
+      <p>The base board decodes the bottom 8K. <button class="pl" data-ref="IC17">IC17</button>, a 74LS138 enabled when MREQ and A15 are low, splits it into eight 1K blocks from A10–A12, each with its own chip select.</p>
+      <p>The first three blocks are 2708 EPROMs: the monitor in <button class="pl" data-ref="IC18">IC18</button> and BURP in <button class="pl" data-ref="IC19">IC19</button> and <button class="pl" data-ref="IC20">IC20</button>. The rest is 21L02 static RAM, a 1K × 1 chip, so a kilobyte takes a column of eight, one per bit. Block 0C00 can be either: link 2 gives it to the RAM column <button class="pl" data-ref="IC22a">IC22a–h</button>, link 1 to a fourth EPROM in <button class="pl" data-ref="IC21">IC21</button> (“Fit link 1 or 2 but not both” on the kit sheet). The kit fits three RAM columns; IC24 and IC25 are optional.</p>
+      <p>A0–A9 go to every memory chip, so <button class="pl" data-ref="IC15">IC15</button> and <button class="pl" data-ref="IC16">IC16</button> buffer them. The memory chips share their own data bus, joined to the main one by <button class="pl" data-ref="IC27">IC27</button> only when the Z80 reads memory. The buffers add delay, but the Z80's tightest reads still leave 750 ns, plenty for 450 ns RAM.</p>
+      <p>A link in the MREQ line lets the optional 74LS139 <button class="pl" data-ref="IC57">IC57</button> split memory into four 8K quarters, for the 32K expansion on the plug <button class="pl" data-ref="J1">J1</button>.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="mem">Show the memory section</button>
+      <table class="mini">
+        <thead><tr><th>Address</th><th>Chips</th></tr></thead>
+        <tbody>
+          <tr><td>0000–03FF</td><td><button class="pl" data-ref="IC18">IC18</button> monitor</td></tr>
+          <tr><td>0400–07FF</td><td><button class="pl" data-ref="IC19">IC19</button> BURP</td></tr>
+          <tr><td>0800–0BFF</td><td><button class="pl" data-ref="IC20">IC20</button> BURP</td></tr>
+          <tr><td>0C00–0FFF</td><td><button class="pl" data-ref="IC22a">IC22a–h</button>, or <button class="pl" data-ref="IC21">IC21</button></td></tr>
+          <tr><td>1000–13FF</td><td><button class="pl" data-ref="IC23a">IC23a–h</button></td></tr>
+          <tr><td>1400–17FF</td><td><button class="pl" data-ref="IC24a">IC24a–h</button> optional</td></tr>
+          <tr><td>1800–1BFF</td><td><button class="pl" data-ref="IC25a">IC25a–h</button> optional</td></tr>
+          <tr><td>1C00–1FFF</td><td><button class="pl" data-ref="IC26a">IC26a–h</button></td></tr>
+          <tr><td>8000–83FF</td><td><button class="pl" data-ref="IC43a">IC43a–g</button> video</td></tr>
+          <tr><td>8400–87FF</td><td><button class="pl" data-ref="IC44a">IC44a–g</button> video</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block" id="c-vdu">
+    <div class="prose">
+      <span class="kicker">Part 2, Fig. 8</span>
+      <h3>The display</h3>
+      <p>The display is built from ordinary TTL counters rather than a display controller chip, which was expensive in 1979 and would have made the graphics option harder. Everything runs from the 8 MHz crystal oscillator in <button class="pl" data-ref="IC28">IC28</button>, which is also the dot clock: one dot every 125 ns.</p>
+      <p><button class="pl" data-ref="IC29">IC29</button> and <button class="pl" data-ref="IC30">IC30</button> divide it to 4 MHz, the Z80's 2 MHz and 250 kHz. At 250 kHz, <button class="pl" data-ref="IC48">IC48</button> steps through sixteen 4 µs states, one television line of 64 µs: state 1 is the line sync, and the picture fills states 4 to 15, 48 µs, leaving margins for a television's overscan.</p>
+      <p>Within the picture, <button class="pl" data-ref="IC37">IC37</button> divides the dot clock by six, one count per character, and <button class="pl" data-ref="IC38">IC38</button> and <button class="pl" data-ref="IC39">IC39</button> count 64 characters across. <button class="pl" data-ref="IC34">IC34</button> counts the ten scan lines of a character row, the last two blank, and <button class="pl" data-ref="IC29">IC29</button> with <button class="pl" data-ref="IC35">IC35</button> count 32 rows: 320 lines a frame instead of the standard 312½, close enough for a television. After the last row the monostable <button class="pl" data-ref="IC36">IC36</button> holds the counters through the frame flyback and makes the frame sync; <button class="pl" data-ref="VR1">VR1</button> sets its time.</p>
+      <p>The screen is 2K of 21L02s, <button class="pl" data-ref="IC43a">IC43a–g</button> and <button class="pl" data-ref="IC44a">IC44a–g</button>: six bits of each byte are the character code, and a seventh is there for the graphics option. The multiplexers <button class="pl" data-ref="IC40">IC40–IC42</button> give the RAM the display counters' address, except while the Z80 writes, when they switch to the Z80's. The Z80 can only write the screen, never read it, and since only A0–A10 and A15 are decoded, the 2K appears sixteen times from 8000 to FFFF.</p>
+      <p>The character code and the scan line go to the 2513 character generator <button class="pl" data-ref="IC47">IC47</button>, which gives five dots. The shift register <button class="pl" data-ref="IC45">IC45</button> loads them with a blank sixth for the gap between characters and clocks them out at 8 MHz, through the video gate in <button class="pl" data-ref="IC33">IC33</button> to the video pads.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="vdu">Show the display section</button>
+      <figure class="figure">
+        <svg class="tl" viewBox="0 0 330 92" role="img" aria-label="One 64 microsecond line: 4 microseconds sync, 8 blank, 48 picture, 4 blank.">
+          <rect x="5" y="20" width="20" height="30" style="fill:var(--ink)"/>
+          <rect x="25" y="20" width="40" height="30" style="fill:var(--paper)"/>
+          <rect x="65" y="20" width="240" height="30" style="fill:color-mix(in srgb, var(--accent) 30%, var(--paper))"/>
+          <rect x="305" y="20" width="20" height="30" style="fill:var(--paper)"/>
+          <text x="15" y="66">4</text><text x="45" y="66">8</text><text x="185" y="39">48 µs: 64 characters × 6 dots</text><text x="315" y="66">4</text>
+          <text x="15" y="12">sync</text><text x="165" y="86">one line = 16 states of 4 µs = 64 µs</text>
+        </svg>
+        <figcaption>One line, from the 16 states of IC48. A character is 5 × 7 dots in a 6 × 10 cell.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="block" id="c-kbd">
+    <div class="prose">
+      <span class="kicker">The kit's keyboard</span>
+      <h3>The keyboard</h3>
+      <p>The keys are on the main board itself: 72 switches along the front edge, with a hex keypad on the right and a RESET key that pulls the Z80's reset line straight down. The other keys are scanned by a General Instrument <button class="pl" data-ref="IC54">AY-5-2376</button> encoder, which drives the matrix columns in turn, watches the rows, and for each key gives a 7-bit code and a strobe. <button class="pl" data-ref="IC55">IC55</button> inverts the strobe for the interrupt, and the code is read through <button class="pl" data-ref="IC13">IC13</button> at port 01.</p>
+      <p>The articles don't draw the encoder or the key matrix, so here each key sits at the crossing of the 2376's matrix that produces its code. The kit's real wiring may differ.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="kbd">Show the keyboard</button>
+    </div>
+  </div>
+
+  <div class="block" id="c-tape">
+    <div class="prose">
+      <span class="kicker">Part 2, Fig. 12</span>
+      <h3>The tape interface</h3>
+      <p>Programs are saved on an ordinary cassette recorder at 300 baud, a 0 as about 1200 Hz and a 1 as 2400 Hz. Each byte goes out as a start bit, the eight data bits from bit 7 down, and a stop bit and a half, 35 ms in all.</p>
+      <p>The Z80 does the timing itself. For each bit it writes D7 to port 20, which clocks one half of the 4013 <button class="pl" data-ref="IC51">IC51</button>; the flip-flop switches a transistor multivibrator between the two tones.</p>
+      <p>Reading back, a Schmitt trigger squares up the signal from the recorder and the 4528 monostable <button class="pl" data-ref="IC52">IC52</button> fires on every cycle. Its pulse is longer than a 2400 Hz cycle but shorter than a 1200 Hz one, so when the other half of IC51 samples it at the next cycle it reads 1 for the high tone and 0 for the low. The Z80 reads the result as D0 of port 00 through <button class="pl" data-ref="IC53">IC53</button>, and wants two 0s in a row before it believes a start bit.</p>
+      <p>Each recording starts with several seconds of stop bits, so there is time to start the tape before typing the READ command.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="tape">Show the tape interface</button>
+    </div>
+  </div>
+
+  <div class="block" id="c-psu">
+    <div class="prose">
+      <span class="kicker">Part 2, Fig. 16</span>
+      <h3>The power supply</h3>
+      <p>The mains transformer sits off the board with three secondaries. The biggest feeds the 5 V supply, which runs most of the board, including 54 RAM chips: two 1N5401s rectify it into the 4700 µF <button class="pl" data-ref="C14">C14</button>, and the 7805 <button class="pl" data-ref="IC56">IC56</button> regulates it, with <button class="pl" data-ref="TR9">TR9</button> driving a 2N3055 on a heatsink off the board to carry most of the current.</p>
+      <p>A second winding, through a bridge built from four 1N4002s, gives ±12 V from the 7812 and 7912 regulators, and −5 V from a 7905. The EPROMs need +12 V and −5 V, the character generator −5 V and −12 V, the keyboard encoder −12 V. A diode drops −5 V to the −4.5 V the calculator chip uses.</p>
+      <p>The third winding, through another diode bridge into the 220 µF 100 V <button class="pl" data-ref="C19">C19</button>, makes a high unregulated rail. Nothing on the main board uses it.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="psu">Show the power supply</button>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<section aria-labelledby="h-parts">
+  <div class="shead">
+    <h2 id="h-parts">The parts</h2>
+    <p>Every part on the board, {{NPARTS}} in all, by section. Click a reference to find it on the board. Values follow the article and the kit sheet; the keys show their legends.</p>
+  </div>
+  <span class="lbl">The chips</span>
+  <ul class="counts">{{SUMMARY}}</ul>
+  <div class="filter">
+    <input type="search" id="pfilter" placeholder="Filter: 74LS, 10k, tape…" aria-label="Filter the parts" autocomplete="off" spellcheck="false">
+    <span class="seg" role="radiogroup" aria-label="Section" id="psec">
+      <label><input type="radio" name="psec" value="" checked><span>All</span></label>
+      <label><input type="radio" name="psec" value="cpu"><span>CPU</span></label>
+      <label><input type="radio" name="psec" value="mem"><span>Memory</span></label>
+      <label><input type="radio" name="psec" value="vdu"><span>Display</span></label>
+      <label><input type="radio" name="psec" value="tape"><span>Tape</span></label>
+      <label><input type="radio" name="psec" value="psu"><span>Power</span></label>
+      <label><input type="radio" name="psec" value="kbd"><span>Keyboard</span></label>
+    </span>
+    <span class="count" id="pcount"></span>
+  </div>
+  <div class="tablewrap">
+    <table class="parts">
+      <thead><tr><th>Ref</th><th>Value</th><th>What it is</th><th>Section</th></tr></thead>
+      <tbody id="ptable">{{PARTS}}</tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="h-src">
+  <div class="shead">
+    <h2 id="h-src">Where it comes from</h2>
+    <p>The placement comes from photos of two sheets that came with the kit; the connections come from the articles' circuit diagrams, transcribed pin by pin.</p>
+  </div>
+  <div class="photos">
+    <figure class="photo"><img src="{{IMG_LAYOUT}}" alt="The kit's component layout sheet: the board outline with every IC numbered and typed, the discrete parts, and the keyboard legends along the bottom" loading="lazy"><figcaption>The component layout sheet. Every IC position on this page is read from it and snapped to the 0.1 in grid.</figcaption></figure>
+    <figure class="photo"><img src="{{IMG_ARTWORK}}" alt="The kit's PCB artwork sheet: blue component-side and red solder-side tracks overlaid on one sheet" loading="lazy"><figcaption>The artwork sheet, both sides on one sheet. The Kit artwork layer is traced from this photo.</figcaption></figure>
+  </div>
+  <ul class="notes">
+    <li><b>The routed tracks are not the original tracks.</b> They connect the same pins, as the article's circuits do, but their paths were made by an autorouter. Only the RAM columns' buses are laid the way the original artwork lays them.</li>
+    <li><b>The kit artwork is approximate.</b> The photo resolves about 65 dots per inch, so where tracks run close together they merge.</li>
+    <li><b>Some pins are a choice.</b> Several figures draw gates and buffers without pin numbers; any gate of the package does the same job. The keyboard matrix is worked out from the encoder's datasheet.</li>
+    <li><b>Discrete parts</b> sit where the kit sheet shows them when it shows the same reference; the rest go near the pins they connect to. Parts the figures don't number have names like <code>R_CPU3</code> or <code>TAPE_R7</code>.</li>
+  </ul>
+</section>
+
+<footer>The board is a KiCad project in the repository's <code>hardware/</code> folder, with the netlist and the notes on every judgement call. This page is generated from it by <code>hardware/tools/make_hardware_page.py</code>.</footer>
+</div>
+
+<script>
+const D = {{DATA}};
+(() => {
+  const svg = document.getElementById("board"), world = document.getElementById("world");
+  const selG = document.getElementById("L-sel"), info = document.getElementById("info");
+  const stage = document.getElementById("stage"), box = svg.parentElement;
+  const [BX, BY, BW, BH] = D.board;
+  const L = id => document.getElementById(id);
+  const comps = D.comps.map(([ref, value, kind, section, bbox, desc, role, pins], i) =>
+    ({ i, ref, value, kind, section, bbox, desc, role, pins }));
+  const byRef = new Map(comps.map(c => [c.ref.toUpperCase(), c]));
+  const netPins = D.nets.map(() => []);
+  for (const c of comps) for (const [pin, n] of c.pins) if (n !== null) netPins[n].push([c, pin]);
+  const netIndex = new Map(D.nets.map((n, i) => [n.toUpperCase(), i]));
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  const natural = (a, b) => a.localeCompare(b, undefined, { numeric: true });
+
+  // ------------------------------------------------------------ view box, zoom and pan
+  let vb = { x: BX - 4, y: BY - 4, w: BW + 8, h: BH + 8 }, flipped = false, anim = 0;
+  function aspect() { const r = svg.getBoundingClientRect(); return r.width > 0 ? r.height / r.width : 0.75; }
+  function apply() {
+    const a = aspect();
+    vb.h = vb.w * a;
+    // keep the board in view: centred when it all fits, otherwise no more than 30% of the view past its edge
+    const keep = (p, size, lo, len) => size >= len + 8 ? lo + len / 2 - size / 2
+      : Math.min(Math.max(p, lo - 4 - size * 0.3), lo + len + 4 - size * 0.7);
+    vb.x = keep(vb.x, vb.w, BX, BW);
+    vb.y = keep(vb.y, vb.h, BY, BH);
+    svg.setAttribute("viewBox", `${vb.x.toFixed(2)} ${vb.y.toFixed(2)} ${vb.w.toFixed(2)} ${vb.h.toFixed(2)}`);
+    svg.classList.toggle("z1", vb.w < 270);
+    svg.classList.toggle("z2", vb.w < 120);
+    const px = svg.getBoundingClientRect().width || 1;
+    document.getElementById("scale").textContent = `${(px / vb.w * 25.4 / 96 * 100).toFixed(0)}% · ${(vb.w / 25.4).toFixed(1)} in across`;
+  }
+  function clampW(w) { return Math.min(Math.max(w, 6), (BW + 8) * 1.8); }
+  function fit(b, margin = 0.12) {
+    // the smallest view showing box b (svg coordinates), keeping the element's aspect
+    const a = aspect(), m = Math.max(b.w, b.h) * margin + 2;
+    let w = Math.max(b.w + m * 2, (b.h + m * 2) / a);
+    w = clampW(w);
+    return { x: b.x + b.w / 2 - w / 2, y: b.y + b.h / 2 - w * a / 2, w, h: w * a };
+  }
+  function animate(to) {
+    cancelAnimationFrame(anim);
+    const from = { ...vb }, t0 = performance.now(), dur = 320;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      vb = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: to.h };
+      apply();
+      if (k < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+  function toSvg(cx, cy) {
+    const r = svg.getBoundingClientRect();
+    return { x: vb.x + (cx - r.left) / r.width * vb.w, y: vb.y + (cy - r.top) / r.height * vb.h };
+  }
+  // board coordinates to svg coordinates (they differ when the board is seen from the solder side)
+  const bx = x => flipped ? 2 * BX + BW - x : x;
+  function boxOf(list) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const c of list) {
+      const [a, b, cc, d] = c.bbox, u = bx(a), v = bx(cc);
+      x0 = Math.min(x0, u, v); x1 = Math.max(x1, u, v); y0 = Math.min(y0, b); y1 = Math.max(y1, d);
+    }
+    return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  }
+  function zoomAt(p, factor) {
+    cancelAnimationFrame(anim);
+    const w = clampW(vb.w / factor), k = w / vb.w;
+    vb = { x: p.x - (p.x - vb.x) * k, y: p.y - (p.y - vb.y) * k, w, h: vb.h * k };
+    apply();
+  }
+  function centre() { return { x: vb.x + vb.w / 2, y: vb.y + vb.h / 2 }; }
+  const whole = () => fit({ x: BX, y: BY, w: BW, h: BH }, 0.0);
+
+  svg.addEventListener("wheel", e => {
+    e.preventDefault();
+    const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    zoomAt(toSvg(e.clientX, e.clientY), Math.exp(-d * (e.ctrlKey ? 0.01 : 0.0018)));
+  }, { passive: false });
+
+  const ptrs = new Map();
+  let down = null, moved = false, pinch = null;
+  svg.addEventListener("pointerdown", e => {
+    svg.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 1) { down = { x: e.clientX, y: e.clientY, vb: { ...vb }, target: e.target }; moved = false; }
+    if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), vb: { ...vb }, mid: toSvg((a.x + b.x) / 2, (a.y + b.y) / 2) };
+      moved = true;
+    }
+    cancelAnimationFrame(anim);
+  });
+  svg.addEventListener("pointermove", e => {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const r = svg.getBoundingClientRect();
+    if (ptrs.size >= 2 && pinch) {
+      const [a, b] = [...ptrs.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const w = clampW(pinch.vb.w * pinch.d / d), k = w / pinch.vb.w;
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      // keep the svg point under the fingers' midpoint where it started
+      vb.w = w; vb.h = pinch.vb.h * k;
+      vb.x = pinch.mid.x - (mx - r.left) / r.width * w;
+      vb.y = pinch.mid.y - (my - r.top) / r.height * vb.h;
+      apply();
+    } else if (down) {
+      const dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (!moved && Math.hypot(dx, dy) > 4) { moved = true; svg.classList.add("drag"); }
+      if (moved) {
+        vb.x = down.vb.x - dx / r.width * vb.w;
+        vb.y = down.vb.y - dy / r.height * vb.h;
+        apply();
+      }
+    }
+  });
+  function up(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (ptrs.size < 2) pinch = null;
+    if (ptrs.size === 0) {
+      svg.classList.remove("drag");
+      if (down && !moved && e.type === "pointerup") pick(down.target);
+      down = null;
+    } else if (ptrs.size === 1) {
+      const [p] = [...ptrs.values()];
+      down = { x: p.x, y: p.y, vb: { ...vb }, target: null };
+    }
+  }
+  svg.addEventListener("pointerup", up);
+  svg.addEventListener("pointercancel", up);
+  svg.addEventListener("dblclick", e => { zoomAt(toSvg(e.clientX, e.clientY), 2); });
+  L("zin").onclick = () => zoomAt(centre(), 1.6);
+  L("zout").onclick = () => zoomAt(centre(), 1 / 1.6);
+  L("zfit").onclick = () => animate(whole());
+
+  // expand to the whole window
+  const exp = L("zexp");
+  function expand(on) {
+    stage.classList.toggle("expanded", on);
+    document.body.classList.toggle("noscroll", on);
+    exp.setAttribute("aria-pressed", on);
+    exp.setAttribute("aria-label", on ? "Close" : "Expand");
+    exp.textContent = on ? "✕" : "⛶";
+    const c = centre();
+    requestAnimationFrame(() => { const a = aspect(); vb.x = c.x - vb.w / 2; vb.y = c.y - vb.w * a / 2; apply(); });
+  }
+  exp.onclick = () => expand(!stage.classList.contains("expanded"));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && stage.classList.contains("expanded")) expand(false);
+  });
+  new ResizeObserver(() => apply()).observe(svg);
+
+  // ------------------------------------------------------------ layers
+  const layers = { top: true, bot: true, pads: true, silk: true, labels: true, sect: false };
+  let copper = "routed";
+  const vis = (id, on) => L(id).toggleAttribute("hidden", !on);
+  function showLayers() {
+    vis("L-top", layers.top && copper === "routed");
+    vis("L-bot", layers.bot && copper === "routed");
+    vis("L-artT", layers.top && copper === "art");
+    vis("L-artB", layers.bot && copper === "art");
+    vis("L-pads", layers.pads); vis("L-holes", layers.pads);
+    vis("L-silk", layers.silk);
+    vis("L-labels", layers.labels);
+    vis("L-sect", layers.sect);
+  }
+  for (const cb of document.querySelectorAll("[data-layer]")) {
+    cb.addEventListener("change", () => { layers[cb.dataset.layer] = cb.checked; showLayers(); });
+  }
+  for (const r of document.querySelectorAll('input[name="cu"]')) {
+    r.addEventListener("change", () => { copper = r.value; showLayers(); });
+  }
+  for (const r of document.querySelectorAll('input[name="side"]')) {
+    r.addEventListener("change", () => setFlip(r.value === "bot"));
+  }
+  function setFlip(on) {
+    if (on === flipped) return;
+    const c = centre();
+    flipped = on;
+    world.setAttribute("transform", on ? `matrix(-1 0 0 1 ${2 * BX + BW} 0)` : "");
+    svg.classList.toggle("flip", on);
+    // the side nearest the viewer is drawn last
+    const [near, far, nearA, farA] = on ? ["L-bot", "L-top", "L-artB", "L-artT"] : ["L-top", "L-bot", "L-artT", "L-artB"];
+    L(far).after(L(near)); L(farA).after(L(nearA));
+    vb.x = 2 * BX + BW - c.x - vb.w / 2;
+    apply();
+    redrawSel();
+  }
+
+  // ------------------------------------------------------------ selection
+  let sel = null;    // {type: "comp"|"net"|"sect", ...}
+  function clearHl() {
+    for (const el of svg.querySelectorAll(".hl")) el.classList.remove("hl");
+    svg.classList.remove("netsel");
+  }
+  function rectFor(c, cls) {
+    const [x0, y0, x1, y1] = c.bbox;
+    const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    r.setAttribute("x", x0 - .6); r.setAttribute("y", y0 - .6);
+    r.setAttribute("width", x1 - x0 + 1.2); r.setAttribute("height", y1 - y0 + 1.2);
+    r.setAttribute("rx", .8);
+    if (cls) r.setAttribute("class", cls);
+    return r;
+  }
+  function redrawSel() {
+    selG.replaceChildren();
+    if (!sel) return;
+    if (sel.type === "comp") selG.append(rectFor(sel.c));
+    if (sel.type === "sect") for (const c of sel.list) selG.append(rectFor(c, "s"));
+  }
+  function selectComp(c, zoom) {
+    clearHl();
+    sel = { type: "comp", c };
+    redrawSel();
+    if (zoom) {
+      const b = boxOf([c]);
+      const target = fit(b, 0.9);
+      animate(target.w < vb.w || !visible(b) ? target : { ...vb, x: b.x + b.w / 2 - vb.w / 2, y: b.y + b.h / 2 - vb.h / 2 });
+    }
+    showComp(c);
+  }
+  function visible(b) { return b.x > vb.x && b.y > vb.y && b.x + b.w < vb.x + vb.w && b.y + b.h < vb.y + vb.h; }
+  function selectNet(n, fromComp) {
+    clearHl();
+    svg.classList.add("netsel");
+    for (const el of svg.querySelectorAll(`[data-n="${n}"]`)) el.classList.add("hl");
+    sel = { type: "net", n };
+    redrawSel();
+    showNet(n, fromComp);
+  }
+  function selectList(list, title, text) {
+    clearHl();
+    sel = { type: "sect", list };
+    redrawSel();
+    animate(fit(boxOf(list), 0.04));
+    info.innerHTML = `<span class="kicker">${esc(title)}</span><p>${esc(text)}</p>` +
+      `<div class="conn">${list.slice().sort((a, b) => natural(a.ref, b.ref)).map(c => `<button class="link" data-c="${c.i}">${esc(c.ref)}</button>`).join("")}</div>` +
+      `<button type="button" class="btn clear" data-clear>Clear</button>`;
+  }
+  function pick(target) {
+    if (!target) return;
+    const n = target.getAttribute && target.getAttribute("data-n");
+    if (n !== null && n !== undefined) {
+      const g = target.closest("[data-c]");
+      selectNet(+n, g && target.closest("#L-pads") ? comps[+g.dataset.c] : null);
+      return;
+    }
+    const g = target.closest && target.closest("[data-c]");
+    if (g) { selectComp(comps[+g.dataset.c], false); return; }
+    sel = null; clearHl(); redrawSel(); showEmpty();
+  }
+
+  // ------------------------------------------------------------ the info panel
+  const status = L("status"), statusText = status.textContent;
+  function showEmpty() {
+    status.textContent = statusText;
+    info.innerHTML = `<span class="kicker">The main board</span>
+      <p>Click a part to see what it does and what each pin connects to, or a track or pad to follow its signal.</p>
+      <ul class="legend">
+        <li><i style="background:var(--cuT)"></i>Component side copper</li>
+        <li><i style="background:var(--cuB)"></i>Solder side copper</li>
+        <li><i style="background:var(--pad)"></i>Pads and vias</li>
+        <li><i style="background:var(--hl)"></i>The signal you pick</li>
+      </ul>
+      <p class="desc">${comps.length - 7} parts and ${D.nets.length} signals. Try <button class="link" data-find="IC1">IC1</button>, <button class="link" data-find="IC6">the MM57109</button> or <button class="link" data-find="CLK_2MHZ">the 2 MHz clock</button>.</p>`;
+  }
+  function showComp(c) {
+    const sec = D.sections[c.section] || "";
+    status.textContent = `${c.ref}: ${c.desc}. ${c.role}`;
+    const pins = c.pins.slice().sort((a, b) => natural(String(a[0]), String(b[0])));
+    const rows = pins.map(([p, n]) => `<b>${esc(p)}</b>` + (n === null ? `<span class="desc">—</span>` :
+      `<button class="link" data-n="${n}" data-from="${c.i}">${esc(D.nets[n])}</button>`)).join("");
+    info.innerHTML = `<span class="kicker">${esc(sec)} · ${esc(c.kind)}</span>
+      <h3>${esc(c.ref)} <span>${esc(c.value)}</span></h3>
+      ${c.desc && c.desc !== c.value ? `<p class="desc">${esc(c.desc)}</p>` : ""}
+      ${c.role ? `<p class="role">${esc(c.role)}</p>` : ""}
+      ${pins.length ? `<span class="lbl">Pins</span><div class="pins">${rows}</div>` : ""}
+      <button type="button" class="btn clear" data-clear>Clear</button>`;
+  }
+  function showNet(n, from) {
+    status.textContent = `Signal ${D.nets[n]}: ${netPins[n].length} connections.`;
+    const list = netPins[n].slice().sort((a, b) => natural(a[0].ref + "." + a[1], b[0].ref + "." + b[1]));
+    const fromTxt = from ? (() => { const p = list.find(([c]) => c === from); return p ? `<p class="desc">Pin ${esc(p[1])} of <button class="link" data-c="${from.i}">${esc(from.ref)}</button>.</p>` : ""; })() : "";
+    info.innerHTML = `<span class="kicker">Signal</span>
+      <h3>${esc(D.nets[n])}</h3>${fromTxt}
+      <p class="desc">${list.length} connections:</p>
+      <div class="conn">${list.map(([c, p]) => `<button class="link" data-c="${c.i}">${esc(c.ref)}.${esc(p)}</button>`).join("")}</div>
+      <button type="button" class="btn clear" data-clear>Clear</button>`;
+  }
+  info.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.hasAttribute("data-clear")) { sel = null; clearHl(); redrawSel(); showEmpty(); return; }
+    if (b.dataset.n !== undefined) { selectNet(+b.dataset.n, b.dataset.from ? comps[+b.dataset.from] : null); return; }
+    if (b.dataset.c !== undefined) { selectComp(comps[+b.dataset.c], true); return; }
+    if (b.dataset.find) find(b.dataset.find);
+  });
+
+  // ------------------------------------------------------------ finding things
+  let lastQ = "", hits = [], hitAt = 0;
+  function find(q) {
+    q = q.trim();
+    if (!q) return;
+    const Q = q.toUpperCase();
+    if (byRef.has(Q)) { selectComp(byRef.get(Q), true); return; }
+    if (netIndex.has(Q)) {
+      const n = netIndex.get(Q);
+      selectNet(n);
+      const list = netPins[n].map(([c]) => c);
+      if (list.length) animate(fit(boxOf(list), 0.08));
+      return;
+    }
+    if (Q !== lastQ) {
+      hits = comps.filter(c => c.kind !== "Mounting hole" &&
+        (c.value.toUpperCase().includes(Q) || c.desc.toUpperCase().includes(Q) || c.role.toUpperCase().includes(Q)));
+      if (!hits.length) {
+        const nets = D.nets.map((n, i) => [n, i]).filter(([n]) => n.toUpperCase().includes(Q));
+        if (nets.length) { find(nets[0][0]); status.textContent = `Signal ${nets[0][0]}` + (nets.length > 1 ? `, and ${nets.length - 1} more with “${q}” in the name.` : "."); return; }
+      }
+      hits.sort((a, b) => natural(a.ref, b.ref));
+      hitAt = 0; lastQ = Q;
+    } else hitAt = (hitAt + 1) % Math.max(hits.length, 1);
+    if (!hits.length) { status.textContent = `Nothing called “${q}”.`; return; }
+    selectComp(hits[hitAt], true);
+    if (hits.length > 1) status.textContent = `${hits[hitAt].ref}: ${hitAt + 1} of ${hits.length} matching “${q}”. Press Return for the next.`;
+  }
+  document.querySelector("form.find").addEventListener("submit", e => { e.preventDefault(); find(L("find").value); });
+
+  // parts from the rest of the page: show them on the board
+  function toBoard() {
+    const r = box.getBoundingClientRect();
+    if (!stage.classList.contains("expanded") && (r.top < 0 || r.bottom > innerHeight))
+      document.getElementById("board-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  document.addEventListener("click", e => {
+    const pl = e.target.closest(".pl, .ref, .show");
+    if (!pl) return;
+    if (pl.dataset.ref) { const c = byRef.get(pl.dataset.ref.toUpperCase()); if (c) { selectComp(c, true); toBoard(); } }
+    else if (pl.dataset.c) { selectComp(comps[+pl.dataset.c], true); toBoard(); }
+    else if (pl.dataset.sec) {
+      const s = pl.dataset.sec;
+      selectList(comps.filter(c => c.section === s && c.kind !== "Mounting hole"), D.sections[s], "The parts in this section of the board:");
+      toBoard();
+    } else if (pl.dataset.refs) {
+      const list = pl.dataset.refs.split(" ").map(r => byRef.get(r)).filter(Boolean);
+      selectList(list, "The calculator chip", "The MM57109 and the parts that talk to it:");
+      toBoard();
+    }
+  });
+
+  // ------------------------------------------------------------ the parts table
+  const rows = [...document.querySelectorAll("#ptable tr")];
+  const pf = L("pfilter"), pc = L("pcount");
+  function filterParts() {
+    const q = pf.value.trim().toUpperCase();
+    const s = document.querySelector('input[name="psec"]:checked').value;
+    let n = 0;
+    for (const r of rows) {
+      const ok = (!s || r.dataset.s === s) && (!q || r.textContent.toUpperCase().includes(q));
+      r.hidden = !ok;
+      if (ok) n++;
+    }
+    pc.textContent = `${n} of ${rows.length}`;
+  }
+  pf.addEventListener("input", filterParts);
+  for (const r of document.querySelectorAll('input[name="psec"]')) r.addEventListener("change", filterParts);
+
+  showLayers();
+  vb = whole();
+  apply();
+  showEmpty();
+  filterParts();
+  const h = location.hash.slice(1);
+  if (h && byRef.has(h.toUpperCase())) selectComp(byRef.get(h.toUpperCase()), true);
+})();
+</script>

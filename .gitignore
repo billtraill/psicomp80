@@ -11,3 +11,4 @@ hardware/kicad/*.ses
 lisp/lisp.lbl
 web/build/
 rom/build/
+hardware/build/

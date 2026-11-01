@@ -53,7 +53,11 @@ had to be interpreted. Read those before trusting a particular pin. The common c
   R41 0R56 → 2R2.
 - IC13 and IC27 must be 81LS95 (non-inverting, one shared enable). The kit sheet
   appears to say 81LS98.
-- The expansion plug J1 has no published pinout, so it is left unconnected.
+- The expansion plug J1 has no published pinout, so the one here is ours (in `net_board.json`):
+  the system bus, the 2 MHz clock, the memory enable that the Fig. 7 expansion drives, the
+  eleven spare port selects and the supplies. The October 1980 floppy-disc controller needs
+  exactly a subset of these. Pins 1 and 3 are left unconnected, as a track passes too close
+  to them for a supply pad.
 
 ## Signals that genuinely go nowhere
 

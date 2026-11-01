@@ -47,6 +47,27 @@ mirrored. So blue is the component side and red the solder side.
   scan of the artwork sheet would make it close to track-accurate: change the corners
   in `tools/trace_artwork.py` and re-run it.
 
+## The expansion plug
+
+The articles never print J1's pinout, so `tools/netlist/net_board.json` gives it one. Odd pins
+are the row nearer the middle of the board.
+
+| Pins | Signals |
+|---|---|
+| 2, 21, 22, 31, 32, 47, 48 | 0 V |
+| 4, 63, 64 | +5 V |
+| 5–20 | A0–A15, straight from the Z80 |
+| 23–30 | D0–D7, the buffered side of IC9–IC12 |
+| 33–46 | RD, WR, MREQ, IORQ, M1, RFSH, MEM_MREQ (the IC17 side of LK3), HALT, WAIT/BUSRQ, BUSAK, INT, NMI, RESET, 2 MHz clock |
+| 49–54 | IC2's spare outputs: OUT 00, 80, 40, C0, A0, E0 |
+| 55–59 | IC3's spare outputs: IN 04, 02, 06, 05, 07 |
+| 60, 61, 62 | +12 V, −5 V, −12 V |
+| 1, 3 | not connected |
+
+`tools/wire_expansion.py` put these nets on the routed board, and `route_board.py --keep`
+routed them without disturbing the tracks already there. `tools/finish_routes.py` routed
+the last six, which Freerouting couldn't fit, on a 0.1–0.2 mm grid.
+
 ## Regenerating
 
 The scripts are in `tools/`:
@@ -76,6 +97,13 @@ cd hardware/tools && /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.fr
 
 ```bash
 cd hardware/tools && /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3 export_routed_svg.py
+```
+
+To route only what's new, keeping the existing tracks, add `--keep` to `route_board.py`; then
+route anything left over with the grid router:
+
+```bash
+cd hardware/tools && /Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3 finish_routes.py
 ```
 
 Freerouting comes from https://github.com/freerouting/freerouting/releases, and Java

@@ -173,7 +173,7 @@ ROLES = {
     "X_VDU1": "The 8 MHz crystal: every clock in the computer comes from it.",
     "VR1": "Sets the frame monostable's time, and so the frame flyback.",
     "C14": "Reservoir for the 5 V supply.", "C17": "Reservoir for +12 V.", "C18": "Reservoir for −12 V and −5 V.",
-    "J1": "Expansion plug: the buses, for the 32K memory expansion.",
+    "J1": "Expansion plug: the Z80's buses and control lines, the spare port selects and the supplies (pinout in hardware/README.md).",
     "J_VIDEO": "Video and sync out to the modulator or monitor.",
     "J_TAPE": "To and from the cassette recorder.",
 }
@@ -551,7 +551,8 @@ def img(path):
 
 def main():
     links = {"screenshots.html": "screenshots.html", "lisp.html": "lisp.html",
-             "emulator.html": "emulator.html", "roms.html": "roms.html"}
+             "emulator.html": "emulator.html", "roms.html": "roms.html",
+             "hardware_v2.html": "hardware_v2.html", "hardware_v3.html": "hardware_v3.html"}
     out = OUT
     if len(sys.argv) > 1:
         for line in Path(sys.argv[1]).read_text().splitlines():

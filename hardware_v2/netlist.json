@@ -1,0 +1,1850 @@
+{
+ "board": {
+  "width": 75.0,
+  "height": 55.0,
+  "layers": 4
+ },
+ "parts": {
+  "U1": {
+   "value": "RP2350A",
+   "footprint": "Package_DFN_QFN:QFN-60-1EP_7x7mm_P0.4mm_EP3.4x3.4mm",
+   "part": "Raspberry Pi RP2350A",
+   "description": "Microcontroller: two Cortex-M33 cores at up to 150 MHz (run here at 240), 520 KB RAM, HSTX, PIO",
+   "pins": {
+    "61": "GND",
+    "47": "GND",
+    "52": "USB_DP",
+    "51": "USB_DM",
+    "1": "+3V3",
+    "11": "+3V3",
+    "20": "+3V3",
+    "30": "+3V3",
+    "38": "+3V3",
+    "45": "+3V3",
+    "54": "+3V3",
+    "53": "+3V3",
+    "44": "+3V3",
+    "49": "+3V3",
+    "46": "VREG_AVDD",
+    "48": "VREG_LX",
+    "50": "+1V1",
+    "6": "+1V1",
+    "23": "+1V1",
+    "39": "+1V1",
+    "21": "XIN",
+    "22": "XOUT",
+    "26": "RUN",
+    "24": "SWCLK",
+    "25": "SWDIO",
+    "2": "UART_TX",
+    "3": "UART_RX",
+    "60": "QSPI_SS",
+    "57": "QSPI_SD0",
+    "59": "QSPI_SD1",
+    "58": "QSPI_SD2",
+    "55": "QSPI_SD3",
+    "56": "QSPI_SCLK",
+    "12": "SD_MISO",
+    "13": "SD_CS",
+    "14": "SD_SCK",
+    "15": "SD_MOSI",
+    "16": "HDMI_D2P_IO",
+    "17": "HDMI_D2N_IO",
+    "18": "HDMI_D1P_IO",
+    "19": "HDMI_D1N_IO",
+    "27": "HDMI_D0P_IO",
+    "28": "HDMI_D0N_IO",
+    "29": "HDMI_CKP_IO",
+    "31": "HDMI_CKN_IO",
+    "32": "USBH_DP_IO",
+    "33": "USBH_DM_IO",
+    "37": "HALT_LED"
+   }
+  },
+  "U2": {
+   "value": "W25Q32JV",
+   "footprint": "Package_SO:SOIC-8_5.3x5.3mm_P1.27mm",
+   "part": "Winbond W25Q32JVSSIQ",
+   "description": "4 MB QSPI flash: holds the firmware",
+   "pins": {
+    "4": "GND",
+    "8": "+3V3",
+    "1": "QSPI_SS",
+    "5": "QSPI_SD0",
+    "2": "QSPI_SD1",
+    "3": "QSPI_SD2",
+    "7": "QSPI_SD3",
+    "6": "QSPI_SCLK"
+   }
+  },
+  "U3": {
+   "value": "AP2112K-3.3",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "Diodes AP2112K-3.3TRG1",
+   "description": "3.3 V 600 mA regulator, from the USB-C 5 V",
+   "pins": {
+    "1": "+5V",
+    "3": "+5V",
+    "2": "GND",
+    "5": "+3V3"
+   }
+  },
+  "Y1": {
+   "value": "12MHz",
+   "footprint": "Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm",
+   "part": "Abracon ABM8-272-T3",
+   "description": "12 MHz crystal for the RP2350's oscillator",
+   "pins": {
+    "2": "GND",
+    "4": "GND",
+    "1": "XIN",
+    "3": "XTAL"
+   }
+  },
+  "L1": {
+   "value": "3.3uH",
+   "footprint": "Inductor_SMD:L_0805_2012Metric",
+   "part": "Abracon AOTA-B201610S3R3-101-T",
+   "description": "Inductor for the RP2350's on-chip 1.1 V core regulator",
+   "pins": {
+    "1": "VREG_LX",
+    "2": "+1V1"
+   }
+  },
+  "J1": {
+   "value": "USB-C",
+   "footprint": "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
+   "part": "GCT USB4105-GF-A",
+   "description": "Power in (5 V), and the RP2350's own USB for loading firmware",
+   "pins": {
+    "A4": "+5V",
+    "B4": "+5V",
+    "A9": "+5V",
+    "B9": "+5V",
+    "A1": "GND",
+    "B1": "GND",
+    "A12": "GND",
+    "B12": "GND",
+    "SH": "GND",
+    "A5": "USBC_CC1",
+    "B5": "USBC_CC2",
+    "A6": "USBC_DP",
+    "B6": "USBC_DP",
+    "A7": "USBC_DM",
+    "B7": "USBC_DM"
+   }
+  },
+  "J2": {
+   "value": "HDMI",
+   "footprint": "Connector_Video:HDMI_A_Molex_208658-1001_Horizontal",
+   "part": "Molex 208658-1001",
+   "description": "HDMI type A socket: the display",
+   "pins": {
+    "2": "GND",
+    "5": "GND",
+    "8": "GND",
+    "11": "GND",
+    "17": "GND",
+    "SH": "GND",
+    "1": "TMDS_D2P",
+    "3": "TMDS_D2N",
+    "4": "TMDS_D1P",
+    "6": "TMDS_D1N",
+    "7": "TMDS_D0P",
+    "9": "TMDS_D0N",
+    "10": "TMDS_CKP",
+    "12": "TMDS_CKN",
+    "18": "HDMI_5V"
+   }
+  },
+  "J3": {
+   "value": "USB-A",
+   "footprint": "Connector_USB:USB_A_Wuerth_614004134726_Horizontal",
+   "part": "Wurth 614004134726",
+   "description": "USB-A socket for the keyboard",
+   "pins": {
+    "4": "GND",
+    "SH": "GND",
+    "3": "USBH_DP",
+    "2": "USBH_DM",
+    "1": "USBH_VBUS"
+   }
+  },
+  "J4": {
+   "value": "microSD",
+   "footprint": "Connector_Card:microSD_HC_Hirose_DM3AT-SF-PEJM5",
+   "part": "Hirose DM3AT-SF-PEJM5",
+   "description": "microSD socket (push-push): ROM images and tapes",
+   "pins": {
+    "6": "GND",
+    "SH": "GND",
+    "4": "+3V3",
+    "7": "SD_MISO",
+    "2": "SD_CS",
+    "5": "SD_SCK",
+    "3": "SD_MOSI",
+    "8": "SD_DAT1",
+    "1": "SD_DAT2"
+   }
+  },
+  "J5": {
+   "value": "DEBUG",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
+   "part": "0.1 in header, 5 way",
+   "description": "Debug: SWD and the firmware's serial console (not needed to use the computer)",
+   "pins": {
+    "1": "GND",
+    "2": "SWCLK",
+    "3": "SWDIO",
+    "4": "UART_TX",
+    "5": "UART_RX"
+   }
+  },
+  "SW1": {
+   "value": "RESET",
+   "footprint": "Button_Switch_SMD:SW_SPST_B3S-1000",
+   "part": "Omron B3S-1000",
+   "description": "Restarts the RP2350: power-on reset of the COMP80",
+   "pins": {
+    "2": "GND",
+    "1": "RUN"
+   }
+  },
+  "SW2": {
+   "value": "BOOTSEL",
+   "footprint": "Button_Switch_SMD:SW_SPST_B3S-1000",
+   "part": "Omron B3S-1000",
+   "description": "Held during reset, the RP2350 appears as a USB drive for new firmware",
+   "pins": {
+    "2": "GND",
+    "1": "BOOTSEL"
+   }
+  },
+  "D1": {
+   "value": "HALT",
+   "footprint": "LED_SMD:LED_0805_2012Metric",
+   "part": "red LED, 0805",
+   "description": "Lit while the Z80 is halted, as the original's HALT LED",
+   "pins": {
+    "1": "GND",
+    "2": "HALT_LED_A"
+   }
+  },
+  "D2": {
+   "value": "BAT54J",
+   "footprint": "Diode_SMD:D_SOD-323F",
+   "part": "Nexperia BAT54J",
+   "description": "Feeds the HDMI +5 V pin, and stops a display back-powering the board",
+   "pins": {
+    "2": "+5V",
+    "1": "HDMI_5V"
+   }
+  },
+  "F1": {
+   "value": "500mA",
+   "footprint": "Fuse:Fuse_1206_3216Metric",
+   "part": "Bourns MF-MSMF050-2",
+   "description": "Resettable fuse for the keyboard's 5 V",
+   "pins": {
+    "1": "+5V",
+    "2": "USBH_VBUS"
+   }
+  },
+  "H1": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H2": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H3": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H4": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "R1": {
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB-C CC1: asks the supply for 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBC_CC1"
+   }
+  },
+  "R2": {
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB-C CC2: asks the supply for 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBC_CC2"
+   }
+  },
+  "R3": {
+   "value": "27R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB D+ series resistor",
+   "pins": {
+    "1": "USBC_DP",
+    "2": "USB_DP"
+   }
+  },
+  "R4": {
+   "value": "27R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB D- series resistor",
+   "pins": {
+    "1": "USBC_DM",
+    "2": "USB_DM"
+   }
+  },
+  "R5": {
+   "value": "33R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Filters the core regulator's analogue supply",
+   "pins": {
+    "1": "+3V3",
+    "2": "VREG_AVDD"
+   }
+  },
+  "R6": {
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Crystal drive limit",
+   "pins": {
+    "1": "XOUT",
+    "2": "XTAL"
+   }
+  },
+  "R7": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "RUN pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "RUN"
+   }
+  },
+  "R8": {
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "BOOTSEL: pulls the flash chip select low",
+   "pins": {
+    "1": "QSPI_SS",
+    "2": "BOOTSEL"
+   }
+  },
+  "R9": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT0/MISO pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_MISO"
+   }
+  },
+  "R10": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT3/CS pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_CS"
+   }
+  },
+  "R11": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD CMD/MOSI pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_MOSI"
+   }
+  },
+  "R12": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT1 pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_DAT1"
+   }
+  },
+  "R13": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT2 pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_DAT2"
+   }
+  },
+  "R14": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D2+ series resistor",
+   "pins": {
+    "1": "HDMI_D2P_IO",
+    "2": "TMDS_D2P"
+   }
+  },
+  "R15": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D2- series resistor",
+   "pins": {
+    "1": "HDMI_D2N_IO",
+    "2": "TMDS_D2N"
+   }
+  },
+  "R16": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D1+ series resistor",
+   "pins": {
+    "1": "HDMI_D1P_IO",
+    "2": "TMDS_D1P"
+   }
+  },
+  "R17": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D1- series resistor",
+   "pins": {
+    "1": "HDMI_D1N_IO",
+    "2": "TMDS_D1N"
+   }
+  },
+  "R18": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D0+ series resistor",
+   "pins": {
+    "1": "HDMI_D0P_IO",
+    "2": "TMDS_D0P"
+   }
+  },
+  "R19": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS D0- series resistor",
+   "pins": {
+    "1": "HDMI_D0N_IO",
+    "2": "TMDS_D0N"
+   }
+  },
+  "R20": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS CLK+ series resistor",
+   "pins": {
+    "1": "HDMI_CKP_IO",
+    "2": "TMDS_CKP"
+   }
+  },
+  "R21": {
+   "value": "270R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HDMI TMDS CLK- series resistor",
+   "pins": {
+    "1": "HDMI_CKN_IO",
+    "2": "TMDS_CKN"
+   }
+  },
+  "R22": {
+   "value": "27R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D+ series resistor",
+   "pins": {
+    "1": "USBH_DP_IO",
+    "2": "USBH_DP"
+   }
+  },
+  "R23": {
+   "value": "27R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D- series resistor",
+   "pins": {
+    "1": "USBH_DM_IO",
+    "2": "USBH_DM"
+   }
+  },
+  "R24": {
+   "value": "15k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D+ pull-down (host side)",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_DP"
+   }
+  },
+  "R25": {
+   "value": "15k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D- pull-down (host side)",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_DM"
+   }
+  },
+  "R26": {
+   "value": "330R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HALT LED current",
+   "pins": {
+    "1": "HALT_LED",
+    "2": "HALT_LED_A"
+   }
+  },
+  "C1": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "Regulator input",
+   "pins": {
+    "1": "+5V",
+    "2": "GND"
+   }
+  },
+  "C2": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "Regulator output, 3.3 V",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C3": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C4": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C5": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C6": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C7": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C8": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 IOVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C9": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 QSPI_IOVDD and USB_OTP_VDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C10": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "RP2350 3.3 V decoupling, on the plane",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C11": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 ADC_AVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C12": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Core regulator input",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C13": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Core regulator analogue supply",
+   "pins": {
+    "2": "GND",
+    "1": "VREG_AVDD"
+   }
+  },
+  "C14": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Core regulator output, 1.1 V",
+   "pins": {
+    "2": "GND",
+    "1": "+1V1"
+   }
+  },
+  "C15": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 DVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V1"
+   }
+  },
+  "C16": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 DVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V1"
+   }
+  },
+  "C17": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "RP2350 DVDD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V1"
+   }
+  },
+  "C18": {
+   "value": "15p",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Crystal load",
+   "pins": {
+    "2": "GND",
+    "1": "XIN"
+   }
+  },
+  "C19": {
+   "value": "15p",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Crystal load",
+   "pins": {
+    "2": "GND",
+    "1": "XTAL"
+   }
+  },
+  "C20": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Flash decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C21": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "microSD supply",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C22": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "microSD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C23": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "Keyboard 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_VBUS"
+   }
+  }
+ },
+ "nets": {
+  "+5V": [
+   [
+    "C1",
+    "1"
+   ],
+   [
+    "D2",
+    "2"
+   ],
+   [
+    "F1",
+    "1"
+   ],
+   [
+    "J1",
+    "A4"
+   ],
+   [
+    "J1",
+    "A9"
+   ],
+   [
+    "J1",
+    "B4"
+   ],
+   [
+    "J1",
+    "B9"
+   ],
+   [
+    "U3",
+    "1"
+   ],
+   [
+    "U3",
+    "3"
+   ]
+  ],
+  "GND": [
+   [
+    "C1",
+    "2"
+   ],
+   [
+    "C10",
+    "2"
+   ],
+   [
+    "C11",
+    "2"
+   ],
+   [
+    "C12",
+    "2"
+   ],
+   [
+    "C13",
+    "2"
+   ],
+   [
+    "C14",
+    "2"
+   ],
+   [
+    "C15",
+    "2"
+   ],
+   [
+    "C16",
+    "2"
+   ],
+   [
+    "C17",
+    "2"
+   ],
+   [
+    "C18",
+    "2"
+   ],
+   [
+    "C19",
+    "2"
+   ],
+   [
+    "C2",
+    "2"
+   ],
+   [
+    "C20",
+    "2"
+   ],
+   [
+    "C21",
+    "2"
+   ],
+   [
+    "C22",
+    "2"
+   ],
+   [
+    "C23",
+    "2"
+   ],
+   [
+    "C3",
+    "2"
+   ],
+   [
+    "C4",
+    "2"
+   ],
+   [
+    "C5",
+    "2"
+   ],
+   [
+    "C6",
+    "2"
+   ],
+   [
+    "C7",
+    "2"
+   ],
+   [
+    "C8",
+    "2"
+   ],
+   [
+    "C9",
+    "2"
+   ],
+   [
+    "D1",
+    "1"
+   ],
+   [
+    "J1",
+    "A1"
+   ],
+   [
+    "J1",
+    "A12"
+   ],
+   [
+    "J1",
+    "B1"
+   ],
+   [
+    "J1",
+    "B12"
+   ],
+   [
+    "J1",
+    "SH"
+   ],
+   [
+    "J2",
+    "11"
+   ],
+   [
+    "J2",
+    "17"
+   ],
+   [
+    "J2",
+    "2"
+   ],
+   [
+    "J2",
+    "5"
+   ],
+   [
+    "J2",
+    "8"
+   ],
+   [
+    "J2",
+    "SH"
+   ],
+   [
+    "J3",
+    "4"
+   ],
+   [
+    "J3",
+    "SH"
+   ],
+   [
+    "J4",
+    "6"
+   ],
+   [
+    "J4",
+    "SH"
+   ],
+   [
+    "J5",
+    "1"
+   ],
+   [
+    "R1",
+    "2"
+   ],
+   [
+    "R2",
+    "2"
+   ],
+   [
+    "R24",
+    "2"
+   ],
+   [
+    "R25",
+    "2"
+   ],
+   [
+    "SW1",
+    "2"
+   ],
+   [
+    "SW2",
+    "2"
+   ],
+   [
+    "U1",
+    "47"
+   ],
+   [
+    "U1",
+    "61"
+   ],
+   [
+    "U2",
+    "4"
+   ],
+   [
+    "U3",
+    "2"
+   ],
+   [
+    "Y1",
+    "2"
+   ],
+   [
+    "Y1",
+    "4"
+   ]
+  ],
+  "USBC_CC1": [
+   [
+    "J1",
+    "A5"
+   ],
+   [
+    "R1",
+    "1"
+   ]
+  ],
+  "USBC_CC2": [
+   [
+    "J1",
+    "B5"
+   ],
+   [
+    "R2",
+    "1"
+   ]
+  ],
+  "USBC_DP": [
+   [
+    "J1",
+    "A6"
+   ],
+   [
+    "J1",
+    "B6"
+   ],
+   [
+    "R3",
+    "1"
+   ]
+  ],
+  "USBC_DM": [
+   [
+    "J1",
+    "A7"
+   ],
+   [
+    "J1",
+    "B7"
+   ],
+   [
+    "R4",
+    "1"
+   ]
+  ],
+  "USB_DP": [
+   [
+    "R3",
+    "2"
+   ],
+   [
+    "U1",
+    "52"
+   ]
+  ],
+  "USB_DM": [
+   [
+    "R4",
+    "2"
+   ],
+   [
+    "U1",
+    "51"
+   ]
+  ],
+  "+3V3": [
+   [
+    "C10",
+    "1"
+   ],
+   [
+    "C11",
+    "1"
+   ],
+   [
+    "C12",
+    "1"
+   ],
+   [
+    "C2",
+    "1"
+   ],
+   [
+    "C20",
+    "1"
+   ],
+   [
+    "C21",
+    "1"
+   ],
+   [
+    "C22",
+    "1"
+   ],
+   [
+    "C3",
+    "1"
+   ],
+   [
+    "C4",
+    "1"
+   ],
+   [
+    "C5",
+    "1"
+   ],
+   [
+    "C6",
+    "1"
+   ],
+   [
+    "C7",
+    "1"
+   ],
+   [
+    "C8",
+    "1"
+   ],
+   [
+    "C9",
+    "1"
+   ],
+   [
+    "J4",
+    "4"
+   ],
+   [
+    "R10",
+    "1"
+   ],
+   [
+    "R11",
+    "1"
+   ],
+   [
+    "R12",
+    "1"
+   ],
+   [
+    "R13",
+    "1"
+   ],
+   [
+    "R5",
+    "1"
+   ],
+   [
+    "R7",
+    "1"
+   ],
+   [
+    "R9",
+    "1"
+   ],
+   [
+    "U1",
+    "1"
+   ],
+   [
+    "U1",
+    "11"
+   ],
+   [
+    "U1",
+    "20"
+   ],
+   [
+    "U1",
+    "30"
+   ],
+   [
+    "U1",
+    "38"
+   ],
+   [
+    "U1",
+    "44"
+   ],
+   [
+    "U1",
+    "45"
+   ],
+   [
+    "U1",
+    "49"
+   ],
+   [
+    "U1",
+    "53"
+   ],
+   [
+    "U1",
+    "54"
+   ],
+   [
+    "U2",
+    "8"
+   ],
+   [
+    "U3",
+    "5"
+   ]
+  ],
+  "VREG_AVDD": [
+   [
+    "C13",
+    "1"
+   ],
+   [
+    "R5",
+    "2"
+   ],
+   [
+    "U1",
+    "46"
+   ]
+  ],
+  "VREG_LX": [
+   [
+    "L1",
+    "1"
+   ],
+   [
+    "U1",
+    "48"
+   ]
+  ],
+  "+1V1": [
+   [
+    "C14",
+    "1"
+   ],
+   [
+    "C15",
+    "1"
+   ],
+   [
+    "C16",
+    "1"
+   ],
+   [
+    "C17",
+    "1"
+   ],
+   [
+    "L1",
+    "2"
+   ],
+   [
+    "U1",
+    "23"
+   ],
+   [
+    "U1",
+    "39"
+   ],
+   [
+    "U1",
+    "50"
+   ],
+   [
+    "U1",
+    "6"
+   ]
+  ],
+  "XIN": [
+   [
+    "C18",
+    "1"
+   ],
+   [
+    "U1",
+    "21"
+   ],
+   [
+    "Y1",
+    "1"
+   ]
+  ],
+  "XOUT": [
+   [
+    "R6",
+    "1"
+   ],
+   [
+    "U1",
+    "22"
+   ]
+  ],
+  "XTAL": [
+   [
+    "C19",
+    "1"
+   ],
+   [
+    "R6",
+    "2"
+   ],
+   [
+    "Y1",
+    "3"
+   ]
+  ],
+  "RUN": [
+   [
+    "R7",
+    "2"
+   ],
+   [
+    "SW1",
+    "1"
+   ],
+   [
+    "U1",
+    "26"
+   ]
+  ],
+  "SWCLK": [
+   [
+    "J5",
+    "2"
+   ],
+   [
+    "U1",
+    "24"
+   ]
+  ],
+  "SWDIO": [
+   [
+    "J5",
+    "3"
+   ],
+   [
+    "U1",
+    "25"
+   ]
+  ],
+  "UART_TX": [
+   [
+    "J5",
+    "4"
+   ],
+   [
+    "U1",
+    "2"
+   ]
+  ],
+  "UART_RX": [
+   [
+    "J5",
+    "5"
+   ],
+   [
+    "U1",
+    "3"
+   ]
+  ],
+  "QSPI_SS": [
+   [
+    "R8",
+    "1"
+   ],
+   [
+    "U1",
+    "60"
+   ],
+   [
+    "U2",
+    "1"
+   ]
+  ],
+  "BOOTSEL": [
+   [
+    "R8",
+    "2"
+   ],
+   [
+    "SW2",
+    "1"
+   ]
+  ],
+  "QSPI_SD0": [
+   [
+    "U1",
+    "57"
+   ],
+   [
+    "U2",
+    "5"
+   ]
+  ],
+  "QSPI_SD1": [
+   [
+    "U1",
+    "59"
+   ],
+   [
+    "U2",
+    "2"
+   ]
+  ],
+  "QSPI_SD2": [
+   [
+    "U1",
+    "58"
+   ],
+   [
+    "U2",
+    "3"
+   ]
+  ],
+  "QSPI_SD3": [
+   [
+    "U1",
+    "55"
+   ],
+   [
+    "U2",
+    "7"
+   ]
+  ],
+  "QSPI_SCLK": [
+   [
+    "U1",
+    "56"
+   ],
+   [
+    "U2",
+    "6"
+   ]
+  ],
+  "SD_MISO": [
+   [
+    "J4",
+    "7"
+   ],
+   [
+    "R9",
+    "2"
+   ],
+   [
+    "U1",
+    "12"
+   ]
+  ],
+  "SD_CS": [
+   [
+    "J4",
+    "2"
+   ],
+   [
+    "R10",
+    "2"
+   ],
+   [
+    "U1",
+    "13"
+   ]
+  ],
+  "SD_SCK": [
+   [
+    "J4",
+    "5"
+   ],
+   [
+    "U1",
+    "14"
+   ]
+  ],
+  "SD_MOSI": [
+   [
+    "J4",
+    "3"
+   ],
+   [
+    "R11",
+    "2"
+   ],
+   [
+    "U1",
+    "15"
+   ]
+  ],
+  "SD_DAT1": [
+   [
+    "J4",
+    "8"
+   ],
+   [
+    "R12",
+    "2"
+   ]
+  ],
+  "SD_DAT2": [
+   [
+    "J4",
+    "1"
+   ],
+   [
+    "R13",
+    "2"
+   ]
+  ],
+  "HDMI_D2P_IO": [
+   [
+    "R14",
+    "1"
+   ],
+   [
+    "U1",
+    "16"
+   ]
+  ],
+  "TMDS_D2P": [
+   [
+    "J2",
+    "1"
+   ],
+   [
+    "R14",
+    "2"
+   ]
+  ],
+  "HDMI_D2N_IO": [
+   [
+    "R15",
+    "1"
+   ],
+   [
+    "U1",
+    "17"
+   ]
+  ],
+  "TMDS_D2N": [
+   [
+    "J2",
+    "3"
+   ],
+   [
+    "R15",
+    "2"
+   ]
+  ],
+  "HDMI_D1P_IO": [
+   [
+    "R16",
+    "1"
+   ],
+   [
+    "U1",
+    "18"
+   ]
+  ],
+  "TMDS_D1P": [
+   [
+    "J2",
+    "4"
+   ],
+   [
+    "R16",
+    "2"
+   ]
+  ],
+  "HDMI_D1N_IO": [
+   [
+    "R17",
+    "1"
+   ],
+   [
+    "U1",
+    "19"
+   ]
+  ],
+  "TMDS_D1N": [
+   [
+    "J2",
+    "6"
+   ],
+   [
+    "R17",
+    "2"
+   ]
+  ],
+  "HDMI_D0P_IO": [
+   [
+    "R18",
+    "1"
+   ],
+   [
+    "U1",
+    "27"
+   ]
+  ],
+  "TMDS_D0P": [
+   [
+    "J2",
+    "7"
+   ],
+   [
+    "R18",
+    "2"
+   ]
+  ],
+  "HDMI_D0N_IO": [
+   [
+    "R19",
+    "1"
+   ],
+   [
+    "U1",
+    "28"
+   ]
+  ],
+  "TMDS_D0N": [
+   [
+    "J2",
+    "9"
+   ],
+   [
+    "R19",
+    "2"
+   ]
+  ],
+  "HDMI_CKP_IO": [
+   [
+    "R20",
+    "1"
+   ],
+   [
+    "U1",
+    "29"
+   ]
+  ],
+  "TMDS_CKP": [
+   [
+    "J2",
+    "10"
+   ],
+   [
+    "R20",
+    "2"
+   ]
+  ],
+  "HDMI_CKN_IO": [
+   [
+    "R21",
+    "1"
+   ],
+   [
+    "U1",
+    "31"
+   ]
+  ],
+  "TMDS_CKN": [
+   [
+    "J2",
+    "12"
+   ],
+   [
+    "R21",
+    "2"
+   ]
+  ],
+  "HDMI_5V": [
+   [
+    "D2",
+    "1"
+   ],
+   [
+    "J2",
+    "18"
+   ]
+  ],
+  "USBH_DP_IO": [
+   [
+    "R22",
+    "1"
+   ],
+   [
+    "U1",
+    "32"
+   ]
+  ],
+  "USBH_DM_IO": [
+   [
+    "R23",
+    "1"
+   ],
+   [
+    "U1",
+    "33"
+   ]
+  ],
+  "USBH_DP": [
+   [
+    "J3",
+    "3"
+   ],
+   [
+    "R22",
+    "2"
+   ],
+   [
+    "R24",
+    "1"
+   ]
+  ],
+  "USBH_DM": [
+   [
+    "J3",
+    "2"
+   ],
+   [
+    "R23",
+    "2"
+   ],
+   [
+    "R25",
+    "1"
+   ]
+  ],
+  "USBH_VBUS": [
+   [
+    "C23",
+    "1"
+   ],
+   [
+    "F1",
+    "2"
+   ],
+   [
+    "J3",
+    "1"
+   ]
+  ],
+  "HALT_LED": [
+   [
+    "R26",
+    "1"
+   ],
+   [
+    "U1",
+    "37"
+   ]
+  ],
+  "HALT_LED_A": [
+   [
+    "D1",
+    "2"
+   ],
+   [
+    "R26",
+    "2"
+   ]
+  ]
+ },
+ "gpio": {
+  "0": {
+   "net": "UART_TX",
+   "use": "Serial console out (debug header)"
+  },
+  "1": {
+   "net": "UART_RX",
+   "use": "Serial console in (debug header)"
+  },
+  "8": {
+   "net": "SD_MISO",
+   "use": "microSD DAT0, SPI1 RX"
+  },
+  "9": {
+   "net": "SD_CS",
+   "use": "microSD DAT3, SPI1 chip select"
+  },
+  "10": {
+   "net": "SD_SCK",
+   "use": "microSD CLK, SPI1 SCK"
+  },
+  "11": {
+   "net": "SD_MOSI",
+   "use": "microSD CMD, SPI1 TX"
+  },
+  "12": {
+   "net": "HDMI_D2P",
+   "use": "HSTX bit 0: TMDS data 2+ (red)"
+  },
+  "13": {
+   "net": "HDMI_D2N",
+   "use": "HSTX bit 1: TMDS data 2-"
+  },
+  "14": {
+   "net": "HDMI_D1P",
+   "use": "HSTX bit 2: TMDS data 1+ (green)"
+  },
+  "15": {
+   "net": "HDMI_D1N",
+   "use": "HSTX bit 3: TMDS data 1-"
+  },
+  "16": {
+   "net": "HDMI_D0P",
+   "use": "HSTX bit 4: TMDS data 0+ (blue, and the sync)"
+  },
+  "17": {
+   "net": "HDMI_D0N",
+   "use": "HSTX bit 5: TMDS data 0-"
+  },
+  "18": {
+   "net": "HDMI_CKP",
+   "use": "HSTX bit 6: TMDS clock+"
+  },
+  "19": {
+   "net": "HDMI_CKN",
+   "use": "HSTX bit 7: TMDS clock-"
+  },
+  "20": {
+   "net": "USBH_DP",
+   "use": "Keyboard USB D+ (PIO-USB)"
+  },
+  "21": {
+   "net": "USBH_DM",
+   "use": "Keyboard USB D- (PIO-USB; must be D+ plus one)"
+  },
+  "25": {
+   "net": "HALT_LED",
+   "use": "HALT LED"
+  }
+ }
+}

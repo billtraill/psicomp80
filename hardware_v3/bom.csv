@@ -1,0 +1,39 @@
+Qty,References,Value,Footprint,Part,Description
+6,C1 C3 C5 C12 C14 C15,10u,C_0805_2012Metric,,1.0 V regulator input; 1.8 V regulator input; 3.3 V regulator input; Keyboard 5 V; USB-C 5 V in; microSD supply
+3,C2 C4 C6,22u,C_0805_2012Metric,,1.0 V regulator output; 1.8 V regulator output; 3.3 V regulator output
+1,C7,100u,C_1210_3225Metric,,"FPGA core supply (VCCINT, VCCBRAM) bulk"
+2,C8 C9,47u,C_1210_3225Metric,,FPGA auxiliary supply (VCCAUX) bulk; I/O supply (VCCO) bulk
+3,C10 C11 C13,100n,C_0603_1608Metric,,Flash decoupling; Oscillator decoupling; microSD decoupling
+22,C16 C17 C18 C19 C20 C21 C22 C23 C27 C28 C29 C30 C33 C34 C35 C36 C37 C38 C39 C40 C41 C42,470n,C_0402_1005Metric,,"FPGA I/O (VCCO) decoupling; FPGA auxiliary (VCCAUX) decoupling; FPGA core (VCCINT, VCCBRAM) decoupling"
+7,C24 C25 C26 C31 C32 C43 C44,4.7u,C_0603_1608Metric,,"FPGA I/O (VCCO) decoupling; FPGA auxiliary (VCCAUX) decoupling; FPGA core (VCCINT, VCCBRAM) decoupling"
+1,D1,HALT,LED_0805_2012Metric,"red LED, 0805","Lit while the Z80 is halted, as the original's HALT LED"
+1,D2,DONE,LED_0805_2012Metric,"green LED, 0805",Lit once the FPGA has loaded its configuration
+1,D3,BAT54J,D_SOD-323F,Nexperia BAT54J,Feeds the HDMI +5 V pin
+1,F1,500mA,Fuse_1206_3216Metric,Bourns MF-MSMF050-2,Resettable fuse for the keyboard's 5 V
+1,J1,USB-C,USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,GCT USB4105-GF-A,"Power in, 5 V"
+1,J2,HDMI,HDMI_A_Molex_208658-1001_Horizontal,Molex 208658-1001,HDMI type A socket: the display
+1,J3,USB-A,USB_A_Wuerth_614004134726_Horizontal,Wurth 614004134726,USB-A socket for the keyboard
+1,J4,microSD,microSD_HC_Hirose_DM3AT-SF-PEJM5,Hirose DM3AT-SF-PEJM5,microSD socket: ROM images and tapes
+1,J5,JTAG,PinHeader_1x06_P2.54mm_Vertical,"0.1 in header, 6 way","JTAG for Vivado: VREF, GND, TCK, TDO, TDI, TMS, the order of Digilent's 6-pin cables"
+1,J6,SERIAL,PinHeader_1x02_P2.54mm_Vertical,"0.1 in header, 2 way",The soft processor's serial console out (115200 baud) and ground
+1,L1,2.2uH,L_1008_2520Metric,Murata DFE252012F-2R2M,Inductor for the 1.0 V regulator
+1,L2,2.2uH,L_1008_2520Metric,Murata DFE252012F-2R2M,Inductor for the 1.8 V regulator
+1,L3,2.2uH,L_1008_2520Metric,Murata DFE252012F-2R2M,Inductor for the 3.3 V regulator
+2,R1 R2,5.1k,R_0603_1608Metric,,USB-C CC1: asks the supply for 5 V; USB-C CC2: asks the supply for 5 V
+2,R3 R5,200k,R_0603_1608Metric,,"1.0 V regulator feedback, top; 1.8 V regulator feedback, top"
+1,R4,301k,R_0603_1608Metric,,"1.0 V regulator feedback, bottom"
+2,R6 R8,100k,R_0603_1608Metric,,"1.8 V regulator feedback, bottom; 3.3 V regulator feedback, bottom"
+1,R7,453k,R_0603_1608Metric,,"3.3 V regulator feedback, top"
+2,R9 R10,4.7k,R_0603_1608Metric,,INIT_B pull-up; PROGRAM_B pull-up
+2,R11 R14,330R,R_0603_1608Metric,,DONE pull-up; HALT LED current
+2,R12 R13,1k,R_0603_1608Metric,,DONE LED current; PUDC_B to 3.3 V: I/O pull-ups off while configuring
+7,R15 R16 R17 R18 R19 R20 R23,10k,R_0603_1608Metric,,Flash chip select pull-up; RESET button pull-up; microSD CMD pull-up; microSD DAT0 pull-up; microSD DAT1 pull-up; microSD DAT2 pull-up; microSD DAT3/CS pull-up
+2,R21 R22,15k,R_0603_1608Metric,,Keyboard USB D+ pull-down (host side); Keyboard USB D- pull-down (host side)
+1,SW1,RESET,SW_SPST_B3S-1000,Omron B3S-1000,"Powers the COMP80 on again (the logic, not the FPGA)"
+1,SW2,PROG,SW_SPST_B3S-1000,Omron B3S-1000,Pulls PROGRAM_B: the FPGA reloads itself from the flash
+1,U1,XC7A100T-1FGG484C,Xilinx_FGG484,AMD XC7A100T-1FGG484C,"FPGA: 101,440 logic cells, 4,860 Kb of block RAM. The whole COMP80 is in here"
+1,U2,IS25LP128F,SOIC-8_5.3x5.3mm_P1.27mm,ISSI IS25LP128F-JBLE,16 MB SPI flash: the FPGA's configuration and the soft processor's program
+1,U3,TLV62569DBV,SOT-23-5,TI TLV62569DBVR,2 A buck regulator: 1.0 V for the FPGA's core and block RAM
+1,U4,TLV62569DBV,SOT-23-5,TI TLV62569DBVR,2 A buck regulator: 1.8 V for the FPGA's auxiliary supply
+1,U5,TLV62569DBV,SOT-23-5,TI TLV62569DBVR,2 A buck regulator: 3.3 V for the I/O banks and everything else
+1,X1,100MHz,Oscillator_SMD_ECS_2520MV-xxx-xx-4Pin_2.5x2.0mm,ECS-2520MV-1000-BN-TR,100 MHz oscillator: the FPGA's clock

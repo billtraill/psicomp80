@@ -1,0 +1,8 @@
+# yosys: synthesise COMP80 v3 for the XC7A100T, to check it builds and fits
+read_verilog -lib -specify +/xilinx/cells_sim.v +/xilinx/cells_xtra.v
+read_verilog -sv ../../rtl/top.v ../../rtl/comp80_machine.v ../../rtl/tv80c.v ../../rtl/video.v ../../rtl/hdmi_out.v ../../rtl/soc.v ../../rtl/spi_master.v
+read_verilog -sv ../tv80/rtl/core/tv80_core.v ../tv80/rtl/core/tv80_alu.v ../tv80/rtl/core/tv80_mcode.v ../tv80/rtl/core/tv80_reg.v
+read_verilog -sv ../picorv32/picorv32.v
+read_verilog -sv ../usb_hid_host/src/usb_hid_host.v ../usb_hid_host/src/usb_hid_host_rom.v
+synth_xilinx -family xc7 -top top
+tee -o utilisation.txt stat -top top

@@ -1,0 +1,293 @@
+<title>COMP80 v2 Hardware</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&amp;family=Source+Sans+3:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+{{STYLE}}
+
+<div class="wrap">
+<header>
+  <span class="kicker">PSI COMP80 · version 2 · current parts</span>
+  <h1>COMP80 v2 Hardware</h1>
+  <p>The 1979 PSI COMP80 took a 16 × 12 inch board and more than 300 parts. This is the same computer on a 75 × 55 mm board with {{NPARTS}} parts, almost all of them passives round one Raspberry Pi RP2350 microcontroller. It runs the original ROM images unchanged: the monitor and BURP, and the FORTH and LISP ROMs, loaded from a microSD card. The display goes out over HDMI, you type on any USB keyboard, and it runs from a USB-C supply.</p>
+  <p>Nothing of the original circuit is left. The RP2350 runs a Z80 emulator and models the MM57109 calculator chip and the tape interface. It draws the screen in the original character set. See the <a href="hardware.html">original board</a>, the <a href="hardware_v3.html">v3 board</a> (the COMP80 in an FPGA), the <a href="emulator.html">emulator</a> and the <a href="roms.html">ROM listings</a>.</p>
+  <ul class="spec">
+    <li><b>RP2350A</b> at 240 MHz</li>
+    <li><b>Z80</b> emulated at 2 MHz</li>
+    <li><b>HDMI</b> 640 × 480</li>
+    <li><b>USB</b> keyboard</li>
+    <li><b>microSD</b> ROMs and tapes</li>
+    <li><b>USB-C</b> 5 V</li>
+    <li><b>{{NPARTS}}</b> parts, 4 layers</li>
+  </ul>
+</header>
+
+<section id="board-section" aria-labelledby="h-board">
+  <div class="shead">
+    <h2 id="h-board">The board</h2>
+    <p>Seen from the top, where every part sits: blue is the top copper, red the bottom. Two inner layers are planes, ground and 3.3 V; turn them on to see them. Scroll or pinch to zoom, drag to move.</p>
+  </div>
+  <div class="viewer">
+    <div class="stage" id="stage">
+      <div class="tools">
+        <div class="group" role="group" aria-label="Layers">
+          <label class="chip t"><input type="checkbox" data-layer="top" checked><i></i>Top</label>
+          <label class="chip b"><input type="checkbox" data-layer="bot" checked><i></i>Bottom</label>
+          <label class="chip g"><input type="checkbox" data-layer="in1"><i></i>Ground plane</label>
+          <label class="chip v"><input type="checkbox" data-layer="in2"><i></i>3.3 V plane</label>
+          <label class="chip p"><input type="checkbox" data-layer="pads" checked><i></i>Pads</label>
+          <label class="chip"><input type="checkbox" data-layer="silk" checked><i></i>Outlines</label>
+          <label class="chip"><input type="checkbox" data-layer="labels" checked><i></i>Labels</label>
+        </div>
+        <div class="group" role="radiogroup" aria-label="View from">
+          <span class="lbl">From</span>
+          <span class="seg">
+            <label><input type="radio" name="side" value="top" checked><span>Top</span></label>
+            <label><input type="radio" name="side" value="bot"><span>Bottom</span></label>
+          </span>
+        </div>
+        <form class="find" role="search">
+          <label class="lbl" for="find">Find</label>
+          <input type="search" id="find" placeholder="U1, HDMI, SD_CS…" autocomplete="off" spellcheck="false">
+        </form>
+      </div>
+      <div class="box">
+        {{BOARD}}
+        <div class="float">
+          <button type="button" class="btn" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" class="btn" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" class="btn" id="zfit" aria-label="Whole board">⤢</button>
+          <button type="button" class="btn" id="zexp" aria-label="Expand" aria-pressed="false">⛶</button>
+        </div>
+        <span class="scale" id="scale"></span>
+      </div>
+      <p class="hint" id="status">Routed by Freerouting after the supply pins were laid by hand: {{NTRACKS}} track segments, {{NVIAS}} vias. KiCad's design check finds no errors.</p>
+    </div>
+    <aside class="info" id="info" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section aria-labelledby="h-how">
+  <div class="shead">
+    <h2 id="h-how">How it works</h2>
+    <p>The ROMs only ever see the Z80, its memory and six I/O ports. If those behave as they did in 1979, the ROMs can't tell the difference, so the RP2350 provides exactly those and nothing more.</p>
+  </div>
+
+  <figure class="figure diagram">
+    <svg class="dg" viewBox="0 0 760 330" role="img" aria-label="Block diagram: USB-C feeds 5 volts to a 3.3 volt regulator and the RP2350's own USB. The RP2350 runs the Z80, its memory, the MM57109 model and the tape on core 0, and the USB keyboard and the screen on core 1. It drives HDMI from its HSTX port, reads a USB keyboard through PIO-USB, and reads ROMs and tapes from a microSD card over SPI.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker></defs>
+      <rect class="mcu" x="240" y="70" width="280" height="190" rx="8"/>
+      <text x="380" y="96">RP2350A · U1</text>
+      <rect x="258" y="112" width="244" height="62" rx="5"/><text x="380" y="135">Core 0</text><text class="s" x="380" y="153">Z80 · 64K memory · MM57109 · tape</text>
+      <rect x="258" y="184" width="244" height="62" rx="5"/><text x="380" y="207">Core 1</text><text class="s" x="380" y="225">USB keyboard · draws the screen</text>
+      <rect x="20" y="40" width="160" height="62" rx="6"/><text x="100" y="65">USB-C · J1</text><text class="s" x="100" y="83">5 V in · firmware USB</text>
+      <rect x="20" y="140" width="160" height="62" rx="6"/><text x="100" y="165">Regulator · U3</text><text class="s" x="100" y="183">AP2112K 3.3 V</text>
+      <rect x="20" y="240" width="160" height="62" rx="6"/><text x="100" y="265">Flash · U2</text><text class="s" x="100" y="283">4 MB · the firmware</text>
+      <rect x="580" y="20" width="160" height="62" rx="6"/><text x="660" y="45">HDMI · J2</text><text class="s" x="660" y="63">HSTX · GPIO12–19</text>
+      <rect x="580" y="102" width="160" height="62" rx="6"/><text x="660" y="127">USB-A · J3</text><text class="s" x="660" y="145">keyboard · GPIO20–21</text>
+      <rect x="580" y="184" width="160" height="62" rx="6"/><text x="660" y="209">microSD · J4</text><text class="s" x="660" y="227">SPI1 · GPIO8–11</text>
+      <rect x="580" y="266" width="160" height="50" rx="6"/><text x="660" y="287">HALT LED · debug</text><text class="s" x="660" y="303">GPIO25 · SWD · UART</text>
+      <path class="ar" d="M100 102V138"/><path class="ar" d="M180 171H238"/><path class="ar" d="M180 71H210V120H238"/>
+      <path d="M180 271H238"/>
+      <path class="ar" d="M520 120H550V51H578"/><path class="ar" d="M578 133H520"/><path d="M520 215H578"/><path d="M520 250H550V291H578"/>
+    </svg>
+    <figcaption>The whole computer. Everything inside the blue box is firmware; everything outside it is a connector or a supply.</figcaption>
+  </figure>
+
+  <div class="circuits">
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">What became of the 1979 board</span>
+      <h3>One chip for three hundred</h3>
+      <p>Each part of the original circuit is either something the RP2350 does in software or something a modern connector does better. The table goes section by section through the <a href="hardware.html">original board</a>.</p>
+      <p>The emulation is exact where the ROMs can see it. The Z80 is a full instruction-set emulator with every instruction's T-states. It runs its 2 MHz in 1 ms slices against the RP2350's timer, so the ROMs' delay loops, the 300 baud tape timing and BURP's waits on the calculator chip all take their real time. The MM57109 is the same model as the MAME driver's and the web emulator's: it pulses its R/W line once per digit and interrupts the Z80, and every instruction takes the chip's own execution time.</p>
+    </div>
+    <div class="side">
+      <table class="table2">
+        <thead><tr><th>1979</th><th>v2</th></tr></thead>
+        <tbody>
+          <tr><td>Z80, IC1</td><td>Emulated on core 0</td></tr>
+          <tr><td>3 × 2708 EPROM</td><td>ROM image from the microSD card, or the built-in BURP</td></tr>
+          <tr><td>40 × 21L02 RAM</td><td>RP2350 RAM; the 32K expansion is a setting</td></tr>
+          <tr><td>Display: 14 × 21L02, 2513, ~20 TTL chips</td><td>HSTX → HDMI, the same 64 × 32 characters and font</td></tr>
+          <tr><td>72 keys, AY-5-2376</td><td>A USB keyboard, giving the same codes and an NMI per key</td></tr>
+          <tr><td>MM57109 and 6 chips</td><td>A model of the chip in software</td></tr>
+          <tr><td>Tape: 4013, 4528, 9 transistors</td><td>WAV files on the card</td></tr>
+          <tr><td>Transformer, 5 regulators</td><td>USB-C 5 V and one 3.3 V regulator</td></tr>
+          <tr><td>Expansion plug</td><td>Left out</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">U1, U2, Y1</span>
+      <h3>The microcontroller</h3>
+      <p>The <button class="pl" data-ref="U1">RP2350A</button> is Raspberry Pi's microcontroller, with two Arm Cortex-M33 cores, 520 KB of RAM, a high-speed serial port (HSTX) that can drive HDMI directly, and programmable I/O state machines (PIO). Its program lives in the 4 MB QSPI flash <button class="pl" data-ref="U2">U2</button>, and a 12 MHz crystal <button class="pl" data-ref="Y1">Y1</button> clocks it.</p>
+      <p>The chip makes its own 1.1 V core supply with an on-chip switching regulator. That takes the inductor <button class="pl" data-ref="L1">L1</button>, which sits straight below the regulator pins, and the filtered supply from <button class="pl" data-ref="R5">R5</button> and <button class="pl" data-ref="C13">C13</button>. Each supply pin has a 0402 capacitor beside it; those pins are 0.4 mm apart, too close for anything bigger.</p>
+      <p>The firmware runs the chip at 240 MHz with the core at 1.2 V. That is above the 150 MHz rating, as most RP2350 video projects run it. PIO-USB needs a multiple of 48 MHz, and HDMI needs its own 126 MHz clock, which comes from the second PLL.</p>
+      <p>Hold <button class="pl" data-ref="SW2">BOOTSEL</button> while pressing <button class="pl" data-ref="SW1">RESET</button>, and the RP2350 shows up on the USB-C port as a drive. Copy <code>comp80v2.uf2</code> onto it to load the firmware.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="mcu">Show the microcontroller's parts</button>
+      <table class="table2">
+        <thead><tr><th>Pin</th><th>Use</th></tr></thead>
+        <tbody>{{GPIO}}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">J2, R14–R21</span>
+      <h3>HDMI</h3>
+      <p>The RP2350's HSTX port has a TMDS encoder built in, so eight GPIOs can drive an HDMI socket's three data pairs and its clock pair directly. Each line has a 270 Ω resistor (<button class="pl" data-ref="R14">R14</button>–<button class="pl" data-ref="R21">R21</button>) into the display's terminations. What goes out is DVI, video without sound, which every HDMI input accepts.</p>
+      <p>The picture is 640 × 480 at 60 Hz. The COMP80 showed 64 × 32 characters of 6 × 10 dots on a 4:3 television, and 640 × 480 fits that exactly with each character cell drawn 10 × 15 pixels. The dot columns are 1, 2, 2, 1, 2, 2 pixels wide, so the 5-dot letters come out symmetrical. The font is the MAME driver's, and so are the 64 graphics characters.</p>
+      <p>Core 0 runs the DMA that feeds the HSTX, so it never waits on the USB stack. Core 1 compares the 2K of screen memory with what it last drew and redraws only the characters that changed.</p>
+      <p><button class="pl" data-ref="D2">D2</button> feeds the socket's +5 V pin, which displays use to read the monitor's details. The diode stops a display that's switched on from powering the board back through it.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="video">Show the HDMI parts</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">J3, R22–R25, F1</span>
+      <h3>The USB keyboard</h3>
+      <p>The RP2350's own USB goes to the USB-C socket, for loading firmware. The keyboard has its own USB-A socket, run by PIO-USB, a USB host made from two GPIOs and a PIO state machine, with TinyUSB's host stack on top. The 15 kΩ pull-downs <button class="pl" data-ref="R24">R24</button> and <button class="pl" data-ref="R25">R25</button> are what a host puts on D+ and D−. <button class="pl" data-ref="F1">F1</button> limits the keyboard's 5 V.</p>
+      <p>Keys become the codes the COMP80's own keyboard gave, the same mapping as the web emulator: letters in capitals, Return, Backspace (rub-out in FORTH and LISP), Ctrl+\ for FS. Each key is latched for IN 01 and raises the Z80's NMI. That is how the original keyboard woke a program waiting in HALT, and how a key pressed while a program runs resets it. Esc is the RESET key.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="usb">Show the keyboard parts</button>
+      <dl class="keys">
+        <dt><kbd>F1</kbd></dt><dd>The set-up screen: ROM, memory, clock, colour, tape</dd>
+        <dt><kbd>F2</kbd></dt><dd>Tapes: play, record or stop</dd>
+        <dt><kbd>F12</kbd></dt><dd>Power on again</dd>
+        <dt><kbd>Esc</kbd></dt><dd>The RESET key</dd>
+        <dt><kbd>Ctrl</kbd>+<kbd>\</kbd></dt><dd>FS</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">J4, R9–R13</span>
+      <h3>ROMs and tapes on microSD</h3>
+      <p>The card works in SPI mode on SPI1, with pull-ups on every data line (<button class="pl" data-ref="R9">R9</button>–<button class="pl" data-ref="R13">R13</button>), and holds a FAT or exFAT file system. At power-on the firmware loads the ROM named in <code>COMP80.CFG</code> into 0000–0BFF. The set-up screen lists every <code>.ROM</code> in the folder. With no card, it runs the monitor and BURP ROM built into the firmware.</p>
+      <p>Tapes are WAV files, the format the MAME driver records. The COMP80's tape interface handed the Z80 one decoded bit each way, so a tape here is that bit against time. Playing feeds IN 00 through a Schmitt trigger, like the driver's; recording writes what OUT 20 sends as a square wave. <code>READ</code>, <code>TAPE</code> and the FORTH and LISP tape words all work as they did on cassette, at the same speed.</p>
+      <p>Tape speed follows the Z80 clock. The ROM's timing loops were written for the real machine's 2 MHz; the MAME driver and the web emulator run at 4 MHz, so tapes recorded there play at twice the baud rate. Set the clock to 4 MHz to load them. Tapes recorded on this board at 2 MHz are true to the original.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="sd">Show the microSD parts</button>
+      <pre class="tree">/COMP80/
+  ROMS/
+    BURP.ROM     psicomp80.rom
+    FORTH.ROM    psicomp80_forth.rom
+    LISP.ROM     psicomp80_lisp.rom
+  TAPES/
+    LIFE.WAV     life/life.wav
+    TAPE01.WAV   recorded here
+  COMP80.CFG</pre>
+      <pre class="tree">ROM=FORTH.ROM
+MEMORY=5
+CLOCK=2000000
+COLOUR=GREEN</pre>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">J1, U3, R1–R4</span>
+      <h3>Power</h3>
+      <p>The USB-C socket <button class="pl" data-ref="J1">J1</button> has 5.1 kΩ resistors on both CC pins (<button class="pl" data-ref="R1">R1</button>, <button class="pl" data-ref="R2">R2</button>), which ask any USB-C supply for 5 V, including a laptop's port. The AP2112K <button class="pl" data-ref="U3">U3</button> makes 3.3 V for everything; the 3.3 V plane on inner layer 2 carries it. The whole board draws well under half an amp, keyboard included.</p>
+      <p>The same socket's data pins go to the RP2350's USB through <button class="pl" data-ref="R3">R3</button> and <button class="pl" data-ref="R4">R4</button>, so one cable powers the board and reloads its firmware.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="power">Show the power parts</button>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<section aria-labelledby="h-fw">
+  <div class="shead">
+    <h2 id="h-fw">The firmware</h2>
+    <p>C, with Raspberry Pi's Pico SDK, TinyUSB, Pico-PIO-USB and FatFs. It's in <code>hardware_v2/firmware/</code>, with a built <code>comp80v2.uf2</code>.</p>
+  </div>
+  <div class="circuits">
+  <div class="block">
+    <div class="prose">
+      <p>The Z80 and the machine around it are a port of the web emulator's, which is checked against MAME line by line. The port was tested the same way. Built for the Mac, it runs every LISP, FORTH and BURP test session and prints screens identical to the web emulator's. It loads <code>life.wav</code> through the tape model byte for byte, and a tape it records loads back the same.</p>
+      <p>The code that touches the hardware compiles for the RP2350: HDMI, the USB host, the SD card and the clock set-up. It has not run on a board yet, because no board has been made.</p>
+      <ul>
+        <li><code>z80.c</code>, <code>comp80.c</code>: the Z80, the memory map, the ports and the MM57109</li>
+        <li><code>tape.c</code>: WAV tapes on IN 00 and OUT 20</li>
+        <li><code>video.c</code>: HSTX, its DMA, and drawing the characters</li>
+        <li><code>keyboard.c</code>: TinyUSB host, boot-protocol keyboards</li>
+        <li><code>sdcard.c</code>, <code>storage.c</code>: the card in SPI mode, FatFs, settings</li>
+        <li><code>menu.c</code>, <code>main.c</code>: the set-up screen, start-up and pacing</li>
+        <li><code>host/</code>: the Mac build and the comparison with the web emulator</li>
+      </ul>
+    </div>
+    <div class="side">
+      <span class="lbl">Build</span>
+      <pre class="tree">cd hardware_v2/firmware
+cmake -B build -DPICO_SDK_PATH=…/pico-sdk
+cmake --build build</pre>
+      <span class="lbl">Test on the Mac</span>
+      <pre class="tree">cd hardware_v2/firmware/host
+make test</pre>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-parts">
+  <div class="shead">
+    <h2 id="h-parts">The parts</h2>
+    <p>All {{NPARTS}} parts, current and stocked. Click a reference to find it on the board. <code>hardware_v2/bom.csv</code> has the same list grouped for ordering.</p>
+  </div>
+  <div class="filter">
+    <input type="search" id="pfilter" placeholder="Filter: 100n, USB, HDMI…" aria-label="Filter the parts" autocomplete="off" spellcheck="false">
+    <span class="seg" role="radiogroup" aria-label="Section" id="psec">
+      <label><input type="radio" name="psec" value="" checked><span>All</span></label>
+      <label><input type="radio" name="psec" value="mcu"><span>RP2350</span></label>
+      <label><input type="radio" name="psec" value="power"><span>Power</span></label>
+      <label><input type="radio" name="psec" value="video"><span>HDMI</span></label>
+      <label><input type="radio" name="psec" value="usb"><span>Keyboard</span></label>
+      <label><input type="radio" name="psec" value="sd"><span>microSD</span></label>
+      <label><input type="radio" name="psec" value="misc"><span>Other</span></label>
+    </span>
+    <span class="count" id="pcount"></span>
+  </div>
+  <div class="tablewrap">
+    <table class="parts">
+      <thead><tr><th>Ref</th><th>Value</th><th>What it is</th><th>Section</th></tr></thead>
+      <tbody id="ptable">{{PARTS}}</tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="h-notes">
+  <div class="shead">
+    <h2 id="h-notes">What to know</h2>
+  </div>
+  <ul class="notes">
+    <li><b>Not built yet.</b> The board passes KiCad's design check and the firmware compiles, but neither has met real hardware. The first board should be checked supply by supply before the RP2350 goes on.</li>
+    <li><b>Assembly.</b> The RP2350 is a 0.4 mm pitch QFN and the capacitors beside it are 0402, so the board wants a stencil and reflow, or a PCB assembly service. Everything else is 0603 or larger.</li>
+    <li><b>Four layers</b>, 0.15 mm tracks with 0.12 mm gaps, and 0.45 mm vias with 0.2 mm holes beside the supply pins: standard for four-layer boards from the usual makers.</li>
+    <li><b>HDMI is DVI.</b> Some televisions are slow to lock onto a DVI signal, or want 640 × 480 set as a PC input. Monitors and capture devices take it without fuss.</li>
+    <li><b>Not carried over:</b> the teleprinter port (OUT 00), the floppy disc, and real cassettes. Use WAV files; any audio tool can convert an old cassette recording to one.</li>
+  </ul>
+</section>
+
+<footer>The board is a KiCad project in the repository's <code>hardware_v2/</code> folder: <code>tools/design.py</code> holds the parts and connections, <code>tools/make_board.py</code> builds the board, and this page is made by <code>tools/make_page.py</code>.</footer>
+</div>
+
+{{SCRIPT}}

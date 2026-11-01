@@ -124,6 +124,17 @@ click a part or a track to see what it is and what it connects to. It talks
 through each circuit and lists every part. Rebuild it with
 python3 hardware/tools/make_hardware_page.py.
 
+Two newer versions run the same ROM images on current parts, each with a page
+like it:
+
+  hardware_v2.html  hardware_v2/: one RP2350 microcontroller emulates the
+                    machine, with HDMI, a USB keyboard, ROMs and tapes on
+                    microSD, and USB-C power. Board, firmware and tests.
+  hardware_v3.html  hardware_v3/: the machine in logic in an Artix-7 XC7A100T
+                    FPGA, with the same connections. Board, Verilog,
+                    simulations; hardware_v3/VIVADO_TODO.md has the steps
+                    still to do in Vivado.
+
 /h2 Floppy disc
 
 The floppy disc extension from the Oct/Dec 1980 articles: FD1771 controller,

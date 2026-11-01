@@ -216,7 +216,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
   <span class="kicker">PSI COMP80 · the main board · Wireless World, 1979</span>
   <h1>COMP80 Hardware</h1>
   <p>The PSI COMP80 is one double-sided board, 16 × 12 inches, with the keyboard along the front edge. The Powertran kit put every part on it but the transformer and one power transistor. This page redraws that board from the kit's layout sheet and the circuit diagrams in J. H. Adams's articles, and talks through the circuits section by section.</p>
-  <p>Zoom into the board below, turn either side's copper on and off, and click a part or a track to see what it is and what it connects to. See also the <a href="screenshots.html">screenshots</a>, the <a href="roms.html">ROM listings</a> and the <a href="emulator.html">emulator</a>.</p>
+  <p>Zoom into the board below, turn either side's copper on and off, and click a part or a track to see what it is and what it connects to. See also the <a href="screenshots.html">screenshots</a>, the <a href="roms.html">ROM listings</a> and the <a href="emulator.html">emulator</a>, and two new versions from current parts: <a href="hardware_v2.html">v2</a>, on an RP2350, and <a href="hardware_v3.html">v3</a>, in an FPGA.</p>
   <ul class="spec">
     <li><b>Z80</b> at 2 MHz</li>
     <li><b>3 KB</b> EPROM, <b>5 KB</b> RAM</li>
@@ -373,6 +373,30 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
           <tr><td>1C00–1FFF</td><td><button class="pl" data-ref="IC26a">IC26a–h</button></td></tr>
           <tr><td>8000–83FF</td><td><button class="pl" data-ref="IC43a">IC43a–g</button> video</td></tr>
           <tr><td>8400–87FF</td><td><button class="pl" data-ref="IC44a">IC44a–g</button> video</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block" id="c-exp">
+    <div class="prose">
+      <span class="kicker">The kit sheet's “optional expansion plug”</span>
+      <h3>The expansion plug</h3>
+      <p>The kit sheet leaves room for a 64-way plug, <button class="pl" data-ref="J1">J1</button>, along the top edge, but none of the articles prints its pinout. The one here brings out what the later add-ons needed. That means the whole system bus with the control lines, the memory enable that the Fig. 7 memory expansion takes over when its link is cut, and the 2 MHz clock. It also has every port select that <button class="pl" data-ref="IC2">IC2</button> and <button class="pl" data-ref="IC3">IC3</button> leave spare, and the supplies.</p>
+      <p>The October 1980 floppy-disc controller is the test. It takes one output select (OUT A0) and one input select (IN 05), with A3, A4, the data bus, the 2 MHz clock and INT, all of them on this plug.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-refs="J1" data-title="The expansion plug">Show the plug</button>
+      <table class="mini">
+        <thead><tr><th>Pins</th><th>Signals</th></tr></thead>
+        <tbody>
+          <tr><td>5–20</td><td>A0–A15</td></tr>
+          <tr><td>23–30</td><td>D0–D7, buffered</td></tr>
+          <tr><td>33–46</td><td>RD, WR, MREQ, IORQ, M1, RFSH, MEM_MREQ, HALT, WAIT, BUSAK, INT, NMI, RESET, 2 MHz</td></tr>
+          <tr><td>49–54</td><td>OUT 00, 80, 40, C0, A0, E0</td></tr>
+          <tr><td>55–59</td><td>IN 04, 02, 06, 05, 07</td></tr>
+          <tr><td>4, 63, 64</td><td>+5 V; 60–62 are +12 V, −5 V, −12 V</td></tr>
+          <tr><td>2, 21, 22, 31, 32, 47, 48</td><td>0 V</td></tr>
         </tbody>
       </table>
     </div>
@@ -843,7 +867,7 @@ const D = {{DATA}};
       toBoard();
     } else if (pl.dataset.refs) {
       const list = pl.dataset.refs.split(" ").map(r => byRef.get(r)).filter(Boolean);
-      selectList(list, "The calculator chip", "The MM57109 and the parts that talk to it:");
+      selectList(list, pl.dataset.title || "The calculator chip", pl.dataset.title ? "On the board:" : "The MM57109 and the parts that talk to it:");
       toBoard();
     }
   });

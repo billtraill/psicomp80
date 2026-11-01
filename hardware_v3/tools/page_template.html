@@ -1,0 +1,293 @@
+<title>COMP80 v3 Hardware</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&amp;family=Source+Sans+3:ital,wght@0,400;0,600;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+{{STYLE}}
+
+<div class="wrap">
+<header>
+  <span class="kicker">PSI COMP80 · version 3 · in an FPGA</span>
+  <h1>COMP80 v3 Hardware</h1>
+  <p>The <a href="hardware_v2.html">v2 board</a> runs the COMP80's ROMs on a Z80 emulator in software. This one builds the computer again in logic, inside an AMD Artix-7 XC7A100T FPGA. There's a Z80 in Verilog with its 64 KB of memory, the I/O ports, the keyboard latch and its NMI, and the display generator, all clocked like hardware. It has the same outside as v2: HDMI, a USB keyboard, ROMs and tapes on a microSD card, and USB-C power.</p>
+  <p>Two things stay in software, on a small RISC-V processor inside the same FPGA: the MM57109 calculator chip, which did BCD floating point, and the jobs a modern machine needs, like reading the card and drawing a set-up screen. See the <a href="hardware.html">original board</a>, <a href="hardware_v2.html">v2</a>, the <a href="emulator.html">emulator</a> and the <a href="roms.html">ROM listings</a>.</p>
+  <ul class="spec">
+    <li><b>XC7A100T</b> FGG484</li>
+    <li><b>Z80</b> in logic, 2 MHz</li>
+    <li><b>HDMI</b> 640 × 480</li>
+    <li><b>USB</b> keyboard</li>
+    <li><b>microSD</b> ROMs and tapes</li>
+    <li><b>USB-C</b> 5 V</li>
+    <li><b>{{NPARTS}}</b> parts, 6 layers</li>
+  </ul>
+</header>
+
+<section id="board-section" aria-labelledby="h-board">
+  <div class="shead">
+    <h2 id="h-board">The board</h2>
+    <p>Seen from the top, where every part sits: blue is the top copper, red the bottom. The four inner layers are planes: ground, 3.3 V, 1.0 V and 1.8 V. Beside every FPGA ball that needs one is a via, half a ball pitch away, to reach a plane or the far side. Scroll or pinch to zoom, drag to move.</p>
+  </div>
+  <div class="viewer">
+    <div class="stage" id="stage">
+      <div class="tools">
+        <div class="group" role="group" aria-label="Layers">
+          <label class="chip t"><input type="checkbox" data-layer="top" checked><i></i>Top</label>
+          <label class="chip b"><input type="checkbox" data-layer="bot" checked><i></i>Bottom</label>
+          <label class="chip g"><input type="checkbox" data-layer="in1"><i></i>Ground</label>
+          <label class="chip v"><input type="checkbox" data-layer="in2"><i></i>3.3 V</label>
+          <label class="chip v1"><input type="checkbox" data-layer="in3"><i></i>1.0 V</label>
+          <label class="chip v8"><input type="checkbox" data-layer="in4"><i></i>1.8 V</label>
+          <label class="chip p"><input type="checkbox" data-layer="pads" checked><i></i>Pads</label>
+          <label class="chip"><input type="checkbox" data-layer="silk" checked><i></i>Outlines</label>
+          <label class="chip"><input type="checkbox" data-layer="labels" checked><i></i>Labels</label>
+        </div>
+        <div class="group" role="radiogroup" aria-label="View from">
+          <span class="lbl">From</span>
+          <span class="seg">
+            <label><input type="radio" name="side" value="top" checked><span>Top</span></label>
+            <label><input type="radio" name="side" value="bot"><span>Bottom</span></label>
+          </span>
+        </div>
+        <form class="find" role="search">
+          <label class="lbl" for="find">Find</label>
+          <input type="search" id="find" placeholder="U1, TMDS, FLASH…" autocomplete="off" spellcheck="false">
+        </form>
+      </div>
+      <div class="box">
+        {{BOARD}}
+        <div class="float">
+          <button type="button" class="btn" id="zin" aria-label="Zoom in">+</button>
+          <button type="button" class="btn" id="zout" aria-label="Zoom out">−</button>
+          <button type="button" class="btn" id="zfit" aria-label="Whole board">⤢</button>
+          <button type="button" class="btn" id="zexp" aria-label="Expand" aria-pressed="false">⛶</button>
+        </div>
+        <span class="scale" id="scale"></span>
+      </div>
+      <p class="hint" id="status">Routed by Freerouting after the BGA breakout and plane vias were laid by script: {{NTRACKS}} track segments, {{NVIAS}} vias. KiCad's design check finds no errors.</p>
+    </div>
+    <aside class="info" id="info" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section aria-labelledby="h-how">
+  <div class="shead">
+    <h2 id="h-how">How it works</h2>
+    <p>Everything in the blue box is logic in the FPGA. The rest are the parts an FPGA needs round it, plus the connectors.</p>
+  </div>
+
+  <figure class="figure diagram">
+    <svg class="dg" viewBox="0 0 760 360" role="img" aria-label="Block diagram: inside the FPGA, the COMP80 machine (Z80, 64 KB, ports, keyboard latch) feeds the display and HDMI logic and talks to the system controller, a PicoRV32 RISC-V processor that reads the microSD card and models the MM57109. A USB host core reads the keyboard. Outside: a 100 MHz oscillator, the configuration flash, three regulators, and the HDMI, USB-A, microSD and USB-C connectors.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker></defs>
+      <rect class="mcu" x="190" y="20" width="390" height="320" rx="8"/>
+      <text x="385" y="44">XC7A100T · U1</text>
+      <rect x="210" y="60" width="200" height="110" rx="5"/><text x="310" y="84">COMP80 machine</text>
+      <text class="s" x="310" y="104">Z80 (TV80) · 64 KB</text><text class="s" x="310" y="120">ports 00 01 03 20 60</text><text class="s" x="310" y="136">key latch → NMI</text><text class="s" x="310" y="152">INT ← MM57109</text>
+      <rect x="430" y="60" width="130" height="110" rx="5"/><text x="495" y="84">Display</text>
+      <text class="s" x="495" y="104">64 × 32 → 640 × 480</text><text class="s" x="495" y="120">TMDS encoders</text><text class="s" x="495" y="136">OSERDES 10:1</text>
+      <rect x="210" y="190" width="200" height="130" rx="5"/><text x="310" y="214">System controller</text>
+      <text class="s" x="310" y="234">PicoRV32 RISC-V · 128 KB</text><text class="s" x="310" y="250">MM57109 model · tapes</text><text class="s" x="310" y="266">microSD (FatFs) · menu</text><text class="s" x="310" y="282">keys from USB reports</text>
+      <rect x="430" y="190" width="130" height="62" rx="5"/><text x="495" y="214">USB host</text><text class="s" x="495" y="232">usb_hid_host · 12 MHz</text>
+      <rect x="430" y="268" width="130" height="52" rx="5"/><text x="495" y="291">Clocks</text><text class="s" x="495" y="307">PLL + MMCM</text>
+      <path class="ar" d="M410 115H428"/><path d="M310 170V188"/><path d="M430 221H410"/>
+      <rect x="610" y="40" width="130" height="50" rx="6"/><text x="675" y="62">HDMI · J2</text><text class="s" x="675" y="78">TMDS_33</text>
+      <rect x="610" y="190" width="130" height="50" rx="6"/><text x="675" y="212">USB-A · J3</text><text class="s" x="675" y="228">keyboard</text>
+      <rect x="610" y="260" width="130" height="50" rx="6"/><text x="675" y="282">microSD · J4</text><text class="s" x="675" y="298">SPI</text>
+      <path class="ar" d="M560 100H580V65H608"/><path d="M560 215H608"/><path d="M410 300H590V285H608"/>
+      <rect x="20" y="40" width="140" height="50" rx="6"/><text x="90" y="62">100 MHz · X1</text><text class="s" x="90" y="78">oscillator</text>
+      <rect x="20" y="120" width="140" height="50" rx="6"/><text x="90" y="142">Flash · U2</text><text class="s" x="90" y="158">16 MB, configuration</text>
+      <rect x="20" y="200" width="140" height="60" rx="6"/><text x="90" y="222">Regulators · U3–U5</text><text class="s" x="90" y="240">1.0 · 1.8 · 3.3 V</text>
+      <rect x="20" y="285" width="140" height="50" rx="6"/><text x="90" y="307">USB-C · J1</text><text class="s" x="90" y="323">5 V in</text>
+      <path class="ar" d="M160 65H188"/><path d="M160 145H188"/><path class="ar" d="M160 230H188"/><path class="ar" d="M90 285V262"/>
+    </svg>
+    <figcaption>The COMP80 machine is the part that matters: the ROMs see a Z80, its memory and its ports, as they were.</figcaption>
+  </figure>
+
+  <div class="circuits">
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">rtl/comp80_machine.v</span>
+      <h3>The COMP80 in logic</h3>
+      <p>The Z80 is TV80, a Verilog Z80 that follows the original's cycle timing, with a clock enable added so it can run inside the FPGA's 50 MHz clock domain. A phase accumulator gives it exactly 2 million T-states a second, the real machine's clock, or 4 million to match MAME and the web emulator.</p>
+      <p>Around it is the memory map the ROMs expect, the same as the emulators'. That's the ROM and RAM in 0000–1FFF, nothing in 2000–7FFF, and the 2 KB screen at 8000 mirrored up to FFFF, or the 32 KB expansion in its place. The ports decode as the emulators decode them. A key latches for IN 01 and pulls NMI low, as the 1979 keyboard did. The MM57109's interrupt is latched until the Z80 acknowledges it.</p>
+      <p>The MM57109 is the one part that waits on software. An OUT 60 stalls the Z80 with WAIT until the system controller has passed the instruction to its model of the chip. So an IN 03 straight afterwards reads exactly what the real chip would have shown.</p>
+    </div>
+    <div class="side">
+      <table class="table2">
+        <thead><tr><th>Address</th><th>What</th></tr></thead>
+        <tbody>
+          <tr><td>0000–0BFF</td><td>ROM image, from the card; Z80 writes ignored</td></tr>
+          <tr><td>0C00–1FFF</td><td>RAM</td></tr>
+          <tr><td>2000–7FFF</td><td>nothing: reads 0</td></tr>
+          <tr><td>8000–87FF</td><td>screen, mirrored to FFFF, or 32 KB RAM</td></tr>
+          <tr><td>IN 00 / OUT 20</td><td>tape level</td></tr>
+          <tr><td>IN 01</td><td>keyboard latch</td></tr>
+          <tr><td>OUT 60 / IN 03</td><td>MM57109 instruction / status</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">rtl/video.v, rtl/hdmi_out.v</span>
+      <h3>The display</h3>
+      <p>The display keeps its own copy of the screen, written through as the Z80 writes 8000–87FF, so it never has to share the Z80's memory. It draws the 64 × 32 characters in 640 × 480 at 60 Hz, each 6 × 10 cell as 10 × 15 pixels, exactly as v2 does. The two character sets, letters and the 64 graphics blocks, are the MAME driver's, in a block RAM.</p>
+      <p>Three TMDS encoders turn each pixel into 10-bit symbols, and the Artix-7's serialisers (OSERDESE2, 10:1 at 125 MHz double data rate) send them out on TMDS_33 outputs, straight into the HDMI socket. The pictures are frames from the simulation, made from real COMP80 screens.</p>
+    </div>
+    <div class="side">
+      <div class="frames">
+        <figure><img src="{{FRAME_BURP}}" alt="A simulated frame: BURP's table of logarithms, 1 to 25, in green characters on black" loading="lazy"><figcaption>BURP printing logarithms, through the logic.</figcaption></figure>
+        <figure><img src="{{FRAME_LIFE}}" alt="A simulated frame: the Game of Life drawn in green graphics blocks" loading="lazy"><figcaption>Life's graphics blocks.</figcaption></figure>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">rtl/soc.v, firmware/</span>
+      <h3>The system controller</h3>
+      <p>A PicoRV32, a small RISC-V processor, runs from 128 KB of block RAM loaded with its program when the FPGA configures. It does what the COMP80 never had to: it reads ROM images and tapes from the card, draws the set-up screen, and turns USB keyboard reports into COMP80 key codes.</p>
+      <p>It also plays the MM57109 and the cassette, with the same C code as v2: <code>mm57109.c</code>, the chip as the MAME driver models it, and <code>tape.c</code>, WAV files played into IN 00 and recorded from OUT 20. Both are timed by the Z80's own T-state count, which the logic keeps. The keys are v2's: F1 for set-up, F2 for tapes, F12 to power on again, Esc for RESET.</p>
+      <p>The keyboard comes through usb_hid_host, a USB host built entirely in logic. It talks to low-speed keyboards, which most are, without a processor.</p>
+    </div>
+    <div class="side">
+      <table class="table2">
+        <thead><tr><th>Address</th><th>For the firmware</th></tr></thead>
+        <tbody>
+          <tr><td>0000_0000</td><td>RAM, 128 KB</td></tr>
+          <tr><td>1000_0000</td><td>serial console</td></tr>
+          <tr><td>2000_0000</td><td>the machine's registers</td></tr>
+          <tr><td>3000_0000</td><td>the Z80's 64 KB</td></tr>
+          <tr><td>4000_0000</td><td>the set-up screen</td></tr>
+          <tr><td>5000_0000</td><td>SPI to the card</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">U1, U2, X1, J5</span>
+      <h3>The FPGA and its configuration</h3>
+      <p>The <button class="pl" data-ref="U1">XC7A100T</button> comes in a 484-ball BGA at 1 mm pitch; this design uses 208 of the balls. At power-on it loads its configuration from the 16 MB SPI flash <button class="pl" data-ref="U2">U2</button> in Master SPI mode (M0 high, M1 and M2 low). <button class="pl" data-ref="D2">DONE</button> lights when it's ready. <button class="pl" data-ref="SW2">PROG</button> makes it load again, and the JTAG header <button class="pl" data-ref="J5">J5</button> is for Vivado.</p>
+      <p>Every I/O bank runs at 3.3 V. The 100 MHz oscillator <button class="pl" data-ref="X1">X1</button> feeds a PLL (50 MHz for the system, 12 MHz for USB) and an MMCM (25 MHz pixels, 125 MHz for the serialisers).</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="fpga">Show the FPGA's parts</button>
+      <table class="table2">
+        <thead><tr><th>Ball</th><th>Use</th></tr></thead>
+        <tbody>{{IO}}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">U3–U5, J1</span>
+      <h3>Power</h3>
+      <p>The USB-C socket <button class="pl" data-ref="J1">J1</button> asks for 5 V through its CC resistors. Three TLV62569 buck regulators make the FPGA's rails: <button class="pl" data-ref="U3">1.0 V</button> for its core and block RAM, <button class="pl" data-ref="U4">1.8 V</button> for its auxiliary supply, and <button class="pl" data-ref="U5">3.3 V</button> for the I/O banks and everything else. Each rail has a plane of its own on the inner layers, and a ring of capacitors round the BGA.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="power">Show the power parts</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">J2, J3, J4</span>
+      <h3>HDMI, keyboard, card</h3>
+      <p>The HDMI socket <button class="pl" data-ref="J2">J2</button> is wired straight to four TMDS_33 output pairs in bank 16, which drive the display's 50 Ω terminations themselves. The keyboard's USB-A socket <button class="pl" data-ref="J3">J3</button> goes to two plain I/O pins with the host's 15 kΩ pull-downs. The microSD socket <button class="pl" data-ref="J4">J4</button> is in SPI mode, with pull-ups on every data line.</p>
+    </div>
+    <div class="side">
+      <button type="button" class="btn show" data-sec="video">Show the HDMI parts</button>
+    </div>
+  </div>
+
+  </div>
+</section>
+
+<section aria-labelledby="h-proof">
+  <div class="shead">
+    <h2 id="h-proof">Proving it</h2>
+    <p>No board has been made and Vivado hasn't run yet. Everything else has been checked with open-source tools.</p>
+  </div>
+  <div class="circuits">
+  <div class="block">
+    <div class="prose">
+      <ul>
+        <li><b>The machine against the C model.</b> Verilator runs the logic through LISP, FORTH and BURP test sessions. The screens come out identical to the v2 firmware's C core, which in turn matches the web emulator and MAME. BURP's calculations prove the MM57109 bridge and the WAIT on OUT 60.</li>
+        <li><b>The whole system boots.</b> With the PicoRV32 running its firmware, the simulation prints <code>COMP80 v3</code> on the serial port, loads the built-in ROM and starts the Z80. The Z80 reaches the monitor's READY prompt and halts waiting for a key.</li>
+        <li><b>The display.</b> Icarus Verilog draws frames from real screens (above), and every TMDS symbol decodes back to its pixel.</li>
+        <li><b>It fits.</b> yosys synthesises the whole design for the XC7A100T: about a sixteenth of the logic, and well over half the block RAM still free.</li>
+      </ul>
+    </div>
+    <div class="side">
+      <span class="lbl">yosys, the whole design</span>
+      <table class="table2">
+        <thead><tr><th>Resource</th><th>Used</th><th>Of</th><th></th></tr></thead>
+        <tbody>{{UTIL}}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">hardware_v3/VIVADO_TODO.md</span>
+      <h3>Still to do: Vivado</h3>
+      <p>The bitstream needs Vivado, which runs on Linux or Windows but not macOS. <code>VIVADO_TODO.md</code> lists the steps for picking this up on another machine. Fetch the outside HDL, run <code>vivado/build.tcl</code>, check timing and utilisation, then program the flash over JTAG. It also lists what to look for in the reports, and the board decisions worth checking against Xilinx's guides before ordering.</p>
+    </div>
+    <div class="side">
+      <pre class="tree">sh tools/fetch.sh
+cd vivado
+vivado -mode batch -source build.tcl</pre>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-parts">
+  <div class="shead">
+    <h2 id="h-parts">The parts</h2>
+    <p>All {{NPARTS}} parts. Click a reference to find it on the board. <code>hardware_v3/bom.csv</code> has the same list grouped for ordering.</p>
+  </div>
+  <div class="filter">
+    <input type="search" id="pfilter" placeholder="Filter: 470n, TLV, HDMI…" aria-label="Filter the parts" autocomplete="off" spellcheck="false">
+    <span class="seg" role="radiogroup" aria-label="Section" id="psec">
+      <label><input type="radio" name="psec" value="" checked><span>All</span></label>
+      <label><input type="radio" name="psec" value="fpga"><span>FPGA</span></label>
+      <label><input type="radio" name="psec" value="config"><span>Config</span></label>
+      <label><input type="radio" name="psec" value="power"><span>Power</span></label>
+      <label><input type="radio" name="psec" value="video"><span>HDMI</span></label>
+      <label><input type="radio" name="psec" value="usb"><span>Keyboard</span></label>
+      <label><input type="radio" name="psec" value="sd"><span>microSD</span></label>
+      <label><input type="radio" name="psec" value="misc"><span>Other</span></label>
+    </span>
+    <span class="count" id="pcount"></span>
+  </div>
+  <div class="tablewrap">
+    <table class="parts">
+      <thead><tr><th>Ref</th><th>Value</th><th>What it is</th><th>Section</th></tr></thead>
+      <tbody id="ptable">{{PARTS}}</tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="h-notes">
+  <div class="shead">
+    <h2 id="h-notes">What to know</h2>
+  </div>
+  <ul class="notes">
+    <li><b>Not built, and not through Vivado.</b> The design simulates, synthesises with yosys and fits, and the board passes KiCad's design check. Timing closure and the bitstream are the next step.</li>
+    <li><b>Assembly.</b> A 484-ball BGA wants a board house that assembles BGAs. The board is six layers, 0.15 mm tracks with 0.12 mm gaps, and 0.45 mm vias with 0.2 mm holes.</li>
+    <li><b>Low-speed keyboards.</b> usb_hid_host does USB low speed only, and no hubs. Nearly every keyboard is low speed.</li>
+    <li><b>Video over USB-C</b> would be possible on this FPGA. Its GTP transceivers can carry DisplayPort, and a USB-C socket can carry that in alternate mode. It would take a DisplayPort transmitter in the logic, a USB Power Delivery controller to agree the mode, and a switch for the cable's orientation. None of that is here.</li>
+    <li><b>Not carried over:</b> the teleprinter port, the floppy disc and real cassettes, as on v2.</li>
+  </ul>
+</section>
+
+<footer>The design is in the repository's <code>hardware_v3/</code> folder. The logic is in <code>rtl/</code> and the system controller's firmware in <code>firmware/</code>. The simulations are in <code>sim/</code>, and <code>tools/design.py</code> holds the board's parts and connections and writes the pin constraints. This page is made by <code>tools/make_page.py</code>.</footer>
+</div>
+
+{{SCRIPT}}

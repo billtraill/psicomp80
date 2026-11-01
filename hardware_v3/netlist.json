@@ -1,0 +1,3130 @@
+{
+ "board": {
+  "width": 100.0,
+  "height": 72.0,
+  "layers": 6
+ },
+ "parts": {
+  "U1": {
+   "value": "XC7A100T-1FGG484C",
+   "footprint": "Package_BGA:Xilinx_FGG484",
+   "part": "AMD XC7A100T-1FGG484C",
+   "description": "FPGA: 101,440 logic cells, 4,860 Kb of block RAM. The whole COMP80 is in here",
+   "pins": {
+    "A10": "GND",
+    "A11": "GND",
+    "A12": "GND",
+    "A2": "GND",
+    "A22": "GND",
+    "A3": "GND",
+    "A5": "GND",
+    "A7": "GND",
+    "A8": "GND",
+    "A9": "GND",
+    "AA12": "GND",
+    "AA2": "GND",
+    "AA22": "GND",
+    "AB19": "GND",
+    "AB9": "GND",
+    "B10": "GND",
+    "B11": "GND",
+    "B12": "GND",
+    "B19": "GND",
+    "B3": "GND",
+    "B5": "GND",
+    "B7": "GND",
+    "B8": "GND",
+    "B9": "GND",
+    "C10": "GND",
+    "C11": "GND",
+    "C12": "GND",
+    "C16": "GND",
+    "C3": "GND",
+    "C4": "GND",
+    "C6": "GND",
+    "C8": "GND",
+    "C9": "GND",
+    "D10": "GND",
+    "D11": "GND",
+    "D12": "GND",
+    "D13": "GND",
+    "D3": "GND",
+    "D4": "GND",
+    "D6": "GND",
+    "D8": "GND",
+    "D9": "GND",
+    "E11": "GND",
+    "E12": "GND",
+    "E20": "GND",
+    "E4": "GND",
+    "E5": "GND",
+    "E7": "GND",
+    "E8": "GND",
+    "E9": "GND",
+    "F11": "GND",
+    "F17": "GND",
+    "F5": "GND",
+    "F7": "GND",
+    "F9": "GND",
+    "G10": "GND",
+    "G12": "GND",
+    "G14": "GND",
+    "G5": "GND",
+    "G6": "GND",
+    "G7": "GND",
+    "G8": "GND",
+    "G9": "GND",
+    "H1": "GND",
+    "H11": "GND",
+    "H21": "GND",
+    "H7": "GND",
+    "H9": "GND",
+    "J10": "GND",
+    "J12": "GND",
+    "J18": "GND",
+    "J8": "GND",
+    "K11": "GND",
+    "K15": "GND",
+    "K5": "GND",
+    "K7": "GND",
+    "K9": "GND",
+    "L10": "GND",
+    "L2": "GND",
+    "L22": "GND",
+    "L8": "GND",
+    "L9": "GND",
+    "M10": "GND",
+    "M11": "GND",
+    "M19": "GND",
+    "M7": "GND",
+    "M9": "GND",
+    "N16": "GND",
+    "N6": "GND",
+    "N8": "GND",
+    "P11": "GND",
+    "P13": "GND",
+    "P3": "GND",
+    "P7": "GND",
+    "P9": "GND",
+    "R10": "GND",
+    "R12": "GND",
+    "R20": "GND",
+    "R8": "GND",
+    "T11": "GND",
+    "T17": "GND",
+    "T7": "GND",
+    "T9": "GND",
+    "U10": "GND",
+    "U14": "GND",
+    "U4": "GND",
+    "U9": "GND",
+    "V1": "GND",
+    "V11": "GND",
+    "V21": "GND",
+    "W18": "GND",
+    "W8": "GND",
+    "Y15": "GND",
+    "Y5": "GND",
+    "A13": "TMDS_D0P",
+    "A14": "TMDS_D0N",
+    "A15": "TMDS_D1P",
+    "A16": "TMDS_D1N",
+    "A17": "+3V3",
+    "AA17": "+3V3",
+    "AA7": "+3V3",
+    "AB14": "+3V3",
+    "AB4": "+3V3",
+    "B14": "+3V3",
+    "C1": "+3V3",
+    "C21": "+3V3",
+    "D18": "+3V3",
+    "E15": "+3V3",
+    "F12": "+3V3",
+    "F2": "+3V3",
+    "F22": "+3V3",
+    "G19": "+3V3",
+    "H16": "+3V3",
+    "H6": "+3V3",
+    "J13": "+3V3",
+    "J3": "+3V3",
+    "K20": "+3V3",
+    "L17": "+3V3",
+    "M14": "+3V3",
+    "M4": "+3V3",
+    "N1": "+3V3",
+    "N21": "+3V3",
+    "P18": "+3V3",
+    "R15": "+3V3",
+    "R5": "+3V3",
+    "T12": "+3V3",
+    "T2": "+3V3",
+    "T22": "+3V3",
+    "U11": "+3V3",
+    "U19": "+3V3",
+    "U8": "+3V3",
+    "V16": "+3V3",
+    "V6": "+3V3",
+    "W13": "+3V3",
+    "W3": "+3V3",
+    "Y10": "+3V3",
+    "Y20": "+3V3",
+    "A18": "TMDS_CKP",
+    "A19": "TMDS_CKN",
+    "A20": "USBH_DM",
+    "AB10": "UART_TX",
+    "AB11": "HALT_LED",
+    "AB12": "RESET_N",
+    "B15": "TMDS_D2P",
+    "B16": "TMDS_D2N",
+    "B17": "CLK100",
+    "B20": "USBH_DP",
+    "G11": "DONE",
+    "H10": "+1V0",
+    "H8": "+1V0",
+    "J11": "+1V0",
+    "J7": "+1V0",
+    "J9": "+1V0",
+    "K8": "+1V0",
+    "L11": "+1V0",
+    "L7": "+1V0",
+    "M8": "+1V0",
+    "N11": "+1V0",
+    "N7": "+1V0",
+    "P10": "+1V0",
+    "P8": "+1V0",
+    "R7": "+1V0",
+    "R9": "+1V0",
+    "T10": "+1V0",
+    "T8": "+1V0",
+    "H12": "+1V8",
+    "K10": "+1V8",
+    "K12": "+1V8",
+    "M12": "+1V8",
+    "P12": "+1V8",
+    "R11": "+1V8",
+    "H22": "SD_MOSI",
+    "J22": "SD_SCK",
+    "K22": "SD_MISO",
+    "L12": "FLASH_SCK",
+    "M22": "SD_CS",
+    "N12": "PROGRAM_B",
+    "P21": "FLASH_IO2",
+    "P22": "FLASH_IO0",
+    "R13": "TDI",
+    "R21": "FLASH_IO3",
+    "R22": "FLASH_IO1",
+    "T13": "TMS",
+    "T19": "FLASH_CS",
+    "U12": "INIT_B",
+    "U13": "TDO",
+    "U22": "PUDC_B",
+    "V12": "TCK"
+   }
+  },
+  "U2": {
+   "value": "IS25LP128F",
+   "footprint": "Package_SO:SOIC-8_5.3x5.3mm_P1.27mm",
+   "part": "ISSI IS25LP128F-JBLE",
+   "description": "16 MB SPI flash: the FPGA's configuration and the soft processor's program",
+   "pins": {
+    "4": "GND",
+    "8": "+3V3",
+    "6": "FLASH_SCK",
+    "3": "FLASH_IO2",
+    "5": "FLASH_IO0",
+    "7": "FLASH_IO3",
+    "2": "FLASH_IO1",
+    "1": "FLASH_CS"
+   }
+  },
+  "U3": {
+   "value": "TLV62569DBV",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TLV62569DBVR",
+   "description": "2 A buck regulator: 1.0 V for the FPGA's core and block RAM",
+   "pins": {
+    "2": "GND",
+    "1": "+5V",
+    "4": "+5V",
+    "3": "SW_1V0",
+    "5": "FB_1V0"
+   }
+  },
+  "U4": {
+   "value": "TLV62569DBV",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TLV62569DBVR",
+   "description": "2 A buck regulator: 1.8 V for the FPGA's auxiliary supply",
+   "pins": {
+    "2": "GND",
+    "1": "+5V",
+    "4": "+5V",
+    "3": "SW_1V8",
+    "5": "FB_1V8"
+   }
+  },
+  "U5": {
+   "value": "TLV62569DBV",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TLV62569DBVR",
+   "description": "2 A buck regulator: 3.3 V for the I/O banks and everything else",
+   "pins": {
+    "2": "GND",
+    "1": "+5V",
+    "4": "+5V",
+    "3": "SW_3V3",
+    "5": "FB_3V3"
+   }
+  },
+  "L1": {
+   "value": "2.2uH",
+   "footprint": "Inductor_SMD:L_1008_2520Metric",
+   "part": "Murata DFE252012F-2R2M",
+   "description": "Inductor for the 1.0 V regulator",
+   "pins": {
+    "2": "+1V0",
+    "1": "SW_1V0"
+   }
+  },
+  "L2": {
+   "value": "2.2uH",
+   "footprint": "Inductor_SMD:L_1008_2520Metric",
+   "part": "Murata DFE252012F-2R2M",
+   "description": "Inductor for the 1.8 V regulator",
+   "pins": {
+    "2": "+1V8",
+    "1": "SW_1V8"
+   }
+  },
+  "L3": {
+   "value": "2.2uH",
+   "footprint": "Inductor_SMD:L_1008_2520Metric",
+   "part": "Murata DFE252012F-2R2M",
+   "description": "Inductor for the 3.3 V regulator",
+   "pins": {
+    "2": "+3V3",
+    "1": "SW_3V3"
+   }
+  },
+  "X1": {
+   "value": "100MHz",
+   "footprint": "Oscillator:Oscillator_SMD_ECS_2520MV-xxx-xx-4Pin_2.5x2.0mm",
+   "part": "ECS-2520MV-1000-BN-TR",
+   "description": "100 MHz oscillator: the FPGA's clock",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3",
+    "4": "+3V3",
+    "3": "CLK100"
+   }
+  },
+  "J1": {
+   "value": "USB-C",
+   "footprint": "Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
+   "part": "GCT USB4105-GF-A",
+   "description": "Power in, 5 V",
+   "pins": {
+    "A1": "GND",
+    "B1": "GND",
+    "A12": "GND",
+    "B12": "GND",
+    "SH": "GND",
+    "A4": "+5V",
+    "B4": "+5V",
+    "A9": "+5V",
+    "B9": "+5V",
+    "A5": "USBC_CC1",
+    "B5": "USBC_CC2"
+   }
+  },
+  "J2": {
+   "value": "HDMI",
+   "footprint": "Connector_Video:HDMI_A_Molex_208658-1001_Horizontal",
+   "part": "Molex 208658-1001",
+   "description": "HDMI type A socket: the display",
+   "pins": {
+    "2": "GND",
+    "5": "GND",
+    "8": "GND",
+    "11": "GND",
+    "17": "GND",
+    "SH": "GND",
+    "7": "TMDS_D0P",
+    "9": "TMDS_D0N",
+    "4": "TMDS_D1P",
+    "6": "TMDS_D1N",
+    "10": "TMDS_CKP",
+    "12": "TMDS_CKN",
+    "1": "TMDS_D2P",
+    "3": "TMDS_D2N",
+    "18": "HDMI_5V"
+   }
+  },
+  "J3": {
+   "value": "USB-A",
+   "footprint": "Connector_USB:USB_A_Wuerth_614004134726_Horizontal",
+   "part": "Wurth 614004134726",
+   "description": "USB-A socket for the keyboard",
+   "pins": {
+    "4": "GND",
+    "SH": "GND",
+    "2": "USBH_DM",
+    "3": "USBH_DP",
+    "1": "USBH_VBUS"
+   }
+  },
+  "J4": {
+   "value": "microSD",
+   "footprint": "Connector_Card:microSD_HC_Hirose_DM3AT-SF-PEJM5",
+   "part": "Hirose DM3AT-SF-PEJM5",
+   "description": "microSD socket: ROM images and tapes",
+   "pins": {
+    "6": "GND",
+    "SH": "GND",
+    "4": "+3V3",
+    "3": "SD_MOSI",
+    "5": "SD_SCK",
+    "7": "SD_MISO",
+    "2": "SD_CS",
+    "8": "SD_DAT1",
+    "1": "SD_DAT2"
+   }
+  },
+  "J5": {
+   "value": "JTAG",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical",
+   "part": "0.1 in header, 6 way",
+   "description": "JTAG for Vivado: VREF, GND, TCK, TDO, TDI, TMS, the order of Digilent's 6-pin cables",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3",
+    "5": "TDI",
+    "6": "TMS",
+    "4": "TDO",
+    "3": "TCK"
+   }
+  },
+  "J6": {
+   "value": "SERIAL",
+   "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+   "part": "0.1 in header, 2 way",
+   "description": "The soft processor's serial console out (115200 baud) and ground",
+   "pins": {
+    "2": "GND",
+    "1": "UART_TX"
+   }
+  },
+  "SW1": {
+   "value": "RESET",
+   "footprint": "Button_Switch_SMD:SW_SPST_B3S-1000",
+   "part": "Omron B3S-1000",
+   "description": "Powers the COMP80 on again (the logic, not the FPGA)",
+   "pins": {
+    "2": "GND",
+    "1": "RESET_N"
+   }
+  },
+  "SW2": {
+   "value": "PROG",
+   "footprint": "Button_Switch_SMD:SW_SPST_B3S-1000",
+   "part": "Omron B3S-1000",
+   "description": "Pulls PROGRAM_B: the FPGA reloads itself from the flash",
+   "pins": {
+    "2": "GND",
+    "1": "PROGRAM_B"
+   }
+  },
+  "D1": {
+   "value": "HALT",
+   "footprint": "LED_SMD:LED_0805_2012Metric",
+   "part": "red LED, 0805",
+   "description": "Lit while the Z80 is halted, as the original's HALT LED",
+   "pins": {
+    "1": "GND",
+    "2": "HALT_LED_A"
+   }
+  },
+  "D2": {
+   "value": "DONE",
+   "footprint": "LED_SMD:LED_0805_2012Metric",
+   "part": "green LED, 0805",
+   "description": "Lit once the FPGA has loaded its configuration",
+   "pins": {
+    "1": "GND",
+    "2": "DONE_LED"
+   }
+  },
+  "D3": {
+   "value": "BAT54J",
+   "footprint": "Diode_SMD:D_SOD-323F",
+   "part": "Nexperia BAT54J",
+   "description": "Feeds the HDMI +5 V pin",
+   "pins": {
+    "2": "+5V",
+    "1": "HDMI_5V"
+   }
+  },
+  "F1": {
+   "value": "500mA",
+   "footprint": "Fuse:Fuse_1206_3216Metric",
+   "part": "Bourns MF-MSMF050-2",
+   "description": "Resettable fuse for the keyboard's 5 V",
+   "pins": {
+    "1": "+5V",
+    "2": "USBH_VBUS"
+   }
+  },
+  "H1": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H2": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H3": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "H4": {
+   "value": "M2.5",
+   "footprint": "MountingHole:MountingHole_2.7mm_M2.5",
+   "part": "",
+   "description": "Mounting hole",
+   "pins": {}
+  },
+  "R1": {
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB-C CC1: asks the supply for 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBC_CC1"
+   }
+  },
+  "R2": {
+   "value": "5.1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "USB-C CC2: asks the supply for 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBC_CC2"
+   }
+  },
+  "R3": {
+   "value": "200k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "1.0 V regulator feedback, top",
+   "pins": {
+    "1": "+1V0",
+    "2": "FB_1V0"
+   }
+  },
+  "R4": {
+   "value": "301k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "1.0 V regulator feedback, bottom",
+   "pins": {
+    "2": "GND",
+    "1": "FB_1V0"
+   }
+  },
+  "R5": {
+   "value": "200k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "1.8 V regulator feedback, top",
+   "pins": {
+    "1": "+1V8",
+    "2": "FB_1V8"
+   }
+  },
+  "R6": {
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "1.8 V regulator feedback, bottom",
+   "pins": {
+    "2": "GND",
+    "1": "FB_1V8"
+   }
+  },
+  "R7": {
+   "value": "453k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "3.3 V regulator feedback, top",
+   "pins": {
+    "1": "+3V3",
+    "2": "FB_3V3"
+   }
+  },
+  "R8": {
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "3.3 V regulator feedback, bottom",
+   "pins": {
+    "2": "GND",
+    "1": "FB_3V3"
+   }
+  },
+  "R9": {
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "PROGRAM_B pull-up",
+   "pins": {
+    "2": "+3V3",
+    "1": "PROGRAM_B"
+   }
+  },
+  "R10": {
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "INIT_B pull-up",
+   "pins": {
+    "2": "+3V3",
+    "1": "INIT_B"
+   }
+  },
+  "R11": {
+   "value": "330R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "DONE pull-up",
+   "pins": {
+    "2": "+3V3",
+    "1": "DONE"
+   }
+  },
+  "R12": {
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "DONE LED current",
+   "pins": {
+    "1": "DONE",
+    "2": "DONE_LED"
+   }
+  },
+  "R13": {
+   "value": "1k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "PUDC_B to 3.3 V: I/O pull-ups off while configuring",
+   "pins": {
+    "2": "+3V3",
+    "1": "PUDC_B"
+   }
+  },
+  "R14": {
+   "value": "330R",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "HALT LED current",
+   "pins": {
+    "1": "HALT_LED",
+    "2": "HALT_LED_A"
+   }
+  },
+  "R15": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "RESET button pull-up",
+   "pins": {
+    "2": "+3V3",
+    "1": "RESET_N"
+   }
+  },
+  "R16": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT0 pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_MISO"
+   }
+  },
+  "R17": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT3/CS pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_CS"
+   }
+  },
+  "R18": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD CMD pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_MOSI"
+   }
+  },
+  "R19": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT1 pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_DAT1"
+   }
+  },
+  "R20": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "microSD DAT2 pull-up",
+   "pins": {
+    "1": "+3V3",
+    "2": "SD_DAT2"
+   }
+  },
+  "R21": {
+   "value": "15k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D+ pull-down (host side)",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_DP"
+   }
+  },
+  "R22": {
+   "value": "15k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Keyboard USB D- pull-down (host side)",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_DM"
+   }
+  },
+  "R23": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Flash chip select pull-up",
+   "pins": {
+    "2": "+3V3",
+    "1": "FLASH_CS"
+   }
+  },
+  "C1": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "1.0 V regulator input",
+   "pins": {
+    "2": "GND",
+    "1": "+5V"
+   }
+  },
+  "C2": {
+   "value": "22u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "1.0 V regulator output",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C3": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "1.8 V regulator input",
+   "pins": {
+    "2": "GND",
+    "1": "+5V"
+   }
+  },
+  "C4": {
+   "value": "22u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "1.8 V regulator output",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C5": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "3.3 V regulator input",
+   "pins": {
+    "2": "GND",
+    "1": "+5V"
+   }
+  },
+  "C6": {
+   "value": "22u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "3.3 V regulator output",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C7": {
+   "value": "100u",
+   "footprint": "Capacitor_SMD:C_1210_3225Metric",
+   "part": "",
+   "description": "FPGA core supply (VCCINT, VCCBRAM) bulk",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C8": {
+   "value": "47u",
+   "footprint": "Capacitor_SMD:C_1210_3225Metric",
+   "part": "",
+   "description": "FPGA auxiliary supply (VCCAUX) bulk",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C9": {
+   "value": "47u",
+   "footprint": "Capacitor_SMD:C_1210_3225Metric",
+   "part": "",
+   "description": "I/O supply (VCCO) bulk",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C10": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Oscillator decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C11": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "Flash decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C12": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "microSD supply",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C13": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "microSD decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C14": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "Keyboard 5 V",
+   "pins": {
+    "2": "GND",
+    "1": "USBH_VBUS"
+   }
+  },
+  "C15": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "USB-C 5 V in",
+   "pins": {
+    "2": "GND",
+    "1": "+5V"
+   }
+  },
+  "C16": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C17": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C18": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C19": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C20": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C21": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C22": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C23": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C24": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C25": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C26": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA core (VCCINT, VCCBRAM) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0"
+   }
+  },
+  "C27": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C28": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C29": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C30": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C31": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C32": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA auxiliary (VCCAUX) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V8"
+   }
+  },
+  "C33": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C34": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C35": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C36": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C37": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C38": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C39": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C40": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C41": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C42": {
+   "value": "470n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C43": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C44": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FPGA I/O (VCCO) decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  }
+ },
+ "nets": {
+  "GND": [
+   [
+    "C1",
+    "2"
+   ],
+   [
+    "C10",
+    "2"
+   ],
+   [
+    "C11",
+    "2"
+   ],
+   [
+    "C12",
+    "2"
+   ],
+   [
+    "C13",
+    "2"
+   ],
+   [
+    "C14",
+    "2"
+   ],
+   [
+    "C15",
+    "2"
+   ],
+   [
+    "C16",
+    "2"
+   ],
+   [
+    "C17",
+    "2"
+   ],
+   [
+    "C18",
+    "2"
+   ],
+   [
+    "C19",
+    "2"
+   ],
+   [
+    "C2",
+    "2"
+   ],
+   [
+    "C20",
+    "2"
+   ],
+   [
+    "C21",
+    "2"
+   ],
+   [
+    "C22",
+    "2"
+   ],
+   [
+    "C23",
+    "2"
+   ],
+   [
+    "C24",
+    "2"
+   ],
+   [
+    "C25",
+    "2"
+   ],
+   [
+    "C26",
+    "2"
+   ],
+   [
+    "C27",
+    "2"
+   ],
+   [
+    "C28",
+    "2"
+   ],
+   [
+    "C29",
+    "2"
+   ],
+   [
+    "C3",
+    "2"
+   ],
+   [
+    "C30",
+    "2"
+   ],
+   [
+    "C31",
+    "2"
+   ],
+   [
+    "C32",
+    "2"
+   ],
+   [
+    "C33",
+    "2"
+   ],
+   [
+    "C34",
+    "2"
+   ],
+   [
+    "C35",
+    "2"
+   ],
+   [
+    "C36",
+    "2"
+   ],
+   [
+    "C37",
+    "2"
+   ],
+   [
+    "C38",
+    "2"
+   ],
+   [
+    "C39",
+    "2"
+   ],
+   [
+    "C4",
+    "2"
+   ],
+   [
+    "C40",
+    "2"
+   ],
+   [
+    "C41",
+    "2"
+   ],
+   [
+    "C42",
+    "2"
+   ],
+   [
+    "C43",
+    "2"
+   ],
+   [
+    "C44",
+    "2"
+   ],
+   [
+    "C5",
+    "2"
+   ],
+   [
+    "C6",
+    "2"
+   ],
+   [
+    "C7",
+    "2"
+   ],
+   [
+    "C8",
+    "2"
+   ],
+   [
+    "C9",
+    "2"
+   ],
+   [
+    "D1",
+    "1"
+   ],
+   [
+    "D2",
+    "1"
+   ],
+   [
+    "J1",
+    "A1"
+   ],
+   [
+    "J1",
+    "A12"
+   ],
+   [
+    "J1",
+    "B1"
+   ],
+   [
+    "J1",
+    "B12"
+   ],
+   [
+    "J1",
+    "SH"
+   ],
+   [
+    "J2",
+    "11"
+   ],
+   [
+    "J2",
+    "17"
+   ],
+   [
+    "J2",
+    "2"
+   ],
+   [
+    "J2",
+    "5"
+   ],
+   [
+    "J2",
+    "8"
+   ],
+   [
+    "J2",
+    "SH"
+   ],
+   [
+    "J3",
+    "4"
+   ],
+   [
+    "J3",
+    "SH"
+   ],
+   [
+    "J4",
+    "6"
+   ],
+   [
+    "J4",
+    "SH"
+   ],
+   [
+    "J5",
+    "2"
+   ],
+   [
+    "J6",
+    "2"
+   ],
+   [
+    "R1",
+    "2"
+   ],
+   [
+    "R2",
+    "2"
+   ],
+   [
+    "R21",
+    "2"
+   ],
+   [
+    "R22",
+    "2"
+   ],
+   [
+    "R4",
+    "2"
+   ],
+   [
+    "R6",
+    "2"
+   ],
+   [
+    "R8",
+    "2"
+   ],
+   [
+    "SW1",
+    "2"
+   ],
+   [
+    "SW2",
+    "2"
+   ],
+   [
+    "U1",
+    "A10"
+   ],
+   [
+    "U1",
+    "A11"
+   ],
+   [
+    "U1",
+    "A12"
+   ],
+   [
+    "U1",
+    "A2"
+   ],
+   [
+    "U1",
+    "A22"
+   ],
+   [
+    "U1",
+    "A3"
+   ],
+   [
+    "U1",
+    "A5"
+   ],
+   [
+    "U1",
+    "A7"
+   ],
+   [
+    "U1",
+    "A8"
+   ],
+   [
+    "U1",
+    "A9"
+   ],
+   [
+    "U1",
+    "AA12"
+   ],
+   [
+    "U1",
+    "AA2"
+   ],
+   [
+    "U1",
+    "AA22"
+   ],
+   [
+    "U1",
+    "AB19"
+   ],
+   [
+    "U1",
+    "AB9"
+   ],
+   [
+    "U1",
+    "B10"
+   ],
+   [
+    "U1",
+    "B11"
+   ],
+   [
+    "U1",
+    "B12"
+   ],
+   [
+    "U1",
+    "B19"
+   ],
+   [
+    "U1",
+    "B3"
+   ],
+   [
+    "U1",
+    "B5"
+   ],
+   [
+    "U1",
+    "B7"
+   ],
+   [
+    "U1",
+    "B8"
+   ],
+   [
+    "U1",
+    "B9"
+   ],
+   [
+    "U1",
+    "C10"
+   ],
+   [
+    "U1",
+    "C11"
+   ],
+   [
+    "U1",
+    "C12"
+   ],
+   [
+    "U1",
+    "C16"
+   ],
+   [
+    "U1",
+    "C3"
+   ],
+   [
+    "U1",
+    "C4"
+   ],
+   [
+    "U1",
+    "C6"
+   ],
+   [
+    "U1",
+    "C8"
+   ],
+   [
+    "U1",
+    "C9"
+   ],
+   [
+    "U1",
+    "D10"
+   ],
+   [
+    "U1",
+    "D11"
+   ],
+   [
+    "U1",
+    "D12"
+   ],
+   [
+    "U1",
+    "D13"
+   ],
+   [
+    "U1",
+    "D3"
+   ],
+   [
+    "U1",
+    "D4"
+   ],
+   [
+    "U1",
+    "D6"
+   ],
+   [
+    "U1",
+    "D8"
+   ],
+   [
+    "U1",
+    "D9"
+   ],
+   [
+    "U1",
+    "E11"
+   ],
+   [
+    "U1",
+    "E12"
+   ],
+   [
+    "U1",
+    "E20"
+   ],
+   [
+    "U1",
+    "E4"
+   ],
+   [
+    "U1",
+    "E5"
+   ],
+   [
+    "U1",
+    "E7"
+   ],
+   [
+    "U1",
+    "E8"
+   ],
+   [
+    "U1",
+    "E9"
+   ],
+   [
+    "U1",
+    "F11"
+   ],
+   [
+    "U1",
+    "F17"
+   ],
+   [
+    "U1",
+    "F5"
+   ],
+   [
+    "U1",
+    "F7"
+   ],
+   [
+    "U1",
+    "F9"
+   ],
+   [
+    "U1",
+    "G10"
+   ],
+   [
+    "U1",
+    "G12"
+   ],
+   [
+    "U1",
+    "G14"
+   ],
+   [
+    "U1",
+    "G5"
+   ],
+   [
+    "U1",
+    "G6"
+   ],
+   [
+    "U1",
+    "G7"
+   ],
+   [
+    "U1",
+    "G8"
+   ],
+   [
+    "U1",
+    "G9"
+   ],
+   [
+    "U1",
+    "H1"
+   ],
+   [
+    "U1",
+    "H11"
+   ],
+   [
+    "U1",
+    "H21"
+   ],
+   [
+    "U1",
+    "H7"
+   ],
+   [
+    "U1",
+    "H9"
+   ],
+   [
+    "U1",
+    "J10"
+   ],
+   [
+    "U1",
+    "J12"
+   ],
+   [
+    "U1",
+    "J18"
+   ],
+   [
+    "U1",
+    "J8"
+   ],
+   [
+    "U1",
+    "K11"
+   ],
+   [
+    "U1",
+    "K15"
+   ],
+   [
+    "U1",
+    "K5"
+   ],
+   [
+    "U1",
+    "K7"
+   ],
+   [
+    "U1",
+    "K9"
+   ],
+   [
+    "U1",
+    "L10"
+   ],
+   [
+    "U1",
+    "L2"
+   ],
+   [
+    "U1",
+    "L22"
+   ],
+   [
+    "U1",
+    "L8"
+   ],
+   [
+    "U1",
+    "L9"
+   ],
+   [
+    "U1",
+    "M10"
+   ],
+   [
+    "U1",
+    "M11"
+   ],
+   [
+    "U1",
+    "M19"
+   ],
+   [
+    "U1",
+    "M7"
+   ],
+   [
+    "U1",
+    "M9"
+   ],
+   [
+    "U1",
+    "N16"
+   ],
+   [
+    "U1",
+    "N6"
+   ],
+   [
+    "U1",
+    "N8"
+   ],
+   [
+    "U1",
+    "P11"
+   ],
+   [
+    "U1",
+    "P13"
+   ],
+   [
+    "U1",
+    "P3"
+   ],
+   [
+    "U1",
+    "P7"
+   ],
+   [
+    "U1",
+    "P9"
+   ],
+   [
+    "U1",
+    "R10"
+   ],
+   [
+    "U1",
+    "R12"
+   ],
+   [
+    "U1",
+    "R20"
+   ],
+   [
+    "U1",
+    "R8"
+   ],
+   [
+    "U1",
+    "T11"
+   ],
+   [
+    "U1",
+    "T17"
+   ],
+   [
+    "U1",
+    "T7"
+   ],
+   [
+    "U1",
+    "T9"
+   ],
+   [
+    "U1",
+    "U10"
+   ],
+   [
+    "U1",
+    "U14"
+   ],
+   [
+    "U1",
+    "U4"
+   ],
+   [
+    "U1",
+    "U9"
+   ],
+   [
+    "U1",
+    "V1"
+   ],
+   [
+    "U1",
+    "V11"
+   ],
+   [
+    "U1",
+    "V21"
+   ],
+   [
+    "U1",
+    "W18"
+   ],
+   [
+    "U1",
+    "W8"
+   ],
+   [
+    "U1",
+    "Y15"
+   ],
+   [
+    "U1",
+    "Y5"
+   ],
+   [
+    "U2",
+    "4"
+   ],
+   [
+    "U3",
+    "2"
+   ],
+   [
+    "U4",
+    "2"
+   ],
+   [
+    "U5",
+    "2"
+   ],
+   [
+    "X1",
+    "2"
+   ]
+  ],
+  "TMDS_D0P": [
+   [
+    "J2",
+    "7"
+   ],
+   [
+    "U1",
+    "A13"
+   ]
+  ],
+  "TMDS_D0N": [
+   [
+    "J2",
+    "9"
+   ],
+   [
+    "U1",
+    "A14"
+   ]
+  ],
+  "TMDS_D1P": [
+   [
+    "J2",
+    "4"
+   ],
+   [
+    "U1",
+    "A15"
+   ]
+  ],
+  "TMDS_D1N": [
+   [
+    "J2",
+    "6"
+   ],
+   [
+    "U1",
+    "A16"
+   ]
+  ],
+  "+3V3": [
+   [
+    "C10",
+    "1"
+   ],
+   [
+    "C11",
+    "1"
+   ],
+   [
+    "C12",
+    "1"
+   ],
+   [
+    "C13",
+    "1"
+   ],
+   [
+    "C33",
+    "1"
+   ],
+   [
+    "C34",
+    "1"
+   ],
+   [
+    "C35",
+    "1"
+   ],
+   [
+    "C36",
+    "1"
+   ],
+   [
+    "C37",
+    "1"
+   ],
+   [
+    "C38",
+    "1"
+   ],
+   [
+    "C39",
+    "1"
+   ],
+   [
+    "C40",
+    "1"
+   ],
+   [
+    "C41",
+    "1"
+   ],
+   [
+    "C42",
+    "1"
+   ],
+   [
+    "C43",
+    "1"
+   ],
+   [
+    "C44",
+    "1"
+   ],
+   [
+    "C6",
+    "1"
+   ],
+   [
+    "C9",
+    "1"
+   ],
+   [
+    "J4",
+    "4"
+   ],
+   [
+    "J5",
+    "1"
+   ],
+   [
+    "L3",
+    "2"
+   ],
+   [
+    "R10",
+    "2"
+   ],
+   [
+    "R11",
+    "2"
+   ],
+   [
+    "R13",
+    "2"
+   ],
+   [
+    "R15",
+    "2"
+   ],
+   [
+    "R16",
+    "1"
+   ],
+   [
+    "R17",
+    "1"
+   ],
+   [
+    "R18",
+    "1"
+   ],
+   [
+    "R19",
+    "1"
+   ],
+   [
+    "R20",
+    "1"
+   ],
+   [
+    "R23",
+    "2"
+   ],
+   [
+    "R7",
+    "1"
+   ],
+   [
+    "R9",
+    "2"
+   ],
+   [
+    "U1",
+    "A17"
+   ],
+   [
+    "U1",
+    "AA17"
+   ],
+   [
+    "U1",
+    "AA7"
+   ],
+   [
+    "U1",
+    "AB14"
+   ],
+   [
+    "U1",
+    "AB4"
+   ],
+   [
+    "U1",
+    "B14"
+   ],
+   [
+    "U1",
+    "C1"
+   ],
+   [
+    "U1",
+    "C21"
+   ],
+   [
+    "U1",
+    "D18"
+   ],
+   [
+    "U1",
+    "E15"
+   ],
+   [
+    "U1",
+    "F12"
+   ],
+   [
+    "U1",
+    "F2"
+   ],
+   [
+    "U1",
+    "F22"
+   ],
+   [
+    "U1",
+    "G19"
+   ],
+   [
+    "U1",
+    "H16"
+   ],
+   [
+    "U1",
+    "H6"
+   ],
+   [
+    "U1",
+    "J13"
+   ],
+   [
+    "U1",
+    "J3"
+   ],
+   [
+    "U1",
+    "K20"
+   ],
+   [
+    "U1",
+    "L17"
+   ],
+   [
+    "U1",
+    "M14"
+   ],
+   [
+    "U1",
+    "M4"
+   ],
+   [
+    "U1",
+    "N1"
+   ],
+   [
+    "U1",
+    "N21"
+   ],
+   [
+    "U1",
+    "P18"
+   ],
+   [
+    "U1",
+    "R15"
+   ],
+   [
+    "U1",
+    "R5"
+   ],
+   [
+    "U1",
+    "T12"
+   ],
+   [
+    "U1",
+    "T2"
+   ],
+   [
+    "U1",
+    "T22"
+   ],
+   [
+    "U1",
+    "U11"
+   ],
+   [
+    "U1",
+    "U19"
+   ],
+   [
+    "U1",
+    "U8"
+   ],
+   [
+    "U1",
+    "V16"
+   ],
+   [
+    "U1",
+    "V6"
+   ],
+   [
+    "U1",
+    "W13"
+   ],
+   [
+    "U1",
+    "W3"
+   ],
+   [
+    "U1",
+    "Y10"
+   ],
+   [
+    "U1",
+    "Y20"
+   ],
+   [
+    "U2",
+    "8"
+   ],
+   [
+    "X1",
+    "1"
+   ],
+   [
+    "X1",
+    "4"
+   ]
+  ],
+  "TMDS_CKP": [
+   [
+    "J2",
+    "10"
+   ],
+   [
+    "U1",
+    "A18"
+   ]
+  ],
+  "TMDS_CKN": [
+   [
+    "J2",
+    "12"
+   ],
+   [
+    "U1",
+    "A19"
+   ]
+  ],
+  "USBH_DM": [
+   [
+    "J3",
+    "2"
+   ],
+   [
+    "R22",
+    "1"
+   ],
+   [
+    "U1",
+    "A20"
+   ]
+  ],
+  "UART_TX": [
+   [
+    "J6",
+    "1"
+   ],
+   [
+    "U1",
+    "AB10"
+   ]
+  ],
+  "HALT_LED": [
+   [
+    "R14",
+    "1"
+   ],
+   [
+    "U1",
+    "AB11"
+   ]
+  ],
+  "RESET_N": [
+   [
+    "R15",
+    "1"
+   ],
+   [
+    "SW1",
+    "1"
+   ],
+   [
+    "U1",
+    "AB12"
+   ]
+  ],
+  "TMDS_D2P": [
+   [
+    "J2",
+    "1"
+   ],
+   [
+    "U1",
+    "B15"
+   ]
+  ],
+  "TMDS_D2N": [
+   [
+    "J2",
+    "3"
+   ],
+   [
+    "U1",
+    "B16"
+   ]
+  ],
+  "CLK100": [
+   [
+    "U1",
+    "B17"
+   ],
+   [
+    "X1",
+    "3"
+   ]
+  ],
+  "USBH_DP": [
+   [
+    "J3",
+    "3"
+   ],
+   [
+    "R21",
+    "1"
+   ],
+   [
+    "U1",
+    "B20"
+   ]
+  ],
+  "DONE": [
+   [
+    "R11",
+    "1"
+   ],
+   [
+    "R12",
+    "1"
+   ],
+   [
+    "U1",
+    "G11"
+   ]
+  ],
+  "+1V0": [
+   [
+    "C16",
+    "1"
+   ],
+   [
+    "C17",
+    "1"
+   ],
+   [
+    "C18",
+    "1"
+   ],
+   [
+    "C19",
+    "1"
+   ],
+   [
+    "C2",
+    "1"
+   ],
+   [
+    "C20",
+    "1"
+   ],
+   [
+    "C21",
+    "1"
+   ],
+   [
+    "C22",
+    "1"
+   ],
+   [
+    "C23",
+    "1"
+   ],
+   [
+    "C24",
+    "1"
+   ],
+   [
+    "C25",
+    "1"
+   ],
+   [
+    "C26",
+    "1"
+   ],
+   [
+    "C7",
+    "1"
+   ],
+   [
+    "L1",
+    "2"
+   ],
+   [
+    "R3",
+    "1"
+   ],
+   [
+    "U1",
+    "H10"
+   ],
+   [
+    "U1",
+    "H8"
+   ],
+   [
+    "U1",
+    "J11"
+   ],
+   [
+    "U1",
+    "J7"
+   ],
+   [
+    "U1",
+    "J9"
+   ],
+   [
+    "U1",
+    "K8"
+   ],
+   [
+    "U1",
+    "L11"
+   ],
+   [
+    "U1",
+    "L7"
+   ],
+   [
+    "U1",
+    "M8"
+   ],
+   [
+    "U1",
+    "N11"
+   ],
+   [
+    "U1",
+    "N7"
+   ],
+   [
+    "U1",
+    "P10"
+   ],
+   [
+    "U1",
+    "P8"
+   ],
+   [
+    "U1",
+    "R7"
+   ],
+   [
+    "U1",
+    "R9"
+   ],
+   [
+    "U1",
+    "T10"
+   ],
+   [
+    "U1",
+    "T8"
+   ]
+  ],
+  "+1V8": [
+   [
+    "C27",
+    "1"
+   ],
+   [
+    "C28",
+    "1"
+   ],
+   [
+    "C29",
+    "1"
+   ],
+   [
+    "C30",
+    "1"
+   ],
+   [
+    "C31",
+    "1"
+   ],
+   [
+    "C32",
+    "1"
+   ],
+   [
+    "C4",
+    "1"
+   ],
+   [
+    "C8",
+    "1"
+   ],
+   [
+    "L2",
+    "2"
+   ],
+   [
+    "R5",
+    "1"
+   ],
+   [
+    "U1",
+    "H12"
+   ],
+   [
+    "U1",
+    "K10"
+   ],
+   [
+    "U1",
+    "K12"
+   ],
+   [
+    "U1",
+    "M12"
+   ],
+   [
+    "U1",
+    "P12"
+   ],
+   [
+    "U1",
+    "R11"
+   ]
+  ],
+  "SD_MOSI": [
+   [
+    "J4",
+    "3"
+   ],
+   [
+    "R18",
+    "2"
+   ],
+   [
+    "U1",
+    "H22"
+   ]
+  ],
+  "SD_SCK": [
+   [
+    "J4",
+    "5"
+   ],
+   [
+    "U1",
+    "J22"
+   ]
+  ],
+  "SD_MISO": [
+   [
+    "J4",
+    "7"
+   ],
+   [
+    "R16",
+    "2"
+   ],
+   [
+    "U1",
+    "K22"
+   ]
+  ],
+  "FLASH_SCK": [
+   [
+    "U1",
+    "L12"
+   ],
+   [
+    "U2",
+    "6"
+   ]
+  ],
+  "SD_CS": [
+   [
+    "J4",
+    "2"
+   ],
+   [
+    "R17",
+    "2"
+   ],
+   [
+    "U1",
+    "M22"
+   ]
+  ],
+  "PROGRAM_B": [
+   [
+    "R9",
+    "1"
+   ],
+   [
+    "SW2",
+    "1"
+   ],
+   [
+    "U1",
+    "N12"
+   ]
+  ],
+  "FLASH_IO2": [
+   [
+    "U1",
+    "P21"
+   ],
+   [
+    "U2",
+    "3"
+   ]
+  ],
+  "FLASH_IO0": [
+   [
+    "U1",
+    "P22"
+   ],
+   [
+    "U2",
+    "5"
+   ]
+  ],
+  "TDI": [
+   [
+    "J5",
+    "5"
+   ],
+   [
+    "U1",
+    "R13"
+   ]
+  ],
+  "FLASH_IO3": [
+   [
+    "U1",
+    "R21"
+   ],
+   [
+    "U2",
+    "7"
+   ]
+  ],
+  "FLASH_IO1": [
+   [
+    "U1",
+    "R22"
+   ],
+   [
+    "U2",
+    "2"
+   ]
+  ],
+  "TMS": [
+   [
+    "J5",
+    "6"
+   ],
+   [
+    "U1",
+    "T13"
+   ]
+  ],
+  "FLASH_CS": [
+   [
+    "R23",
+    "1"
+   ],
+   [
+    "U1",
+    "T19"
+   ],
+   [
+    "U2",
+    "1"
+   ]
+  ],
+  "INIT_B": [
+   [
+    "R10",
+    "1"
+   ],
+   [
+    "U1",
+    "U12"
+   ]
+  ],
+  "TDO": [
+   [
+    "J5",
+    "4"
+   ],
+   [
+    "U1",
+    "U13"
+   ]
+  ],
+  "PUDC_B": [
+   [
+    "R13",
+    "1"
+   ],
+   [
+    "U1",
+    "U22"
+   ]
+  ],
+  "TCK": [
+   [
+    "J5",
+    "3"
+   ],
+   [
+    "U1",
+    "V12"
+   ]
+  ],
+  "+5V": [
+   [
+    "C1",
+    "1"
+   ],
+   [
+    "C15",
+    "1"
+   ],
+   [
+    "C3",
+    "1"
+   ],
+   [
+    "C5",
+    "1"
+   ],
+   [
+    "D3",
+    "2"
+   ],
+   [
+    "F1",
+    "1"
+   ],
+   [
+    "J1",
+    "A4"
+   ],
+   [
+    "J1",
+    "A9"
+   ],
+   [
+    "J1",
+    "B4"
+   ],
+   [
+    "J1",
+    "B9"
+   ],
+   [
+    "U3",
+    "1"
+   ],
+   [
+    "U3",
+    "4"
+   ],
+   [
+    "U4",
+    "1"
+   ],
+   [
+    "U4",
+    "4"
+   ],
+   [
+    "U5",
+    "1"
+   ],
+   [
+    "U5",
+    "4"
+   ]
+  ],
+  "USBC_CC1": [
+   [
+    "J1",
+    "A5"
+   ],
+   [
+    "R1",
+    "1"
+   ]
+  ],
+  "USBC_CC2": [
+   [
+    "J1",
+    "B5"
+   ],
+   [
+    "R2",
+    "1"
+   ]
+  ],
+  "SW_1V0": [
+   [
+    "L1",
+    "1"
+   ],
+   [
+    "U3",
+    "3"
+   ]
+  ],
+  "FB_1V0": [
+   [
+    "R3",
+    "2"
+   ],
+   [
+    "R4",
+    "1"
+   ],
+   [
+    "U3",
+    "5"
+   ]
+  ],
+  "SW_1V8": [
+   [
+    "L2",
+    "1"
+   ],
+   [
+    "U4",
+    "3"
+   ]
+  ],
+  "FB_1V8": [
+   [
+    "R5",
+    "2"
+   ],
+   [
+    "R6",
+    "1"
+   ],
+   [
+    "U4",
+    "5"
+   ]
+  ],
+  "SW_3V3": [
+   [
+    "L3",
+    "1"
+   ],
+   [
+    "U5",
+    "3"
+   ]
+  ],
+  "FB_3V3": [
+   [
+    "R7",
+    "2"
+   ],
+   [
+    "R8",
+    "1"
+   ],
+   [
+    "U5",
+    "5"
+   ]
+  ],
+  "DONE_LED": [
+   [
+    "D2",
+    "2"
+   ],
+   [
+    "R12",
+    "2"
+   ]
+  ],
+  "HALT_LED_A": [
+   [
+    "D1",
+    "2"
+   ],
+   [
+    "R14",
+    "2"
+   ]
+  ],
+  "HDMI_5V": [
+   [
+    "D3",
+    "1"
+   ],
+   [
+    "J2",
+    "18"
+   ]
+  ],
+  "USBH_VBUS": [
+   [
+    "C14",
+    "1"
+   ],
+   [
+    "F1",
+    "2"
+   ],
+   [
+    "J3",
+    "1"
+   ]
+  ],
+  "SD_DAT1": [
+   [
+    "J4",
+    "8"
+   ],
+   [
+    "R19",
+    "2"
+   ]
+  ],
+  "SD_DAT2": [
+   [
+    "J4",
+    "1"
+   ],
+   [
+    "R20",
+    "2"
+   ]
+  ]
+ },
+ "io": {
+  "clk100": {
+   "ball": "B17",
+   "standard": "LVCMOS33",
+   "use": "100 MHz oscillator (bank 16 SRCC)",
+   "bank": "16"
+  },
+  "tmds_p[0]": {
+   "ball": "A13",
+   "standard": "TMDS_33",
+   "use": "HDMI data 0+ (blue)",
+   "bank": "16"
+  },
+  "tmds_n[0]": {
+   "ball": "A14",
+   "standard": "TMDS_33",
+   "use": "HDMI data 0-",
+   "bank": "16"
+  },
+  "tmds_p[1]": {
+   "ball": "A15",
+   "standard": "TMDS_33",
+   "use": "HDMI data 1+ (green)",
+   "bank": "16"
+  },
+  "tmds_n[1]": {
+   "ball": "A16",
+   "standard": "TMDS_33",
+   "use": "HDMI data 1-",
+   "bank": "16"
+  },
+  "tmds_p[2]": {
+   "ball": "B15",
+   "standard": "TMDS_33",
+   "use": "HDMI data 2+ (red)",
+   "bank": "16"
+  },
+  "tmds_n[2]": {
+   "ball": "B16",
+   "standard": "TMDS_33",
+   "use": "HDMI data 2-",
+   "bank": "16"
+  },
+  "tmds_p[3]": {
+   "ball": "A18",
+   "standard": "TMDS_33",
+   "use": "HDMI clock+",
+   "bank": "16"
+  },
+  "tmds_n[3]": {
+   "ball": "A19",
+   "standard": "TMDS_33",
+   "use": "HDMI clock-",
+   "bank": "16"
+  },
+  "usb_dp": {
+   "ball": "B20",
+   "standard": "LVCMOS33",
+   "use": "Keyboard USB D+",
+   "bank": "16"
+  },
+  "usb_dm": {
+   "ball": "A20",
+   "standard": "LVCMOS33",
+   "use": "Keyboard USB D-",
+   "bank": "16"
+  },
+  "sd_sck": {
+   "ball": "J22",
+   "standard": "LVCMOS33",
+   "use": "microSD CLK",
+   "bank": "15"
+  },
+  "sd_mosi": {
+   "ball": "H22",
+   "standard": "LVCMOS33",
+   "use": "microSD CMD",
+   "bank": "15"
+  },
+  "sd_miso": {
+   "ball": "K22",
+   "standard": "LVCMOS33",
+   "use": "microSD DAT0",
+   "bank": "15"
+  },
+  "sd_cs_n": {
+   "ball": "M22",
+   "standard": "LVCMOS33",
+   "use": "microSD DAT3/CS",
+   "bank": "15"
+  },
+  "uart_tx": {
+   "ball": "AB10",
+   "standard": "LVCMOS33",
+   "use": "Serial console out",
+   "bank": "13"
+  },
+  "led_halt": {
+   "ball": "AB11",
+   "standard": "LVCMOS33",
+   "use": "HALT LED",
+   "bank": "13"
+  },
+  "btn_reset_n": {
+   "ball": "AB12",
+   "standard": "LVCMOS33",
+   "use": "RESET button (low when pressed)",
+   "bank": "13"
+  }
+ }
+}

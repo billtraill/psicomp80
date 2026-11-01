@@ -403,7 +403,7 @@ def add_circuit(board, nets, occ):
     slots = kit_slots()
     pending = []
     for ref, part in sorted(parts.items()):
-        if ref in kit_ics or ref.startswith("SW") or ref.startswith("J_"):
+        if ref in kit_ics or ref.startswith("SW") or ref.startswith("J_") or ref == bd.EXPANSION["ref"]:
             continue
         if ref in slots and slots[ref][0] == "box":
             lib, name = box_footprint(slots[ref][2])
@@ -577,11 +577,16 @@ def apply_netclasses(board):
     ns.RecomputeEffectiveNetclasses()
     board.SynchronizeNetsAndNetClasses(True)
 
-def add_expansion(board):
+def add_expansion(board, nets):
+    """The expansion plug, with the pinout given to J1 in net_board.json."""
     e = bd.EXPANSION
     num, x, y = g.expansion_pins()[0]
     name = f"PinHeader_2x{e['pins_per_row']}_P2.54mm_Vertical"
-    return [place(board, load("Connector_PinHeader_2.54mm", name), e["ref"], e["value"], x, y, 90)]
+    fp = place(board, load("Connector_PinHeader_2.54mm", name), e["ref"], e["value"], x, y, 90)
+    part = json.load(open(NETLIST))["parts"].get(e["ref"])
+    if part:
+        nets.assign(fp, part["pins"])
+    return [fp]
 
 
 def key_footprint(board, k):
@@ -687,9 +692,9 @@ def main():
     add_artwork(board)
     add_furniture(board)
     occ = Occupancy()
-    for fp in add_expansion(board) + add_holes(board):
-        occ.mark(fp_box(fp))
     nets = Nets(board)
+    for fp in add_expansion(board, nets) + add_holes(board):
+        occ.mark(fp_box(fp))
     add_circuit(board, nets, occ)
     add_edge_keepout(board)
     apply_netclasses(board)

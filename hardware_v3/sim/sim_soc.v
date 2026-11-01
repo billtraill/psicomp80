@@ -36,5 +36,7 @@ module sim_soc #(parameter SYS_HZ = 12_000_000) (
         .h_addr(h_addr), .h_wdata(h_wdata), .h_we(h_we), .h_rdata(h_rdata),
         .menu_we(menu_we), .menu_addr(menu_addr), .menu_data(menu_data),
         .usb_report(1'b0), .usb_typ(2'b0), .usb_mod(8'b0), .usb_keys(32'b0),
-        .sd_sck(sd_sck), .sd_mosi(sd_mosi), .sd_miso(1'b1), .sd_cs(sd_cs));
+        .sd_sck(sd_sck), .sd_mosi(sd_mosi), .sd_miso(1'b1), .sd_cs(sd_cs),
+        .dp_hpd(), .dp_aux_invert(), .dp_lane_sel(), .dp_link_up(1'b0), .pd_scl_low(), .pd_sda_low(), .vbus_en(),
+        .pd_scl(1'b1), .pd_sda(1'b1), .pd_int_n(1'b1), .vbus_flt_n(1'b1));
 endmodule

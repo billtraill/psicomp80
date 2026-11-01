@@ -10,6 +10,9 @@
 //   3000_0000  the Z80's 64 KB, a byte a word
 //   4000_0000  the set-up screen, 2 KB, a byte a word (write only)
 //   5000_0000  SPI: +0 data, +4 busy, +8 chip select, +C clock divider
+//   2000_0038  DisplayPort: bit 0 hot-plug, bit 1 AUX swapped, bits 15-8 lane map
+//   2000_003C  USB-PD: write bit 0 pull SCL low, 1 pull SDA low, 2 VBUS on;
+//              read bit 0 SCL, 1 SDA, 2 FUSB302 INT_N, 3 VBUS fault_n, 4 DisplayPort link up
 module soc #(
     parameter SYS_HZ = 50_000_000,
     parameter FIRMWARE = "firmware.hex"
@@ -55,7 +58,20 @@ module soc #(
     output            sd_sck,
     output            sd_mosi,
     input             sd_miso,
-    output reg        sd_cs
+    output reg        sd_cs,
+
+    // DisplayPort over USB-C, and the FUSB302 USB-PD controller beside it
+    output reg        dp_hpd,
+    output reg        dp_aux_invert,
+    output reg  [7:0] dp_lane_sel,
+    input             dp_link_up,
+    output reg        pd_scl_low,
+    output reg        pd_sda_low,
+    output reg        vbus_en,
+    input             pd_scl,
+    input             pd_sda,
+    input             pd_int_n,
+    input             vbus_flt_n
 );
     // ------------------------------------------------------------ the processor
     wire        mem_valid, mem_instr;
@@ -130,6 +146,7 @@ module soc #(
         if (rst) begin
             z80_run <= 0; clk4 <= 0; expansion <= 0; menu_on <= 0; colour <= 24'hffffff;
             tape_in <= 1; sd_cs <= 1; spi_div <= 8'd62; wait_n <= 0; u_bits <= 0;
+            dp_hpd <= 0; dp_aux_invert <= 0; dp_lane_sel <= 8'b11_10_01_00; pd_scl_low <= 0; pd_sda_low <= 0; vbus_en <= 0;
         end else if (mem_valid && !mem_ready) begin
             case (mem_addr[31:28])
                 4'h0: begin                       // the RAM's output is a clock behind its address
@@ -151,6 +168,8 @@ module soc #(
                         6'h06: mm_done <= 1'b1;
                         6'h07: mm_irq <= 1'b1;
                         6'h08: tape_in <= mem_wdata[0];
+                        6'h0e: {dp_lane_sel, dp_aux_invert, dp_hpd} <= {mem_wdata[15:8], mem_wdata[1:0]};
+                        6'h0f: {vbus_en, pd_sda_low, pd_scl_low} <= mem_wdata[2:0];
                         default: ;
                     endcase
                     case (mem_addr[7:2])
@@ -162,6 +181,8 @@ module soc #(
                         6'h0b: mem_rdata <= usb_keys;
                         6'h0c: mem_rdata <= {21'b0, usb_report, usb_typ, usb_mod};
                         6'h0d: mem_rdata <= usec;
+                        6'h0e: mem_rdata <= {16'b0, dp_lane_sel, 6'b0, dp_aux_invert, dp_hpd};
+                        6'h0f: mem_rdata <= {27'b0, dp_link_up, vbus_flt_n, pd_int_n, pd_sda, pd_scl};
                         default: mem_rdata <= 32'b0;
                     endcase
                 end

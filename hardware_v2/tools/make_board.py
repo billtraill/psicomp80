@@ -221,7 +221,7 @@ def preroute_decoupling(board, u1, nets):
     return done
 
 
-def fanout(board, names, done=(), skip=("U1",)):
+def fanout(board, names, done=(), skip=("U1",), peg_clear=0):
     """A via beside every surface-mount pad on the plane nets, joined by a short track,
     placed clear of everything on other nets. The autorouter won't drop to the planes
     by itself."""
@@ -231,7 +231,10 @@ def fanout(board, names, done=(), skip=("U1",)):
     obstacles = []                    # (box, net code)
     for fp in board.GetFootprints():
         for p in fp.Pads():
-            obstacles.append((p.GetBoundingBox(), p.GetNetCode()))
+            box = p.GetBoundingBox()
+            if peg_clear and p.GetAttribute() == pcbnew.PAD_ATTRIB_NPTH:
+                box.Inflate(mm(peg_clear))    # kept clear by a rule area
+            obstacles.append((box, p.GetNetCode()))
     for t in board.GetTracks():
         obstacles.append((t.GetBoundingBox(), t.GetNetCode()))
 

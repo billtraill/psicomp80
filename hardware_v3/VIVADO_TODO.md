@@ -12,9 +12,15 @@ Vivado. Pick this up on a Linux or Windows machine.
   firmware, boots and reaches the monitor's READY prompt (`make -C sim boot`). The
   display logic draws correct frames, and every TMDS symbol decodes back to its pixel
   (`sim/video_tb.v`).
+- DisplayPort over USB-C (`rtl/dp_out.v`): `sim/dp_tb.v` runs the COMP80 DisplayPort source
+  and hamsternz's stream-attribute inserter, and `sim/dp_decode.py` unpacks
+  the lane symbols back into an 800 × 600 frame: every pixel matches the screen. The
+  transceivers and the AUX channel can't be simulated here (they're Xilinx
+  primitives and a monitor), so those are the parts to watch on the bench.
 - `tools/synth.sh`: yosys synthesises the whole design for the XC7A100T. It comes
-  to about 4,100 LUTs (6.5%), 2,240 flip-flops (1.8%) and 49 of 135 block RAMs, plus
-  one PLL, one MMCM and eight OSERDESE2. No DSPs.
+  to about 5,900 LUTs (9%), 3,600 flip-flops (2.8%) and 50 of 135 block RAMs, plus
+  one PLL, one MMCM, eight OSERDESE2, and for DisplayPort one GTPE2_COMMON, four
+  GTPE2_CHANNEL and an IBUFDS_GTE2. No DSPs.
 - `rtl/comp80v3.xdc`: pins, I/O standards, the clock and the bitstream settings,
   generated from the board design (`tools/design.py`), so the two agree.
 
@@ -36,8 +42,8 @@ git clone <this repository> && cd psicomp80/hardware_v3
 sh tools/fetch.sh
 ```
 
-That puts TV80, PicoRV32, usb_hid_host and FatFs in `build/`, at the commits the
-design was made with.
+That puts TV80, PicoRV32, usb_hid_host, DisplayPort_Verilog and FatFs in `build/`,
+at the commits the design was made with.
 
 ## 2. Build
 
@@ -55,7 +61,9 @@ files, and set `top` as the top module.
 ## 3. Check the results
 
 - [ ] **Timing**: `out/timing.txt` must show no negative slack (WNS ≥ 0) on every
-  clock: 50 MHz system, 12 MHz USB, 25 MHz pixel, 125 MHz serial.
+  clock: 50 MHz system, 12 MHz USB, 25 MHz pixel, 125 MHz serial, 100 MHz (the
+  DisplayPort AUX channel and link management) and the transceivers' 135 MHz symbol
+  clock (TXOUTCLK).
   - The Z80 (TV80) runs from the 50 MHz clock with a clock enable every 25 (or 12.5)
     cycles. If its paths fail at 50 MHz, they can be given multicycle constraints,
     because nothing in `tv80c`/`tv80_core` changes between enables, for example:
@@ -63,7 +71,7 @@ files, and set `top` as the top module.
     and the matching `-hold 11`. Check that the clock enable reaches every register
     first.
   - PicoRV32 at 50 MHz is comfortably inside what it does on an Artix-7.
-- [ ] **Utilisation**: about 4,100 LUTs and 49 block RAMs, as yosys found. Far more
+- [ ] **Utilisation**: about 5,900 LUTs and 50 block RAMs, as yosys found. Far more
   means something has been unrolled. Far fewer usually means a `$readmemh` file
   wasn't found and a memory was optimised away. Check that `firmware.hex` and
   `font.hex` loaded: the synthesis log names them.
@@ -75,6 +83,20 @@ files, and set `top` as the top module.
     CLOCK_DEDICATED_ROUTE warning.
   - The MMCM (VCO 625 MHz, ×6.25 ÷25 and ÷5) and the PLL (VCO 1200 MHz, ÷24 and ÷100)
     should both be legal for the −1 speed grade.
+  - The four GTPE2_CHANNELs must land in quad 216, the part's only one, to
+    reach pins B4/A4, D5/C5, B6/A6 and D7/C7, and the IBUFDS_GTE2 on F6/E6
+    (MGTREFCLK0_216). If Vivado complains that it can't place them, add `LOC`s.
+    The channels are taken in reverse, `dp_tx[0]` on D7/C7 and `dp_tx[3]` on
+    B4/A4, so that the pairs reach J7 without crossing; any channel can drive
+    any pair, since the logic maps lanes onto pairs.
+  - The transceiver settings in `rtl/dp_transceivers.v` come from hamsternz's Nexys
+    Video design (a 135 MHz reference, the PLL at 2.7 GHz, 20-bit TX data). Vivado
+    checks the PLL0 settings against the reference: look for GTPE2 DRC warnings.
+  - `dp_aux_p`/`dp_aux_n` must be an IOBUFDS in LVDS_25, on bank 35 at 2.5 V, with
+    no internal termination.
+  - Warnings that `txdata_for_tx[31:16]` and the upper `txchardisp*` bits have no
+    driver are expected: the GTPs run 2-byte (20-bit) TX data, as in the original,
+    and the unused upper bits are tied off.
 - [ ] **DRC**: `out/drc.txt`. With `CFGBVS` and `CONFIG_VOLTAGE` set, the usual
   configuration-voltage warning should be gone.
 
@@ -91,6 +113,8 @@ GND, TCK, TDO, TDI, TMS. **Check that against the cable before plugging in.**
 
 ## 5. Bring-up
 
+`SETUP.md` is the full guide for a working board. On a first board:
+
 - [ ] Before fitting the FPGA, or with it fitted but not configured: check the
   rails, 1.0 V, 1.8 V and 3.3 V, and that none is shorted.
 - [ ] After configuring, the serial header J6 (115200 baud) prints `COMP80 v3`, then
@@ -101,15 +125,36 @@ GND, TCK, TDO, TDI, TMS. **Check that against the cable before plugging in.**
   usb_hid_host doesn't do full speed or hubs.
 - [ ] The card: put ROMs in `/COMP80/ROMS` and tapes in `/COMP80/TAPES` (as for v2).
   Choose them with F1 and F2.
+- [ ] The serial console prints `USB-PD: FUSB302 id 9x` (or 8x, Ax). `00` means
+  the I²C to U6 isn't working.
+- [ ] A USB-C monitor on J7: the console shows `monitor on CC1` (or CC2), then
+  `DisplayPort mode`. The monitor gets 5 V (VBUS) as soon as it's seen: check
+  that U7's EN is active high (the firmware drives `vbus_en` high to turn it on) and
+  that VBUS at J7 is 5 V.
+- [ ] The picture over DisplayPort, **with the plug both ways up**. The lane
+  mapping and AUX polarity for each orientation are worked out from the USB-C and
+  DisplayPort alt-mode pin tables, not measured; they're the constants `LANES_CC1`,
+  `LANES_CC2` and the `aux_invert` choice in `firmware/pd.c`. If one orientation
+  trains and the other doesn't, swap that orientation's lane pairs or its AUX
+  polarity there. If neither trains, the AUX channel is the first suspect: watch
+  SBU1/SBU2 with a scope for the 1 Mb/s Manchester bursts after hot-plug.
 
 ## Points to review on the board itself
 
 These are judgement calls in `tools/design.py`, worth checking against Xilinx's
 documents before a board is ordered:
 
-- **Unused transceivers**: MGTAVCC, MGTAVTT and the receive pins are grounded;
-  MGTRREF, the transmit pins and the reference clocks are left open. Check against
-  UG482's advice for devices whose transceivers are all unused.
+- **Transceivers**: MGTAVCC is +1V0_MGT, the 1.0 V rail through ferrite bead FB1,
+  and MGTAVTT is a TLV75512 LDO's 1.2 V from 3.3 V. Each is a copper island in an
+  inner plane under the BGA's top-left corner. MGTRREF has its 100 Ω to MGTAVTT.
+  The receive pins are grounded, as UG482 advises for unused receivers; MGTREFCLK1
+  is left open. The four transmit pairs go to J7 through 100 nF capacitors. Check
+  UG482's power-supply filtering and the island shapes before ordering.
+- **Bank 35 at 2.5 V**: VCCO_35 is a TLV75525's 2.5 V, so that LVDS_25 is legal for
+  the AUX channel. Its six balls reach it through an island in the 3.3 V plane under
+  the BGA's left columns. The FUSB302 lines on that bank are LVCMOS25, pulled up to 2.5 V.
+- **The 135 MHz oscillator** (SiT9121, LVDS) is AC-coupled into MGTREFCLK0 through
+  C55 and C56, with the termination inside the GTP.
 - **XADC unused**: VCCADC to 1.8 V; GNDADC, VP, VN, VREFP and VREFN grounded.
   **VCCBATT** grounded (no encryption key). DXP and DXN open.
 - **Configuration**: M[2:0] = 001 (Master SPI), CFGBVS to 3.3 V, PUDC_B to 3.3 V

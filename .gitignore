@@ -27,3 +27,6 @@ hardware_v3/sim/video_tb
 hardware_v3/sim/font.hex
 hardware_v3/sim/frame.ppm
 hardware_v3/vivado/out/
+hardware_v3/sim/dp_tb
+hardware_v3/sim/dp_symbols.txt
+hardware_v3/sim/dp_frame.png

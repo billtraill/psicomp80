@@ -154,7 +154,30 @@ def route(board, g, net):
             arr[:margin, :] = arr[-margin:, :] = True
             arr[:, :margin] = arr[:, -margin:] = True
     # the rule areas along the board edge are kept clear by the margin; the
-    # holes of mounting holes are pads, so they're in already
+    # holes of mounting holes are pads, so they're in already. Other keepouts
+    # (round connector pegs, say) are marked cell by cell.
+    for z in board.Zones():
+        if not z.GetIsRuleArea():
+            continue
+        box = z.GetBoundingBox()
+        if box.GetWidth() > pcbnew.FromMM(20) or box.GetHeight() > pcbnew.FromMM(20):
+            continue                          # an edge strip: the margin covers it
+        ol = z.Outline()
+        for l in LAYERS:
+            if not z.IsOnLayer(l):
+                continue
+            for arr, allowed, half in ((block[l], not z.GetDoNotAllowTracks(), TRACK / 2),
+                                       (vblock[l], not z.GetDoNotAllowVias(), VIA / 2)):
+                if allowed:
+                    continue
+                r = half + CLEAR + GRID * 0.5
+                i0, j0 = g.cell(mm(box.GetLeft()) - r, mm(box.GetTop()) - r)
+                i1, j1 = g.cell(mm(box.GetRight()) + r, mm(box.GetBottom()) + r)
+                for i in range(max(i0, 0), min(i1, g.w - 1) + 1):
+                    for j in range(max(j0, 0), min(j1, g.h - 1) + 1):
+                        x, y = g.pos(i, j)
+                        if ol.Collide(pcbnew.VECTOR2I(pcbnew.FromMM(x), pcbnew.FromMM(y)), pcbnew.FromMM(r)):
+                            arr[i, j] = True
 
     # join the pieces one by one onto the biggest
     groups.sort(key=len, reverse=True)
@@ -286,13 +309,18 @@ def main():
     board = pcbnew.LoadBoard(PCB)
     g = Grid(board)
     names = args
-    nets = [board.FindNet(n).GetNetCode() for n in names] if names else \
+    by_name = {str(k): v.GetNetCode() for k, v in board.GetNetsByName().items()}
+    for n in names:
+        if n not in by_name:
+            print("no net called", n)
+    nets = [by_name[n] for n in names if n in by_name] if names else \
         [c for c in range(1, board.GetNetCount())]
+    planes = {z.GetNetname() for z in board.Zones() if not z.GetIsRuleArea()}
     total = 0
     for code in nets:
         name = board.GetNetInfo().GetNetItem(code).GetNetname()
-        if not names and name in ("", "GND"):
-            continue
+        if not names and (not name or name in planes):
+            continue                    # nets joined through a plane: this can't see the fill
         n = route(board, g, code)
         if n:
             print(f"{name}: {n} tracks and vias added")

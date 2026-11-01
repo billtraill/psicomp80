@@ -1,7 +1,7 @@
 {
  "board": {
-  "width": 100.0,
-  "height": 72.0,
+  "width": 110.0,
+  "height": 84.0,
   "layers": 6
  },
  "parts": {
@@ -11,6 +11,7 @@
    "part": "AMD XC7A100T-1FGG484C",
    "description": "FPGA: 101,440 logic cells, 4,860 Kb of block RAM. The whole COMP80 is in here",
    "pins": {
+    "A1": "AUX_N_FPGA",
     "A10": "GND",
     "A11": "GND",
     "A12": "GND",
@@ -27,30 +28,22 @@
     "AB19": "GND",
     "AB9": "GND",
     "B10": "GND",
-    "B11": "GND",
     "B12": "GND",
     "B19": "GND",
     "B3": "GND",
-    "B5": "GND",
-    "B7": "GND",
     "B8": "GND",
-    "B9": "GND",
     "C10": "GND",
     "C11": "GND",
     "C12": "GND",
     "C16": "GND",
     "C3": "GND",
-    "C4": "GND",
     "C6": "GND",
-    "C8": "GND",
     "C9": "GND",
-    "D10": "GND",
     "D11": "GND",
     "D12": "GND",
     "D13": "GND",
     "D3": "GND",
     "D4": "GND",
-    "D6": "GND",
     "D8": "GND",
     "D9": "GND",
     "E11": "GND",
@@ -59,13 +52,10 @@
     "E4": "GND",
     "E5": "GND",
     "E7": "GND",
-    "E8": "GND",
     "E9": "GND",
     "F11": "GND",
     "F17": "GND",
     "F5": "GND",
-    "F7": "GND",
-    "F9": "GND",
     "G10": "GND",
     "G12": "GND",
     "G14": "GND",
@@ -135,23 +125,17 @@
     "AB14": "+3V3",
     "AB4": "+3V3",
     "B14": "+3V3",
-    "C1": "+3V3",
     "C21": "+3V3",
     "D18": "+3V3",
     "E15": "+3V3",
     "F12": "+3V3",
-    "F2": "+3V3",
     "F22": "+3V3",
     "G19": "+3V3",
     "H16": "+3V3",
-    "H6": "+3V3",
     "J13": "+3V3",
-    "J3": "+3V3",
     "K20": "+3V3",
     "L17": "+3V3",
     "M14": "+3V3",
-    "M4": "+3V3",
-    "N1": "+3V3",
     "N21": "+3V3",
     "P18": "+3V3",
     "R15": "+3V3",
@@ -171,13 +155,47 @@
     "A18": "TMDS_CKP",
     "A19": "TMDS_CKN",
     "A20": "USBH_DM",
+    "A4": "DP3_N_FPGA",
+    "A6": "DP1_N_FPGA",
     "AB10": "UART_TX",
     "AB11": "HALT_LED",
     "AB12": "RESET_N",
+    "B1": "AUX_P_FPGA",
+    "B11": "+1V2",
+    "B5": "+1V2",
+    "B7": "+1V2",
+    "B9": "+1V2",
+    "C4": "+1V2",
+    "C8": "+1V2",
     "B15": "TMDS_D2P",
     "B16": "TMDS_D2N",
     "B17": "CLK100",
     "B20": "USBH_DP",
+    "B4": "DP3_P_FPGA",
+    "B6": "DP1_P_FPGA",
+    "C1": "+2V5",
+    "F2": "+2V5",
+    "H6": "+2V5",
+    "J3": "+2V5",
+    "M4": "+2V5",
+    "N1": "+2V5",
+    "C2": "PD_SCL",
+    "C5": "DP2_N_FPGA",
+    "C7": "DP0_N_FPGA",
+    "D1": "PD_SDA",
+    "D10": "+1V0_MGT",
+    "D6": "+1V0_MGT",
+    "E8": "+1V0_MGT",
+    "F7": "+1V0_MGT",
+    "F9": "+1V0_MGT",
+    "D5": "DP2_P_FPGA",
+    "D7": "DP0_P_FPGA",
+    "E1": "PD_INT_N",
+    "E6": "REFCLK_N_FPGA",
+    "F1": "VBUS_EN",
+    "F6": "REFCLK_P_FPGA",
+    "F8": "MGTRREF",
+    "G1": "VBUS_FLT_N",
     "G11": "DONE",
     "H10": "+1V0",
     "H8": "+1V0",
@@ -362,9 +380,9 @@
   },
   "J3": {
    "value": "USB-A",
-   "footprint": "Connector_USB:USB_A_Wuerth_614004134726_Horizontal",
-   "part": "Wurth 614004134726",
-   "description": "USB-A socket for the keyboard",
+   "footprint": "Connector_USB:USB_A_Molex_67643_Horizontal",
+   "part": "Molex 67643-3910",
+   "description": "USB-A socket for the keyboard, lying flat",
    "pins": {
     "4": "GND",
     "SH": "GND",
@@ -472,6 +490,116 @@
    "pins": {
     "1": "+5V",
     "2": "USBH_VBUS"
+   }
+  },
+  "J7": {
+   "value": "USB-C VIDEO",
+   "footprint": "Connector_USB:USB_C_Receptacle_Amphenol_12401610E4-2A",
+   "part": "Amphenol 12401610E4-2A",
+   "description": "Video out: DisplayPort alternate mode to a USB-C monitor",
+   "pins": {
+    "A1": "GND",
+    "B1": "GND",
+    "A12": "GND",
+    "B12": "GND",
+    "SH": "GND",
+    "A2": "DP0_P",
+    "A3": "DP0_N",
+    "B11": "DP1_P",
+    "B10": "DP1_N",
+    "B2": "DP2_P",
+    "B3": "DP2_N",
+    "A11": "DP3_P",
+    "A10": "DP3_N",
+    "A8": "SBU1",
+    "B8": "SBU2",
+    "A5": "VIDEO_CC1",
+    "B5": "VIDEO_CC2",
+    "A4": "VIDEO_VBUS",
+    "B4": "VIDEO_VBUS",
+    "A9": "VIDEO_VBUS",
+    "B9": "VIDEO_VBUS"
+   }
+  },
+  "U6": {
+   "value": "FUSB302B",
+   "footprint": "Package_DFN_QFN:WQFN-14-1EP_2.5x2.5mm_P0.5mm_EP1.45x1.45mm",
+   "part": "onsemi FUSB302BMPX",
+   "description": "USB Power Delivery PHY: agrees DisplayPort alternate mode with the monitor",
+   "pins": {
+    "8": "GND",
+    "9": "GND",
+    "15": "GND",
+    "3": "+3V3",
+    "4": "+3V3",
+    "6": "PD_SCL",
+    "7": "PD_SDA",
+    "5": "PD_INT_N",
+    "10": "VIDEO_CC1",
+    "11": "VIDEO_CC1",
+    "1": "VIDEO_CC2",
+    "14": "VIDEO_CC2",
+    "2": "VIDEO_VBUS"
+   }
+  },
+  "U7": {
+   "value": "TPS2051C",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TPS2051CDBVR",
+   "description": "Current-limited switch: 5 V to the monitor's VBUS",
+   "pins": {
+    "2": "GND",
+    "4": "VBUS_EN",
+    "3": "VBUS_FLT_N",
+    "5": "+5V",
+    "1": "VIDEO_VBUS"
+   }
+  },
+  "U8": {
+   "value": "TLV75525",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TLV75525PDBVR",
+   "description": "2.5 V regulator for I/O bank 35 (the AUX channel's LVDS_25)",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3",
+    "3": "+3V3",
+    "5": "+2V5"
+   }
+  },
+  "U9": {
+   "value": "TLV75512",
+   "footprint": "Package_TO_SOT_SMD:SOT-23-5",
+   "part": "TI TLV75512PDBVR",
+   "description": "1.2 V regulator for the transceivers' termination (MGTAVTT)",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3",
+    "3": "+3V3",
+    "5": "+1V2"
+   }
+  },
+  "X2": {
+   "value": "135MHz",
+   "footprint": "Oscillator:Oscillator_SMD_SiTime_SiT9121-6Pin_3.2x2.5mm",
+   "part": "SiTime SiT9121AI-2C3-33E135.000000",
+   "description": "135 MHz LVDS oscillator: the transceivers' reference (2.7 Gb/s)",
+   "pins": {
+    "3": "GND",
+    "1": "+3V3",
+    "6": "+3V3",
+    "4": "REFCLK_P",
+    "5": "REFCLK_N"
+   }
+  },
+  "FB1": {
+   "value": "220R@100MHz",
+   "footprint": "Inductor_SMD:L_0603_1608Metric",
+   "part": "Murata BLM18KG221SN1D",
+   "description": "Ferrite bead: filters 1.0 V into the transceivers' analogue supply (MGTAVCC)",
+   "pins": {
+    "2": "+1V0_MGT",
+    "1": "+1V0"
    }
   },
   "H1": {
@@ -882,6 +1010,336 @@
     "1": "+5V"
    }
   },
+  "C45": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 TX1+",
+   "pins": {
+    "1": "DP0_P_FPGA",
+    "2": "DP0_P"
+   }
+  },
+  "C46": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 TX1-",
+   "pins": {
+    "1": "DP0_N_FPGA",
+    "2": "DP0_N"
+   }
+  },
+  "C47": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 RX1+",
+   "pins": {
+    "1": "DP1_P_FPGA",
+    "2": "DP1_P"
+   }
+  },
+  "C48": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 RX1-",
+   "pins": {
+    "1": "DP1_N_FPGA",
+    "2": "DP1_N"
+   }
+  },
+  "C49": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 TX2+",
+   "pins": {
+    "1": "DP2_P_FPGA",
+    "2": "DP2_P"
+   }
+  },
+  "C50": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 TX2-",
+   "pins": {
+    "1": "DP2_N_FPGA",
+    "2": "DP2_N"
+   }
+  },
+  "C51": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 RX2+",
+   "pins": {
+    "1": "DP3_P_FPGA",
+    "2": "DP3_P"
+   }
+  },
+  "C52": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "DisplayPort lane AC coupling, J7 RX2-",
+   "pins": {
+    "1": "DP3_N_FPGA",
+    "2": "DP3_N"
+   }
+  },
+  "C53": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "AUX channel AC coupling, SBU1",
+   "pins": {
+    "1": "AUX_P_FPGA",
+    "2": "SBU1"
+   }
+  },
+  "C54": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "AUX channel AC coupling, SBU2",
+   "pins": {
+    "1": "AUX_N_FPGA",
+    "2": "SBU2"
+   }
+  },
+  "C55": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "135 MHz reference AC coupling, +",
+   "pins": {
+    "1": "REFCLK_P_FPGA",
+    "2": "REFCLK_P"
+   }
+  },
+  "C56": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "135 MHz reference AC coupling, -",
+   "pins": {
+    "1": "REFCLK_N_FPGA",
+    "2": "REFCLK_N"
+   }
+  },
+  "C57": {
+   "value": "1u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "FUSB302 supply",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C58": {
+   "value": "10u",
+   "footprint": "Capacitor_SMD:C_0805_2012Metric",
+   "part": "",
+   "description": "Monitor VBUS",
+   "pins": {
+    "2": "GND",
+    "1": "VIDEO_VBUS"
+   }
+  },
+  "C59": {
+   "value": "1u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "2.5 V regulator input",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C60": {
+   "value": "1u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "2.5 V regulator output",
+   "pins": {
+    "2": "GND",
+    "1": "+2V5"
+   }
+  },
+  "C61": {
+   "value": "1u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "1.2 V regulator input (3.3 V)",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "C62": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "1.2 V regulator output, MGTAVTT",
+   "pins": {
+    "2": "GND",
+    "1": "+1V2"
+   }
+  },
+  "C63": {
+   "value": "4.7u",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "MGTAVCC, after the ferrite",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0_MGT"
+   }
+  },
+  "C64": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA MGTAVCC decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0_MGT"
+   }
+  },
+  "C65": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA MGTAVCC decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V0_MGT"
+   }
+  },
+  "C66": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA MGTAVTT decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V2"
+   }
+  },
+  "C67": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA MGTAVTT decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+1V2"
+   }
+  },
+  "C68": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA bank 35 VCCO decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+2V5"
+   }
+  },
+  "C69": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0402_1005Metric",
+   "part": "",
+   "description": "FPGA bank 35 VCCO decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+2V5"
+   }
+  },
+  "C70": {
+   "value": "100n",
+   "footprint": "Capacitor_SMD:C_0603_1608Metric",
+   "part": "",
+   "description": "135 MHz oscillator decoupling",
+   "pins": {
+    "2": "GND",
+    "1": "+3V3"
+   }
+  },
+  "R24": {
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "AUX+ bias to ground (DisplayPort source)",
+   "pins": {
+    "2": "GND",
+    "1": "AUX_P_FPGA"
+   }
+  },
+  "R25": {
+   "value": "100k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "AUX- bias to 2.5 V (DisplayPort source)",
+   "pins": {
+    "1": "AUX_N_FPGA",
+    "2": "+2V5"
+   }
+  },
+  "R26": {
+   "value": "100R 1%",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "Transceiver termination calibration (MGTRREF to MGTAVTT)",
+   "pins": {
+    "2": "+1V2",
+    "1": "MGTRREF"
+   }
+  },
+  "R27": {
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "FUSB302 SCL pull-up",
+   "pins": {
+    "2": "+2V5",
+    "1": "PD_SCL"
+   }
+  },
+  "R28": {
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "FUSB302 SDA pull-up",
+   "pins": {
+    "2": "+2V5",
+    "1": "PD_SDA"
+   }
+  },
+  "R29": {
+   "value": "4.7k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "FUSB302 INT_N pull-up",
+   "pins": {
+    "2": "+2V5",
+    "1": "PD_INT_N"
+   }
+  },
+  "R30": {
+   "value": "10k",
+   "footprint": "Resistor_SMD:R_0603_1608Metric",
+   "part": "",
+   "description": "VBUS switch fault pull-up",
+   "pins": {
+    "2": "+2V5",
+    "1": "VBUS_FLT_N"
+   }
+  },
   "C16": {
    "value": "470n",
    "footprint": "Capacitor_SMD:C_0402_1005Metric",
@@ -1174,6 +1632,20 @@
   }
  },
  "nets": {
+  "AUX_N_FPGA": [
+   [
+    "C54",
+    "1"
+   ],
+   [
+    "R25",
+    "1"
+   ],
+   [
+    "U1",
+    "A1"
+   ]
+  ],
   "GND": [
    [
     "C1",
@@ -1336,11 +1808,67 @@
     "2"
    ],
    [
+    "C57",
+    "2"
+   ],
+   [
+    "C58",
+    "2"
+   ],
+   [
+    "C59",
+    "2"
+   ],
+   [
     "C6",
     "2"
    ],
    [
+    "C60",
+    "2"
+   ],
+   [
+    "C61",
+    "2"
+   ],
+   [
+    "C62",
+    "2"
+   ],
+   [
+    "C63",
+    "2"
+   ],
+   [
+    "C64",
+    "2"
+   ],
+   [
+    "C65",
+    "2"
+   ],
+   [
+    "C66",
+    "2"
+   ],
+   [
+    "C67",
+    "2"
+   ],
+   [
+    "C68",
+    "2"
+   ],
+   [
+    "C69",
+    "2"
+   ],
+   [
     "C7",
+    "2"
+   ],
+   [
+    "C70",
     "2"
    ],
    [
@@ -1428,6 +1956,26 @@
     "2"
    ],
    [
+    "J7",
+    "A1"
+   ],
+   [
+    "J7",
+    "A12"
+   ],
+   [
+    "J7",
+    "B1"
+   ],
+   [
+    "J7",
+    "B12"
+   ],
+   [
+    "J7",
+    "SH"
+   ],
+   [
     "R1",
     "2"
    ],
@@ -1441,6 +1989,10 @@
    ],
    [
     "R22",
+    "2"
+   ],
+   [
+    "R24",
     "2"
    ],
    [
@@ -1529,10 +2081,6 @@
    ],
    [
     "U1",
-    "B11"
-   ],
-   [
-    "U1",
     "B12"
    ],
    [
@@ -1545,19 +2093,7 @@
    ],
    [
     "U1",
-    "B5"
-   ],
-   [
-    "U1",
-    "B7"
-   ],
-   [
-    "U1",
     "B8"
-   ],
-   [
-    "U1",
-    "B9"
    ],
    [
     "U1",
@@ -1581,23 +2117,11 @@
    ],
    [
     "U1",
-    "C4"
-   ],
-   [
-    "U1",
     "C6"
    ],
    [
     "U1",
-    "C8"
-   ],
-   [
-    "U1",
     "C9"
-   ],
-   [
-    "U1",
-    "D10"
    ],
    [
     "U1",
@@ -1618,10 +2142,6 @@
    [
     "U1",
     "D4"
-   ],
-   [
-    "U1",
-    "D6"
    ],
    [
     "U1",
@@ -1657,10 +2177,6 @@
    ],
    [
     "U1",
-    "E8"
-   ],
-   [
-    "U1",
     "E9"
    ],
    [
@@ -1674,14 +2190,6 @@
    [
     "U1",
     "F5"
-   ],
-   [
-    "U1",
-    "F7"
-   ],
-   [
-    "U1",
-    "F9"
    ],
    [
     "U1",
@@ -1936,8 +2444,36 @@
     "2"
    ],
    [
+    "U6",
+    "15"
+   ],
+   [
+    "U6",
+    "8"
+   ],
+   [
+    "U6",
+    "9"
+   ],
+   [
+    "U7",
+    "2"
+   ],
+   [
+    "U8",
+    "2"
+   ],
+   [
+    "U9",
+    "2"
+   ],
+   [
     "X1",
     "2"
+   ],
+   [
+    "X2",
+    "3"
    ]
   ],
   "TMDS_D0P": [
@@ -2046,7 +2582,23 @@
     "1"
    ],
    [
+    "C57",
+    "1"
+   ],
+   [
+    "C59",
+    "1"
+   ],
+   [
     "C6",
+    "1"
+   ],
+   [
+    "C61",
+    "1"
+   ],
+   [
+    "C70",
     "1"
    ],
    [
@@ -2139,10 +2691,6 @@
    ],
    [
     "U1",
-    "C1"
-   ],
-   [
-    "U1",
     "C21"
    ],
    [
@@ -2159,10 +2707,6 @@
    ],
    [
     "U1",
-    "F2"
-   ],
-   [
-    "U1",
     "F22"
    ],
    [
@@ -2175,15 +2719,7 @@
    ],
    [
     "U1",
-    "H6"
-   ],
-   [
-    "U1",
     "J13"
-   ],
-   [
-    "U1",
-    "J3"
    ],
    [
     "U1",
@@ -2196,14 +2732,6 @@
    [
     "U1",
     "M14"
-   ],
-   [
-    "U1",
-    "M4"
-   ],
-   [
-    "U1",
-    "N1"
    ],
    [
     "U1",
@@ -2274,12 +2802,44 @@
     "8"
    ],
    [
+    "U6",
+    "3"
+   ],
+   [
+    "U6",
+    "4"
+   ],
+   [
+    "U8",
+    "1"
+   ],
+   [
+    "U8",
+    "3"
+   ],
+   [
+    "U9",
+    "1"
+   ],
+   [
+    "U9",
+    "3"
+   ],
+   [
     "X1",
     "1"
    ],
    [
     "X1",
     "4"
+   ],
+   [
+    "X2",
+    "1"
+   ],
+   [
+    "X2",
+    "6"
    ]
   ],
   "TMDS_CKP": [
@@ -2316,6 +2876,26 @@
     "A20"
    ]
   ],
+  "DP3_N_FPGA": [
+   [
+    "C52",
+    "1"
+   ],
+   [
+    "U1",
+    "A4"
+   ]
+  ],
+  "DP1_N_FPGA": [
+   [
+    "C48",
+    "1"
+   ],
+   [
+    "U1",
+    "A6"
+   ]
+  ],
   "UART_TX": [
    [
     "J6",
@@ -2348,6 +2928,66 @@
    [
     "U1",
     "AB12"
+   ]
+  ],
+  "AUX_P_FPGA": [
+   [
+    "C53",
+    "1"
+   ],
+   [
+    "R24",
+    "1"
+   ],
+   [
+    "U1",
+    "B1"
+   ]
+  ],
+  "+1V2": [
+   [
+    "C62",
+    "1"
+   ],
+   [
+    "C66",
+    "1"
+   ],
+   [
+    "C67",
+    "1"
+   ],
+   [
+    "R26",
+    "2"
+   ],
+   [
+    "U1",
+    "B11"
+   ],
+   [
+    "U1",
+    "B5"
+   ],
+   [
+    "U1",
+    "B7"
+   ],
+   [
+    "U1",
+    "B9"
+   ],
+   [
+    "U1",
+    "C4"
+   ],
+   [
+    "U1",
+    "C8"
+   ],
+   [
+    "U9",
+    "5"
    ]
   ],
   "TMDS_D2P": [
@@ -2392,6 +3032,262 @@
    [
     "U1",
     "B20"
+   ]
+  ],
+  "DP3_P_FPGA": [
+   [
+    "C51",
+    "1"
+   ],
+   [
+    "U1",
+    "B4"
+   ]
+  ],
+  "DP1_P_FPGA": [
+   [
+    "C47",
+    "1"
+   ],
+   [
+    "U1",
+    "B6"
+   ]
+  ],
+  "+2V5": [
+   [
+    "C60",
+    "1"
+   ],
+   [
+    "C68",
+    "1"
+   ],
+   [
+    "C69",
+    "1"
+   ],
+   [
+    "R25",
+    "2"
+   ],
+   [
+    "R27",
+    "2"
+   ],
+   [
+    "R28",
+    "2"
+   ],
+   [
+    "R29",
+    "2"
+   ],
+   [
+    "R30",
+    "2"
+   ],
+   [
+    "U1",
+    "C1"
+   ],
+   [
+    "U1",
+    "F2"
+   ],
+   [
+    "U1",
+    "H6"
+   ],
+   [
+    "U1",
+    "J3"
+   ],
+   [
+    "U1",
+    "M4"
+   ],
+   [
+    "U1",
+    "N1"
+   ],
+   [
+    "U8",
+    "5"
+   ]
+  ],
+  "PD_SCL": [
+   [
+    "R27",
+    "1"
+   ],
+   [
+    "U1",
+    "C2"
+   ],
+   [
+    "U6",
+    "6"
+   ]
+  ],
+  "DP2_N_FPGA": [
+   [
+    "C50",
+    "1"
+   ],
+   [
+    "U1",
+    "C5"
+   ]
+  ],
+  "DP0_N_FPGA": [
+   [
+    "C46",
+    "1"
+   ],
+   [
+    "U1",
+    "C7"
+   ]
+  ],
+  "PD_SDA": [
+   [
+    "R28",
+    "1"
+   ],
+   [
+    "U1",
+    "D1"
+   ],
+   [
+    "U6",
+    "7"
+   ]
+  ],
+  "+1V0_MGT": [
+   [
+    "C63",
+    "1"
+   ],
+   [
+    "C64",
+    "1"
+   ],
+   [
+    "C65",
+    "1"
+   ],
+   [
+    "FB1",
+    "2"
+   ],
+   [
+    "U1",
+    "D10"
+   ],
+   [
+    "U1",
+    "D6"
+   ],
+   [
+    "U1",
+    "E8"
+   ],
+   [
+    "U1",
+    "F7"
+   ],
+   [
+    "U1",
+    "F9"
+   ]
+  ],
+  "DP2_P_FPGA": [
+   [
+    "C49",
+    "1"
+   ],
+   [
+    "U1",
+    "D5"
+   ]
+  ],
+  "DP0_P_FPGA": [
+   [
+    "C45",
+    "1"
+   ],
+   [
+    "U1",
+    "D7"
+   ]
+  ],
+  "PD_INT_N": [
+   [
+    "R29",
+    "1"
+   ],
+   [
+    "U1",
+    "E1"
+   ],
+   [
+    "U6",
+    "5"
+   ]
+  ],
+  "REFCLK_N_FPGA": [
+   [
+    "C56",
+    "1"
+   ],
+   [
+    "U1",
+    "E6"
+   ]
+  ],
+  "VBUS_EN": [
+   [
+    "U1",
+    "F1"
+   ],
+   [
+    "U7",
+    "4"
+   ]
+  ],
+  "REFCLK_P_FPGA": [
+   [
+    "C55",
+    "1"
+   ],
+   [
+    "U1",
+    "F6"
+   ]
+  ],
+  "MGTRREF": [
+   [
+    "R26",
+    "1"
+   ],
+   [
+    "U1",
+    "F8"
+   ]
+  ],
+  "VBUS_FLT_N": [
+   [
+    "R30",
+    "1"
+   ],
+   [
+    "U1",
+    "G1"
+   ],
+   [
+    "U7",
+    "3"
    ]
   ],
   "DONE": [
@@ -2459,6 +3355,10 @@
    ],
    [
     "C7",
+    "1"
+   ],
+   [
+    "FB1",
     "1"
    ],
    [
@@ -2858,6 +3758,10 @@
    [
     "U5",
     "4"
+   ],
+   [
+    "U7",
+    "5"
    ]
   ],
   "USBC_CC1": [
@@ -3015,6 +3919,184 @@
     "R20",
     "2"
    ]
+  ],
+  "DP0_P": [
+   [
+    "C45",
+    "2"
+   ],
+   [
+    "J7",
+    "A2"
+   ]
+  ],
+  "DP0_N": [
+   [
+    "C46",
+    "2"
+   ],
+   [
+    "J7",
+    "A3"
+   ]
+  ],
+  "DP1_P": [
+   [
+    "C47",
+    "2"
+   ],
+   [
+    "J7",
+    "B11"
+   ]
+  ],
+  "DP1_N": [
+   [
+    "C48",
+    "2"
+   ],
+   [
+    "J7",
+    "B10"
+   ]
+  ],
+  "DP2_P": [
+   [
+    "C49",
+    "2"
+   ],
+   [
+    "J7",
+    "B2"
+   ]
+  ],
+  "DP2_N": [
+   [
+    "C50",
+    "2"
+   ],
+   [
+    "J7",
+    "B3"
+   ]
+  ],
+  "DP3_P": [
+   [
+    "C51",
+    "2"
+   ],
+   [
+    "J7",
+    "A11"
+   ]
+  ],
+  "DP3_N": [
+   [
+    "C52",
+    "2"
+   ],
+   [
+    "J7",
+    "A10"
+   ]
+  ],
+  "SBU1": [
+   [
+    "C53",
+    "2"
+   ],
+   [
+    "J7",
+    "A8"
+   ]
+  ],
+  "SBU2": [
+   [
+    "C54",
+    "2"
+   ],
+   [
+    "J7",
+    "B8"
+   ]
+  ],
+  "VIDEO_CC1": [
+   [
+    "J7",
+    "A5"
+   ],
+   [
+    "U6",
+    "10"
+   ],
+   [
+    "U6",
+    "11"
+   ]
+  ],
+  "VIDEO_CC2": [
+   [
+    "J7",
+    "B5"
+   ],
+   [
+    "U6",
+    "1"
+   ],
+   [
+    "U6",
+    "14"
+   ]
+  ],
+  "VIDEO_VBUS": [
+   [
+    "C58",
+    "1"
+   ],
+   [
+    "J7",
+    "A4"
+   ],
+   [
+    "J7",
+    "A9"
+   ],
+   [
+    "J7",
+    "B4"
+   ],
+   [
+    "J7",
+    "B9"
+   ],
+   [
+    "U6",
+    "2"
+   ],
+   [
+    "U7",
+    "1"
+   ]
+  ],
+  "REFCLK_P": [
+   [
+    "C55",
+    "2"
+   ],
+   [
+    "X2",
+    "4"
+   ]
+  ],
+  "REFCLK_N": [
+   [
+    "C56",
+    "2"
+   ],
+   [
+    "X2",
+    "5"
+   ]
   ]
  },
  "io": {
@@ -3125,6 +4207,48 @@
    "standard": "LVCMOS33",
    "use": "RESET button (low when pressed)",
    "bank": "13"
+  },
+  "dp_aux_p": {
+   "ball": "B1",
+   "standard": "LVDS_25",
+   "use": "DisplayPort AUX+ (SBU1)",
+   "bank": "35"
+  },
+  "dp_aux_n": {
+   "ball": "A1",
+   "standard": "LVDS_25",
+   "use": "DisplayPort AUX- (SBU2)",
+   "bank": "35"
+  },
+  "pd_scl": {
+   "ball": "C2",
+   "standard": "LVCMOS25",
+   "use": "FUSB302 I2C clock",
+   "bank": "35"
+  },
+  "pd_sda": {
+   "ball": "D1",
+   "standard": "LVCMOS25",
+   "use": "FUSB302 I2C data",
+   "bank": "35"
+  },
+  "pd_int_n": {
+   "ball": "E1",
+   "standard": "LVCMOS25",
+   "use": "FUSB302 interrupt",
+   "bank": "35"
+  },
+  "vbus_en": {
+   "ball": "F1",
+   "standard": "LVCMOS25",
+   "use": "Monitor VBUS switch on",
+   "bank": "35"
+  },
+  "vbus_flt_n": {
+   "ball": "G1",
+   "standard": "LVCMOS25",
+   "use": "Monitor VBUS fault",
+   "bank": "35"
   }
  }
 }

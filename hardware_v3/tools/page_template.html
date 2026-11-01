@@ -11,7 +11,7 @@
 <header>
   <span class="kicker">PSI COMP80 · version 3 · in an FPGA</span>
   <h1>COMP80 v3 Hardware</h1>
-  <p>The <a href="hardware_v2.html">v2 board</a> runs the COMP80's ROMs on a Z80 emulator in software. This one builds the computer again in logic, inside an AMD Artix-7 XC7A100T FPGA. There's a Z80 in Verilog with its 64 KB of memory, the I/O ports, the keyboard latch and its NMI, and the display generator, all clocked like hardware. It has the same outside as v2: HDMI, a USB keyboard, ROMs and tapes on a microSD card, and USB-C power.</p>
+  <p>The <a href="hardware_v2.html">v2 board</a> runs the COMP80's ROMs on a Z80 emulator in software. This one builds the computer again in logic, inside an AMD Artix-7 XC7A100T FPGA. There's a Z80 in Verilog with its 64 KB of memory, the I/O ports, the keyboard latch and its NMI, and the display generator, all clocked like hardware. It has v2's outside, HDMI, a USB keyboard, ROMs and tapes on a microSD card, and USB-C power, plus a second USB-C socket that sends the screen to a USB-C monitor as DisplayPort.</p>
   <p>Two things stay in software, on a small RISC-V processor inside the same FPGA: the MM57109 calculator chip, which did BCD floating point, and the jobs a modern machine needs, like reading the card and drawing a set-up screen. See the <a href="hardware.html">original board</a>, <a href="hardware_v2.html">v2</a>, the <a href="emulator.html">emulator</a> and the <a href="roms.html">ROM listings</a>.</p>
   <ul class="spec">
     <li><b>XC7A100T</b> FGG484</li>
@@ -19,7 +19,8 @@
     <li><b>HDMI</b> 640 × 480</li>
     <li><b>USB</b> keyboard</li>
     <li><b>microSD</b> ROMs and tapes</li>
-    <li><b>USB-C</b> 5 V</li>
+    <li><b>USB-C</b> 5 V in</li>
+    <li><b>USB-C</b> DisplayPort out</li>
     <li><b>{{NPARTS}}</b> parts, 6 layers</li>
   </ul>
 </header>
@@ -65,7 +66,7 @@
         </div>
         <span class="scale" id="scale"></span>
       </div>
-      <p class="hint" id="status">Routed by Freerouting after the BGA breakout and plane vias were laid by script: {{NTRACKS}} track segments, {{NVIAS}} vias. KiCad's design check finds no errors.</p>
+      <p class="hint" id="status">Routed by Freerouting after the hard parts were laid by script: the BGA breakout, the plane and island vias, and the escapes from the USB-C and HDMI sockets' fine-pitch pins. A grid router finished the last few. {{NTRACKS}} track segments, {{NVIAS}} vias. KiCad's design check finds no errors.</p>
     </div>
     <aside class="info" id="info" aria-live="polite"></aside>
   </div>
@@ -78,30 +79,33 @@
   </div>
 
   <figure class="figure diagram">
-    <svg class="dg" viewBox="0 0 760 360" role="img" aria-label="Block diagram: inside the FPGA, the COMP80 machine (Z80, 64 KB, ports, keyboard latch) feeds the display and HDMI logic and talks to the system controller, a PicoRV32 RISC-V processor that reads the microSD card and models the MM57109. A USB host core reads the keyboard. Outside: a 100 MHz oscillator, the configuration flash, three regulators, and the HDMI, USB-A, microSD and USB-C connectors.">
+    <svg class="dg" viewBox="0 0 760 360" role="img" aria-label="Block diagram: inside the FPGA, the COMP80 machine (Z80, 64 KB, ports, keyboard latch) feeds the HDMI display logic and the DisplayPort transmitter, and talks to the system controller, a PicoRV32 RISC-V processor that reads the microSD card, models the MM57109 and runs USB Power Delivery for the monitor socket. A USB host core reads the keyboard. Outside: a 100 MHz oscillator, the configuration flash, the regulators, and the HDMI, USB-C video, USB-A, microSD and USB-C power connectors.">
       <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor" stroke="none"/></marker></defs>
       <rect class="mcu" x="190" y="20" width="390" height="320" rx="8"/>
       <text x="385" y="44">XC7A100T · U1</text>
       <rect x="210" y="60" width="200" height="110" rx="5"/><text x="310" y="84">COMP80 machine</text>
       <text class="s" x="310" y="104">Z80 (TV80) · 64 KB</text><text class="s" x="310" y="120">ports 00 01 03 20 60</text><text class="s" x="310" y="136">key latch → NMI</text><text class="s" x="310" y="152">INT ← MM57109</text>
-      <rect x="430" y="60" width="130" height="110" rx="5"/><text x="495" y="84">Display</text>
-      <text class="s" x="495" y="104">64 × 32 → 640 × 480</text><text class="s" x="495" y="120">TMDS encoders</text><text class="s" x="495" y="136">OSERDES 10:1</text>
+      <rect x="430" y="60" width="130" height="54" rx="5"/><text x="495" y="82">HDMI</text>
+      <text class="s" x="495" y="100">640 × 480 · TMDS</text>
+      <rect x="430" y="122" width="130" height="54" rx="5"/><text x="495" y="144">DisplayPort</text>
+      <text class="s" x="495" y="162">800 × 600 · GTP</text>
       <rect x="210" y="190" width="200" height="130" rx="5"/><text x="310" y="214">System controller</text>
-      <text class="s" x="310" y="234">PicoRV32 RISC-V · 128 KB</text><text class="s" x="310" y="250">MM57109 model · tapes</text><text class="s" x="310" y="266">microSD (FatFs) · menu</text><text class="s" x="310" y="282">keys from USB reports</text>
+      <text class="s" x="310" y="234">PicoRV32 RISC-V · 128 KB</text><text class="s" x="310" y="250">MM57109 model · tapes</text><text class="s" x="310" y="266">microSD (FatFs) · menu</text><text class="s" x="310" y="282">keys from USB reports</text><text class="s" x="310" y="298">USB-PD for the monitor</text>
       <rect x="430" y="190" width="130" height="62" rx="5"/><text x="495" y="214">USB host</text><text class="s" x="495" y="232">usb_hid_host · 12 MHz</text>
-      <rect x="430" y="268" width="130" height="52" rx="5"/><text x="495" y="291">Clocks</text><text class="s" x="495" y="307">PLL + MMCM</text>
-      <path class="ar" d="M410 115H428"/><path d="M310 170V188"/><path d="M430 221H410"/>
+      <rect x="430" y="288" width="130" height="44" rx="5"/><text x="495" y="306">Clocks</text><text class="s" x="495" y="322">PLL + MMCM</text>
+      <path class="ar" d="M410 115H419V87H428"/><path class="ar" d="M419 115V149H428"/><path d="M310 170V188"/><path d="M430 221H410"/>
       <rect x="610" y="40" width="130" height="50" rx="6"/><text x="675" y="62">HDMI · J2</text><text class="s" x="675" y="78">TMDS_33</text>
+      <rect x="610" y="110" width="130" height="60" rx="6"/><text x="675" y="132">USB-C · J7</text><text class="s" x="675" y="148">DisplayPort</text><text class="s" x="675" y="162">PD: FUSB302 · U6</text>
       <rect x="610" y="190" width="130" height="50" rx="6"/><text x="675" y="212">USB-A · J3</text><text class="s" x="675" y="228">keyboard</text>
       <rect x="610" y="260" width="130" height="50" rx="6"/><text x="675" y="282">microSD · J4</text><text class="s" x="675" y="298">SPI</text>
-      <path class="ar" d="M560 100H580V65H608"/><path d="M560 215H608"/><path d="M410 300H590V285H608"/>
+      <path class="ar" d="M560 87H580V65H608"/><path class="ar" d="M560 149H608"/><path d="M560 215H608"/><path d="M410 272H608"/>
       <rect x="20" y="40" width="140" height="50" rx="6"/><text x="90" y="62">100 MHz · X1</text><text class="s" x="90" y="78">oscillator</text>
       <rect x="20" y="120" width="140" height="50" rx="6"/><text x="90" y="142">Flash · U2</text><text class="s" x="90" y="158">16 MB, configuration</text>
-      <rect x="20" y="200" width="140" height="60" rx="6"/><text x="90" y="222">Regulators · U3–U5</text><text class="s" x="90" y="240">1.0 · 1.8 · 3.3 V</text>
+      <rect x="20" y="200" width="140" height="60" rx="6"/><text x="90" y="220">Regulators</text><text class="s" x="90" y="237">1.0 · 1.8 · 3.3 V</text><text class="s" x="90" y="252">2.5 · 1.2 V</text>
       <rect x="20" y="285" width="140" height="50" rx="6"/><text x="90" y="307">USB-C · J1</text><text class="s" x="90" y="323">5 V in</text>
       <path class="ar" d="M160 65H188"/><path d="M160 145H188"/><path class="ar" d="M160 230H188"/><path class="ar" d="M90 285V262"/>
     </svg>
-    <figcaption>The COMP80 machine is the part that matters: the ROMs see a Z80, its memory and its ports, as they were.</figcaption>
+    <figcaption>The COMP80 machine is the part that matters: the ROMs see a Z80, its memory and its ports, as they were. The rest shows them its screen, on two kinds of monitor.</figcaption>
   </figure>
 
   <div class="circuits">
@@ -147,6 +151,22 @@
 
   <div class="block">
     <div class="prose">
+      <span class="kicker">rtl/dp_out.v, firmware/pd.c, J7</span>
+      <h3>DisplayPort over USB-C</h3>
+      <p>The second USB-C socket, <button class="pl" data-ref="J7">J7</button>, is for a USB-C monitor. It carries DisplayPort in alternate mode: the cable's high-speed pairs carry DisplayPort lanes instead of USB, and its SBU wires carry DisplayPort's AUX channel. The transmitter is Mike Field's open DisplayPort core, made for this Artix-7 family. It sends 800 × 600 at 60 Hz on one lane at 2.7 Gb/s from the FPGA's GTP transceivers, which run from their own 135 MHz oscillator <button class="pl" data-ref="X2">X2</button>. In place of his test patterns, a COMP80 source draws the same screen as HDMI does, its 6 × 10 characters as 12 × 18 pixels.</p>
+      <p>Before any of that, the two ends agree terms over USB Power Delivery. The system controller does that through a <button class="pl" data-ref="U6">FUSB302B</button>, a PD interface chip on I²C. It finds the monitor's pull-down on one of the CC pins, which also tells it which way up the plug is, and switches 5 V to the monitor through <button class="pl" data-ref="U7">U7</button>. Then it asks the monitor what it is and enters DisplayPort mode. Last, it tells the logic which of the socket's four pairs carries the lane and whether the AUX wires are crossed. A USB-C plug fits either way up, and that's how this design copes with it: the FPGA can drive any lane on any pair, so no crossbar switch is needed.</p>
+      <p>The picture is a frame from the simulation. The COMP80 source and the core's stream-attribute logic ran on a real screen, and the symbols on the lane were decoded back into pixels. All 480,000 match. The transceivers and the AUX channel need hardware to test.</p>
+    </div>
+    <div class="side">
+      <div class="frames">
+        <figure><img src="{{FRAME_DP}}" alt="A simulated DisplayPort frame: the COMP80's screen at 800 by 600, decoded from the lane's symbols" loading="lazy"><figcaption>The DisplayPort frame, decoded from the lane.</figcaption></figure>
+      </div>
+      <button type="button" class="btn show" data-sec="dp">Show the USB-C video parts</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="prose">
       <span class="kicker">rtl/soc.v, firmware/</span>
       <h3>The system controller</h3>
       <p>A PicoRV32, a small RISC-V processor, runs from 128 KB of block RAM loaded with its program when the FPGA configures. It does what the COMP80 never had to: it reads ROM images and tapes from the card, draws the set-up screen, and turns USB keyboard reports into COMP80 key codes.</p>
@@ -172,8 +192,8 @@
     <div class="prose">
       <span class="kicker">U1, U2, X1, J5</span>
       <h3>The FPGA and its configuration</h3>
-      <p>The <button class="pl" data-ref="U1">XC7A100T</button> comes in a 484-ball BGA at 1 mm pitch; this design uses 208 of the balls. At power-on it loads its configuration from the 16 MB SPI flash <button class="pl" data-ref="U2">U2</button> in Master SPI mode (M0 high, M1 and M2 low). <button class="pl" data-ref="D2">DONE</button> lights when it's ready. <button class="pl" data-ref="SW2">PROG</button> makes it load again, and the JTAG header <button class="pl" data-ref="J5">J5</button> is for Vivado.</p>
-      <p>Every I/O bank runs at 3.3 V. The 100 MHz oscillator <button class="pl" data-ref="X1">X1</button> feeds a PLL (50 MHz for the system, 12 MHz for USB) and an MMCM (25 MHz pixels, 125 MHz for the serialisers).</p>
+      <p>The <button class="pl" data-ref="U1">XC7A100T</button> comes in a 484-ball BGA at 1 mm pitch; this design uses 226 of the balls. At power-on it loads its configuration from the 16 MB SPI flash <button class="pl" data-ref="U2">U2</button> in Master SPI mode (M0 high, M1 and M2 low). <button class="pl" data-ref="D2">DONE</button> lights when it's ready. <button class="pl" data-ref="SW2">PROG</button> makes it load again, and the JTAG header <button class="pl" data-ref="J5">J5</button> is for Vivado.</p>
+      <p>Every I/O bank runs at 3.3 V but bank 35, at 2.5 V for the DisplayPort AUX channel's LVDS. The 100 MHz oscillator <button class="pl" data-ref="X1">X1</button> feeds a PLL (50 MHz for the system, 12 MHz for USB) and an MMCM (25 MHz pixels, 125 MHz for the serialisers).</p>
     </div>
     <div class="side">
       <button type="button" class="btn show" data-sec="fpga">Show the FPGA's parts</button>
@@ -186,9 +206,10 @@
 
   <div class="block">
     <div class="prose">
-      <span class="kicker">U3–U5, J1</span>
+      <span class="kicker">U3–U5, U8, U9, J1</span>
       <h3>Power</h3>
       <p>The USB-C socket <button class="pl" data-ref="J1">J1</button> asks for 5 V through its CC resistors. Three TLV62569 buck regulators make the FPGA's rails: <button class="pl" data-ref="U3">1.0 V</button> for its core and block RAM, <button class="pl" data-ref="U4">1.8 V</button> for its auxiliary supply, and <button class="pl" data-ref="U5">3.3 V</button> for the I/O banks and everything else. Each rail has a plane of its own on the inner layers, and a ring of capacitors round the BGA.</p>
+      <p>Two small LDOs serve the DisplayPort side: <button class="pl" data-ref="U8">2.5 V</button> for bank 35 and <button class="pl" data-ref="U9">1.2 V</button> for the transceivers' termination supply. The transceivers' 1.0 V is the core rail through the ferrite bead <button class="pl" data-ref="FB1">FB1</button>. Every transceiver supply ball is in the BGA's top-left corner, so their two rails are islands in the inner planes under that corner. Bank 35's 2.5 V is an island too, in the 3.3 V plane under the BGA's left columns.</p>
     </div>
     <div class="side">
       <button type="button" class="btn show" data-sec="power">Show the power parts</button>
@@ -221,7 +242,8 @@
         <li><b>The machine against the C model.</b> Verilator runs the logic through LISP, FORTH and BURP test sessions. The screens come out identical to the v2 firmware's C core, which in turn matches the web emulator and MAME. BURP's calculations prove the MM57109 bridge and the WAIT on OUT 60.</li>
         <li><b>The whole system boots.</b> With the PicoRV32 running its firmware, the simulation prints <code>COMP80 v3</code> on the serial port, loads the built-in ROM and starts the Z80. The Z80 reaches the monitor's READY prompt and halts waiting for a key.</li>
         <li><b>The display.</b> Icarus Verilog draws frames from real screens (above), and every TMDS symbol decodes back to its pixel.</li>
-        <li><b>It fits.</b> yosys synthesises the whole design for the XC7A100T: about a sixteenth of the logic, and well over half the block RAM still free.</li>
+        <li><b>DisplayPort.</b> The COMP80 source's lane symbols, decoded, give back the screen pixel for pixel. The USB-PD firmware runs in the boot simulation as far as reading the FUSB302's ID.</li>
+        <li><b>It fits.</b> yosys synthesises the whole design for the XC7A100T, all four transceivers included: under a tenth of the logic, and well over half the block RAM still free.</li>
       </ul>
     </div>
     <div class="side">
@@ -244,6 +266,19 @@ cd vivado
 vivado -mode batch -source build.tcl</pre>
     </div>
   </div>
+  <div class="block">
+    <div class="prose">
+      <span class="kicker">hardware_v3/SETUP.md</span>
+      <h3>Setting up a board</h3>
+      <p><code>SETUP.md</code> takes a built board from first power to READY. Check the six rails before programming. Write the bitstream to the flash over JTAG, with Vivado's Hardware Manager or with openFPGALoader, which also runs on macOS. Put the ROMs in <code>/COMP80/ROMS</code> on a FAT32 card and tapes in <code>/COMP80/TAPES</code>.</p>
+      <p>The guide also covers the keys, the serial console on J6 at 115200 baud, what happens when a USB-C monitor is plugged in, and a table of faults and where to look. The one thing to check first on a new board is the USB-C monitor with the plug both ways up: the lane order for each orientation was worked out from the specifications, not measured.</p>
+    </div>
+    <div class="side">
+      <pre class="tree">openFPGALoader -c digilent_hs2 \
+  --fpga-part xc7a100tfgg484 \
+  -f out/comp80v3.bit</pre>
+    </div>
+  </div>
   </div>
 </section>
 
@@ -260,6 +295,7 @@ vivado -mode batch -source build.tcl</pre>
       <label><input type="radio" name="psec" value="config"><span>Config</span></label>
       <label><input type="radio" name="psec" value="power"><span>Power</span></label>
       <label><input type="radio" name="psec" value="video"><span>HDMI</span></label>
+      <label><input type="radio" name="psec" value="dp"><span>USB-C video</span></label>
       <label><input type="radio" name="psec" value="usb"><span>Keyboard</span></label>
       <label><input type="radio" name="psec" value="sd"><span>microSD</span></label>
       <label><input type="radio" name="psec" value="misc"><span>Other</span></label>
@@ -282,7 +318,8 @@ vivado -mode batch -source build.tcl</pre>
     <li><b>Not built, and not through Vivado.</b> The design simulates, synthesises with yosys and fits, and the board passes KiCad's design check. Timing closure and the bitstream are the next step.</li>
     <li><b>Assembly.</b> A 484-ball BGA wants a board house that assembles BGAs. The board is six layers, 0.15 mm tracks with 0.12 mm gaps, and 0.45 mm vias with 0.2 mm holes.</li>
     <li><b>Low-speed keyboards.</b> usb_hid_host does USB low speed only, and no hubs. Nearly every keyboard is low speed.</li>
-    <li><b>Video over USB-C</b> would be possible on this FPGA. Its GTP transceivers can carry DisplayPort, and a USB-C socket can carry that in alternate mode. It would take a DisplayPort transmitter in the logic, a USB Power Delivery controller to agree the mode, and a switch for the cable's orientation. None of that is here.</li>
+    <li><b>USB-C video</b> needs a monitor that takes DisplayPort over USB-C and a cable with the high-speed pairs; charge-only cables won't do. The board gives the monitor 5 V but takes no power from it. It's one lane at 800 × 600, enough for the COMP80's 64 × 32 characters.</li>
+    <li><b>On the silkscreen</b> along the bottom edge: the COMP80's screen from the kit leaflet's cover, dot for dot from the picture program, with the board's name and its line from the 1979 original.</li>
     <li><b>Not carried over:</b> the teleprinter port, the floppy disc and real cassettes, as on v2.</li>
   </ul>
 </section>

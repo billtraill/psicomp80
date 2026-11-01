@@ -21,7 +21,25 @@ read_verilog [list \
     $root/rtl/hdmi_out.v $root/rtl/soc.v $root/rtl/spi_master.v \
     $root/build/tv80/rtl/core/tv80_core.v $root/build/tv80/rtl/core/tv80_alu.v \
     $root/build/tv80/rtl/core/tv80_mcode.v $root/build/tv80/rtl/core/tv80_reg.v \
-    $root/build/picorv32/picorv32.v]
+    $root/build/picorv32/picorv32.v \
+    $root/rtl/dp_out.v $root/rtl/dp_comp80_source.v $root/rtl/dp_transceivers.v \
+    $root/build/DisplayPort_Verilog/src/main_stream_processing.v \
+    $root/build/DisplayPort_Verilog/src/idle_pattern_inserter.v \
+    $root/build/DisplayPort_Verilog/src/insert_training_pattern.v \
+    $root/build/DisplayPort_Verilog/src/scrambler_all_channels.v \
+    $root/build/DisplayPort_Verilog/src/scrambler_reset_inserter.v \
+    $root/build/DisplayPort_Verilog/src/skew_channels.v \
+    $root/build/DisplayPort_Verilog/src/auxch/channel_managemnt.v \
+    $root/build/DisplayPort_Verilog/src/auxch/aux_channel.v \
+    $root/build/DisplayPort_Verilog/src/auxch/aux_interface.v \
+    $root/build/DisplayPort_Verilog/src/auxch/dp_aux_messages.v \
+    $root/build/DisplayPort_Verilog/src/auxch/dp_register_decode.v \
+    $root/build/DisplayPort_Verilog/src/auxch/edid_decode.v \
+    $root/build/DisplayPort_Verilog/src/auxch/hotplug_decode.v \
+    $root/build/DisplayPort_Verilog/src/auxch/link_signal_mgmt.v \
+    $root/build/DisplayPort_Verilog/src/artix7/transceiver.v \
+    $root/build/DisplayPort_Verilog/src/artix7/gtx_tx_reset_controller.v \
+    $root/build/DisplayPort_Verilog/src/test_streams/insert_main_stream_attrbutes_one_channel.v]
 read_verilog -sv [list $root/build/usb_hid_host/src/usb_hid_host.v $root/build/usb_hid_host/src/usb_hid_host_rom.v]
 read_xdc $root/rtl/comp80v3.xdc
 

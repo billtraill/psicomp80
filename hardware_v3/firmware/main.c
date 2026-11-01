@@ -1,7 +1,8 @@
 // COMP80 v3 system controller firmware, for the PicoRV32 in the FPGA.  The
 // COMP80 itself is logic (comp80_machine.v); this loads its ROM from the
 // microSD card, stands in for the MM57109 and the tape interface, turns USB
-// keyboard reports into COMP80 keys, and draws the set-up screen.  The
+// keyboard reports into COMP80 keys, draws the set-up screen, and talks USB-PD
+// to a monitor on the USB-C video socket (pd.c).  The
 // MM57109 model, the WAV tapes and the card's files are the v2 firmware's own
 // mm57109.c, tape.c and storage.c.
 #include <stdio.h>
@@ -12,6 +13,7 @@
 #include "ff.h"
 #include "hw.h"
 #include "mm57109.h"
+#include "pd.h"
 #include "storage.h"
 #include "tape.h"
 #include "video.h"
@@ -93,6 +95,7 @@ static void reset_key(void) {
 static int last_tape_out = 1;
 
 static void service(void) {
+    pd_poll(tape_state() != TAPE_STOPPED);     // the USB-C monitor; slow checks wait while a tape runs
     uint32_t st = M_STATUS;
     if (st & ST_MM_CMD) {                      // an OUT 60: the Z80 waits for this
         mm_write(M_MM_CMD);
@@ -299,6 +302,7 @@ static void menu(bool tapes_only) {
 // ------------------------------------------------------------ main
 int main(void) {
     printf("COMP80 v3\n");
+    pd_init();
     if (!storage_mount()) printf("no microSD card: the built-in BURP ROM\n");
     storage_load_settings(&cfg);
     power_on();

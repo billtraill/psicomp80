@@ -1,8 +1,9 @@
 # yosys: synthesise COMP80 v3 for the XC7A100T, to check it builds and fits
 read_verilog -lib -specify +/xilinx/cells_sim.v +/xilinx/cells_xtra.v
-read_verilog -sv ../../rtl/top.v ../../rtl/comp80_machine.v ../../rtl/tv80c.v ../../rtl/video.v ../../rtl/hdmi_out.v ../../rtl/soc.v ../../rtl/spi_master.v
+read_verilog -sv ../../rtl/top.v ../../rtl/comp80_machine.v ../../rtl/tv80c.v ../../rtl/video.v ../../rtl/hdmi_out.v ../../rtl/soc.v ../../rtl/spi_master.v ../../rtl/dp_out.v ../../rtl/dp_comp80_source.v ../../rtl/dp_transceivers.v
 read_verilog -sv ../tv80/rtl/core/tv80_core.v ../tv80/rtl/core/tv80_alu.v ../tv80/rtl/core/tv80_mcode.v ../tv80/rtl/core/tv80_reg.v
 read_verilog -sv ../picorv32/picorv32.v
+read_verilog -sv ../DisplayPort_Verilog/src/main_stream_processing.v ../DisplayPort_Verilog/src/idle_pattern_inserter.v ../DisplayPort_Verilog/src/insert_training_pattern.v ../DisplayPort_Verilog/src/scrambler_all_channels.v ../DisplayPort_Verilog/src/scrambler_reset_inserter.v ../DisplayPort_Verilog/src/skew_channels.v ../DisplayPort_Verilog/src/auxch/channel_managemnt.v ../DisplayPort_Verilog/src/auxch/aux_channel.v ../DisplayPort_Verilog/src/auxch/aux_interface.v ../DisplayPort_Verilog/src/auxch/dp_aux_messages.v ../DisplayPort_Verilog/src/auxch/dp_register_decode.v ../DisplayPort_Verilog/src/auxch/edid_decode.v ../DisplayPort_Verilog/src/auxch/hotplug_decode.v ../DisplayPort_Verilog/src/auxch/link_signal_mgmt.v ../DisplayPort_Verilog/src/artix7/transceiver.v ../DisplayPort_Verilog/src/artix7/gtx_tx_reset_controller.v ../DisplayPort_Verilog/src/test_streams/insert_main_stream_attrbutes_one_channel.v
 read_verilog -sv ../usb_hid_host/src/usb_hid_host.v ../usb_hid_host/src/usb_hid_host_rom.v
 synth_xilinx -family xc7 -top top
 tee -o utilisation.txt stat -top top

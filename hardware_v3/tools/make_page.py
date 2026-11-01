@@ -23,11 +23,15 @@ PCB = HERE.parent / "kicad" / "comp80v3.kicad_pcb"
 OUT = REPO / "hardware_v3.html"
 
 SECTIONS = [("fpga", "FPGA"), ("config", "Configuration"), ("power", "Power"), ("video", "HDMI"),
-            ("usb", "Keyboard"), ("sd", "microSD"), ("misc", "Buttons and debug")]
+            ("dp", "USB-C video"), ("usb", "Keyboard"), ("sd", "microSD"), ("misc", "Buttons and debug")]
+DP_PARTS = {"J7", "U6", "U7", "X2", "C70", "R24", "R25", "R26", "R27", "R28", "R29", "R30",
+            *(f"C{n}" for n in range(45, 59))}
 DECOUPLE = {c[0] for c in d.DECOUPLE}
 
 
 def section_of(ref):
+    if ref in DP_PARTS:
+        return "dp"
     if ref == "U1" or ref in DECOUPLE or ref in ("C7", "C8", "C9", "X1", "C10"):
         return "fpga"
     if ref in ("U2", "C11", "R23", "R9", "R10", "R11", "R12", "R13", "D2", "SW2", "J5"):
@@ -169,9 +173,9 @@ def template():
         <li><i style="background:var(--cuT)"></i>Top copper (all the parts are on top)</li>
         <li><i style="background:var(--cuB)"></i>Bottom copper</li>
         <li><i style="background:var(--gnd)"></i>Ground plane, inner layer 1</li>
-        <li><i style="background:var(--v33)"></i>3.3 V plane, inner layer 2</li>
-        <li><i style="background:var(--v10)"></i>1.0 V plane, inner layer 3</li>
-        <li><i style="background:var(--v18)"></i>1.8 V plane, inner layer 4</li>
+        <li><i style="background:var(--v33)"></i>3.3 V plane, inner layer 2, with a 2.5 V island</li>
+        <li><i style="background:var(--v10)"></i>1.0 V plane, inner layer 3, with the transceivers' 1.0 V island</li>
+        <li><i style="background:var(--v18)"></i>1.8 V plane, inner layer 4, with a 1.2 V island</li>
         <li><i style="background:var(--pad)"></i>Pads and vias</li>
         <li><i style="background:var(--hl)"></i>The signal you pick</li>
       </ul>
@@ -232,6 +236,7 @@ def main():
             .replace("{{IO}}", io_table())
             .replace("{{FRAME_BURP}}", img(HERE.parent / "pictures" / "frame_burp.png"))
             .replace("{{FRAME_LIFE}}", img(HERE.parent / "pictures" / "frame_life.png"))
+            .replace("{{FRAME_DP}}", img(HERE.parent / "pictures" / "frame_dp.png"))
             .replace("{{UTIL}}", util())
             .replace("{{NPARTS}}", str(sum(1 for c in b["comps"] if c["kind"] != "Mounting hole")))
             .replace("{{NVIAS}}", str(len(b["vias"])))

@@ -6,7 +6,7 @@ V2 = ../../hardware_v2/firmware/src
 FF = ../build/fatfs/source
 CFLAGS = -march=rv32imc -mabi=ilp32 -Os -ffunction-sections -fdata-sections -Wall \
          -I. -I$(V2) -Ibuild
-SRC = start.S main.c sd_spi.c $(V2)/mm57109.c $(V2)/tape.c $(V2)/storage.c $(V2)/data.c \
+SRC = start.S main.c sd_spi.c pd.c $(V2)/mm57109.c $(V2)/tape.c $(V2)/storage.c $(V2)/data.c \
       build/ff.c build/ffunicode.c
 
 firmware.hex: build/firmware.bin
@@ -15,7 +15,7 @@ firmware.hex: build/firmware.bin
 build/firmware.bin: build/firmware.elf
 	$(CROSS)objcopy -O binary $< $@
 
-build/firmware.elf: $(SRC) link.ld hw.h
+build/firmware.elf: $(SRC) link.ld hw.h pd.h
 	$(CROSS)gcc $(CFLAGS) -T link.ld -nostartfiles --specs=nano.specs -u _printf_float \
 	  -Wl,--gc-sections -o $@ $(SRC) -lm
 	$(CROSS)size $@

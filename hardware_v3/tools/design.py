@@ -31,12 +31,15 @@ HOLES = [(3.5, 3.5), (106.5, 3.5), (3.5, 80.5), (106.5, 80.5)]
 
 # Along the bottom edge, on the silkscreen: the kit leaflet's "PSI COMP 80"
 # screen, dot for dot from the COMP80's own characters (pictures/cover_screen.hex,
-# made by make_cover_screen.sh), and the board's name, version and lineage.
+# made by make_cover_screen.sh), and the board's name, version, lineage and where
+# the project lives.
 LOGO_AT, LOGO_DOT = (8.0, 72.5), 0.1      # top-left corner, mm per dot
 TITLE = [("PSI COMP 80  v3", 1.8),
          ("The COMP80 in logic: an AMD Artix-7 XC7A100T FPGA", 0.9),
-         ("After J. H. Adams's PSI COMP 80, Wireless World, April-September 1979,", 0.75),
-         ("and the Powertran kit.  v1 1979: Z80 and TTL  >  v2: RP2350  >  v3: FPGA, 2026", 0.75)]
+         ("After J. H. Adams's PSI COMP 80, Wireless World, April-September 1979,", 0.8),
+         ("and the Powertran kit.  v1 1979: Z80 and TTL  >  v2: RP2350  >  v3: FPGA, 2026", 0.8),
+         ("Design files: github.com/billtraill/psicomp80", 0.8),
+         ("Web pages: billtraill.github.io/psicomp80", 0.8)]
 TITLE_AT = (46.0, 73.5)
 FPGA_AT = (50.0, 36.0)
 

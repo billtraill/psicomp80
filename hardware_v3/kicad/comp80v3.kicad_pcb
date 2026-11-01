@@ -35823,24 +35823,48 @@
 		(uuid "377600c3-3839-42f6-b7da-5900b70130f2")
 	)
 	(gr_text "After J. H. Adams's PSI COMP 80, Wireless World, April-September 1979,"
-		(at 146 178.465 0)
+		(at 146 178.49 0)
 		(layer "F.SilkS")
-		(uuid "1051ff67-eccf-4a69-946c-91df450c02f7")
+		(uuid "69357375-f5ec-40e9-b70f-123b2aa2dc12")
 		(effects
 			(font
-				(size 0.75 0.75)
+				(size 0.8 0.8)
 				(thickness 0.15)
 			)
 			(justify left)
 		)
 	)
 	(gr_text "and the Powertran kit.  v1 1979: Z80 and TTL  >  v2: RP2350  >  v3: FPGA, 2026"
-		(at 146 179.74 0)
+		(at 146 179.85 0)
 		(layer "F.SilkS")
-		(uuid "3f6de1fe-527c-4009-b062-6da3d91cae6b")
+		(uuid "b1fc1783-10ed-4bd1-aef2-e7d9a00f225c")
 		(effects
 			(font
-				(size 0.75 0.75)
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left)
+		)
+	)
+	(gr_text "Design files: github.com/billtraill/psicomp80"
+		(at 146 181.21 0)
+		(layer "F.SilkS")
+		(uuid "b9c7d6ba-8156-4247-99b7-96485373912a")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left)
+		)
+	)
+	(gr_text "Web pages: billtraill.github.io/psicomp80"
+		(at 146 182.57 0)
+		(layer "F.SilkS")
+		(uuid "75d567d7-b9d5-404f-8970-60cdf571b4fa")
+		(effects
+			(font
+				(size 0.8 0.8)
 				(thickness 0.15)
 			)
 			(justify left)
@@ -35849,7 +35873,7 @@
 	(gr_text "The COMP80 in logic: an AMD Artix-7 XC7A100T FPGA"
 		(at 146 177.01 0)
 		(layer "F.SilkS")
-		(uuid "75775b83-5228-414f-a60f-7e64e1955192")
+		(uuid "feb94fe1-6d7a-462b-bcca-bef8ef9fa5aa")
 		(effects
 			(font
 				(size 0.9 0.9)
@@ -35861,7 +35885,7 @@
 	(gr_text "PSI COMP 80  v3"
 		(at 146 174.4 0)
 		(layer "F.SilkS")
-		(uuid "6424c340-90c9-436d-aeae-f2a3abd2c99c")
+		(uuid "bccda5f5-da66-422d-b89e-aa94e43061ae")
 		(effects
 			(font
 				(size 1.8 1.8)

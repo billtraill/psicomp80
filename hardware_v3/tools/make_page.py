@@ -139,22 +139,33 @@ def img(path):
 
 
 def util():
-    """The yosys totals, from tools/synth.sh's report, as table rows."""
-    f = HERE.parent / "build" / "synth" / "utilisation.txt"
-    if not f.exists():
-        return ""
-    text = f.read_text()
-    text = text[text.index("design hierarchy"):]
-    count = {}
-    for line in text.splitlines():
-        m = re.match(r"\s+(\d+)\s+(LUT\d|FD\w+|RAMB\w+|CARRY4|OSERDESE2|MMCME2_BASE|PLLE2_BASE)$", line)
-        if m:
-            count[m.group(2)] = int(m.group(1))
-    luts = sum(v for k, v in count.items() if k.startswith("LUT"))
-    ffs = sum(v for k, v in count.items() if k.startswith("FD"))
-    brams = count.get("RAMB36E1", 0) + count.get("RAMB18E1", 0) / 2
-    rows = [("LUTs", luts, 63400), ("Flip-flops", ffs, 126800), ("Block RAM (36 Kb)", brams, 135), ("DSP slices", 0, 240)]
-    return "".join(f"<tr><td>{n}</td><td>{v:,.4g}</td><td>{t:,}</td><td>{v / t * 100:.1f}%</td></tr>" for n, v, t in rows)
+    """The utilisation table's label and rows: Vivado's post-route report if there is
+    one (vivado/build.tcl), otherwise the yosys totals (tools/synth.sh)."""
+    total = {"LUTs": 63400, "Flip-flops": 126800, "Block RAM (36 Kb)": 135, "DSP slices": 240}
+    f = HERE.parent / "vivado" / "out" / "utilisation.txt"
+    if f.exists():
+        text = f.read_text()
+        def used(name):
+            return float(re.search(r"^\| " + name + r"\s+\|\s+([\d.]+) \|", text, re.M).group(1))
+        got, label = {"LUTs": used("Slice LUTs"), "Flip-flops": used("Slice Registers"),
+                      "Block RAM (36 Kb)": used("Block RAM Tile"), "DSP slices": used("DSPs")}, "Vivado, placed and routed"
+    else:
+        f = HERE.parent / "build" / "synth" / "utilisation.txt"
+        if not f.exists():
+            return "", ""
+        text = f.read_text()
+        text = text[text.index("design hierarchy"):]
+        count = {}
+        for line in text.splitlines():
+            m = re.match(r"\s+(\d+)\s+(LUT\d|FD\w+|RAMB\w+|CARRY4|OSERDESE2|MMCME2_BASE|PLLE2_BASE)$", line)
+            if m:
+                count[m.group(2)] = int(m.group(1))
+        got = {"LUTs": sum(v for k, v in count.items() if k.startswith("LUT")),
+               "Flip-flops": sum(v for k, v in count.items() if k.startswith("FD")),
+               "Block RAM (36 Kb)": count.get("RAMB36E1", 0) + count.get("RAMB18E1", 0) / 2, "DSP slices": 0}
+        label = "yosys, the whole design"
+    return label, "".join(f"<tr><td>{n}</td><td>{v:,.4g}</td><td>{total[n]:,}</td><td>{v / total[n] * 100:.1f}%</td></tr>"
+                          for n, v in got.items())
 
 
 def template():
@@ -257,7 +268,8 @@ def main():
             .replace("{{FRAME_BURP}}", img(HERE.parent / "pictures" / "frame_burp.png"))
             .replace("{{FRAME_LIFE}}", img(HERE.parent / "pictures" / "frame_life.png"))
             .replace("{{FRAME_DP}}", img(HERE.parent / "pictures" / "frame_dp.png"))
-            .replace("{{UTIL}}", util())
+            .replace("{{UTIL}}", util()[1])
+            .replace("{{UTIL_SRC}}", util()[0])
             .replace("{{NPARTS}}", str(sum(1 for c in b["comps"] if c["kind"] != "Mounting hole")))
             .replace("{{NVIAS}}", str(len(b["vias"])))
             .replace("{{NTRACKS}}", str(ntracks)))

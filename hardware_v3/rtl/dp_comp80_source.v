@@ -179,7 +179,11 @@ module dp_comp80_source(
     wire  [5:0] ncell = nx / 12;
     wire  [2:0] ndot  = (nx % 12) / 2;
     wire  [5:0] nbits = linebuf[{line_y[0], ncell}];
-    wire        next_dot = nx_in && (line_y >= 12) && (line_y < 588) && nbits[3'd5 - ndot];
+    wire        next_dot_c = nx_in && (line_y >= 12) && (line_y < 588) && nbits[3'd5 - ndot];
+    // registered, for timing at 135 MHz: pixel_count only steps on PIX_12, at
+    // least three clocks apart, so this is always up to date when it's used
+    reg         next_dot = 0;
+    always @(posedge clk) next_dot <= next_dot_c;
     // ---------------------------------------------------------------
 initial begin
     M_value              = 24'h012F68;

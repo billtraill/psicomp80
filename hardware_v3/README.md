@@ -8,8 +8,9 @@ The outside is v2's, HDMI, USB keyboard, microSD and USB-C power, plus a second
 USB-C socket that sends the screen to a USB-C monitor as DisplayPort. The web page is
 `../hardware_v3.html`.
 
-**Vivado hasn't been run yet**: see `VIVADO_TODO.md` for picking it up on another
-machine. `SETUP.md` covers a built board: programming it, the microSD card, the keys,
+The bitstream builds in Vivado and meets timing; no board has been made yet.
+`VIVADO_TODO.md` has the build steps, what the reports showed and the bring-up
+checklist. `SETUP.md` covers a built board: programming it, the microSD card, the keys,
 the serial console and the USB-C monitor.
 
 | Folder | What's in it |

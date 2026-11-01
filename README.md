@@ -169,12 +169,14 @@ See [`disk/README.md`](disk/README.md).
 
 ## To do
 
-- [ ] **v3: build the bitstream.** Vivado doesn't run on macOS, so v3 has only been simulated and synthesised with open tools. [`hardware_v3/VIVADO_TODO.md`](hardware_v3/VIVADO_TODO.md) lists the steps: fetch the outside HDL, run `vivado/build.tcl`, and check timing and utilisation.
 - [ ] **v3: make and bring up a board** ([`SETUP.md`](hardware_v3/SETUP.md)). Check the USB-C monitor with the plug both ways up: the lane order and AUX polarity for each orientation were worked out from the specifications, not measured.
 - [ ] **v2: make and test a board.** The firmware's machine matches the web emulator in host tests, but it hasn't run on hardware.
 - [ ] **v2: fit a flat USB-A socket.** The Würth 614004134726 stands upright; v3 now uses a flat Molex 67643.
 - [ ] **v3, optional: power from the video USB-C.** Today only J1 powers the board. Taking power from J7 needs a power mux, overvoltage protection, and firmware that asks the monitor for 5 V and swaps data roles.
 - [ ] **Web emulator, optional: tapes and discs.** Programs are copied into memory instead.
+
+Done:
+- [x] **v3: build the bitstream.** Vivado 2026.1 builds it and every clock meets timing; [`hardware_v3/VIVADO_TODO.md`](hardware_v3/VIVADO_TODO.md) has the results.
 
 Done from the original list:
 - [x] Worked out how the monitor parses commands: `LIST 1000` works, and the reason `RUN 01B6` misbehaves is above.

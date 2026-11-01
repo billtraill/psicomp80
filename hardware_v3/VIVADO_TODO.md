@@ -1,8 +1,9 @@
 # To do: build the bitstream with Vivado
 
-Vivado doesn't run on macOS, so the v3 design has been simulated and synthesised
-with open-source tools (Verilator, Icarus Verilog, yosys) but never run through
-Vivado. Pick this up on a Linux or Windows machine.
+Vivado doesn't run on macOS, so the v3 design was simulated and synthesised with
+open-source tools (Verilator, Icarus Verilog, yosys) first. **Steps 1–3 have now been
+done** on Windows with Vivado 2026.1 (1 November 2026): the bitstream builds and meets
+timing. What's left is a board: steps 4 and 5.
 
 ## What's already done
 
@@ -24,7 +25,18 @@ Vivado. Pick this up on a Linux or Windows machine.
 - `rtl/comp80v3.xdc`: pins, I/O standards, the clock and the bitstream settings,
   generated from the board design (`tools/design.py`), so the two agree.
 
-Nothing has been through Vivado's timing analysis, and no board has been made.
+- Vivado 2026.1: `vivado/build.tcl` builds `out/comp80v3.bit` and `out/comp80v3.mcs`
+  with every clock meeting timing (see section 3). The first run found that the
+  GTPs' own clocks weren't declared, so the DisplayPort symbol domain had gone
+  untimed (hamsternz's constraints have the same lines commented out). Declaring them
+  showed `dp_comp80_source.v` missing 135 MHz by 64 ps, fixed by registering
+  `next_dot`; its symbol output is unchanged, bit for bit, in `sim/dp_tb.v`.
+
+No board has been made.
+
+Vivado 2026.1's ML Standard edition needs a free node-locked licence from AMD's
+licensing site; put `Xilinx.lic` in `~/.Xilinx/` (on Windows,
+`C:\Users\<you>\.Xilinx\`).
 
 ## 1. Set up the machine
 
@@ -60,10 +72,13 @@ files, and set `top` as the top module.
 
 ## 3. Check the results
 
-- [ ] **Timing**: `out/timing.txt` must show no negative slack (WNS ≥ 0) on every
+- [x] **Timing**: `out/timing.txt` must show no negative slack (WNS ≥ 0) on every
   clock: 50 MHz system, 12 MHz USB, 25 MHz pixel, 125 MHz serial, 100 MHz (the
   DisplayPort AUX channel and link management) and the transceivers' 135 MHz symbol
-  clock (TXOUTCLK).
+  clock (TXOUTCLK). *Met: worst setup slack 0.46 ns (`dp_symbol`), worst hold 0.065 ns;
+  50 MHz has 5.7 ns to spare, so the Z80 needs no multicycle paths. `check_timing`
+  shows no unclocked registers; the only unconstrained paths are the slow
+  asynchronous I/O pins.*
   - The Z80 (TV80) runs from the 50 MHz clock with a clock enable every 25 (or 12.5)
     cycles. If its paths fail at 50 MHz, they can be given multicycle constraints,
     because nothing in `tv80c`/`tv80_core` changes between enables, for example:
@@ -71,11 +86,14 @@ files, and set `top` as the top module.
     and the matching `-hold 11`. Check that the clock enable reaches every register
     first.
   - PicoRV32 at 50 MHz is comfortably inside what it does on an Artix-7.
-- [ ] **Utilisation**: about 5,900 LUTs and 50 block RAMs, as yosys found. Far more
+- [x] **Utilisation**: about 5,900 LUTs and 50 block RAMs, as yosys found. *Vivado:
+  5,582 LUTs (8.8%), 3,228 flip-flops, 50.5 block RAMs, no DSPs.* Far more
   means something has been unrolled. Far fewer usually means a `$readmemh` file
   wasn't found and a memory was optimised away. Check that `firmware.hex` and
   `font.hex` loaded: the synthesis log names them.
-- [ ] **Warnings worth reading**:
+- [x] **Warnings worth reading** (*all as expected: no critical warnings, no
+  CLOCK_DEDICATED_ROUTE, no GTPE2/MMCM/PLL DRC; the USB and AUX pins came out as
+  tristate buffers*):
   - `usb_dp`/`usb_dm` must come out as IOBUFs (usb_hid_host drives them tri-state).
   - The OBUFDS outputs must sit on true pairs: A13/A14, A15/A16, B15/B16 and A18/A19
     are L10, L9, L7 and L17 of bank 16.
@@ -97,8 +115,12 @@ files, and set `top` as the top module.
   - Warnings that `txdata_for_tx[31:16]` and the upper `txchardisp*` bits have no
     driver are expected: the GTPs run 2-byte (20-bit) TX data, as in the original,
     and the unused upper bits are tied off.
-- [ ] **DRC**: `out/drc.txt`. With `CFGBVS` and `CONFIG_VOLTAGE` set, the usual
-  configuration-voltage warning should be gone.
+- [x] **DRC**: `out/drc.txt`. With `CFGBVS` and `CONFIG_VOLTAGE` set, the usual
+  configuration-voltage warning should be gone. *It is. Left: LVDS-1 (the AUX pair is
+  bidirectional LVDS_25, as on hamsternz's boards; it's point to point, so fine) and
+  REQP-1839/1840, because TV80's address register has an asynchronous reset and
+  drives block RAM addresses. At worst a reset could disturb one byte of memory as it
+  happens, which the reset clears anyway.*
 
 ## 4. Program the board
 

@@ -233,7 +233,7 @@
 <section aria-labelledby="h-proof">
   <div class="shead">
     <h2 id="h-proof">Proving it</h2>
-    <p>No board has been made and Vivado hasn't run yet. Everything else has been checked with open-source tools.</p>
+    <p>No board has been made yet. The logic has been checked with open-source tools, and the bitstream builds in Vivado and meets timing.</p>
   </div>
   <div class="circuits">
   <div class="block">
@@ -247,7 +247,7 @@
       </ul>
     </div>
     <div class="side">
-      <span class="lbl">yosys, the whole design</span>
+      <span class="lbl">{{UTIL_SRC}}</span>
       <table class="table2">
         <thead><tr><th>Resource</th><th>Used</th><th>Of</th><th></th></tr></thead>
         <tbody>{{UTIL}}</tbody>
@@ -257,8 +257,8 @@
   <div class="block">
     <div class="prose">
       <span class="kicker">hardware_v3/VIVADO_TODO.md</span>
-      <h3>Still to do: Vivado</h3>
-      <p>The bitstream needs Vivado, which runs on Linux or Windows but not macOS. <code>VIVADO_TODO.md</code> lists the steps for picking this up on another machine. Fetch the outside HDL, run <code>vivado/build.tcl</code>, check timing and utilisation, then program the flash over JTAG. It also lists what to look for in the reports, and the board decisions worth checking against Xilinx's guides before ordering.</p>
+      <h3>The bitstream</h3>
+      <p>Vivado builds the bitstream and the flash image, on Linux or Windows (not macOS). Every clock meets timing, the tightest being the 135 MHz DisplayPort symbol clock with 0.46 ns to spare, and the design takes 5,582 LUTs (under 9%) and 50 block RAMs. <code>VIVADO_TODO.md</code> has the steps, what the reports showed, the bring-up checklist, and the board decisions worth checking against Xilinx's guides before ordering.</p>
     </div>
     <div class="side">
       <pre class="tree">sh tools/fetch.sh
@@ -315,7 +315,7 @@ vivado -mode batch -source build.tcl</pre>
     <h2 id="h-notes">What to know</h2>
   </div>
   <ul class="notes">
-    <li><b>Not built, and not through Vivado.</b> The design simulates, synthesises with yosys and fits, and the board passes KiCad's design check. Timing closure and the bitstream are the next step.</li>
+    <li><b>Not built yet.</b> The design simulates, builds in Vivado with every clock meeting timing, and the board passes KiCad's design check. Making a board and bringing it up are the next step.</li>
     <li><b>Assembly.</b> A 484-ball BGA wants a board house that assembles BGAs. The board is six layers, 0.15 mm tracks with 0.12 mm gaps, and 0.45 mm vias with 0.2 mm holes.</li>
     <li><b>Low-speed keyboards.</b> usb_hid_host does USB low speed only, and no hubs. Nearly every keyboard is low speed.</li>
     <li><b>USB-C video</b> needs a monitor that takes DisplayPort over USB-C and a cable with the high-speed pairs; charge-only cables won't do. The board gives the monitor 5 V but takes no power from it. It's one lane at 800 × 600, enough for the COMP80's 64 × 32 characters.</li>

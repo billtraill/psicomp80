@@ -81,6 +81,19 @@ def build():
             pts = [(h.num(q[1]), h.num(q[2])) for q in h.kid(fp, "pts") if isinstance(q, list) and q[0] == "xy"]
             planes[layer].append("M" + "L".join(f"{h.f(x)} {h.f(y)}" for x, y in pts) + "Z")
     b["planes"] = planes
+    # the board's own silkscreen: the cover screen drawn as rectangles, and the name
+    b["silk_rects"] = []
+    for r in h.kids(pcb, "gr_rect"):
+        if h.kid(r, "layer")[1] == "F.SilkS":
+            a, e = h.kid(r, "start"), h.kid(r, "end")
+            x0, y0, x1, y1 = h.num(a[1]), h.num(a[2]), h.num(e[1]), h.num(e[2])
+            b["silk_rects"].append(f"M{h.f(min(x0, x1))} {h.f(min(y0, y1))}h{h.f(abs(x1 - x0))}v{h.f(abs(y1 - y0))}h{h.f(-abs(x1 - x0))}z")
+    b["silk_text"] = []
+    for t in h.kids(pcb, "gr_text"):
+        if h.kid(t, "layer")[1] == "F.SilkS":
+            at = h.kid(t, "at")
+            size = h.num(h.kid(h.kid(h.kid(t, "effects"), "font"), "size")[1])
+            b["silk_text"].append((t[1], h.num(at[1]), h.num(at[2]), size))
     return b
 
 
@@ -88,7 +101,12 @@ def board_svg(b):
     s = h.board_svg(b)
     extra = "".join(f'<g id="L-in{k}" class="plane" hidden><path d="{"".join(b["planes"][f"In{k}.Cu"])}"/></g>'
                     for k in (1, 2, 3, 4))
-    return s.replace('<g id="L-artB"', extra + '<g id="L-artB"', 1)
+    s = s.replace('<g id="L-artB"', extra + '<g id="L-artB"', 1)
+    # KiCad's text size is the capital height: about 0.72 of the font size
+    silk = f'<path class="logo" d="{"".join(b["silk_rects"])}"/>' + "".join(
+        f'<text class="brd" x="{h.f(x)}" y="{h.f(y)}" font-size="{h.f(size / 0.72)}">{html.escape(text)}</text>'
+        for text, x, y, size in b["silk_text"])
+    return s.replace('<g id="L-silk">', '<g id="L-silk">' + silk, 1)
 
 
 def parts_table(b):
@@ -188,6 +206,8 @@ def template():
 #L-in2 path { fill: var(--v33); pointer-events: none; }
 #L-in3 path { fill: var(--v10); pointer-events: none; }
 #L-in4 path { fill: var(--v18); pointer-events: none; }
+#L-silk path.logo { fill: var(--silk); stroke: none; opacity: .85; }
+#L-silk text.brd { fill: var(--silk); font-family: "Helvetica Neue", Arial, sans-serif; font-weight: 600; dominant-baseline: central; white-space: pre; opacity: .85; pointer-events: none; }
 .chip.g i { color: #6d8296; } .chip.v i { color: #c8862a; } .chip.v1 i { color: #a45bb0; } .chip.v8 i { color: #2f9e6a; }
 .frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
 .frames img { display: block; width: 100%; height: auto; border-radius: 6px; image-rendering: pixelated; }

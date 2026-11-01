@@ -22,6 +22,7 @@ the serial console and the USB-C monitor.
 | `tools/` | `design.py` (the board), `make_board.py` (KiCad), `fetch.sh` (outside HDL), `synth.sh` (yosys), `make_font.py`, `make_page.py` |
 | `kicad/` | The KiCad 10 board: six layers, routed and filled. KiCad's DRC: no errors |
 | `netlist.json`, `bom.csv` | The connections and the parts list |
+| `fab/` | Files for a board house: Gerbers and drill files, a PCBWay BOM, pick-and-place and an assembly drawing, with the quote settings in `fab/README.md`. Rebuilt by `tools/make_fab.py` |
 
 Outside HDL, fetched into `build/` by `tools/fetch.sh` at fixed commits: TV80 (MIT),
 PicoRV32 (ISC), usb_hid_host (Apache-2.0), DisplayPort_Verilog (MIT), and FatFs for

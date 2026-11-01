@@ -1,0 +1,44 @@
+Item #,Designator,Qty,Manufacturer,Mfg Part #,Description / Value,Package/Footprint,Type,Your Instructions / Notes
+1,C1 C3 C5 C12 C14 C15 C58,7,Murata,GRM21BR61E106KA73L,10 uF 25 V X5R 10% 0805,C_0805_2012Metric,SMD,Equivalent to this spec accepted
+2,C2 C4 C6,3,Murata,GRM21BR61A226ME44L,22 uF 10 V X5R 20% 0805,C_0805_2012Metric,SMD,Equivalent to this spec accepted
+3,C7,1,Murata,GRM32ER60J107ME20L,100 uF 6.3 V X5R 20% 1210,C_1210_3225Metric,SMD,Equivalent to this spec accepted
+4,C8 C9,2,Murata,GRM32ER61A476ME20L,47 uF 10 V X5R 20% 1210,C_1210_3225Metric,SMD,Equivalent to this spec accepted
+5,C10 C11 C13 C70,4,Murata,GRM188R71C104KA01D,100 nF 16 V X7R 10% 0603,C_0603_1608Metric,SMD,Equivalent to this spec accepted
+6,C16 C17 C18 C19 C20 C21 C22 C23 C27 C28 C29 C30 C33 C34 C35 C36 C37 C38 C39 C40 C41 C42,22,Murata,GRM155R61A474KE15D,470 nF 10 V X5R 10% 0402,C_0402_1005Metric,SMD,Equivalent to this spec accepted
+7,C24 C25 C26 C31 C32 C43 C44 C62 C63,9,Murata,GRM188R61A475KE15D,4.7 uF 10 V X5R 10% 0603,C_0603_1608Metric,SMD,Equivalent to this spec accepted
+8,C45 C46 C47 C48 C49 C50 C51 C52 C53 C54 C55 C56 C64 C65 C66 C67 C68 C69,18,Murata,GRM155R71C104KA88D,100 nF 16 V X7R 10% 0402,C_0402_1005Metric,SMD,Equivalent to this spec accepted
+9,C57 C59 C60 C61,4,Murata,GRM188R61C105KA93D,1 uF 16 V X5R 10% 0603,C_0603_1608Metric,SMD,Equivalent to this spec accepted
+10,D1,1,Wurth,150080RS75000,Red LED 0805,LED_0805_2012Metric,SMD,Equivalent to this spec accepted
+11,D2,1,Wurth,150080GS75000,Green LED 0805,LED_0805_2012Metric,SMD,Equivalent to this spec accepted
+12,D3,1,Nexperia,BAT54J,Feeds the HDMI +5 V pin,D_SOD-323F,SMD,
+13,F1,1,Bourns,MF-MSMF050-2,Resettable fuse for the keyboard's 5 V,Fuse_1206_3216Metric,SMD,
+14,FB1,1,Murata,BLM18KG221SN1D,Ferrite bead: filters 1.0 V into the transceivers' analogue supply (MGTAVCC),L_0603_1608Metric,SMD,
+15,J1,1,GCT,USB4105-GF-A,"Power in, 5 V",USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,SMD + THT tabs,
+16,J2,1,Molex,208658-1001,HDMI type A socket: the display,HDMI_A_Molex_208658-1001_Horizontal,SMD + THT tabs,
+17,J3,1,Molex,67643-3910,"USB-A socket for the keyboard, lying flat",USB_A_Molex_67643_Horizontal,THT,
+18,J4,1,Hirose,DM3AT-SF-PEJM5,microSD socket: ROM images and tapes,microSD_HC_Hirose_DM3AT-SF-PEJM5,SMD,
+19,J5,1,,,"2.54 mm pin header, 1 x 6, straight",PinHeader_1x06_P2.54mm_Vertical,THT,Equivalent to this spec accepted
+20,J6,1,,,"2.54 mm pin header, 1 x 2, straight",PinHeader_1x02_P2.54mm_Vertical,THT,Equivalent to this spec accepted
+21,J7,1,Amphenol,12401610E4-2A,Video out: DisplayPort alternate mode to a USB-C monitor,USB_C_Receptacle_Amphenol_12401610E4-2A,SMD + THT tabs,
+22,L1 L2 L3,3,Murata,DFE252012F-2R2M,"2.2 uH power inductor, 1008",L_1008_2520Metric,SMD,
+23,R1 R2,2,Yageo,RC0603FR-075K1L,5.1 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+24,R3 R5,2,Yageo,RC0603FR-07200KL,200 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+25,R4,1,Yageo,RC0603FR-07301KL,301 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+26,R6 R8 R24 R25,4,Yageo,RC0603FR-07100KL,100 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+27,R7,1,Yageo,RC0603FR-07453KL,453 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+28,R9 R10 R27 R28 R29,5,Yageo,RC0603FR-074K7L,4.7 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+29,R11 R14,2,Yageo,RC0603FR-07330RL,330 ohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+30,R12 R13,2,Yageo,RC0603FR-071KL,1 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+31,R15 R16 R17 R18 R19 R20 R23 R30,8,Yageo,RC0603FR-0710KL,10 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+32,R21 R22,2,Yageo,RC0603FR-0715KL,15 kohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+33,R26,1,Yageo,RC0603FR-07100RL,100 ohm 1% 0.1 W 0603,R_0603_1608Metric,SMD,Equivalent to this spec accepted
+34,SW1 SW2,2,Omron,B3S-1000,"Tactile switch, SMD",SW_SPST_B3S-1000,SMD,
+35,U1,1,AMD,XC7A100T-1FGG484C,"FPGA: 101,440 logic cells, 4,860 Kb of block RAM. The whole COMP80 is in here",Xilinx_FGG484,SMD,"BGA, 1.0 mm pitch: X-ray inspection please"
+36,U2,1,ISSI,IS25LP128F-JBLE,16 MB SPI flash: the FPGA's configuration and the soft processor's program,SOIC-8_5.3x5.3mm_P1.27mm,SMD,
+37,U3 U4 U5,3,TI,TLV62569DBVR,"2 A step-down regulator, SOT-23-5",SOT-23-5,SMD,
+38,U6,1,onsemi,FUSB302BMPX,USB Power Delivery PHY: agrees DisplayPort alternate mode with the monitor,WQFN-14-1EP_2.5x2.5mm_P0.5mm_EP1.45x1.45mm,SMD,
+39,U7,1,TI,TPS2051CDBVR,Current-limited switch: 5 V to the monitor's VBUS,SOT-23-5,SMD,
+40,U8,1,TI,TLV75525PDBVR,2.5 V regulator for I/O bank 35 (the AUX channel's LVDS_25),SOT-23-5,SMD,
+41,U9,1,TI,TLV75512PDBVR,1.2 V regulator for the transceivers' termination (MGTAVTT),SOT-23-5,SMD,
+42,X1,1,ECS,ECS-2520MV-1000-BN-TR,"100 MHz oscillator, 3.3 V CMOS, 2.5 x 2.0 mm",Oscillator_SMD_ECS_2520MV-xxx-xx-4Pin_2.5x2.0mm,SMD,
+43,X2,1,SiTime,SiT9121AI-2C3-33E135.000000,135 MHz LVDS oscillator: the transceivers' reference (2.7 Gb/s),Oscillator_SMD_SiTime_SiT9121-6Pin_3.2x2.5mm,SMD,

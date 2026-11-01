@@ -134,6 +134,7 @@ def main():
     tb.SetRevision("1")
 
     ds = board.GetDesignSettings()
+    ds.SetAuxOrigin(pt(0, d.BOARD_H))   # the fab files' origin: the bottom-left corner
     ds.m_TrackMinWidth = mm(0.09)
     ds.m_MinClearance = mm(0.12)
     ds.m_ViasMinSize = mm(0.45)

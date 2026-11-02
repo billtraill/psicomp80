@@ -8,6 +8,8 @@
 //   { line: "text" }           type a line once FORTH or LISP is waiting
 //   { fast: true | false }     run flat out, or at the real speed
 //   { ready: true }            wait until the computer is waiting for a key
+// "file" is the source shown with the example: the file typed in, or for a
+// machine-code program the assembly it was made from.
 // "rom": null means any ROM: the monitor is the same in all three.  With
 // BURP every key waits until BURP is ready for it: BURP is often busy with
 // its calculator chip, and a key then would reset the machine.
@@ -17,7 +19,7 @@ const EXAMPLES = [
   {
     id: "life", lang: "monitor", rom: null, title: "Game of Life",
     text: "Conway’s Game of Life in Z80 machine code, 128 × 64 cells, each character showing a 2 × 2 block of cells. It loads at 1000 and runs with RUN 1000, as it would from tape.",
-    keys: "R new random board · P pause and resume · S stop",
+    keys: "R new random board · P pause and resume · S stop", file: "life.asm",
     steps: [{ fs: true }, { bin: "life", at: 0x1000 }, { keys: "RUN 1000" }],
   },
   {
@@ -70,6 +72,19 @@ const EXAMPLES = [
       { keys: "120 PRINT A2 S6 C6 \r" }, { keys: "130 RETURN :" }, { ready: true }, { keys: "RUN 10 " }],
   },
   {
+    id: "burpsier", lang: "burp", rom: "burp", title: "Sierpiński triangle",
+    text: "Pascal’s triangle with each number taken mod 2 is the Sierpiński triangle. BURP has no way to print part of a line, so each row is a number whose digits are the cells: row r is the product of 11, 101 and 10001 for the bits set in r, as (1 + x)ʳ mod 2 is the product of 1 + x^(2ᵇ). The bottom half prints in two numbers, as the chip holds 8 digits. About 20 s.",
+    steps: [{ fs: true }, { keys: "^" }, { keys: "LOAD " },
+      { keys: '10 PRINT "SIERPINSKI TRIANGLE" \r' }, { keys: "20 FOR R=0 STEP 1 UNTIL 7 \r" }, { keys: "30 GOSUB 100 \r" },
+      { keys: "40 PRINT P0, \r" }, { keys: "50 NEXT R \r" }, { keys: "60 LET T=10000000 \r" },
+      { keys: "70 FOR R=0 STEP 1 UNTIL 7 \r" }, { keys: "80 GOSUB 100 \r" }, { keys: "90 LET H=P T * \r" },
+      { keys: "92 PRINT H0, P0, \r" }, { keys: "94 LET T=T 10 / \r" }, { keys: "96 NEXT R \r" }, { keys: "98 END \r" },
+      { keys: "100 LET P=1 \r" }, { keys: "110 LET B=R \r" }, { keys: "120 IF B<4 THEN 150 \r" },
+      { keys: "130 LET P=P 10001 * \r" }, { keys: "140 LET B=B 4 - \r" }, { keys: "150 IF B<2 THEN 180 \r" },
+      { keys: "160 LET P=P 101 * \r" }, { keys: "170 LET B=B 2 - \r" }, { keys: "180 IF B<1 THEN 200 \r" },
+      { keys: "190 LET P=P 11 * \r" }, { keys: "200 RETURN :" }, { ready: true }, { keys: "RUN 10 " }],
+  },
+  {
     id: "forth", lang: "forth", rom: "forth", title: "A FORTH session",
     text: "Squares, a factorial that calls itself, hex numbers, bars of graphics blocks, and the stack shown with .S.",
     steps: [{ keys: "^" }, { fast: true },
@@ -90,6 +105,27 @@ const EXAMPLES = [
     text: "One point per character, shaded by escape time, in 16-bit fixed point with 90 as 1.0. About 95 s to draw.",
     file: "mandel.fs",
     steps: [{ keys: "^" }, { fast: true }, { source: "mandel.fs" }, { fast: false }, { line: "MANDEL" }],
+  },
+  {
+    id: "forthsier", lang: "forth", rom: "forth", title: "Sierpiński triangle in FORTH",
+    text: "Pascal’s triangle mod 2 over the whole screen: 64 rows, four cells to a character, written straight to screen memory. Entry x of row y is odd when x AND y = x. About 10 s to draw.",
+    keys: "any key: back to FORTH",
+    file: "sier.fs",
+    steps: [{ keys: "^" }, { fast: true }, { source: "sier.fs" }, { fast: false }, { line: "SIER" }],
+  },
+  {
+    id: "forthhilbert", lang: "forth", rom: "forth", title: "Hilbert curve in FORTH",
+    text: "A turtle draws a level-5 Hilbert curve over the whole screen, 32 × 32 points joined by one line that never crosses itself. Each level is four copies of the one below, turned and joined by three steps: HIL calls itself four times. About 10 s.",
+    keys: "any key: back to FORTH",
+    file: "hilbert.fs",
+    steps: [{ keys: "^" }, { fast: true }, { source: "hilbert.fs" }, { fast: false }, { line: "HILBERT" }],
+  },
+  {
+    id: "forthhanoi", lang: "forth", rom: "forth", title: "Towers of Hanoi in FORTH, animated",
+    text: "Six discs move from the left peg to the right one, one at a time and never a bigger one on a smaller one. Each disc lifts off its peg, slides across and drops onto the next. 63 moves in about 75 s.",
+    keys: "any key stops it (RS to get back into FORTH)",
+    file: "hanoi.fs",
+    steps: [{ keys: "^" }, { fast: true }, { source: "hanoi.fs" }, { fast: false }, { line: "6 HANOI" }],
   },
   {
     id: "lisp", lang: "lisp", rom: "lisp", title: "A LISP session",
@@ -124,5 +160,17 @@ const EXAMPLES = [
     text: "A backtracking search for eight queens that don’t attack each other. The first solution takes about 26 s.",
     file: "queens.lsp",
     steps: [{ keys: "^" }, { fast: true }, { source: "queens.lsp" }, { fast: false }, { line: "(QUEENS 8)" }],
+  },
+  {
+    id: "lispsier", lang: "lisp", rom: "lisp", title: "Sierpiński triangle in LISP",
+    text: "Pascal’s triangle mod 2, 16 rows printed a character at a time with TYO. ODD tests an entry a bit at a time with REM and /, and FROM is a loop that halves its range, so the recursion stays shallow. About 6 s.",
+    file: "sier.lsp",
+    steps: [{ keys: "^" }, { fast: true }, { source: "sier.lsp" }, { fast: false }, { line: "(SIER)" }],
+  },
+  {
+    id: "lisphilbert", lang: "lisp", rom: "lisp", title: "Hilbert curve in LISP",
+    text: "A Hilbert curve of 16 × 16 points, printed a line at a time. D works out how far along the curve each point is, a quarter at a time, and two neighbours are joined when their distances differ by 1. About 30 s.",
+    file: "hilbert.lsp",
+    steps: [{ keys: "^" }, { fast: true }, { source: "hilbert.lsp" }, { fast: false }, { line: "(HILBERT)" }],
   },
 ];

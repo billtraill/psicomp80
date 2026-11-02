@@ -57,11 +57,17 @@ def data():
             "cover": b64("pictures/cover.bin"),
         },
         "sources": {
+            "life.asm": (REPO / "life/life.asm").read_text(),
             "life.fs": (REPO / "forth/examples/life.fs").read_text(),
             "mandel.fs": (REPO / "forth/examples/mandel.fs").read_text(),
+            "sier.fs": (REPO / "forth/examples/sier.fs").read_text(),
+            "hilbert.fs": (REPO / "forth/examples/hilbert.fs").read_text(),
+            "hanoi.fs": (REPO / "forth/examples/hanoi.fs").read_text(),
             "deriv.lsp": (REPO / "lisp/examples/deriv.lsp").read_text(),
             "hanoi.lsp": (REPO / "lisp/examples/hanoi.lsp").read_text(),
             "queens.lsp": (REPO / "lisp/examples/queens.lsp").read_text(),
+            "sier.lsp": (REPO / "lisp/examples/sier.lsp").read_text(),
+            "hilbert.lsp": (REPO / "lisp/examples/hilbert.lsp").read_text(),
         },
     }
 

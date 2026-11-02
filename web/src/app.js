@@ -34,7 +34,7 @@
     for (const t of tasks.slice()) {
       for (let n = 0; n < 1000 && (t.pred === null || t.pred()); n++) {
         const r = t.gen.next();
-        if (r.done) { tasks = tasks.filter((x) => x !== t); if (t === script) endScript(); break; }
+        if (r.done) { tasks = tasks.filter((x) => x !== t); if (t === script) { endScript(); listingState("Typed in"); } break; }
         t.pred = r.value;
       }
     }
@@ -89,25 +89,38 @@
   function* exampleSteps(ex) {
     const patient = ex.rom === "burp";
     yield after(1.0);
-    for (const s of ex.steps) {
-      if (s.fs) { yield* typeKey(0x1c); yield after(0.3); }
-      else if (s.keys) { status = "Typing " + s.keys.trim(); yield* typeText(s.keys, patient); yield after(0.3); }
-      else if (s.ready) yield* idle();
+    for (const [n, s] of ex.steps.entries()) {
+      if (s.fs) { listingMark(n); yield* typeKey(0x1c); yield after(0.3); }
+      else if (s.keys) { listingMark(n); status = "Typing " + s.keys.trim(); yield* typeText(s.keys, patient); yield after(0.3); }
+      else if (s.ready) { listingState("Waiting for the computer"); yield* idle(); }
       else if (s.bin) m.mem.set(b64(D.bins[s.bin]), s.at);
       else if (s.source) {
         const lines = sourceLines(D.sources[s.source], s.source.endsWith(".lsp"));
         for (let i = 0; i < lines.length; i++) {
           status = `Typing ${s.source}: line ${i + 1} of ${lines.length}`;
+          listingMark(n + "." + i);
           yield* typeLine(lines[i]);
         }
       }
-      else if (s.line) { status = "Typing " + s.line.trim(); yield* typeLine(s.line); }
+      else if (s.line) { listingMark(n); status = "Typing " + s.line.trim(); yield* typeLine(s.line); }
       else if ("fast" in s) scriptFast = s.fast;
     }
   }
 
+  // BURP takes a program with LOAD: each line ends with a space and Return,
+  // the last with a colon.
   function* pasted(text) {
     const lines = sourceLines(text, m.romName === "lisp");
+    if (m.romName === "burp") {
+      status = "Typing LOAD";
+      yield* typeText("LOAD ", true);
+      for (let i = 0; i < lines.length; i++) {
+        status = `Typing line ${i + 1} of ${lines.length}`;
+        yield* typeText(lines[i].trim() + (i === lines.length - 1 ? " :" : " \r"), true);
+      }
+      yield* idle();
+      return;
+    }
     for (let i = 0; i < lines.length; i++) {
       status = `Typing line ${i + 1} of ${lines.length}`;
       if (CURS[m.romName] !== undefined) yield* typeLine(lines[i]);
@@ -122,7 +135,7 @@
     document.body.classList.add("busy");
   }
   function stopScript() {
-    if (script) tasks = tasks.filter((t) => t !== script);
+    if (script) { tasks = tasks.filter((t) => t !== script); listingState("Stopped"); }
     script = null;
     scriptFast = false;
     endScript();
@@ -134,16 +147,90 @@
     document.body.classList.remove("busy");
   }
 
+  // ---------------------------------------------------------------- listing
+  // Under the screen while an example runs: everything it types, a row per
+  // line, with the line being typed marked.  The rows are keyed by step
+  // number, and step.line for the lines of a source file.
+
+  const listing = { rows: new Map(), cur: null };
+  function showListing(ex) {
+    const rows = [];
+    const add = (key, text, cls) => rows.push({ key, text, cls });
+    ex.steps.forEach((s, n) => {
+      if (s.fs) add(n, "FS", "key");
+      else if (s.keys) for (const l of s.keys.split("\r")) {
+        if (l.trim() === "^") add(n, "RS", "key");
+        else if (l.trim()) add(n, l.trimEnd());
+      }
+      else if (s.line) add(n, s.line);
+      else if (s.bin) {
+        const at = s.at.toString(16).toUpperCase();
+        if (ex.file) for (const l of D.sources[ex.file].split("\n")) add(null, l, "src");
+        else add(null, `(${s.bin}.bin, copied into memory at ${at})`, "note");
+      }
+      else if (s.source) {
+        const lisp = s.source.endsWith(".lsp");
+        let i = 0;
+        for (const l of D.sources[s.source].split("\n")) {
+          const typed = l.trim() !== "" && !(lisp && /^\s*;/.test(l));
+          add(typed ? n + "." + i++ : null, l, typed ? "src" : "src skip");
+        }
+      }
+    });
+    const pre = $("listing-code");
+    pre.textContent = "";
+    listing.rows.clear();
+    listing.cur = null;
+    for (const r of rows) {
+      const el = document.createElement("span");
+      el.className = "ln" + (r.cls ? " " + r.cls : "");
+      el.textContent = r.text;
+      pre.appendChild(el);
+      if (r.key !== null && !listing.rows.has(String(r.key))) listing.rows.set(String(r.key), el);
+    }
+    pre.scrollTop = 0;
+    $("listing-title").textContent = ex.title;
+    listingState("Typing");
+    $("listing").hidden = false;
+  }
+  function listingMark(key) {
+    const el = listing.rows.get(String(key));
+    if (!el || $("listing").hidden) return;
+    if (listing.cur) listing.cur.classList.remove("cur");
+    el.classList.add("cur");
+    listing.cur = el;
+    listingState("Typing");
+    // keep the line in view inside the listing, without scrolling the page
+    const pre = $("listing-code");
+    if (el.offsetTop < pre.scrollTop || el.offsetTop + el.offsetHeight > pre.scrollTop + pre.clientHeight)
+      pre.scrollTop = el.offsetTop - pre.clientHeight / 3;
+  }
+  function listingState(text) { $("listing-state").textContent = text; }
+  function hideListing() { $("listing").hidden = true; }
+
   // ---------------------------------------------------------------- machine
+
+  // What "Type in a program" says, for each ROM.
+  const PASTE_HELP = {
+    burp: ["Paste the lines of a BURP program, each starting with its line number. They are typed in with LOAD, a line at a time, waiting for BURP between lines; then type RUN and the first line number, and a space. Enter BURP first (RS at READY).",
+      "10 FOR A=1 STEP 1 UNTIL 5\n20 LET R=A ROOT\n30 PRINT A0 R6\n40 NEXT A\n50 END"],
+    forth: ["Paste a FORTH program, or monitor commands. It is typed a line at a time, waiting for FORTH between lines. Enter FORTH first (RS at READY).",
+      ": SQUARES 11 1 DO I DUP * . LOOP ;\nSQUARES"],
+    lisp: ["Paste a LISP program, or monitor commands. It is typed a line at a time, waiting for LISP between lines; comments are left out. Enter LISP first (RS at READY).",
+      "(DEFUN SQ (X) (* X X))\n(SQ 7)"],
+  };
 
   function power(rom) {
     stopScript();
+    hideListing();
     keyQueue.length = 0;
     m.powerOn(ROMS[rom], rom, $("mem").value === "32");
     for (const r of document.querySelectorAll("input[name=rom]")) r.checked = r.value === rom;
     store.set("rom", rom);
     document.title = "COMP80 Emulator";
     $("romname").textContent = ROM_NAMES[rom];
+    $("paste-help").textContent = PASTE_HELP[rom][0];
+    $("paste").placeholder = PASTE_HELP[rom][1];
   }
 
   function press(c) {
@@ -155,6 +242,7 @@
   function runExample(id) {
     const ex = EXAMPLES.find((e) => e.id === id);
     power(ex.rom || m.romName);
+    showListing(ex);
     startScript(exampleSteps(ex), "Starting " + ex.title);
     canvas.focus({ preventScroll: true });
     if (window.matchMedia("(max-width: 60rem)").matches) canvas.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -226,14 +314,15 @@
     $("btn-fast").setAttribute("aria-pressed", String(fast));
   });
   $("btn-stop").addEventListener("click", () => stopScript());
+  $("listing-close").addEventListener("click", hideListing);
   $("btn-type").addEventListener("click", () => {
     const text = $("paste").value;
     if (text.trim()) { startScript(pasted(text), "Typing your program"); canvas.focus({ preventScroll: true }); }
   });
 
-  // Examples: one card each, grouped by language.
-  for (const ex of EXAMPLES) {
-    const list = $("ex-" + ex.lang);
+  // Examples: one card each, grouped by language on the Examples tab, and
+  // again on each language's page.
+  function exampleCard(ex) {
     const card = document.createElement("article");
     card.className = "ex";
     const src = ex.file ? D.sources[ex.file]
@@ -248,7 +337,11 @@
     card.querySelector("code").textContent = src;
     card.querySelector(".run").addEventListener("click", () => runExample(ex.id));
     card.querySelector(".run").setAttribute("aria-label", "Run " + ex.title);
-    list.appendChild(card);
+    return card;
+  }
+  for (const ex of EXAMPLES) {
+    $("ex-" + ex.lang).appendChild(exampleCard(ex));
+    $("exl-" + ex.lang).appendChild(exampleCard(ex));
   }
 
   // Tabs

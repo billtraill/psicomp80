@@ -62,6 +62,20 @@ select { padding: .4rem .5rem; border: 1px solid var(--rule); border-radius: 8px
 .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn[aria-pressed="true"] kbd { color: inherit; }
 #btn-stop { display: none; }
+.listing { display: grid; gap: .4rem; }
+.listing .bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  font: 400 .8125rem/1.4 var(--mono); color: var(--muted); }
+.listing .bar b { color: var(--ink); font-weight: 600; }
+.listing .close { padding: .2rem .55rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel);
+  font: 600 .8125rem/1 var(--body); color: var(--muted); cursor: pointer; }
+.listing .close:hover { border-color: var(--accent); color: var(--ink); }
+.listing .close:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#listing-code { position: relative; margin: 0; max-height: min(16rem, 32vh); overflow: auto; padding: .5rem 0;
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); font: 400 .8125rem/1.5 var(--mono); }
+#listing-code .ln { display: block; padding: 0 .85rem; white-space: pre; border-left: 3px solid transparent; min-height: 1.5em; }
+#listing-code .key { color: var(--accent); font-weight: 600; }
+#listing-code .note, #listing-code .skip { color: var(--muted); }
+#listing-code .cur { background: color-mix(in srgb, var(--accent) 16%, transparent); border-left-color: var(--accent); }
 body.busy #btn-stop { display: inline-block; }
 .typing { display: grid; gap: .35rem; }
 #kbd { width: 100%; box-sizing: border-box; padding: .55rem .7rem; border: 1px solid var(--rule); border-radius: 8px;
@@ -125,6 +139,10 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 <section class="machine" aria-label="The computer">
   <div class="bezel"><canvas id="screen" width="384" height="320" tabindex="0" aria-label="COMP80 screen. Click or focus it to type."></canvas></div>
   <div class="state" aria-live="polite"><span><b id="romname">BURP</b> · <span id="status">Starting</span></span><span id="speed"></span></div>
+  <section class="listing" id="listing" aria-label="Listing of the example" hidden>
+    <div class="bar"><span>Listing · <b id="listing-title"></b> · <span id="listing-state"></span></span><button type="button" class="close" id="listing-close" aria-label="Close the listing">Close</button></div>
+    <pre id="listing-code"></pre>
+  </section>
   <div class="controls">
     <div class="group" role="radiogroup" aria-label="ROM">
       <span class="lbl">ROM</span>
@@ -157,9 +175,9 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
   </div>
   <details class="paste">
     <summary>Type in a program</summary>
-    <p>Paste a FORTH or LISP program, or monitor commands. It is typed a line at a time, waiting for the computer between lines. Enter the language first (RS at READY).</p>
+    <p id="paste-help"></p>
     <label class="lbl" for="paste">Program</label>
-    <textarea id="paste" spellcheck="false" placeholder="(DEFUN SQ (X) (* X X))&#10;(SQ 7)"></textarea>
+    <textarea id="paste" spellcheck="false"></textarea>
     <div><button type="button" class="btn" id="btn-type">Type it in</button></div>
   </details>
 </section>

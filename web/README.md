@@ -7,10 +7,11 @@ help page for each language. Open it in a browser; it needs no server.
 - Switch ROM between BURP, FORTH and LISP, and memory between 5 KB and the
   32 KB expansion (both power the machine off and on).
 - Run any of the examples: Life, the two Fig. 22 pictures, ALPH and LIST in
-  the monitor, BURP's sample program, e^x and a sine table, the FORTH
-  session, Life and Mandelbrot, and the LISP session, differentiation, Hanoi
-  and the queens. The page types each one in, flat out, then runs it at the
-  real 4 MHz.
+  the monitor; BURP's sample program, e^x and a sine table; the FORTH
+  session, Life, Mandelbrot and an animated Towers of Hanoi; the LISP
+  session, differentiation, Hanoi and the queens; a Sierpiński triangle in
+  each language, and a Hilbert curve in FORTH and LISP. The page types each
+  one in, flat out, then runs it at the real 4 MHz.
 - Paste a program to have it typed in a line at a time.
 - Keys: Return, `^` (RS), Backspace (rubout in FORTH and LISP), Ctrl+`\` (FS),
   Esc (RESET). A key while a program runs resets to the monitor, as on the

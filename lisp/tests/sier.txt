@@ -1,0 +1,21 @@
+^
+#wait 0.5
+(DEFUN ODD (X Y)\r
+  (COND ((EQ X 0) T)\r
+        ((AND (EQ (REM X 2) 1) (EQ (REM Y 2) 0)) NIL)\r
+        (T (ODD (/ X 2) (/ Y 2)))))\r
+(DEFUN FROM (LO HI FN)\r
+  (COND ((< (- HI LO) 2) (COND ((< LO HI) (FN LO))))\r
+        (T (FROM LO (/ (+ LO HI) 2) FN)\r
+           (FROM (/ (+ LO HI) 2) HI FN))))\r
+(DEFUN TWO (C) (TYO C) (TYO C))\r
+(DEFUN ENTRY (X) (TWO (COND ((ODD X Y) 143) (T 32))))\r
+(DEFUN SP (X) (TYO 32))\r
+(DEFUN ROW (Y)\r
+  (FROM 0 (- 15 Y) SP)\r
+  (FROM 0 (+ Y 1) ENTRY)\r
+  (TERPRI))\r
+(DEFUN SIER () (FROM 0 16 ROW))\r
+(SIER)
+#ready
+#screen

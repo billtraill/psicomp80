@@ -27,20 +27,21 @@ or `./mamed psicomp80x -bios lisp`), and uses the extra memory there.
 
 ## Example programs
 
-`examples/` has three classic LISP programs to type in (or let `c80.sh` type
-them):
+`examples/` has five LISP programs to type in (or let `c80.sh` type them):
 
 | | |
 |---|---|
 | `deriv.lsp` | Symbolic differentiation, the program LISP was made for. `(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)` gives `(+ (* 6 X) 2)`. `~/localdev/psicomp80/c80.sh deriv` |
 | `hanoi.lsp` | The Towers of Hanoi. `(HANOI 4 'A 'C 'B)` prints the 15 moves. `~/localdev/psicomp80/c80.sh hanoi` |
 | `queens.lsp` | The eight queens. `(QUEENS 8)` prints the first solution as a board, in about 26 s in the emulator. `~/localdev/psicomp80/c80.sh queens` |
+| `sier.lsp` | The Sierpiński triangle: 16 rows of Pascal's triangle mod 2, printed with `TYO`. `(SIER)` takes about 6 s. `~/localdev/psicomp80/c80.sh lispsier` |
+| `hilbert.lsp` | A Hilbert curve, 16 × 16 points, printed a line at a time: each point's distance along the curve is worked out a quarter at a time, and neighbours whose distances differ by 1 are joined. `(HILBERT)` takes about 30 s. `~/localdev/psicomp80/c80.sh lisphilbert` |
 
 `load.lua` does the typing: it enters LISP and types the file a line at a
 time, leaving out comment lines and waiting for LISP's cursor between lines
 (a key while LISP is busy resets to the monitor), with the emulator running
 flat out. Then it types the run line at normal speed. `screens/` has
-screenshots of each, made by `screens.sh`; they are also on `../lisp.html`.
+screenshots of the first three, made by `screens.sh`; they are also on `../lisp.html`.
 
 Without the expansion there is room for one of these programs at a time:
 DERIV takes about 380 of the 672 cells, QUEENS about 190.
@@ -186,3 +187,5 @@ changes without rebuilding MAME.
 - `gc.txt`: a tree kept intact through many collections
 - `bios.txt`: the Backspace key under `-bios lisp`
 - `demo.txt`: the session in the picture above
+- `sier.txt`: `sier.lsp` typed in and run
+- `hilbert.txt`: `hilbert.lsp` typed in and run

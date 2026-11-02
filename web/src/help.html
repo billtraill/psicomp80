@@ -27,7 +27,7 @@
       <li><strong>ROM</strong> switches the language in the top 2 KB of the ROM. Switching powers the computer off and on, so memory is cleared.</li>
       <li><strong>Memory</strong> adds the 32 KB expansion at 8800–FFFF. LISP uses it for 7680 cells instead of 672; the others don’t need it.</li>
       <li><strong>Fast</strong> runs as fast as your browser can instead of at the real 4 MHz. Examples are typed in fast anyway.</li>
-      <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for FORTH or LISP to be ready for each line.</li>
+      <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for the computer to be ready for each line. In BURP it types the lines in with LOAD.</li>
     </ul>
     <h3>What isn’t emulated</h3>
     <p>There is no cassette interface or floppy disc, so READ, TAPE and the disc commands do nothing useful. Programs that came on tape are loaded straight into memory by the examples.</p>
@@ -61,11 +61,12 @@
       <li><strong>The pictures</strong> recreate Fig. 22 of the August 1979 article from photos of the screen: a 16-byte loader copies a 2 KB picture to the screen and waits for a key.</li>
       <li><strong>ALPH</strong> and <strong>LIST</strong> show two of the monitor’s own commands.</li>
     </ul>
+    <div class="exlist" id="exl-monitor"></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-burp" aria-labelledby="tab-burp" hidden>
     <h2>BURP</h2>
-    <p>BURP is the high-level language of the original ROM, from the Wireless World articles: a small BASIC-like language whose arithmetic is done by a National MM57109 scientific calculator chip. Press RS at READY and the top line changes to BURP. Commands end with a space.</p>
+    <p>BURP, short for Basic Using Reverse Polish, is the high-level language of the original ROM, from the Wireless World articles: a small BASIC-like language whose arithmetic is done by a National MM57109 scientific calculator chip. Expressions are written in reverse Polish notation, the order the chip takes them: <code>LET X=X 1 +</code> rather than X+1. Press RS at READY and the top line changes to BURP. Commands end with a space.</p>
     <p>The chip takes its time, as the real one did: an addition takes about 20 ms, a logarithm 0.3 s and a sine half a second. Type a key only when BURP is waiting for one; a key while it is busy restarts the monitor.</p>
     <h3>Commands</h3>
     <div class="tablewrap"><table>
@@ -105,7 +106,9 @@
       <li><strong>BURP sample program</strong> copies the program from ROM, lists it and runs it.</li>
       <li><strong>e to the x</strong> follows the articles: it changes line 6, adds a heading line and runs from line 4.</li>
       <li><strong>Sines and cosines</strong> types in a new program with LOAD: a FOR loop with STEP 0.5 calling a subroutine, then a negative number and a division.</li>
+      <li><strong>Sierpiński triangle</strong> prints Pascal’s triangle mod 2, which is the Sierpiński triangle, as 1s and 0s. Every PRINT is a line of its own, so each row is a single number whose digits are the cells. Row <var>r</var> is the product of 11, 101 and 10001 for the bits 1, 2 and 4 set in <var>r</var>, since (1 + <var>x</var>)<sup><var>r</var></sup> mod 2 is the product of 1 + <var>x</var><sup>2<sup><var>b</var></sup></sup> over those bits, here with <var>x</var> = 10. The bottom eight rows are the top eight twice; they print as two numbers, as the chip holds only 8 digits.</li>
     </ul>
+    <div class="exlist" id="exl-burp"></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-forth" aria-labelledby="tab-forth" hidden>
@@ -138,7 +141,11 @@
     <ul>
       <li><strong>Game of Life in FORTH</strong> plays on 64 × 31 cells, one per character, reading the board straight from screen memory. It adds up columns of three cells first, so each cell takes three additions; a generation takes about 3 s. <code>1000 LIFE</code> runs 1000 generations.</li>
       <li><strong>Mandelbrot set in FORTH</strong> draws one point per character, shaded by how many steps it takes to escape, with the set in solid blocks. With only 16-bit integers it works in fixed point with 90 as 1.0. <code>MANDEL</code> takes about 95 s.</li>
+      <li><strong>Sierpiński triangle in FORTH</strong> draws Pascal’s triangle mod 2: entry <var>x</var> of row <var>y</var> is odd when the bits of <var>x</var> are all set in <var>y</var>, which is one <code>AND</code>. It has 64 rows, each entry two cells wide, four cells to a graphics character, and fills the whole screen, title line too; a key clears it and puts the title back. <code>SIER</code> takes about 10 s.</li>
+      <li><strong>Hilbert curve in FORTH</strong> is drawn by a turtle that knows its position and direction and can turn and step. A Hilbert curve of level <var>n</var> is four of level <var>n</var> − 1: turn, draw one mirrored, step, turn back, draw one, step, draw one, turn back, step, draw one mirrored, turn. HIL does exactly that, calling itself four times, with the sign of its angle doing the mirroring. Level 5 is 32 × 32 points, 4 cells apart across and 2 down so the curve comes out square, over the whole screen. <code>HILBERT</code> takes about 10 s; a key clears it.</li>
+      <li><strong>Towers of Hanoi in FORTH</strong> moves the discs the same way as the LISP version: N − 1 discs out of the way onto the spare peg, disc N across, then the N − 1 back on top of it. HAN takes the two pegs as one number, from × 3 + to, so it only has two things on the stack to juggle; the spare peg is 3 − from − to. Each move is animated by writing the disc straight to screen memory a step at a time and putting back the peg behind it. <code>6 HANOI</code> makes 63 moves in about 75 s; up to <code>10 HANOI</code> fits on the screen. <code>SPEED</code> sets the pause between steps (300 to start with): <code>100 SPEED !</code> is faster.</li>
     </ul>
+    <div class="exlist" id="exl-forth"></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-lisp" aria-labelledby="tab-lisp" hidden>
@@ -168,5 +175,8 @@
       <li><strong>Symbolic differentiation</strong> is the program LISP was made for: an expression is a list, so DERIV can take it apart and build its derivative. <code>(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)</code> gives <code>(+ (* 6 X) 2)</code>.</li>
       <li><strong>Towers of Hanoi</strong>: move all but the bottom disc out of the way, move the bottom disc, move the rest back on top. <code>(HANOI 4 'A 'C 'B)</code> prints 15 moves.</li>
       <li><strong>Eight queens</strong> puts a queen in the first safe row of each column and backs up when a column has none. N is never passed to the inner functions: dynamic scope finds the N that QUEENS was called with.</li>
+      <li><strong>Sierpiński triangle in LISP</strong> prints the same triangle, 16 rows of it, with <code>TYO</code>. With no AND, ODD looks at one bit at a time using <code>REM</code> and <code>/</code>. There are no loops either, so FROM calls a function on each number in a range by splitting the range in half: the recursion goes 5 deep for 16 numbers instead of 16. <code>(SIER)</code> takes about 6 s.</li>
+      <li><strong>Hilbert curve in LISP</strong> can’t move a turtle about the screen, as LISP prints a line at a time. Instead D works out how far along the curve a point is: it looks at which quarter of the square the point is in, adds the points of the quarters before it, turns the point round to that quarter’s way up, and carries on with the quarter. Neighbouring points are joined when their distances differ by 1. ROW keeps the distances of the row below in BELOW with <code>SETQ</code>, so each point’s distance is worked out once. <code>(HILBERT)</code> takes about 30 s.</li>
     </ul>
+    <div class="exlist" id="exl-lisp"></div>
   </div>

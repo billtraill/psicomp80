@@ -1,0 +1,35 @@
+^
+#wait 0.5
+(DEFUN D (S X Y N)\r
+  (COND ((EQ S 0) N)\r
+        (T (QUARTER (REM (/ X S) 2) (REM (/ Y S) 2)))))\r
+(DEFUN QUARTER (RX RY)\r
+  (COND ((EQ RY 1) (D (/ S 2) X Y (+ N (* (* S S) (+ RX 1)))))\r
+        ((EQ RX 1) (D (/ S 2) (- 15 Y) (- 15 X) (+ N (* (* S S) 3))))\r
+        (T (D (/ S 2) Y X N))))\r
+(DEFUN DROW (X Y)\r
+  (COND ((EQ X 16) NIL)\r
+        (T (CONS (D 8 X Y 0) (DROW (+ X 1) Y)))))\r
+(DEFUN NEXT (A B) (OR (EQ (- A B) 1) (EQ (- B A) 1)))\r
+(DEFUN LINE (A B)\r
+  (COND (A (POINT (AND (CDR A) (NEXT (CAR A) (CADR A)))\r
+                  (AND B (NEXT (CAR A) (CAR B))))\r
+           (LINE (CDR A) (CDR B)))))\r
+(DEFUN POINT (H V)\r
+  (TYO (+ 129 (+ (COND (H 2) (T 0)) (COND (V 8) (T 0)))))\r
+  (TYO (COND (H 131) (T 32))))\r
+(DEFUN FROM (LO HI FN)\r
+  (COND ((< (- HI LO) 2) (COND ((< LO HI) (FN LO))))\r
+        (T (FROM LO (/ (+ LO HI) 2) FN)\r
+           (FROM (/ (+ LO HI) 2) HI FN))))\r
+(DEFUN ROW (Y)\r
+  (SETQ BELOW (COND ((< Y 15) (DROW 0 (+ Y 1)))))\r
+  (LINE HERE BELOW)\r
+  (TERPRI)\r
+  (SETQ HERE BELOW))\r
+(DEFUN HILBERT ()\r
+  (SETQ HERE (DROW 0 0))\r
+  (FROM 0 16 ROW))\r
+(HILBERT)
+#ready
+#screen

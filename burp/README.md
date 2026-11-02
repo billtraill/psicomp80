@@ -55,6 +55,8 @@ prints the screen:
 - `programs.txt`: new programs with LOAD: IF and a loop, a FOR loop with a
   fractional STEP calling a subroutine with SIN and COS, negative numbers and
   division, and INPUT
+- `sierpinski.txt`: Pascal's triangle mod 2 (the Sierpiński triangle), each
+  row a number made by multiplying 11, 101 and 10001 for the bits of the row
 
 ## What made it work
 

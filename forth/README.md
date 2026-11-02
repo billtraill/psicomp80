@@ -21,17 +21,20 @@ appears. Type a line and press Return; the line runs and FORTH prints `OK`.
 
 ## Example programs
 
-`examples/` has two programs to type in (or let `c80.sh` type them):
+`examples/` has five programs to type in (or let `c80.sh` type them):
 
 | | |
 |---|---|
 | `life.fs` | Game of Life, 64 × 31 cells, one per character. `1000 LIFE` runs 1000 generations from a random board; about 3 s a generation in the emulator. `~/localdev/psicomp80/c80.sh forthlife` |
 | `mandel.fs` | The Mandelbrot set, one point per character, shaded by escape time, in fixed point (90 = 1.0). `MANDEL` draws it in about 95 s. `~/localdev/psicomp80/c80.sh mandel` |
+| `sier.fs` | The Sierpiński triangle: Pascal's triangle mod 2, where entry x of row y is odd when `x AND y` is x. 64 rows, four cells to a character, over the whole screen. `SIER` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthsier` |
+| `hilbert.fs` | A level-5 Hilbert curve, 32 × 32 points, drawn over the whole screen by a turtle: HIL calls itself four times, the sign of its angle mirroring the copies. `HILBERT` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthhilbert` |
+| `hanoi.fs` | The Towers of Hanoi, animated: each disc lifts off its peg, slides across and drops onto the next. `6 HANOI` makes 63 moves in about 75 s; up to `10 HANOI` fits. `SPEED` sets the pause between steps. `~/localdev/psicomp80/c80.sh forthhanoi` |
 
 `load.lua` does the typing: it enters FORTH, types the file a line at a time
 (waiting for FORTH's cursor between lines, since a key while FORTH is busy
 resets to the monitor) with the emulator running flat out, then types the
-run command at normal speed. `screens/` has screenshots of both, also on
+run command at normal speed. `screens/` has screenshots of Life and Mandelbrot, also on
 `screenshots.html`.
 
 ## Keys
@@ -148,3 +151,6 @@ changes without rebuilding MAME.
   graphics, KEY, COLD, BYE
 - `bios.txt`: the Backspace key under `-bios forth`
 - `demo.txt`: the session in the picture above
+- `sier.txt`: `sier.fs` typed in and run, and a key to clear it
+- `hilbert.txt`: the same for `hilbert.fs`
+- `hanoi.txt`: `hanoi.fs` typed in and `6 HANOI` run to the end

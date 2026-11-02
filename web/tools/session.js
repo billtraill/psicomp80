@@ -2,9 +2,10 @@
 // MAME.  node web/tools/session.js <rom> <steps file> [32k]
 // The steps file is in the format of lisp/tests/*.txt: each line is typed
 // (\r = Return, \b = Backspace, ^ = RS), "#wait <s>" waits, "#screen" prints
-// the screen, "#ready" waits for the cursor.  A line ending in \r is typed
-// once FORTH or LISP is waiting for a line (its cursor is showing); the
-// time it waited is printed if over a second.  NOWAIT=1 turns that off, as
+// the screen, "#ready" waits for the cursor (or, in BURP, which has none,
+// until it is waiting for a key).  A line ending in \r is typed once FORTH
+// or LISP is waiting for a line (its cursor is showing); the time it waited
+// is printed if over a second.  NOWAIT=1 turns that off, as
 // in forth/test_forth.lua.
 "use strict";
 const fs = require("fs");
@@ -17,7 +18,7 @@ const [rom, file, mem] = process.argv.slice(2);
 const m = new COMP80(D.fonts);
 m.powerOn(Buffer.from(D.roms[rom], "base64"), rom, mem === "32k");
 const CURS = { forth: 0x1da0, lisp: 0x0c12 }[rom];
-const waitingLine = () => CURS !== undefined && m.mem[m.mem[CURS] | (m.mem[CURS + 1] << 8)] === 0x1f && m.waitingForKey();
+const waitingLine = () => CURS === undefined ? m.waitingForKey() : m.mem[m.mem[CURS] | (m.mem[CURS + 1] << 8)] === 0x1f && m.waitingForKey();
 
 const sec = () => m.cycles / CLOCK;
 const step = (s) => m.run(Math.round(s * CLOCK));

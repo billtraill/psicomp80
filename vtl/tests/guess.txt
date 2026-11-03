@@ -1,0 +1,28 @@
+^
+#wait 0.5
+10 ) GUESS THE NUMBER\r
+20 X='/100 THE REMAINDER, IN %, IS 0 TO 99\r
+30 N=%+1\r
+40 T=0\r
+50 ?="I AM THINKING OF A NUMBER FROM 1 TO 100"\r
+60 ?="YOUR GUESS? ";\r
+70 G=?\r
+80 T=T+1\r
+90 #=(G=N)*150\r
+100 #=(G<N)*130\r
+110 ?="TOO BIG"\r
+120 #=60\r
+130 ?="TOO SMALL"\r
+140 #=60\r
+150 ?="RIGHT, IN ";\r
+160 ?=T\r
+170 ?=" GUESSES"\r
+ #=1\r
+#ready
+50\r
+#ready
+25\r
+#ready
+N\r
+#ready
+#screen

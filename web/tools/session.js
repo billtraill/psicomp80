@@ -19,7 +19,7 @@ const [rom, file, mem] = process.argv.slice(2);
 const m = new COMP80(D.fonts);
 m.powerOn(Buffer.from(D.roms[rom], "base64"), rom, mem === "32k");
 const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
-  pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e }[rom];
+  pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e, vtl: 0x1da0, mouse: 0x1da0, befunge: 0x1da0, sheet: 0x0c02, trac: 0x0c06, pl0: 0x1da0, bf: 0x1da0 }[rom];
 const waitingLine = () => CURS === undefined ? m.waitingForKey() : m.mem[m.mem[CURS] | (m.mem[CURS + 1] << 8)] === 0x1f && m.waitingForKey();
 
 const sec = () => m.cycles / CLOCK;

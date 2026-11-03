@@ -1,0 +1,11 @@
+^
+#wait 0.5
+10 TYPE A LINE AND IT COMES BACK REVERSED\r
+20 >,----------            READ A KEY AND TAKE 10\r
+30 [++++++++++>,----------] UNTIL RETURN WHICH GIVES 10\r
+40 <[.<]                   PRINT BACKWARDS DOWN TO CELL 0\r
+50 ++++++++++.             NEW LINE\r
+RUN\r
+COMP80\r
+#ready
+#screen

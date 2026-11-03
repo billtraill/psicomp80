@@ -1,0 +1,20 @@
+^
+#wait 0.5
+#ready
+#(DS,FACT,(#(EQ,X,1,1,(#(ML,X,#(CL,FACT,#(SU,X,1)))))))'
+#ready
+#(SS,FACT,X)'
+#ready
+#(PF,FACT)'
+#ready
+#(PS,#(CL,FACT,5))'
+#ready
+#(PS,#(CL,FACT,7))'
+#ready
+#(DS,FIB,(#(GR,N,1,(#(AD,#(CL,FIB,#(SU,N,1)),#(CL,FIB,#(SU,N,2)))),N)))'
+#ready
+#(SS,FIB,N)'
+#ready
+#(PS,#(CL,FIB,10))'
+#ready
+#screen

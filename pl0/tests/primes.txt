@@ -1,0 +1,22 @@
+^
+#wait 0.5
+10 CONST MAX = 100;\r
+20 VAR N, D, P;\r
+30 BEGIN\r
+40   N := 2;\r
+50   WHILE N <= MAX DO\r
+60   BEGIN\r
+70     P := 1;\r
+80     D := 2;\r
+90     WHILE D * D <= N DO\r
+100    BEGIN\r
+110      IF N / D * D = N THEN P := 0;\r
+120      D := D + 1\r
+130    END;\r
+140    IF P = 1 THEN ! N;\r
+150    N := N + 1\r
+160  END\r
+170 END.\r
+RUN\r
+#ready
+#screen

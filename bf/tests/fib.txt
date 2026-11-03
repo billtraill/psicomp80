@@ -1,0 +1,17 @@
+^
+#wait 0.5
+10 FIBONACCI NUMBERS AS BARS OF SOLID BLOCKS\r
+20 CELLS  0 ROWS  1 A  2 B  3 BLOCK  4 NEW LINE  5 AND 6 SPARE\r
+30 ++++++++++>+>+>>+++++++++++[<+++++++++++++>-]++++++++++<<<<\r
+40 [                       FOR EACH ROW\r
+50 >[>>>>+>+<<<<<-]        COPY A INTO CELLS 5 AND 6\r
+60 >>>>>[<<<<<+>>>>>-]     AND CELL 6 BACK INTO A\r
+70 <[<<.>>-]<.             PRINT A BLOCKS THEN A NEW LINE\r
+80 <<<[>>>>+<<<<-]         A INTO CELL 5\r
+90 >[<+>>>>>+<<<<-]        B INTO A AND CELL 6\r
+100 >>>[<<<+>>>-]          CELL 5 INTO B\r
+110 >[<<<<+>>>>-]          AND CELL 6 ONTO B\r
+120 <<<<<<-]               ONE ROW FEWER\r
+RUN\r
+#ready
+#screen

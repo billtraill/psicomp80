@@ -1,0 +1,45 @@
+^
+#wait 0.5
+10 CONST TEN = 10, TWO = 2;\r
+20 VAR A, B;\r
+30 PROCEDURE SHOW;\r
+40   VAR T;\r
+50   BEGIN T := A * TEN + B; ! T END;\r
+60 PROCEDURE OUTER;\r
+70   PROCEDURE INNER; ! 0 - 7;\r
+80   BEGIN CALL INNER; CALL SHOW END;\r
+90 BEGIN\r
+100  A := 4; B := TWO; CALL SHOW;\r
+110  IF ODD 3 THEN ! 1;\r
+120  IF ODD 4 THEN ! 99;\r
+130  IF 5 # 5 THEN ! 99;\r
+140  IF 0-3 < 2 THEN ! 2;\r
+150  IF 3 >= 3 THEN ! 3;\r
+160  IF 2 > 3 THEN ! 99;\r
+170  ! (7 + 3) * 2 - 30 / 4;\r
+180  ! 0 - 32767 - 1;\r
+190  CALL OUTER\r
+200 END.\r
+CODE\r
+RUN\r
+#ready
+#screen
+195 ! A\r
+RUN\r
+#ready
+195\r
+75 ! Q;\r
+RUN\r
+#ready
+75\r
+120  ! 9 / (A - 4);\r
+RUN\r
+#ready
+LIST 190\r
+#ready
+#screen
+NEW\r
+LIST\r
+FROG\r
+#ready
+#screen

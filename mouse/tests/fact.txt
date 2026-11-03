@@ -1,0 +1,8 @@
+^
+#wait 0.5
+10 1 N: ( N. 8 < & N. ! " FACTORIAL IS " #F,N.; ! "!"\r
+20 N. 1 + N: ) $$\r
+30 $F %1 2 < [ 1 @ ] %1 #F,%1 1 -; * @\r
+RUN\r
+#ready
+#screen

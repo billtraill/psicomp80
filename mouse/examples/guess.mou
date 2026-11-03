@@ -1,0 +1,4 @@
+10 100 ?. N: 0 T: "I AM THINKING OF A NUMBER FROM 1 TO 100!"
+20 ( "YOUR GUESS? " ? G: T. 1 + T: G. N. = 0 = &
+30 G. N. < [ "HIGHER!" ] G. N. > [ "LOWER!" ] )
+40 "RIGHT, IN " T. ! " GUESSES!" $$

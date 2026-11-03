@@ -1,0 +1,11 @@
+10 VAR X, Y;
+20 BEGIN
+30   ? X;
+40   ? Y;
+50   WHILE X # Y DO
+60   BEGIN
+70     IF X > Y THEN X := X - Y;
+80     IF Y > X THEN Y := Y - X
+90   END;
+100  ! X
+110 END.

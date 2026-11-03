@@ -1,0 +1,10 @@
+^
+#wait 0.5
+10 THE ALPHABET\r
+20 ++++++++[>++++++++<-]>+ CELL 1 IS 65 WHICH PRINTS AS A\r
+30 <++++++++++++++++++++++++++\r
+40 [>.+<-]                 PRINT 26 LETTERS\r
+50 >>++++++++++.           NEW LINE FROM CELL 2\r
+RUN\r
+#ready
+#screen

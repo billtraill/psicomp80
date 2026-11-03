@@ -1,0 +1,8 @@
+^
+#wait 0.5
+CLEAR\r
+0 0 1>:.1+:55+)!V\r
+1 1 '          =@\r
+RUN\r
+#ready
+#screen

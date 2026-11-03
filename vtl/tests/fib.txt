@@ -1,0 +1,22 @@
+^
+#wait 0.5
+10 ) FIBONACCI NUMBERS UNTIL THEY PASS 65535\r
+20 A=0\r
+30 B=1\r
+40 #=200 PRINT B: THE SUBROUTINE COMES BACK WITH #=!\r
+50 C=A+B\r
+60 #=(C<B)*100 THE SUM WENT ROUND PAST 65535\r
+70 A=B\r
+80 B=C\r
+90 #=40\r
+100 ?=""\r
+110 ?="THE NEXT IS ";\r
+120 ?=C\r
+130 ?=", AS IT IS KEPT IN 16 BITS"\r
+140 #=999 THERE IS NO LINE 999: STOP\r
+200 ?=B\r
+210 $=32\r
+220 #=!\r
+ #=1\r
+#ready
+#screen

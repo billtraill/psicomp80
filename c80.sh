@@ -7,8 +7,8 @@
 #   life plasma dump fire banner boat schmitt cover; alph and list run the
 #   monitor commands; disk loads the disc software at 1D00 with
 #   disk/programs.img in the drive.
-# Languages: forth, lisp, basic, logo, focal, pilot, zasm, prolog and chip8
-# boot that ROM and enter it.
+# Languages: forth, lisp, basic, logo, focal, pilot, zasm, prolog, chip8, vtl,
+# mouse, befunge, sheet, trac, pl0 and bf boot that ROM and enter it.
 # FORTH programs from forth/examples, typed in and run: forthlife mandel
 #   forthsier forthhilbert forthhanoi forthdragon forthkoch forthant
 #   forthsieve forthballs forthstars snake forthmaze forthrule forthfern
@@ -21,6 +21,11 @@
 #   pilotquiz pilottables pilotstory pilotdraw, prologfamily prologlists
 #   prologcolour prologpath; CHIP-8 programs copied to 0E00 and run:
 #   c8bounce c8keys c8dodge c8kaleido.
+# The Other languages' examples: vtlprimes vtlguess vtlfib vtlcircles
+#   vtlchaos, mousefib mousefact mousesieve mouseguess mousecircles, befhello
+#   befcount beffact befstars, sheetbudget sheetinterest sheettimes sheettemp,
+#   trachello tracfact tracrev tracletter, pl0squares pl0primes pl0gcd pl0fact
+#   pl0rings, bfhello bfcount bfadd bfalpha bfreverse bffib.
 # ready just starts at READY.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -176,6 +181,86 @@ case "$prog" in
            script=$HERE/forth/load.lua; set -- -bios prolog "$@" ;;
   prologpath) bin=; forth=$HERE/prolog/examples/path.pl; typed="?- WAY(ARK,FORD,P)."; curs=0C0E
            script=$HERE/forth/load.lua; set -- -bios prolog "$@" ;;
+  vtl) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  vtlprimes) bin=; forth=$HERE/vtl/examples/primes.vtl; typed="#=1"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  vtlguess) bin=; forth=$HERE/vtl/examples/guess.vtl; typed="#=1"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  vtlfib) bin=; forth=$HERE/vtl/examples/fib.vtl; typed="#=1"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  vtlcircles) bin=; forth=$HERE/vtl/examples/circles.vtl; typed="#=1"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  vtlchaos) bin=; forth=$HERE/vtl/examples/chaos.vtl; typed="#=1"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios vtl "$@" ;;
+  mouse) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  mousefib) bin=; forth=$HERE/mouse/examples/fib.mou; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  mousefact) bin=; forth=$HERE/mouse/examples/fact.mou; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  mousesieve) bin=; forth=$HERE/mouse/examples/sieve.mou; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  mouseguess) bin=; forth=$HERE/mouse/examples/guess.mou; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  mousecircles) bin=; forth=$HERE/mouse/examples/circles.mou; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios mouse "$@" ;;
+  befunge) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios befunge "$@" ;;
+  befhello) bin=; forth=$HERE/befunge/examples/hello.bef; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios befunge "$@" ;;
+  befcount) bin=; forth=$HERE/befunge/examples/count.bef; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios befunge "$@" ;;
+  beffact) bin=; forth=$HERE/befunge/examples/fact.bef; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios befunge "$@" ;;
+  befstars) bin=; forth=$HERE/befunge/examples/stars.bef; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios befunge "$@" ;;
+  sheet) bin=; typed=""; curs=0C02
+           script=$HERE/forth/load.lua; set -- -bios sheet "$@" ;;
+  sheetbudget) bin=; forth=$HERE/sheet/examples/budget.cal; typed=""; curs=0C02
+           script=$HERE/forth/load.lua; set -- -bios sheet "$@" ;;
+  sheetinterest) bin=; forth=$HERE/sheet/examples/interest.cal; typed=""; curs=0C02
+           script=$HERE/forth/load.lua; set -- -bios sheet "$@" ;;
+  sheettimes) bin=; forth=$HERE/sheet/examples/times.cal; typed=""; curs=0C02
+           script=$HERE/forth/load.lua; set -- -bios sheet "$@" ;;
+  sheettemp) bin=; forth=$HERE/sheet/examples/temp.cal; typed=""; curs=0C02
+           script=$HERE/forth/load.lua; set -- -bios sheet "$@" ;;
+  trac) bin=; typed=""; curs=0C06
+           script=$HERE/forth/load.lua; set -- -bios trac "$@" ;;
+  trachello) bin=; forth=$HERE/trac/examples/hello.trac; typed=""; curs=0C06
+           script=$HERE/forth/load.lua; set -- -bios trac "$@" ;;
+  tracfact) bin=; forth=$HERE/trac/examples/fact.trac; typed=""; curs=0C06
+           script=$HERE/forth/load.lua; set -- -bios trac "$@" ;;
+  tracrev) bin=; forth=$HERE/trac/examples/rev.trac; typed=""; curs=0C06
+           script=$HERE/forth/load.lua; set -- -bios trac "$@" ;;
+  tracletter) bin=; forth=$HERE/trac/examples/letter.trac; typed=""; curs=0C06
+           script=$HERE/forth/load.lua; set -- -bios trac "$@" ;;
+  pl0) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  pl0squares) bin=; forth=$HERE/pl0/examples/squares.pl0; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  pl0primes) bin=; forth=$HERE/pl0/examples/primes.pl0; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  pl0gcd) bin=; forth=$HERE/pl0/examples/gcd.pl0; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  pl0fact) bin=; forth=$HERE/pl0/examples/fact.pl0; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  pl0rings) bin=; forth=$HERE/pl0/examples/rings.pl0; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios pl0 "$@" ;;
+  bf) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bfhello) bin=; forth=$HERE/bf/examples/hello.bf; typed="SHOW"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bfcount) bin=; forth=$HERE/bf/examples/count.bf; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bfadd) bin=; forth=$HERE/bf/examples/add.bf; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bfalpha) bin=; forth=$HERE/bf/examples/alpha.bf; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bfreverse) bin=; forth=$HERE/bf/examples/reverse.bf; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  bffib) bin=; forth=$HERE/bf/examples/fib.bf; typed="RUN"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
   chip8)   bin=;                           typed="^"; set -- -bios chip8 "$@" ;;
   c8bounce) bin=$HERE/chip8/examples/bounce.ch8; addr=0E00; typed="^"; set -- -bios chip8 "$@" ;;
   c8keys) bin=$HERE/chip8/examples/keys.ch8; addr=0E00; typed="^"; set -- -bios chip8 "$@" ;;

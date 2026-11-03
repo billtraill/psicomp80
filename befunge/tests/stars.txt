@@ -1,0 +1,8 @@
+^
+#wait 0.5
+CLEAR\r
+0 0 0>:"*";:3*;4+P1+:99+1+)!V\r
+1 1 '                      =@\r
+RUN\r
+#ready
+#screen

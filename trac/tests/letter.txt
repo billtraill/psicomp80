@@ -1,0 +1,20 @@
+^
+#wait 0.5
+#ready
+#(DS,LETTER,(DEAR NAME,\r
+#ready
+THANK YOU FOR THE THING.\r
+#ready
+I WILL THINK OF YOU WHENEVER I USE IT.\r
+#ready
+LOVE FROM ME\r
+#ready
+))'
+#ready
+#(SS,LETTER,NAME,THING,ME)'
+#ready
+#(PS,##(CL,LETTER,AUNT JEAN,TEAPOT,BILL))'
+#ready
+#(PS,##(CL,LETTER,GRANDAD,WOOLLY JUMPER,ANNE))'
+#ready
+#screen

@@ -1,0 +1,11 @@
+^
+#wait 0.5
+CLEAR\r
+0 0 &>:1-:V V *=$.@\r
+1 1 '    =$>;:'\r
+RUN\r
+5\r
+RUN\r
+7\r
+#ready
+#screen

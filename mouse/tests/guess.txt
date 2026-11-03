@@ -1,0 +1,16 @@
+^
+#wait 0.5
+10 100 ?. N: 0 T: "I AM THINKING OF A NUMBER FROM 1 TO 100!"\r
+20 ( "YOUR GUESS? " ? G: T. 1 + T: G. N. = 0 = &\r
+30 G. N. < [ "HIGHER!" ] G. N. > [ "LOWER!" ] )\r
+40 "RIGHT, IN " T. ! " GUESSES!" $$\r
+RUN\r
+50\r
+75\r
+88\r
+94\r
+97\r
+95\r
+96\r
+#ready
+#screen

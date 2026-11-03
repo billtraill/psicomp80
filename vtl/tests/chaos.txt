@@ -1,0 +1,27 @@
+^
+#wait 0.5
+10 ) A SIERPINSKI TRIANGLE BY THE CHAOS GAME\r
+20 I=0\r
+30 ?=""\r
+40 I=I+1\r
+50 #=(I<31)*30\r
+60 X=64\r
+70 Y=30\r
+80 N=0\r
+90 R='/3 PICK A CORNER: % IS 0, 1 OR 2\r
+100 A=64\r
+110 B=0\r
+120 #=(%=0)*170\r
+130 A=0\r
+140 B=61\r
+150 #=(%=1)*170\r
+160 A=127\r
+170 X=X+A/2 HALF WAY TO THE CORNER\r
+180 Y=Y+B/2\r
+190 @=Y*128+X\r
+200 N=N+1\r
+210 #=(N<2500)*90\r
+220 K=$ WAIT FOR A KEY\r
+ #=1\r
+#ready
+#screen

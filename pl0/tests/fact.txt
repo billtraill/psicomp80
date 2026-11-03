@@ -1,0 +1,27 @@
+^
+#wait 0.5
+10 VAR N, F, I;\r
+20 PROCEDURE FACT;\r
+30 BEGIN\r
+40   IF N = 0 THEN F := 1;\r
+50   IF N > 0 THEN\r
+60   BEGIN\r
+70     N := N - 1;\r
+80     CALL FACT;\r
+90     N := N + 1;\r
+100    F := F * N\r
+110  END\r
+120 END;\r
+130 BEGIN\r
+140   I := 1;\r
+150   WHILE I <= 7 DO\r
+160   BEGIN\r
+170     N := I;\r
+180     CALL FACT;\r
+190     ! F;\r
+200     I := I + 1\r
+210   END\r
+220 END.\r
+RUN\r
+#ready
+#screen

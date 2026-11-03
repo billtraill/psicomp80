@@ -285,6 +285,20 @@ SECTIONS = [
      "<p>A Z80 assembler and disassembler covering every documented instruction. ASM is the disassembler run backwards: it tries each opcode until its text matches the line typed. Source: <code>zasm/zasm.asm</code>.</p>"),
     ("prolog", "r", "Prolog", "0400–0BFF",
      "<p>A small Prolog: unification, depth-first backtracking with choice points, cut, lists and micro-PROLOG style arithmetic. Source: <code>prolog/prolog.asm</code>.</p>"),
+    ("vtl", "v", "VTL-2", "0400–0BFF",
+     "<p>VTL-2, the Very Tiny Language of 1977, where every statement is an assignment: <code>#=</code> jumps, <code>?=</code> prints, <code>@=</code> plots. Source: <code>vtl/vtl.asm</code>.</p>"),
+    ("mouse", "u", "Mouse", "0400–0BFF",
+     "<p>Peter Grogono's 1979 stack language, one character a command, with macros that can call themselves. Source: <code>mouse/mouse.asm</code>.</p>"),
+    ("befunge", "e", "Befunge", "0400–0BFF",
+     "<p>Befunge-93 with the screen as its playfield, so programs that change themselves change in front of you. Source: <code>befunge/befunge.asm</code>.</p>"),
+    ("sheet", "s", "CALC", "0400–0BFF",
+     "<p>A VisiCalc-style spreadsheet: six columns of 24 rows, formulas with references that move when copied, and fixed point in hundredths. Source: <code>sheet/sheet.asm</code>.</p>"),
+    ("trac", "t", "TRAC", "0400–0BFF",
+     "<p>Calvin Mooers' 1964 string language, in which a program is text that rewrites itself as it is read. Source: <code>trac/trac.asm</code>.</p>"),
+    ("pl0", "k", "PL/0", "0400–0BFF",
+     "<p>A one-pass compiler for Wirth's PL/0 that writes Z80 machine code and runs it. Source: <code>pl0/pl0.asm</code>.</p>"),
+    ("bf", "x", "BF", "0400–0BFF",
+     "<p>A Brainf*** interpreter that shows the program, the tape and the output as it runs. Source: <code>bf/bf.asm</code>.</p>"),
 ]
 
 ROMS = [("psicomp80.rom", "BURP", "b"), ("psicomp80_forth.rom", "FORTH", "f"), ("psicomp80_lisp.rom", "LISP", "l")] + \
@@ -330,8 +344,8 @@ def main():
                      f'<p class="sums"><span>CRC <b>{crc}</b></span><span>SHA1 <b>{sha}</b></span></p>'
                      f'<div class="lstwrap"><pre class="hex" data-p="{p}">{hex_dump(name, rom, p, page)}</pre></div></div>')
     body.append('<section class="view" id="hex" data-view="hex" data-p="hex">'
-                '<div class="shead"><span class="kicker">0000–0BFF · ten ROMs</span><h2>Hex dumps</h2>'
-                '<p>The ten 3 KB ROM images, sixteen bytes to a line as in the magazine\'s listing. '
+                '<div class="shead"><span class="kicker">0000–0BFF · seventeen ROMs</span><h2>Hex dumps</h2>'
+                '<p>The seventeen 3 KB ROM images, sixteen bytes to a line as in the magazine\'s listing. '
                 'The first 400h bytes, the monitor, are the same in all of them. Click an address or a byte to see '
                 'it in the listing. The checksums are the ones the MAME driver expects.</p>'
                 '<div class="tsel" role="group" aria-label="Text column"><span class="lbl">Text column</span>'
@@ -457,8 +471,8 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 <header>
   <span class="kicker">PSI COMP80 · the 3 KB ROM · 0000–0BFF</span>
   <h1>COMP80 ROM Listings</h1>
-  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the ten languages that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM and Prolog were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
-  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all ten ROMs.</p>
+  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the seventeen languages that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM, Prolog, VTL-2, Mouse, Befunge, CALC, TRAC, PL/0 and BF were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
+  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all seventeen ROMs.</p>
   <div class="map" aria-label="Memory map">
     <div><b>0000–03FF</b><span>Monitor ROM, 1 KB</span></div>
     <div><b>0400–0BFF</b><span>BURP or another language, 2 KB</span></div>
@@ -468,7 +482,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 </header>
 <nav>
   <div class="tabs">
-    <a href="#monitor">Monitor</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#basic">BASIC</a><a href="#logo">Logo</a><a href="#chip8">CHIP-8</a><a href="#focal">FOCAL</a><a href="#pilot">PILOT</a><a href="#zasm">ZASM</a><a href="#prolog">Prolog</a><a href="#hex">Hex dumps</a>
+    <a href="#monitor">Monitor</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#basic">BASIC</a><a href="#logo">Logo</a><a href="#chip8">CHIP-8</a><a href="#focal">FOCAL</a><a href="#pilot">PILOT</a><a href="#zasm">ZASM</a><a href="#prolog">Prolog</a><a href="#vtl">VTL-2</a><a href="#mouse">Mouse</a><a href="#befunge">Befunge</a><a href="#sheet">CALC</a><a href="#trac">TRAC</a><a href="#pl0">PL/0</a><a href="#bf">BF</a><a href="#hex">Hex dumps</a>
   </div>
   <form class="go"><label for="goaddr">Address</label><input id="goaddr" maxlength="4" autocomplete="off" spellcheck="false" placeholder="0800"><button type="submit">Go</button></form>
 </nav>

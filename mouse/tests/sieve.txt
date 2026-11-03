@@ -1,0 +1,11 @@
+^
+#wait 0.5
+10 "PRIMES BELOW 300, BY THE SIEVE!" 2 I:\r
+20 ( I. 300 < & 1 I. 400 + : I. 1 + I: ) 2 I: 0 N:\r
+30 ( I. 300 < & I. 400 + . [ I. ! " " N. 1 + N:\r
+40 N. 12 % 0 = [ "!" ] I. 18 < [ I. I. * J:\r
+50 ( J. 300 < & 0 J. 400 + : J. I. + J: ) ] ]\r
+60 I. 1 + I: ) "!" N. ! " PRIMES!" $$\r
+RUN\r
+#ready
+#screen

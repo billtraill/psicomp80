@@ -1,0 +1,38 @@
+^
+#wait 0.5
+HOUSEHOLD BUDGET\r
+>A3\r
+ITEM\r
+RENT\r
+FOOD\r
+HEAT\r
+PHONE\r
+CAR\r
+SAVINGS\r
+>A11\r
+TOTAL\r
+PER WEEK\r
+>B3\r
+"   MONTH\r
+450\r
+320.50\r
+65\r
+22.99\r
+140\r
+100\r
+>B11\r
+@SUM(B4...B9)\r
+>C3\r
+"    YEAR\r
++B4*12\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+>C11\r
+@SUM(C4...C9)\r
+>B12\r
++C11/52\r
+#ready
+#screen

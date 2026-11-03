@@ -1,0 +1,18 @@
+^
+#wait 0.5
+10 VAR X, Y;\r
+20 BEGIN\r
+30   ? X;\r
+40   ? Y;\r
+50   WHILE X # Y DO\r
+60   BEGIN\r
+70     IF X > Y THEN X := X - Y;\r
+80     IF Y > X THEN Y := Y - X\r
+90   END;\r
+100  ! X\r
+110 END.\r
+RUN\r
+1071\r
+462\r
+#ready
+#screen

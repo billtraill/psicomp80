@@ -1,0 +1,16 @@
+^
+#wait 0.5
+#ready
+#(DS,S,COMP80)'
+#ready
+#(DS,R,(#(EQ,K,*,,(#(CL,R,##(CC,S,*))K))))'
+#ready
+#(SS,R,K)'
+#ready
+#(PS,#(CL,R,##(CC,S,*)))'
+#ready
+#(DS,S,WIRELESS WORLD)'
+#ready
+#(PS,#(CL,R,##(CC,S,*)))'
+#ready
+#screen

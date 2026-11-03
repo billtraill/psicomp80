@@ -1300,6 +1300,34 @@ ROMX_LOAD("psicomp80_zasm.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(9, "prolog", "Monitor + Prolog")
 ROMX_LOAD("psicomp80_prolog.rom", 0x0000, 0x0c00,
          CRC(7c6db089) SHA1(dc6c27554340767799120dab7a8d22374aa4eb69), ROM_BIOS(9))
+// Monitor + COMP80 VTL-2 in place of BURP (vtl/, built by vtl/build.sh)
+ROM_SYSTEM_BIOS(10, "vtl", "Monitor + VTL-2")
+ROMX_LOAD("psicomp80_vtl.rom", 0x0000, 0x0c00,
+         CRC(9545892e) SHA1(fe9740c7102add496cdd200fdd0b1b5e28984891), ROM_BIOS(10))
+// Monitor + COMP80 Mouse in place of BURP (mouse/, built by mouse/build.sh)
+ROM_SYSTEM_BIOS(11, "mouse", "Monitor + MOUSE")
+ROMX_LOAD("psicomp80_mouse.rom", 0x0000, 0x0c00,
+         CRC(5d4aafb8) SHA1(c1e9498791acc28a9f776c395546798965a7d4b5), ROM_BIOS(11))
+// Monitor + COMP80 Befunge in place of BURP (befunge/, built by befunge/build.sh)
+ROM_SYSTEM_BIOS(12, "befunge", "Monitor + Befunge")
+ROMX_LOAD("psicomp80_befunge.rom", 0x0000, 0x0c00,
+         CRC(8f0e8bda) SHA1(f6d027c58b29deda8241f9ba9ed9a656d5cac8b2), ROM_BIOS(12))
+// Monitor + COMP80 CALC spreadsheet in place of BURP (sheet/, built by sheet/build.sh)
+ROM_SYSTEM_BIOS(13, "sheet", "Monitor + CALC spreadsheet")
+ROMX_LOAD("psicomp80_sheet.rom", 0x0000, 0x0c00,
+         CRC(a99d0be4) SHA1(5bd4ee07749f1d39a05fca5517fe9cda6f3b8fc3), ROM_BIOS(13))
+// Monitor + COMP80 TRAC in place of BURP (trac/, built by trac/build.sh)
+ROM_SYSTEM_BIOS(14, "trac", "Monitor + TRAC")
+ROMX_LOAD("psicomp80_trac.rom", 0x0000, 0x0c00,
+         CRC(477a1b44) SHA1(de0e30d805310488501898d1efd83c3b0306c7dd), ROM_BIOS(14))
+// Monitor + COMP80 PL/0 compiler in place of BURP (pl0/, built by pl0/build.sh)
+ROM_SYSTEM_BIOS(15, "pl0", "Monitor + PL/0")
+ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
+         CRC(de3acdb6) SHA1(fba03a21e1b9fd72018ee1a68c8596e8fef6f8eb), ROM_BIOS(15))
+// Monitor + COMP80 BF (Brainf***) interpreter in place of BURP (bf/, built by bf/build.sh)
+ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
+ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,
+         CRC(6d2e5156) SHA1(ff83b2441e06071c98f4848dfdd577dffd153600), ROM_BIOS(16))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1347,6 +1375,34 @@ ROMX_LOAD("psicomp80_zasm.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(9, "prolog", "Monitor + Prolog")
 ROMX_LOAD("psicomp80_prolog.rom", 0x0000, 0x0c00,
          CRC(7c6db089) SHA1(dc6c27554340767799120dab7a8d22374aa4eb69), ROM_BIOS(9))
+// Monitor + COMP80 VTL-2 in place of BURP (vtl/, built by vtl/build.sh)
+ROM_SYSTEM_BIOS(10, "vtl", "Monitor + VTL-2")
+ROMX_LOAD("psicomp80_vtl.rom", 0x0000, 0x0c00,
+         CRC(9545892e) SHA1(fe9740c7102add496cdd200fdd0b1b5e28984891), ROM_BIOS(10))
+// Monitor + COMP80 Mouse in place of BURP (mouse/, built by mouse/build.sh)
+ROM_SYSTEM_BIOS(11, "mouse", "Monitor + MOUSE")
+ROMX_LOAD("psicomp80_mouse.rom", 0x0000, 0x0c00,
+         CRC(5d4aafb8) SHA1(c1e9498791acc28a9f776c395546798965a7d4b5), ROM_BIOS(11))
+// Monitor + COMP80 Befunge in place of BURP (befunge/, built by befunge/build.sh)
+ROM_SYSTEM_BIOS(12, "befunge", "Monitor + Befunge")
+ROMX_LOAD("psicomp80_befunge.rom", 0x0000, 0x0c00,
+         CRC(8f0e8bda) SHA1(f6d027c58b29deda8241f9ba9ed9a656d5cac8b2), ROM_BIOS(12))
+// Monitor + COMP80 CALC spreadsheet in place of BURP (sheet/, built by sheet/build.sh)
+ROM_SYSTEM_BIOS(13, "sheet", "Monitor + CALC spreadsheet")
+ROMX_LOAD("psicomp80_sheet.rom", 0x0000, 0x0c00,
+         CRC(a99d0be4) SHA1(5bd4ee07749f1d39a05fca5517fe9cda6f3b8fc3), ROM_BIOS(13))
+// Monitor + COMP80 TRAC in place of BURP (trac/, built by trac/build.sh)
+ROM_SYSTEM_BIOS(14, "trac", "Monitor + TRAC")
+ROMX_LOAD("psicomp80_trac.rom", 0x0000, 0x0c00,
+         CRC(477a1b44) SHA1(de0e30d805310488501898d1efd83c3b0306c7dd), ROM_BIOS(14))
+// Monitor + COMP80 PL/0 compiler in place of BURP (pl0/, built by pl0/build.sh)
+ROM_SYSTEM_BIOS(15, "pl0", "Monitor + PL/0")
+ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
+         CRC(de3acdb6) SHA1(fba03a21e1b9fd72018ee1a68c8596e8fef6f8eb), ROM_BIOS(15))
+// Monitor + COMP80 BF (Brainf***) interpreter in place of BURP (bf/, built by bf/build.sh)
+ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
+ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,
+         CRC(6d2e5156) SHA1(ff83b2441e06071c98f4848dfdd577dffd153600), ROM_BIOS(16))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

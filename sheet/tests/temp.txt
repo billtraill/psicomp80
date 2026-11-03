@@ -1,0 +1,34 @@
+^
+#wait 0.5
+"CELSIUS\r
+-20\r
++A2+10\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+>B1\r
+"   FAHR.\r
++A2*9/5+32\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/F1\r
+#ready
+#screen

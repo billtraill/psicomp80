@@ -1,0 +1,14 @@
+^
+#wait 0.5
+10 VAR X;\r
+20 BEGIN\r
+30   X := 1;\r
+40   WHILE X <= 10 DO\r
+50   BEGIN\r
+60     ! X * X;\r
+70     X := X + 1\r
+80   END\r
+90 END.\r
+RUN\r
+#ready
+#screen

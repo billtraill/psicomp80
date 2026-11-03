@@ -1,0 +1,9 @@
+10 VAR X;
+20 BEGIN
+30   X := 1;
+40   WHILE X <= 10 DO
+50   BEGIN
+60     ! X * X;
+70     X := X + 1
+80   END
+90 END.

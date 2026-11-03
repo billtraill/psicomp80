@@ -1,0 +1,18 @@
+10 VAR X, Y, DX, DY;
+20 BEGIN
+30   CLS;
+40   Y := 0;
+50   WHILE Y < 62 DO
+60   BEGIN
+70     DY := (Y - 31) * 5 / 3;
+80     X := 0;
+90     WHILE X < 128 DO
+100    BEGIN
+110      DX := X - 64;
+120      IF ODD (DX * DX + DY * DY) / 256 THEN PLOT X, Y;
+130      X := X + 1
+140    END;
+150    Y := Y + 1
+160  END;
+170  WHILE 0 = 0 DO
+180 END.

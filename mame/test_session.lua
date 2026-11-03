@@ -73,6 +73,6 @@ emu.register_frame_done(function()
     local a = tonumber(la, 16)
     for k = 1, #d do mem:write_u8(a + k - 1, d:byte(k)) end
     wake = t + 0.1
-  elseif s:match("^#") then wake = t
+  elseif s:match("^#dump") then wake = t
   else m.natkeyboard:post((s:gsub("\\r", "\r"):gsub("\\b", "\b"))); wake = t + 0.3 end
 end)

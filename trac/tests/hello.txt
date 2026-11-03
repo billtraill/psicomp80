@@ -1,0 +1,18 @@
+^
+#wait 0.5
+#ready
+#(PS,HELLO FROM TRAC)'
+#ready
+#(DS,AA,CAT)'
+#ready
+#(PS,##(CL,AA))'
+#ready
+#(DS,AA,(#(PS,MEOW)))'
+#ready
+#(CL,AA)'
+#ready
+#(PS,#(AD,19,79))'
+#ready
+#(PS,(#(AD,19,79)))'
+#ready
+#screen

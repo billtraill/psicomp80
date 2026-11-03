@@ -1,0 +1,8 @@
+^
+#wait 0.5
+10 "FIBONACCI NUMBERS, TILL THEY PASS 32767!" 1 A: 1 B: 0 K:\r
+20 ( A. 0 > & A. ! " " B. A. + C: B. A: C. B:\r
+30 K. 1 + K: K. 8 % 0 = [ "!" ] ) "!" $$\r
+RUN\r
+#ready
+#screen

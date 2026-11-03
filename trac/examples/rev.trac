@@ -1,0 +1,6 @@
+#(DS,S,COMP80)'
+#(DS,R,(#(EQ,K,*,,(#(CL,R,##(CC,S,*))K))))'
+#(SS,R,K)'
+#(PS,#(CL,R,##(CC,S,*)))'
+#(DS,S,WIRELESS WORLD)'
+#(PS,#(CL,R,##(CC,S,*)))'

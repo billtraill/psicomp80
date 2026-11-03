@@ -1,0 +1,8 @@
+#(DS,FACT,(#(EQ,X,1,1,(#(ML,X,#(CL,FACT,#(SU,X,1)))))))'
+#(SS,FACT,X)'
+#(PF,FACT)'
+#(PS,#(CL,FACT,5))'
+#(PS,#(CL,FACT,7))'
+#(DS,FIB,(#(GR,N,1,(#(AD,#(CL,FIB,#(SU,N,1)),#(CL,FIB,#(SU,N,2)))),N)))'
+#(SS,FIB,N)'
+#(PS,#(CL,FIB,10))'

@@ -1,19 +1,20 @@
 # COMP80 in a web page
 
 `../emulator.html` is the COMP80 as one self-contained web page: a Z80
-emulator, the ten ROMs (BURP, FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT,
-ZASM and Prolog), the example programs and a help page for each language.
+emulator, the seventeen ROMs (BURP, FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL,
+PILOT, ZASM and Prolog, and under Other VTL-2, Mouse, Befunge, CALC, TRAC,
+PL/0 and BF), the example programs and a help page for each language.
 Open it in a browser; it needs no server.
 
-- Switch ROM between the ten, and memory between 5 KB and the 32 KB
-  expansion (both power the machine off and on).
-- Run any of the 90 examples: machine code (Life, a
+- Switch ROM between the ten on buttons and the seven in the Other menu, and
+  memory between 5 KB and the 32 KB expansion (both power the machine off and on).
+- Run any of the 123 examples: machine code (Life, a
   plasma, fire, a scrolling banner, a memory viewer, the Fig. 22 pictures);
   BURP's sample program and number programs from Collatz to Zeller's
   congruence; FORTH graphics, animations and games (Mandelbrot, fractals,
   Langton's ant, a maze, sorting, bouncing balls, snake, a clock); LISP's
   symbolic programs (differentiation, Eliza, the animal game, unification,
-  LISP in LISP); and a few for each of the other languages. The page types
+  LISP in LISP); and a few for each of the other languages, the Other ones in one group. The page types
   each one in, flat out, then runs it at the real 4 MHz.
 - Paste a program to have it typed in a line at a time.
 - Keys: Return, `^` (RS), Backspace (rubout in the languages that read a line), Ctrl+`\` (FS),

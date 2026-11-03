@@ -1,0 +1,7 @@
+^
+#wait 0.5
+CLEAR\r
+0 0 "!DLROW ,OLLEH">:#,=@\r
+RUN\r
+#ready
+#screen

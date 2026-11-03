@@ -1,0 +1,59 @@
+^
+#wait 0.5
+COMPOUND INTEREST\r
+>A3\r
+RATE %\r
+START\r
+>B3\r
+5\r
+1000\r
+>A6\r
+YEAR\r
+1\r
++A7+1\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+>B6\r
+"   START\r
++B4\r
++D7\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+>C6\r
+"INTEREST\r
++B7*$B$3/100\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+>D6\r
+"     END\r
++B7+C7\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+/U\r
+#ready
+#screen

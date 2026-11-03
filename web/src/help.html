@@ -12,6 +12,7 @@
     <div class="exgroup"><h3>PILOT</h3><div class="exlist" id="ex-pilot"></div></div>
     <div class="exgroup"><h3>ZASM</h3><div class="exlist" id="ex-zasm"></div></div>
     <div class="exgroup"><h3>Prolog</h3><div class="exlist" id="ex-prolog"></div></div>
+    <div class="exgroup"><h3>Other languages</h3><p class="note">More languages written for the 2 KB where BURP was; choose one from the Other menu by the ROM switch, or just press Run.</p><h4 class="lang">VTL-2</h4><div class="exlist" id="ex-vtl"></div><h4 class="lang">Mouse</h4><div class="exlist" id="ex-mouse"></div><h4 class="lang">Befunge</h4><div class="exlist" id="ex-befunge"></div><h4 class="lang">CALC</h4><div class="exlist" id="ex-sheet"></div><h4 class="lang">TRAC</h4><div class="exlist" id="ex-trac"></div><h4 class="lang">PL/0</h4><div class="exlist" id="ex-pl0"></div><h4 class="lang">BF</h4><div class="exlist" id="ex-bf"></div></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-using" aria-labelledby="tab-using" hidden>
@@ -61,7 +62,7 @@
     </table></div>
     <h3>Memory</h3>
     <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
-    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all ten languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
+    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all seventeen languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
     <h3>The examples</h3>
     <ul>
       <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>
@@ -376,4 +377,181 @@
       <li><strong>Finding a way</strong> between two towns without going through a town twice, keeping the towns so far in a list and testing it with a NOTIN made of cut and FAIL.</li>
     </ul>
     <div class="exlist" id="exl-prolog"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-other" aria-labelledby="tab-other" hidden>
+    <h2>Other languages</h2>
+    <p>Seven more languages, each written for this project to fit in the 2 KB of ROM where BURP was, beside the same monitor. Choose one from the Other menu by the ROM switch, then press RS at READY.</p>
+    <div class="subnav" id="other-nav" role="group" aria-label="Language"><button type="button" data-lang="vtl">VTL-2</button><button type="button" data-lang="mouse">Mouse</button><button type="button" data-lang="befunge">Befunge</button><button type="button" data-lang="sheet">CALC</button><button type="button" data-lang="trac">TRAC</button><button type="button" data-lang="pl0">PL/0</button><button type="button" data-lang="bf">BF</button></div>
+    <section class="sub" id="other-vtl" aria-label="VTL-2" hidden>
+<h2>VTL-2</h2>
+      <p>VTL-2, the Very Tiny Language, was written for the Altair 680 in 1976–77 to fit in under 1 KB of ROM. This one is written afresh for the COMP80, in the 2 KB where BURP was. RS at READY enters it. Everything is an assignment, one to a line: <code>#=100</code> is GOTO 100, <code>?="HELLO"</code> prints, <code>A=?</code> reads a number. A line with a number goes into the program, a number alone deletes the line, <code>0</code> lists the program, and <code>#=1</code> runs it.</p>
+      <h3>The rules</h3>
+      <ul>
+        <li>A statement is <code>V=E</code> with no spaces: a space ends it, so anything after one is a comment, and a line starting <code>)</code> is all comment.</li>
+        <li>Numbers are 16-bit and unsigned, 0 to 65535; <code>2-3</code> is 65535. Expressions are worked out from left to right with no precedence, so <code>3+4*2</code> is 14; brackets group. <code>+ - * /</code>, and <code>= &lt; &gt;</code>, which give 1 or 0 (<code>&gt;</code> is greater than or equal).</li>
+        <li>Every character is a variable. <code>#</code> is the line: <code>#=E</code> goes to line E (or the next one after it), and going to 0 does nothing, so <code>#=(A&lt;5)*100</code> is IF A&lt;5 GOTO 100. A jump sets <code>!</code> to the line after, so <code>#=!</code> returns from a subroutine.</li>
+        <li><code>?="TEXT"</code> prints and starts a new line, unless a <code>;</code> follows; <code>?=E</code> prints a number and <code>?=""</code> starts a new line. <code>A=?</code> reads a line and works it out. <code>$=E</code> prints the character with code E; <code>A=$</code> waits for a key.</li>
+        <li><code>'</code> is a random number, <code>%</code> the remainder of the last division (so <code>X='/6</code> leaves 0–5 in <code>%</code>), <code>&amp;</code> the end of the program (<code>&amp;=0</code> clears it), <code>*</code> the top of memory, and <code>:E)</code> an array after the program.</li>
+        <li><code>@=Y*128+X</code> plots a point, X 0–127 and Y 0–61, four to a character in the quarter blocks; adding 8192 clears it. This is new; the original had no graphics.</li>
+        <li>A program ends when it runs off its last line or jumps past it (<code>#=999</code>). The only errors are WHAT? and FULL. Any key stops a running program; RS comes back with it kept.</li>
+      </ul>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Primes</strong> divides each number by 2, 3, 4… up to its square root and looks at <code>%</code> for a remainder of 0. The 62 primes below 300 take about 6 s.</li>
+        <li><strong>Guess the number</strong>: <code>X='/100</code> leaves a random 0–99 in <code>%</code>. As <code>?</code> takes an expression, typing <code>N</code> wins straight away.</li>
+        <li><strong>Fibonacci</strong> prints each number with a subroutine that comes back with <code>#=!</code>, and stops when the sum goes round past 65535.</li>
+        <li><strong>Circles</strong> draws five circles by the midpoint rule, which needs only adding. The error is kept 1000 too big so that it never goes below 0, and the points are spread across by 5/3, as they are taller than they are wide. About 2 s; a key ends it.</li>
+        <li><strong>Chaos game</strong>: a point jumps half way to a random corner of a triangle 2500 times, and a Sierpiński triangle appears. About 27 s; a key ends it.</li>
+      </ul>
+      <div class="exlist" id="exl-vtl"></div>
+    </section>
+    <section class="sub" id="other-mouse" aria-label="Mouse" hidden>
+<h2>Mouse</h2>
+      <p>Mouse is Peter Grogono’s little stack language, published in BYTE in July 1979: every command is one character, so a whole program fits in a few lines. This Mouse is new, written for the COMP80 in the 2 KB where BURP was. RS at READY enters it. A line starting with a digit goes into the program in order of number, and a number alone deletes its line; <code>LIST</code>, <code>RUN</code> and <code>NEW</code> work on the program, and any other line runs at once (start it with a space if it begins with a number). The lines run as one stream of text; the main program ends at <code>$$</code> and macro definitions follow it.</p>
+      <h3>Commands</h3>
+      <ul>
+        <li><code>123</code> pushes a number; <code>A</code>–<code>Z</code> push a variable’s address. <code>5 X:</code> stores 5 in X and <code>X.</code> fetches it. <code>+ - * /</code> and <code>%</code> (remainder) work on the top two numbers; <code>&lt; = &gt;</code> give 1 or 0.</li>
+        <li><code>!</code> prints a number, <code>!'</code> a character, and <code>"TEXT"</code> prints the text, with <code>!</code> in it a new line. <code>?</code> reads a number and <code>?'</code> a character; <code>'C</code> pushes the code of C.</li>
+        <li><code>[ … ]</code> does what is inside if the number popped is above 0. <code>( … )</code> loops for ever, and <code>&amp;</code> leaves the loop if the number popped is 0 or less.</li>
+        <li><code>#A,P1,P2;</code> calls macro A, defined as <code>$A … @</code>; <code>%1</code> runs the text of the first parameter, in the caller’s variables. Each call has its own 26 variables, so macros can call themselves.</li>
+        <li>Two additions: <code>x y !.</code> plots a point on the 128 × 62 quarter-block screen (an x below 0 clears it), and <code>n ?.</code> is a random number from 1 to n.</li>
+      </ul>
+      <p>Numbers are 16-bit integers. Memory is 768 words: the variables of the macro calls are at the bottom, and higher addresses make arrays (<code>1 I. 400 + :</code>). <code>^</code> is the RS key and <code>\</code> and <code>~</code> can’t be typed, so the loop’s <code>^</code> is <code>&amp;</code> here, remainder is <code>%</code>, and there are no comments. Mistakes stop the program with STACK?, ADDRESS?, DIVIDE?, MACRO?, NESTED? or MISSING? and the line.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Fibonacci numbers</strong> adds the last two until the sum passes 32767 and goes negative, eight to a line with <code>K. 8 % 0 = [ "!" ]</code>.</li>
+        <li><strong>Factorials</strong> uses a macro that calls itself: <code>$F %1 2 &lt; [ 1 @ ] %1 #F,%1 1 -; * @</code>. The parameter <code>%1 1 -</code> is worked out when the inner call uses it, in the outer call’s variables.</li>
+        <li><strong>The sieve of Eratosthenes</strong> keeps an array at addresses 400 to 699, crosses out the multiples of each prime below 18 and prints the 62 primes below 300, in about 6 s.</li>
+        <li><strong>Guess the number</strong>: <code>100 ?.</code> picks it, <code>?</code> reads each guess, and the loop leaves when they are equal.</li>
+        <li><strong>Circles</strong> draws five circles by the midpoint algorithm, adding to a running error instead of using square roots. Macro Q plots four points at once with <code>!.</code>, and makes the circles round by shrinking the up-and-down distances to 3/5, as the quarter blocks are taller than they are wide. About 3 s.</li>
+      </ul>
+      <div class="exlist" id="exl-mouse"></div>
+    </section>
+    <section class="sub" id="other-befunge" aria-label="Befunge" hidden>
+<h2>Befunge</h2>
+      <p>Befunge, invented by Chris Pressey in 1993, is a two-dimensional language: the program is a grid of characters, and the instruction pointer moves over it right, left, up or down, turned by arrows. In COMP80 Befunge, written for this project in the 2 KB where BURP was, the grid is the screen itself. Lines 1–24 are the 64 × 24 playfield, which wraps round at its edges; lines 25–31 are for commands and output. RS at READY enters it.</p>
+      <h3>Commands</h3>
+      <ul>
+        <li><code>Y X TEXT</code> puts TEXT on line Y (0–23) of the playfield from column X (0–63): exactly one space after X, then the text as it stands, spaces and all.</li>
+        <li><code>EDIT Y X</code> types straight onto the playfield: Return goes to the next line, RS steps back, and Return on a line where nothing has been typed ends.</li>
+        <li><code>RUN</code> runs from the top left corner, going right. <code>STEP</code> does one instruction and shows on the top line where the pointer is and the top of the stack, with the next cell as a block. <code>SPEED N</code> waits before each instruction (N up to 255, about 0.8 ms each) and shows the pointer moving; 0 runs flat out. <code>CLEAR</code> blanks the playfield.</li>
+      </ul>
+      <h3>The instructions</h3>
+      <ul>
+        <li>Digits push themselves; <code>+ - * / %</code> pop a, then b, and push b + a, b − a, b × a, b ÷ a or b mod a; <code>!</code> is not, <code>)</code> is greater than (Befunge’s <code>`</code>).</li>
+        <li><code>&gt; &lt; ^ v</code> turn the pointer, <code>?</code> turns it at random, <code>_</code> goes right if the top is 0 and left if not, <code>I</code> (Befunge’s <code>|</code>) down or up. <code>#</code> jumps over a cell and <code>@</code> stops.</li>
+        <li><code>"</code> starts and ends a string, whose character codes are pushed; <code>:</code> duplicates, <code>\</code> swaps, <code>$</code> drops; <code>.</code> prints a number and <code>,</code> a character; <code>&amp;</code> reads a number and <code>(</code> (Befunge’s <code>~</code>) a key.</li>
+        <li><code>G</code> and <code>P</code> read and write cells of the playfield, which is the screen, so a program that changes itself changes in front of you.</li>
+      </ul>
+      <p>The keyboard can’t type <code>^</code>, <code>_</code> or <code>\</code>, as they are RS, Return and FS, so type <code>'</code>, <code>=</code> and <code>;</code> instead: they are changed as you type, in strings too. Numbers are 16-bit; division by 0 gives 0. A key while a program runs stops it; RS comes back with the playfield as it was.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Hello, world</strong>: <code>"!DLROW ,OLLEH"</code> pushes the string backwards, then <code>&gt;:#,_@</code> prints a character at a time until it reaches the 0 under it.</li>
+        <li><strong>Counting</strong> goes right along line 0 printing and adding 1; <code>_</code> sends it back left along line 1 and up the <code>^</code> until the count passes 10. Run it with <code>SPEED 20</code> to watch the pointer go round.</li>
+        <li><strong>Factorial</strong> reads a number with <code>&amp;</code>, counts down from it onto the stack, then multiplies them all together: 7 gives 5040.</li>
+        <li><strong>Stars</strong> draws a diagonal of stars with <code>P</code>, at x = 3n and y = n + 4, writing onto the same screen the program is on.</li>
+      </ul>
+      <div class="exlist" id="exl-befunge"></div>
+    </section>
+    <section class="sub" id="other-sheet" aria-label="CALC" hidden>
+<h2>CALC</h2>
+      <p>COMP80 CALC is a spreadsheet in the style of VisiCalc, the program of 1979 that sold the Apple II, written from scratch for this machine in the 2 KB where BURP was. RS at READY enters it. The screen is a grid of 6 columns, A–F, and 24 rows; a <code>&gt;</code> marks the current cell, the line under the grid shows what is in it, and you type at the <code>&gt;</code> prompt below that.</p>
+      <h3>Typing</h3>
+      <ul>
+        <li>Each line goes into the marked cell, and the marker moves down (<code>/R</code>: right; <code>/D</code>: down again). An empty line just moves on.</li>
+        <li>A number or formula starts with a digit, <code>.</code>, <code>+</code>, <code>-</code>, <code>(</code> or <code>@</code>: <code>450</code>, <code>+B4*12</code>, <code>(A1+A2)/2</code>, <code>@SUM(B4...B9)</code>. Anything starting with a letter is a label, as is anything after a <code>"</code>; a long label runs on into empty cells.</li>
+        <li><code>&gt;B3</code> moves the marker. <code>/B</code> blanks the cell, <code>/C</code> clears the sheet, <code>/F0</code> to <code>/F2</code> set the decimals shown.</li>
+        <li><code>/U</code> copies the cell above, with its references moved down a row; <code>/L</code> copies the cell on the left, moved right a column. A <code>$</code> in front of a column or row keeps it: <code>+B7*$B$3/100</code> always uses B3. A formula typed once and <code>/U</code> for each row below fills a table.</li>
+      </ul>
+      <h3>Numbers</h3>
+      <p>Numbers are whole numbers of hundredths in 32 bits, −21474836.48 to 21474836.47: the calculator chip would be far too slow for a whole sheet. <code>* /</code> come before <code>+ -</code>, with brackets; multiplying and dividing go through a 64-bit product and are rounded to the hundredth. <code>@SUM</code> adds up any rectangle of cells (the @ can be left out, and : used for the dots). Labels and empty cells count as 0. A formula that can't be worked out, divides by 0 or overflows shows ERROR, and so does any formula that uses it; a number too wide for its column shows #########. After every change the sheet is worked out row by row, and again while anything changes, so formulas can use cells further down.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Household budget</strong>: six monthly amounts, each times 12 for the year by one formula copied down with <code>/U</code>, totals by <code>@SUM</code> and the cost a week.</li>
+        <li><strong>Compound interest</strong>: 1000 at 5% for ten years, each year’s interest <code>+B7*$B$3/100</code>, rounded to the penny. Go to B3 and type a new rate, and the whole table changes.</li>
+        <li><strong>Multiplication table</strong>: one formula, <code>+$A2*B$1</code>, copied across with <code>/L</code> and down with <code>/U</code>; the dollars keep column A and row 1.</li>
+        <li><strong>Celsius to Fahrenheit</strong>: −20 to 100 in tens, <code>+A2*9/5+32</code> copied down, shown with <code>/F1</code>.</li>
+      </ul>
+      <div class="exlist" id="exl-sheet"></div>
+    </section>
+    <section class="sub" id="other-trac" aria-label="TRAC" hidden>
+<h2>TRAC</h2>
+      <p>TRAC, the Text Reckoning And Compiling language, was designed by Calvin Mooers in 1964: everything in it is a string, and a program is text that rewrites itself as it is read. This one, in the style of TRAC T-64, is written from scratch for the COMP80 in the 2 KB where BURP was. RS at READY enters it. TRAC reads what you type up to the meta character, <code>'</code>, so <code>#(PS,HELLO)'</code> prints HELLO; Return just starts a new line, and nothing happens until the <code>'</code>.</p>
+      <h3>How it reads</h3>
+      <ul>
+        <li><code>#(</code> starts an active function: when its <code>)</code> is reached it is evaluated and its value goes back in front of the rest of the text, to be read again. <code>##(</code> starts a neutral function, whose value is kept as it is.</li>
+        <li><code>(</code> protects: everything up to the matching <code>)</code> is kept unread, without the outer parentheses. <code>,</code> separates arguments, and Return is dropped unless it is protected.</li>
+        <li>When the text is used up TRAC starts again with its idling procedure, <code>#(PS,#(RS))</code>: read a string, read through it, print what is left. As an active value is read again, commas in it separate arguments; use <code>##(</code> to keep a value with commas whole.</li>
+      </ul>
+      <h3>Primitives</h3>
+      <ul>
+        <li><code>PS,X</code> prints X; <code>RS</code> reads up to the meta character, <code>RC</code> one key; <code>CM,X</code> changes the meta character.</li>
+        <li><code>DS,N,X</code> defines form N; <code>SS,N,X1,X2…</code> marks each X1 in it as gap 1, X2 as gap 2…; <code>CL,N,A1,A2…</code> is the form with its gaps filled. <code>CS</code>, <code>CC</code> and <code>IN,N,X,Z</code> take the next segment, the next character or the text up to X from the form pointer, giving Z at the end; <code>CR</code> puts the pointer back. <code>DD</code> deletes forms, <code>DA</code> all of them, <code>LN,S</code> lists the names and <code>PF,N</code> prints a form with its gaps.</li>
+        <li><code>AD SU ML DV,A,B,Z</code> work on the numbers at the ends of A and B and keep A’s prefix: <code>#(SU,X5,9)</code> is X-4; DV by 0 gives Z. <code>EQ,A,B,T,F</code> is T if A and B are the same, <code>GR</code> if A’s number is greater. Numbers are 16-bit.</li>
+      </ul>
+      <p>SS marks every place its pattern appears, so choose gap names that appear nowhere else in the form.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>First steps</strong>: PS, a form defined and called, and the difference protection makes: <code>#(PS,(#(AD,19,79)))</code> prints the function instead of 98.</li>
+        <li><strong>Factorial and Fibonacci</strong>: the classic factorial is a form that calls itself through EQ, ML and SU, with X marked as its gap by SS: <code>#(CL,FACT,7)</code> gives 5040. FIB adds two calls of itself; <code>#(CL,FIB,10)</code> gives 55 in about 2.5 s.</li>
+        <li><strong>Reversing a string</strong>: R is called with the next character of the form S, from CC; it calls itself for the rest, then puts its character after it, stopping at the * CC gives at the end.</li>
+        <li><strong>A form letter</strong> over several lines, with gaps for the name, the present and the sender, filled in twice with ##(CL,…) so its commas are kept.</li>
+      </ul>
+      <div class="exlist" id="exl-trac"></div>
+    </section>
+    <section class="sub" id="other-pl0" aria-label="PL/0" hidden>
+<h2>PL/0</h2>
+      <p>PL/0 is the little language Niklaus Wirth used to teach how compilers work, in <em>Algorithms + Data Structures = Programs</em> (1976). This one is a compiler written for the COMP80 in the 2 KB where BURP was: RUN compiles the whole program in one pass straight into Z80 machine code and runs it, about 16 times as fast as BASIC. RS at READY enters it. Type the program in numbered lines, as in BASIC; a number on its own deletes a line.</p>
+      <h3>Commands</h3>
+      <ul>
+        <li><strong>RUN</strong> compiles the program and runs it; <strong>CODE</strong> compiles it and prints how many bytes of machine code it made; <strong>LIST</strong> [line]; <strong>NEW</strong>.</li>
+        <li>A compile error stops with <code>SYNTAX?</code> or <code>NAME?</code> and the line; <code>FULL</code> means the program is too long and <code>DIVIDE?</code> is dividing by 0. Any key while a program runs resets to the monitor; RS comes back with the program kept.</li>
+      </ul>
+      <h3>The language</h3>
+      <ul>
+        <li>A program is a block and a full stop. A block is <code>CONST A = 1, B = 2;</code>, <code>VAR X, Y;</code> and <code>PROCEDURE P; block;</code>, each if wanted, then one statement.</li>
+        <li>Statements: <code>X := expression</code>, <code>CALL P</code>, <code>BEGIN … ; … END</code>, <code>IF condition THEN statement</code>, <code>WHILE condition DO statement</code>, <code>! expression</code> to print a number on a line of its own, <code>? X</code> to read one, <code>PLOT X, Y</code> to set a point on the 128 × 62 quarter blocks of lines 1–31, and <code>CLS</code>.</li>
+        <li>A condition is <code>ODD expression</code> or two expressions compared with <code>= # &lt; &lt;= &gt; &gt;=</code>; <code>#</code> is “not equal”. Expressions have <code>+ − * /</code> and brackets, on 16-bit integers; <code>/</code> rounds towards 0.</li>
+        <li>Names belong to the block they are declared in, and procedures can be nested. Each variable has one place in memory, so a procedure that calls itself shares its variables with itself, as in FORTRAN.</li>
+      </ul>
+      <h3>How it compiles</h3>
+      <p>The parser has one routine for each rule of the grammar, and each puts out machine code for what it has just read. An expression leaves its value in HL: a number is <code>LD HL,n</code>, a variable <code>LD HL,(v)</code>, and <code>a + b</code> is a, <code>PUSH HL</code>, b, <code>POP DE</code>, <code>ADD HL,DE</code>. When b is a single load the PUSH becomes <code>EX DE,HL</code> and there is no POP. Multiplying, dividing and comparing call small routines; a comparison sets the Z flag when it is false, so IF and WHILE are a <code>JP Z</code>, whose address is filled in once the code it jumps over has been compiled. <code>X := e</code> is <code>LD (X),HL</code>, CALL is CALL and a procedure ends with RET. The code goes straight after the program text. A program of 300 bytes compiles in about 30 ms.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Squares</strong> prints the squares of 1 to 10 with a WHILE loop: 51 bytes of code.</li>
+        <li><strong>Primes</strong> tries each number below 100 against the divisors up to its square root; <code>N / D * D = N</code> is true when D divides N.</li>
+        <li><strong>GCD</strong> reads two numbers with <code>?</code> and takes the smaller from the larger until they are equal: 1071 and 462 give 21.</li>
+        <li><strong>Factorials</strong> uses a procedure that calls itself. With only global variables it takes N down by 1 before the call and puts it back afterwards, then multiplies.</li>
+        <li><strong>Rings</strong> plots the points where (DX² + DY²) / 256 is odd, with DY scaled by 5/3 for the shape of the points: concentric rings over the screen, 7936 points in about 7.5 s. It then waits in a loop until a key is pressed.</li>
+      </ul>
+      <div class="exlist" id="exl-pl0"></div>
+    </section>
+    <section class="sub" id="other-bf" aria-label="BF" hidden>
+<h2>BF</h2>
+      <p>Brainf*** is a joke from 1993, made to have the smallest compiler possible: eight commands, a tape of byte cells and a pointer into it. This one is written for the COMP80 and takes 1656 bytes of the 2 KB where BURP was; most of the rest shows it working. RS at READY enters it; the second line says how long the tape is: 768 cells, or 30000 with the 32 KB expansion.</p>
+      <h3>The language</h3>
+      <ul>
+        <li><code>&gt;</code> and <code>&lt;</code> move the pointer a cell right or left; <code>+</code> and <code>-</code> add 1 to the cell or take 1 away; <code>.</code> prints it as a character and <code>,</code> waits for a key and puts it in the cell (Return gives 10).</li>
+        <li><code>[</code> jumps past the matching <code>]</code> if the cell is 0, and <code>]</code> jumps back to just after the matching <code>[</code> if it isn't, so <code>[ … ]</code> is a loop that runs until the cell is 0.</li>
+        <li>Every other character is a comment. Cells are bytes and wrap round, 255 + 1 being 0, and so does the tape at its ends.</li>
+        <li>Output: 10 is a new line, 32–95 print as themselves, lower case as capitals, and 128 + <var>n</var> is graphics character <var>n</var>, so 143 is a solid block.</li>
+      </ul>
+      <h3>Commands</h3>
+      <ul>
+        <li>Lines with a number go into the program, as in BASIC; a number on its own deletes the line. <code>LIST</code> and <code>NEW</code>. A line without a number runs at once.</li>
+        <li><strong>RUN</strong> runs the program flat out. <strong>SHOW</strong> runs it with everything on the screen: the commands, 64 to a line with the next one marked underneath; the 16 cells round the pointer in hex with its cell marked; the output below; and IP, DP, the cell and the number of steps in hex at the top. <code>SPEED n</code> sets the pause between commands, about 0.8 ms a unit (20 to start with; 0 is as fast as it can draw). <strong>STEP</strong> does one command a key: Q stops and R runs on as SHOW.</li>
+        <li>RUN first copies the commands out of the program, one byte each, and matches the brackets, keeping each one's partner in a table, so a jump takes no searching. Errors: NO [, NO ], TOO LONG (over 511 commands) and FULL.</li>
+        <li>Any key while a program runs, in RUN or SHOW, goes back to the monitor; RS comes back to BF with the program kept. STEP waits for its keys, so they are safe there.</li>
+      </ul>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Hello world</strong>: one loop builds 72, 104, 88 and 32 in four cells, and each letter is a few steps from one of them. In SHOW it takes 906 commands.</li>
+        <li><strong>Counting</strong> prints a cell of 48, the digit 0, and adds 1 to it, ten times.</li>
+        <li><strong>Adding two digits</strong> reads two keys, takes 48 from the second and adds it to the first, printing <code>3+4=7</code>; the sum must be below 10.</li>
+        <li><strong>The alphabet</strong>: a cell of 65 printed and added to 26 times.</li>
+        <li><strong>Reversing a line</strong> reads keys into cell after cell until Return, then prints them walking back to cell 0, which stays 0 to stop the loop.</li>
+        <li><strong>Fibonacci bars</strong> keeps two numbers and prints the first as a bar of solid blocks, character 143, then makes the pair (b, a + b) by moving cells about, ten times: 1, 1, 2, 3, 5 … 55.</li>
+      </ul>
+      <div class="exlist" id="exl-bf"></div>
+    </section>
   </div>

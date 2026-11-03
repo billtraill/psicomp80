@@ -1,0 +1,39 @@
+^
+#wait 0.5
+10 ) CIRCLES BY THE MIDPOINT RULE, WITH ADDING ONLY\r
+20 I=0\r
+30 ?="" CLEAR THE SCREEN BY SCROLLING IT\r
+40 I=I+1\r
+50 #=(I<31)*30\r
+60 W=64\r
+70 C=31\r
+80 R=6\r
+90 X=0\r
+100 Y=R\r
+110 E=1001-R THE ERROR, PLUS 1000 SO IT STAYS POSITIVE\r
+120 P=X*5/3 POINTS ARE TALL: STRETCH ACROSS\r
+130 Q=Y*5/3\r
+140 #=300\r
+150 X=X+1\r
+160 #=(E<1000)*200\r
+170 Y=Y-1\r
+180 E=E+X+X-Y-Y+1\r
+190 #=210\r
+200 E=E+X+X+1\r
+210 #=(X<(Y+1))*120\r
+220 R=R+6\r
+230 #=(R<31)*90\r
+240 K=$ WAIT FOR A KEY\r
+250 #=999\r
+300 @=(C+Y)*128+W+P\r
+310 @=(C-Y)*128+W+P\r
+320 @=(C+Y)*128+W-P\r
+330 @=(C-Y)*128+W-P\r
+340 @=(C+X)*128+W+Q\r
+350 @=(C-X)*128+W+Q\r
+360 @=(C+X)*128+W-Q\r
+370 @=(C-X)*128+W-Q\r
+380 #=!\r
+ #=1\r
+#ready
+#screen

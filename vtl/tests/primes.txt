@@ -1,0 +1,22 @@
+^
+#wait 0.5
+10 ) THE PRIMES BELOW 300, BY TRIAL DIVISION\r
+20 N=2\r
+30 C=0\r
+40 D=2\r
+50 #=(D*D>(N+1))*90 NO DIVISOR UP TO THE ROOT: PRIME\r
+60 X=N/D\r
+70 #=(%=0)*110 IT DIVIDES: NOT PRIME\r
+80 D=D+1\r
+85 #=50\r
+90 ?=N\r
+95 $=32\r
+100 C=C+1\r
+110 N=N+1\r
+120 #=(N<300)*40\r
+130 ?=""\r
+140 ?=C\r
+150 ?=" PRIMES BELOW 300"\r
+ #=1\r
+#ready
+#screen

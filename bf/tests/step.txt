@@ -1,0 +1,24 @@
+^
+#wait 0.5
+10 ++[>+++<-]>.\r
+STEP\r
+#wait 0.5
+ 
+#wait 0.3
+ 
+#wait 0.3
+ 
+#wait 0.3
+#screen
+R
+#ready
+LIST\r
+NEW\r
+LIST\r
+20 [[]\r
+RUN\r
+NEW\r
+30 ]\r
+RUN\r
++++[>+<-]>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.\r
+#screen

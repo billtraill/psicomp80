@@ -1,0 +1,41 @@
+^
+#wait 0.5
+#ready
+#(PS,#(AD,12,30) #(SU,X5,9) #(ML,-6,7) #(DV,100,7) #(DV,-7,2) #(DV,1,0,ZERO))'
+#ready
+#(PS,#(EQ,A,A,YES,NO) #(EQ,A,B,YES,NO) #(GR,5,3,YES,NO) #(GR,-3,5,YES,NO))'
+#ready
+#(DS,G,(HELLO, NAME, HOW ARE YOU?))#(SS,G,NAME)#(PF,G)'
+#ready
+#(PS,##(CL,G,BILL))'
+#ready
+#(PS,##(CS,G,END)/##(CS,G,END)/##(CS,G,END))'
+#ready
+#(CR,G)#(PS,#(CC,G)#(CC,G)/##(IN,G,(, ))/##(IN,G,Q,NONE))'
+#ready
+#(DS,AA,1)#(DS,BB,2)#(PS,##(LN,(,)))'
+#ready
+#(DD,AA,G)#(PS,##(LN,( )))'
+#ready
+#(PS,ABX^^C)'
+#ready
+#(PS,#(RC))'
+X
+#ready
+#(CM,!)'
+#ready
+#(PS,BANG)!
+#ready
+#(CM,')!
+#ready
+#(DS,LOOP,(#(CL,LOOP)#(CL,LOOP)))#(CL,LOOP)'
+#ready
+#(PS,UNKNOWN #(ZZ,1)FUNCTION)'
+#ready
+)#(PS,LONE BRACKET)'
+#ready
+^
+#wait 0.5
+#(PS,AFTER RS ##(LN,( )))'
+#ready
+#screen

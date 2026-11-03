@@ -1,0 +1,55 @@
+COMPOUND INTEREST
+>A3
+RATE %
+START
+>B3
+5
+1000
+>A6
+YEAR
+1
++A7+1
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+>B6
+"   START
++B4
++D7
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+>C6
+"INTEREST
++B7*$B$3/100
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+>D6
+"     END
++B7+C7
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U
+/U

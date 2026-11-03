@@ -1,0 +1,30 @@
+^
+#wait 0.5
+10 VAR X, Y, DX, DY;\r
+20 BEGIN\r
+30   CLS;\r
+40   Y := 0;\r
+50   WHILE Y < 62 DO\r
+60   BEGIN\r
+70     DY := (Y - 31) * 5 / 3;\r
+80     X := 0;\r
+90     WHILE X < 128 DO\r
+100    BEGIN\r
+110      DX := X - 64;\r
+120      IF ODD (DX * DX + DY * DY) / 256 THEN PLOT X, Y;\r
+130      X := X + 1\r
+140    END;\r
+150    Y := Y + 1\r
+160  END;\r
+170  WHILE 0 = 0 DO\r
+180 END.\r
+RUN\r
+#wait 12
+#screen
+X
+#wait 0.5
+^
+#wait 0.5
+LIST 160\r
+#ready
+#screen

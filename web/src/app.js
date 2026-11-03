@@ -6,11 +6,16 @@
   const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
   const ROMS = Object.fromEntries(Object.entries(D.roms).map(([k, v]) => [k, b64(v)]));
   const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP", basic: "BASIC", logo: "Logo",
-    chip8: "CHIP-8", focal: "FOCAL", pilot: "PILOT", zasm: "ZASM", prolog: "Prolog" };
+    chip8: "CHIP-8", focal: "FOCAL", pilot: "PILOT", zasm: "ZASM", prolog: "Prolog",
+    vtl: "VTL-2", mouse: "Mouse", befunge: "Befunge", sheet: "CALC", trac: "TRAC", pl0: "PL/0", bf: "BF" };
+  // These are under "Other": a menu by the ROM switch, one tab of help and
+  // one group of examples, so the rows of buttons stay short.
+  const OTHER = ["vtl", "mouse", "befunge", "sheet", "trac", "pl0", "bf"];
   // The languages that read a line keep the address of their cursor here; it
   // shows _ (1Fh) while they wait for one.  BURP and CHIP-8 have none.
   const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
-    pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e };
+    pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e,
+    vtl: 0x1da0, mouse: 0x1da0, befunge: 0x1da0, sheet: 0x0c02, trac: 0x0c06, pl0: 0x1da0, bf: 0x1da0 };
   const $ = (id) => document.getElementById(id);
   const canvas = $("screen"), ctx = canvas.getContext("2d"), img = ctx.createImageData(384, 320);
   const m = new COMP80(D.fonts);
@@ -240,6 +245,20 @@
       "ASM 1000\nLD A,41\nLD (8040),A\nRET\n\nG 1000"],
     prolog: ["Paste a Prolog program, or monitor commands. It is typed a line at a time, waiting for Prolog between lines; comments are left out. Enter Prolog first (RS at READY). Clauses end with a full stop; queries start ?- .",
       "LIKES(MARY,WINE).\nLIKES(JOHN,X) :- LIKES(MARY,X).\n?- LIKES(JOHN,W)."],
+    vtl: ["Paste a VTL-2 program, or monitor commands. It is typed a line at a time, waiting for VTL-2 between lines; numbered lines go into the program. Enter VTL-2 first (RS at READY), then 0 lists it and #=1 runs it.",
+      "10 I=1\n20 ?=I*I\n30 I=I+1\n40 #=(I<11)*20\n#=1"],
+    mouse: ["Paste a Mouse program, or monitor commands. It is typed a line at a time, waiting for Mouse between lines; numbered lines go into the program, then type RUN. Enter Mouse first (RS at READY).",
+      "10 1 N: ( N. 11 < & N. N. * ! \" \" N. 1 + N: ) $$\nRUN"],
+    befunge: ["Paste Befunge commands. They are typed a line at a time, waiting for Befunge between lines: Y X TEXT puts TEXT on line Y of the playfield from column X; then RUN. Type ' = ; for ^ _ \\, and I ) ( for | ` ~. Enter Befunge first (RS at READY).",
+      "CLEAR\n0 0 \"!IH\">:#,=@\nRUN"],
+    sheet: ["Paste lines to type into the sheet, a line at a time, waiting for CALC between lines. Each goes into the marked cell: a number, a formula (+A1*B2, @SUM(A1...A5)) or a label; >B3 moves, /U copies the cell above. Enter CALC first (RS at READY).",
+      ">A1\n12\n30\n+A1*A2"],
+    trac: ["Paste a TRAC program, or monitor commands. It is typed a line at a time, waiting for TRAC between lines; nothing runs until the meta character ' ends the input. Enter TRAC first (RS at READY).",
+      "#(DS,AA,CAT)'\n#(PS,##(CL,AA))'"],
+    pl0: ["Paste a PL/0 program, or monitor commands. It is typed a line at a time, waiting for PL/0 between lines; numbered lines go into the program. Enter PL/0 first (RS at READY), and type RUN to compile and run it.",
+      "10 VAR I;\n20 BEGIN I := 1;\n30 WHILE I <= 10 DO BEGIN ! I * I; I := I + 1 END\n40 END.\nRUN"],
+    bf: ["Paste a BF program as numbered lines, or monitor commands. It is typed a line at a time, waiting for BF between lines; then type RUN, SHOW or STEP. Enter BF first (RS at READY).",
+      "10 ++++++++[>++++++++<-]>+.\nSHOW"],
   };
 
   function power(rom) {
@@ -248,6 +267,7 @@
     keyQueue.length = 0;
     m.powerOn(ROMS[rom], rom, $("mem").value === "32");
     for (const r of document.querySelectorAll("input[name=rom]")) r.checked = r.value === rom;
+    $("rom-other").value = OTHER.includes(rom) ? rom : "";
     store.set("rom", rom);
     document.title = "COMP80 Emulator";
     $("romname").textContent = ROM_NAMES[rom];
@@ -326,6 +346,7 @@
   // ---------------------------------------------------------------- controls
 
   for (const r of document.querySelectorAll("input[name=rom]")) r.addEventListener("change", () => power(r.value));
+  $("rom-other").addEventListener("change", () => { if ($("rom-other").value) power($("rom-other").value); });
   $("mem").addEventListener("change", () => { store.set("mem", $("mem").value); power(m.romName); });
   $("btn-rs").addEventListener("click", () => { press(0x1e); canvas.focus(); });
   $("btn-fs").addEventListener("click", () => { press(0x1c); canvas.focus(); });
@@ -384,6 +405,13 @@
       if (d) { e.preventDefault(); showTab(tabs[(i + d + tabs.length) % tabs.length].dataset.tab, true); }
     });
   });
+  // The Other tab shows one language at a time.
+  function showOther(lang) {
+    for (const b of document.querySelectorAll("#other-nav button")) b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    for (const s of document.querySelectorAll("#panel-other .sub")) s.hidden = s.id !== "other-" + lang;
+  }
+  for (const b of document.querySelectorAll("#other-nav button")) b.addEventListener("click", () => showOther(b.dataset.lang));
+  showOther(OTHER[0]);
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[data-goto]");
     if (a) { e.preventDefault(); showTab(a.dataset.goto); $("panel-" + a.dataset.goto).scrollIntoView({ block: "nearest" }); }

@@ -1,0 +1,7 @@
+#(PS,HELLO FROM TRAC)'
+#(DS,AA,CAT)'
+#(PS,##(CL,AA))'
+#(DS,AA,(#(PS,MEOW)))'
+#(CL,AA)'
+#(PS,#(AD,19,79))'
+#(PS,(#(AD,19,79)))'

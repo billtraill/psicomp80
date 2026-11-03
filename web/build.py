@@ -70,6 +70,7 @@ def data():
         },
         "bins": {
             "life": b64("life/life.bin"),
+            "storm": b64("storm/storm.bin"),
             "plasma": b64("plasma/plasma.bin"),
             "banner": b64("banner/banner.bin"),
             "fire": b64("fire/fire.bin"),
@@ -84,6 +85,7 @@ def data():
         },
         "sources": {
             "life.asm": (REPO / "life/life.asm").read_text(),
+            "storm.asm": (REPO / "storm/storm.asm").read_text(),
             "plasma.asm": (REPO / "plasma/plasma.asm").read_text(),
             "banner.asm": (REPO / "banner/banner.asm").read_text(),
             "fire.asm": (REPO / "fire/fire.asm").read_text(),

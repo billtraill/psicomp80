@@ -37,7 +37,7 @@ Each page is a single self-contained HTML file in this folder, so they also work
 | `basic/`, `logo/`, `chip8/`, `focal/`, `pilot/`, `zasm/`, `prolog/` | The other languages, each with its source, `build.sh`, README, examples and tests |
 | `vtl/`, `mouse/`, `befunge/`, `sheet/`, `trac/`, `pl0/`, `bf/`, `ed/`, `db/`, `adv/`, `apl/` | The ROMs under Other on the emulator page, laid out the same way |
 | `life/`, `pictures/` | The Game of Life and the articles' pictures, as programs and tapes |
-| `plasma/`, `dump/`, `fire/`, `banner/` | More machine code: a plasma, a memory viewer, a fire effect and a scrolling banner |
+| `storm/`, `plasma/`, `dump/`, `fire/`, `banner/` | More machine code: Storm (a shooting game), a plasma, a memory viewer, a fire effect and a scrolling banner |
 | `disk/` | The floppy disc extension (October and December 1980): disc image and software |
 | `web/` | The web emulator's source and build |
 | `hardware/` | The original board in KiCad, and the hardware page |

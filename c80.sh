@@ -4,7 +4,7 @@
 # 32k runs the machine with the 32 KB memory expansion (psicomp80x), which the
 # disc FORMAT command needs.
 # Monitor programs, copied into memory and run (no tape load needed):
-#   life plasma dump fire banner boat schmitt cover; alph and list run the
+#   life storm plasma dump fire banner boat schmitt cover; alph and list run the
 #   monitor commands; disk loads the disc software at 1D00 with
 #   disk/programs.img in the drive.
 # Languages: forth, lisp, basic, logo, focal, pilot, zasm, prolog, chip8, vtl,
@@ -45,6 +45,7 @@ curs=
 case "$prog" in
   life)    bin=$HERE/life/life.bin;        typed="RUN 1000" ;;
   plasma)  bin=$HERE/plasma/plasma.bin;    typed="RUN 1000" ;;
+  storm)   bin=$HERE/storm/storm.bin;      typed="RUN 1000" ;;
   dump)    bin=$HERE/dump/dump.bin;        typed="RUN 1000" ;;
   fire)    bin=$HERE/fire/fire.bin;        typed="RUN 1000" ;;
   banner)  bin=$HERE/banner/banner.bin;    typed="RUN 1000" ;;

@@ -23,6 +23,12 @@ const EXAMPLES = [
     steps: [{ fs: true }, { bin: "life", at: 0x1000 }, { keys: "RUN 1000" }],
   },
   {
+    id: "storm", lang: "monitor", rom: null, title: "Storm",
+    text: "A shooting game in Z80 machine code: chains weave down the screen, and each hit breaks a chain in two. Starred segments drop bombs, chains on the bottom creep towards you, and every shot costs energy. Three cannons; clear a wave for the next. It loads at 1000 and runs with RUN 1000.",
+    keys: "Z , left · X . right · space or Return fire · Q quit", file: "storm.asm",
+    steps: [{ fs: true }, { bin: "storm", at: 0x1000 }, { keys: "RUN 1000" }],
+  },
+  {
     id: "plasma", lang: "monitor", rom: null, title: "Plasma",
     text: "Flowing bands of shading over the whole screen, each character the sum of four sine waves looked up in a table, in Z80 machine code at about 20 frames a second. It loads at 1000 and runs with RUN 1000.",
     keys: "any key: back to the monitor", file: "plasma.asm",

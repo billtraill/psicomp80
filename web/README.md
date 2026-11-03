@@ -9,7 +9,7 @@ Open it in a browser; it needs no server.
 
 - Switch ROM between the ten on buttons and the eleven in the Other menu, and
   memory between 5 KB and the 32 KB expansion (both power the machine off and on).
-- Run any of the 139 examples: machine code (Life, a
+- Run any of the 140 examples: machine code (Storm, a shooting game; Life, a
   plasma, fire, a scrolling banner, a memory viewer, the Fig. 22 pictures);
   BURP's sample program and number programs from Collatz to Zeller's
   congruence; FORTH graphics, animations and games (Mandelbrot, fractals,

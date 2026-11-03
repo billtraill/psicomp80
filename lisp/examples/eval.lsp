@@ -1,0 +1,35 @@
+; LISP in LISP: EV evaluates an expression E with the variables in
+; the list A, ((NAME VALUE) ...).  It knows QUOTE, COND, LAMBDA
+; and CAR, CDR, CONS, EQ and ATOM; a function can also be a name
+; whose value in A is a LAMBDA.  Like the LISP it runs on, its
+; scope is dynamic, which is what lets APP call itself.
+(DEFUN EV (E A)
+  (COND ((ATOM E) (VAL E A))
+        ((EQ (CAR E) 'QUOTE) (CADR E))
+        ((EQ (CAR E) 'COND) (EVC (CDR E) A))
+        ((EQ (CAR E) 'LAMBDA) E)
+        (T (AP (CAR E) (EVL (CDR E) A) A))))
+(DEFUN VAL (E A)
+  (COND ((OR (NUMBERP E) (EQ E T) (NULL E)) E)
+        (T (CADR (LOOK E A)))))
+(DEFUN LOOK (E A)
+  (COND ((NULL A) NIL) ((EQ E (CAR (CAR A))) (CAR A))
+        (T (LOOK E (CDR A)))))
+(DEFUN EVC (C A)
+  (COND ((EV (CAR (CAR C)) A) (EV (CADR (CAR C)) A))
+        (T (EVC (CDR C) A))))
+(DEFUN EVL (L A) (COND (L (CONS (EV (CAR L) A) (EVL (CDR L) A)))))
+; apply F to the evaluated arguments X
+(DEFUN AP (F X A)
+  (COND ((EQ F 'CAR) (CAR (CAR X)))
+        ((EQ F 'CDR) (CDR (CAR X)))
+        ((EQ F 'CONS) (CONS (CAR X) (CADR X)))
+        ((EQ F 'EQ) (EQ (CAR X) (CADR X)))
+        ((EQ F 'ATOM) (ATOM (CAR X)))
+        ((ATOM F) (AP (VAL F A) X A))
+        (T (EV (CADDR F) (PAIR (CADR F) X A)))))
+(DEFUN PAIR (V X A)
+  (COND (V (CONS (LIST (CAR V) (CAR X)) (PAIR (CDR V) (CDR X) A)))
+        (T A)))
+(SETQ ENV '((APP (LAMBDA (X Y)
+  (COND ((EQ X NIL) Y) (T (CONS (CAR X) (APP (CDR X) Y))))))))

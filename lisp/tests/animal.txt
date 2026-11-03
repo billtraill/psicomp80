@@ -1,0 +1,37 @@
+^
+#wait 0.5
+(SETQ TREE '((DOES IT HAVE FUR) CAT FISH))\r
+(DEFUN PLAY () (SETQ NODE TREE) (SETQ PATH NIL) (ASK))\r
+(DEFUN ASK ()\r
+  (COND ((ATOM NODE) (LIST 'IS 'IT 'A NODE)) (T (CAR NODE))))\r
+(DEFUN YES () (COND ((ATOM NODE) '(I WIN)) (T (DOWN 'Y (CADR NODE)))))\r
+(DEFUN NO ()\r
+  (COND ((ATOM NODE) '(WHAT IS IT))\r
+        (T (DOWN 'N (CADDR NODE)))))\r
+(DEFUN DOWN (D N) (SETQ PATH (CONS D PATH)) (SETQ NODE N) (ASK))\r
+(DEFUN REV (L A) (COND (L (REV (CDR L) (CONS (CAR L) A))) (T A)))\r
+(DEFUN GROW (TR P NEW)\r
+  (COND ((NULL P) NEW)\r
+        ((EQ (CAR P) 'Y)\r
+         (LIST (CAR TR) (GROW (CADR TR) (CDR P) NEW) (CADDR TR)))\r
+        (T (LIST (CAR TR) (CADR TR) (GROW (CADDR TR) (CDR P) NEW)))))\r
+(DEFUN ITS (A Q)\r
+  (SETQ TREE (GROW TREE (REV PATH NIL) (LIST Q A NODE))))\r
+(PLAY)\r
+(YES)\r
+(NO)\r
+(ITS 'DOG '(DOES IT BARK))\r
+(PLAY)\r
+(YES)\r
+(YES)\r
+(YES)\r
+(PLAY)\r
+(NO)\r
+(NO)\r
+(ITS 'BIRD '(CAN IT FLY))\r
+(PLAY)\r
+(NO)\r
+(YES)\r
+(YES)\r
+#ready
+#screen

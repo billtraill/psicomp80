@@ -1,0 +1,11 @@
+#load ../examples/keys.ch8 0E00
+^
+#wait 0.5
+1
+Q
+R
+#wait 0.5
+#screen
+V
+#wait 0.5
+#screen

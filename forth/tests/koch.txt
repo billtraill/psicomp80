@@ -1,0 +1,33 @@
+^
+#wait 0.5
+( KOCH SNOWFLAKE IN COMP80 FORTH )\r
+( EACH SIDE OF A TRIANGLE BECOMES FOUR, A THIRD AS LONG, )\r
+( WITH A POINT IN THE MIDDLE, AND SO ON, 3 TIMES )\r
+( SIX DIRECTIONS, 60 DEGREES APART: UP OR DOWN 2 CELLS, OR )\r
+( 3 ACROSS AND 1 UP OR DOWN, WHICH IS NEARLY THE SAME LENGTH )\r
+HEX 8000 CONSTANT SCR DECIMAL\r
+VARIABLE X  VARIABLE Y  VARIABLE D\r
+( THE BIT FOR EACH QUARTER OF A CHARACTER: TL TR BL BR )\r
+VARIABLE BITS  1 BITS !  2 ,  8 ,  4 ,\r
+( THREE STEPS FOR EACH DIRECTION: N, NE, SE, S, SW, NW )\r
+VARIABLE DXS  0 DXS !  0 , 0 ,  1 , 1 , 1 ,  1 , 1 , 1 ,\r
+  0 , 0 , 0 ,  -1 , -1 , -1 ,  -1 , -1 , -1 ,\r
+VARIABLE DYS  -1 DYS !  -1 , 0 ,  0 , -1 , 0 ,  0 , 1 , 0 ,\r
+  1 , 1 , 0 ,  0 , 1 , 0 ,  0 , -1 , 0 ,\r
+: PLOT ( -- ) X @ 2 /  Y @ 2 / 64 * +  SCR +\r
+  DUP C@ DUP 64 < IF DROP 64 THEN\r
+  X @ 1 AND  Y @ 1 AND DUP +  +  DUP + BITS + @  OR  SWAP C! ;\r
+: FD ( -- ) D @ 3 * DUP 3 + SWAP DO\r
+  I DUP + DUP DXS + @ X +!  DYS + @ Y +!  PLOT LOOP ;\r
+: TURN ( A -- ) D @ + 6 + 6 MOD D ! ;\r
+( A SIDE OF LEVEL N IS FOUR SIDES OF LEVEL N-1 )\r
+: SIDE ( N -- ) DUP 0= IF DROP FD EXIT THEN  1-\r
+  DUP SIDE  -1 TURN  DUP SIDE  2 TURN\r
+  DUP SIDE  -1 TURN  SIDE ;\r
+( A KEY CLEARS IT )\r
+: KOCH ( -- ) PAGE  0 1 AT ." KOCH SNOWFLAKE"\r
+  37 X !  60 Y !  0 D !  PLOT\r
+  3 0 DO 3 SIDE  2 TURN LOOP  KEY DROP PAGE ;\r
+KOCH\r
+#wait 5
+#screen

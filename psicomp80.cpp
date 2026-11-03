@@ -1272,6 +1272,34 @@ ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(2, "lisp", "Monitor + LISP")
 ROMX_LOAD("psicomp80_lisp.rom", 0x0000, 0x0c00,
          CRC(dacda6b0) SHA1(bb6dd54ec8e27fb2456cb89c2891a533a8870753), ROM_BIOS(2))
+// Monitor + COMP80 Tiny BASIC in place of BURP (basic/, built by basic/build.sh)
+ROM_SYSTEM_BIOS(3, "basic", "Monitor + BASIC")
+ROMX_LOAD("psicomp80_basic.rom", 0x0000, 0x0c00,
+         CRC(ed276001) SHA1(efd6fa022f60c20f314d64c63e4239b4a3a75109), ROM_BIOS(3))
+// Monitor + COMP80 Logo in place of BURP (logo/, built by logo/build.sh)
+ROM_SYSTEM_BIOS(4, "logo", "Monitor + LOGO")
+ROMX_LOAD("psicomp80_logo.rom", 0x0000, 0x0c00,
+         CRC(5cd69a7d) SHA1(8391e3056e4a58de3e79951ee1cd96f90bf76e8a), ROM_BIOS(4))
+// Monitor + COMP80 CHIP-8 interpreter in place of BURP (chip8/, built by chip8/build.sh)
+ROM_SYSTEM_BIOS(5, "chip8", "Monitor + CHIP-8")
+ROMX_LOAD("psicomp80_chip8.rom", 0x0000, 0x0c00,
+         CRC(19ccb0e6) SHA1(26284b4662bdf78fec999ce281a22e6a4b9e213a), ROM_BIOS(5))
+// Monitor + COMP80 FOCAL in place of BURP (focal/, built by focal/build.sh)
+ROM_SYSTEM_BIOS(6, "focal", "Monitor + FOCAL")
+ROMX_LOAD("psicomp80_focal.rom", 0x0000, 0x0c00,
+         CRC(c17bb84d) SHA1(71c17ab2a9884f49d02d8be721986a806cf3806c), ROM_BIOS(6))
+// Monitor + COMP80 PILOT in place of BURP (pilot/, built by pilot/build.sh)
+ROM_SYSTEM_BIOS(7, "pilot", "Monitor + PILOT")
+ROMX_LOAD("psicomp80_pilot.rom", 0x0000, 0x0c00,
+         CRC(3579c8b1) SHA1(13d0a6d6cd08ca05bc785d8a5a09249138875e29), ROM_BIOS(7))
+// Monitor + COMP80 ZASM assembler and disassembler in place of BURP (zasm/, built by zasm/build.sh)
+ROM_SYSTEM_BIOS(8, "zasm", "Monitor + ZASM assembler")
+ROMX_LOAD("psicomp80_zasm.rom", 0x0000, 0x0c00,
+         CRC(6a2531bf) SHA1(1bd8816616b566f244543ee38e209bd4a809a747), ROM_BIOS(8))
+// Monitor + COMP80 Prolog in place of BURP (prolog/, built by prolog/build.sh)
+ROM_SYSTEM_BIOS(9, "prolog", "Monitor + Prolog")
+ROMX_LOAD("psicomp80_prolog.rom", 0x0000, 0x0c00,
+         CRC(7c6db089) SHA1(dc6c27554340767799120dab7a8d22374aa4eb69), ROM_BIOS(9))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1291,6 +1319,34 @@ ROMX_LOAD("psicomp80_forth.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(2, "lisp", "Monitor + LISP")
 ROMX_LOAD("psicomp80_lisp.rom", 0x0000, 0x0c00,
          CRC(dacda6b0) SHA1(bb6dd54ec8e27fb2456cb89c2891a533a8870753), ROM_BIOS(2))
+// Monitor + COMP80 Tiny BASIC in place of BURP (basic/, built by basic/build.sh)
+ROM_SYSTEM_BIOS(3, "basic", "Monitor + BASIC")
+ROMX_LOAD("psicomp80_basic.rom", 0x0000, 0x0c00,
+         CRC(ed276001) SHA1(efd6fa022f60c20f314d64c63e4239b4a3a75109), ROM_BIOS(3))
+// Monitor + COMP80 Logo in place of BURP (logo/, built by logo/build.sh)
+ROM_SYSTEM_BIOS(4, "logo", "Monitor + LOGO")
+ROMX_LOAD("psicomp80_logo.rom", 0x0000, 0x0c00,
+         CRC(5cd69a7d) SHA1(8391e3056e4a58de3e79951ee1cd96f90bf76e8a), ROM_BIOS(4))
+// Monitor + COMP80 CHIP-8 interpreter in place of BURP (chip8/, built by chip8/build.sh)
+ROM_SYSTEM_BIOS(5, "chip8", "Monitor + CHIP-8")
+ROMX_LOAD("psicomp80_chip8.rom", 0x0000, 0x0c00,
+         CRC(19ccb0e6) SHA1(26284b4662bdf78fec999ce281a22e6a4b9e213a), ROM_BIOS(5))
+// Monitor + COMP80 FOCAL in place of BURP (focal/, built by focal/build.sh)
+ROM_SYSTEM_BIOS(6, "focal", "Monitor + FOCAL")
+ROMX_LOAD("psicomp80_focal.rom", 0x0000, 0x0c00,
+         CRC(c17bb84d) SHA1(71c17ab2a9884f49d02d8be721986a806cf3806c), ROM_BIOS(6))
+// Monitor + COMP80 PILOT in place of BURP (pilot/, built by pilot/build.sh)
+ROM_SYSTEM_BIOS(7, "pilot", "Monitor + PILOT")
+ROMX_LOAD("psicomp80_pilot.rom", 0x0000, 0x0c00,
+         CRC(3579c8b1) SHA1(13d0a6d6cd08ca05bc785d8a5a09249138875e29), ROM_BIOS(7))
+// Monitor + COMP80 ZASM assembler and disassembler in place of BURP (zasm/, built by zasm/build.sh)
+ROM_SYSTEM_BIOS(8, "zasm", "Monitor + ZASM assembler")
+ROMX_LOAD("psicomp80_zasm.rom", 0x0000, 0x0c00,
+         CRC(6a2531bf) SHA1(1bd8816616b566f244543ee38e209bd4a809a747), ROM_BIOS(8))
+// Monitor + COMP80 Prolog in place of BURP (prolog/, built by prolog/build.sh)
+ROM_SYSTEM_BIOS(9, "prolog", "Monitor + Prolog")
+ROMX_LOAD("psicomp80_prolog.rom", 0x0000, 0x0c00,
+         CRC(7c6db089) SHA1(dc6c27554340767799120dab7a8d22374aa4eb69), ROM_BIOS(9))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

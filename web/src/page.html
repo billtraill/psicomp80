@@ -45,7 +45,7 @@ header p { margin: 0; max-width: 64ch; }
 .controls { display: flex; flex-wrap: wrap; gap: .6rem 1.25rem; align-items: center; }
 .group { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
 .lbl { font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
 .seg label { position: relative; }
 .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .seg span { display: block; padding: .45rem .8rem; font: 600 .875rem/1 var(--body); cursor: pointer; }
@@ -132,7 +132,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 <header>
   <span class="kicker">PSI COMP80 · Wireless World, 1979 · in your browser</span>
   <h1>COMP80 Emulator</h1>
-  <p>The PSI COMP80, a Z80 computer published as a build-it-yourself series in Wireless World, running its monitor ROM with one of three languages in the top 2 KB: the original BURP, or the FORTH and LISP written for this project. Pick a ROM, then click the screen and type, or run one of the examples.</p>
+  <p>The PSI COMP80, a Z80 computer published as a build-it-yourself series in Wireless World, running its monitor ROM with one of ten languages in the top 2 KB: the original BURP, or FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM or Prolog, written for this project. Pick a ROM, then click the screen and type, or run one of the examples.</p>
 </header>
 
 <div class="main">
@@ -150,6 +150,13 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
         <label><input type="radio" name="rom" value="burp" id="rom-burp"><span>BURP</span></label>
         <label><input type="radio" name="rom" value="forth" id="rom-forth"><span>FORTH</span></label>
         <label><input type="radio" name="rom" value="lisp" id="rom-lisp"><span>LISP</span></label>
+        <label><input type="radio" name="rom" value="basic" id="rom-basic"><span>BASIC</span></label>
+        <label><input type="radio" name="rom" value="logo" id="rom-logo"><span>Logo</span></label>
+        <label><input type="radio" name="rom" value="chip8" id="rom-chip8"><span>CHIP-8</span></label>
+        <label><input type="radio" name="rom" value="focal" id="rom-focal"><span>FOCAL</span></label>
+        <label><input type="radio" name="rom" value="pilot" id="rom-pilot"><span>PILOT</span></label>
+        <label><input type="radio" name="rom" value="zasm" id="rom-zasm"><span>ZASM</span></label>
+        <label><input type="radio" name="rom" value="prolog" id="rom-prolog"><span>Prolog</span></label>
       </span>
     </div>
     <div class="group">
@@ -159,7 +166,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
   </div>
   <div class="controls">
     <div class="group" aria-label="Keys">
-      <button type="button" class="btn" id="btn-rs" title="RS: enter the language from READY; rubs out in FORTH and LISP">RS<kbd>^</kbd></button>
+      <button type="button" class="btn" id="btn-rs" title="RS: enter the language from READY; rubs out while typing a line">RS<kbd>^</kbd></button>
       <button type="button" class="btn" id="btn-fs" title="FS: back to the monitor">FS<kbd>Ctrl \</kbd></button>
       <button type="button" class="btn" id="btn-reset" title="The RESET key: restarts the monitor, memory kept">Reset<kbd>Esc</kbd></button>
       <button type="button" class="btn" id="btn-power" title="Switch off and on: memory cleared">Power off and on</button>
@@ -190,6 +197,13 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
     <button type="button" role="tab" id="tab-burp" data-tab="burp" aria-controls="panel-burp">BURP</button>
     <button type="button" role="tab" id="tab-forth" data-tab="forth" aria-controls="panel-forth">FORTH</button>
     <button type="button" role="tab" id="tab-lisp" data-tab="lisp" aria-controls="panel-lisp">LISP</button>
+    <button type="button" role="tab" id="tab-basic" data-tab="basic" aria-controls="panel-basic">BASIC</button>
+    <button type="button" role="tab" id="tab-logo" data-tab="logo" aria-controls="panel-logo">Logo</button>
+    <button type="button" role="tab" id="tab-chip8" data-tab="chip8" aria-controls="panel-chip8">CHIP-8</button>
+    <button type="button" role="tab" id="tab-focal" data-tab="focal" aria-controls="panel-focal">FOCAL</button>
+    <button type="button" role="tab" id="tab-pilot" data-tab="pilot" aria-controls="panel-pilot">PILOT</button>
+    <button type="button" role="tab" id="tab-zasm" data-tab="zasm" aria-controls="panel-zasm">ZASM</button>
+    <button type="button" role="tab" id="tab-prolog" data-tab="prolog" aria-controls="panel-prolog">Prolog</button>
   </div>
 <!--HELP-->
 </section>

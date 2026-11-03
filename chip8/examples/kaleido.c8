@@ -1,0 +1,33 @@
+; KALEIDO: a dot wanders at random in the top left quarter of the
+; screen, and every step is copied into the other three quarters,
+; mirrored.  DRW flips the pixels, so the pattern keeps changing.
+; V0, V1 = the dot, V3, V4 = its mirror images' x and y.
+
+        CLS
+        LD V0, 16
+        LD V1, 8
+        LD I, dot
+loop:   RND V2, 3               ; a step up, down, left or right
+        SNE V2, 0
+        ADD V1, 255
+        SNE V2, 1
+        ADD V1, 1
+        SNE V2, 2
+        ADD V0, 255
+        SNE V2, 3
+        ADD V0, 1
+        LD V5, 31               ; stay in the quarter, wrapping round
+        AND V0, V5
+        LD V5, 15
+        AND V1, V5
+        LD V3, 63
+        SUB V3, V0
+        LD V4, 31
+        SUB V4, V1
+        DRW V0, V1, 1
+        DRW V3, V1, 1
+        DRW V0, V4, 1
+        DRW V3, V4, 1
+        JP loop
+
+dot:    DB 0b1.......

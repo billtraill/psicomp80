@@ -1,0 +1,28 @@
+^
+#wait 0.5
+10 R:TIMES TABLES: FIVE QUESTIONS, WITH A SCORE\r
+20 T:WHICH TABLE DO YOU WANT TO PRACTISE?\r
+30 A:#T\r
+40 C:#S=0\r
+50 C:#Q=0\r
+60 *ASK C:#Q=#Q+1\r
+70 C:#N=?12\r
+80 C:#P=#N*#T\r
+90 T:QUESTION #Q: WHAT IS #N TIMES #T?\r
+100 A:#A\r
+110 T(#A=#P):RIGHT!\r
+120 C(#A=#P):#S=#S+1\r
+130 T(#A<>#P):NO, #N TIMES #T IS #P.\r
+140 J(#Q<5):*ASK\r
+150 T:YOU SCORED #S OUT OF 5.\r
+160 T(#S=5):PERFECT!\r
+170 E:\r
+RUN\r
+7\r
+28\r
+49\r
+48\r
+70\r
+14\r
+#ready
+#screen

@@ -1,0 +1,6 @@
+#bin ../../life/life.bin 1000
+^
+#wait 0.5
+DIS 1000
+#wait 1
+#screen

@@ -1,0 +1,11 @@
+^
+#wait 0.5
+01.01 C A SINE WAVE, ONE LINE A STEP: SPACES, THEN A STAR\r
+01.10 FOR X=0,18; DO 2\r
+01.20 QUIT\r
+02.10 SET C=FITR(14+13*FSIN(X/3))\r
+02.20 FOR J=0,C; TYPE " "\r
+02.30 TYPE "*",!\r
+GO\r
+#ready
+#screen

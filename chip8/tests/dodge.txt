@@ -1,0 +1,11 @@
+#load ../examples/dodge.ch8 0E00
+^
+#wait 1.5
+AAAA
+#wait 0.3
+#screen
+#wait 40
+#screen
+W
+#wait 1
+#screen

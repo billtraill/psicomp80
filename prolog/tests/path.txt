@@ -1,0 +1,35 @@
+^
+#wait 0.5
+% FINDING A WAY THROUGH A NETWORK OF ROADS BETWEEN TOWNS.\r
+ROAD(ARK,BAY).\r
+ROAD(ARK,COVE).\r
+ROAD(BAY,DALE).\r
+ROAD(COVE,DALE).\r
+ROAD(DALE,ELM).\r
+ROAD(COVE,ELM).\r
+ROAD(ELM,FORD).\r
+% ROADS GO BOTH WAYS.\r
+NEAR(X,Y) :- ROAD(X,Y).\r
+NEAR(X,Y) :- ROAD(Y,X).\r
+% NOTIN(X,L): X IS NOT IN L.  IF IT IS, CUT AND FAIL.\r
+NOTIN(X,L) :- MEMBER(X,L), !, FAIL.\r
+NOTIN(?,?).\r
+MEMBER(X,[X:?]).\r
+MEMBER(X,[?:T]) :- MEMBER(X,T).\r
+% GO(X,Y,V,P): P IS V AND A WAY ON FROM X TO Y, BACK TO FRONT,\r
+% NOT THROUGH THE TOWNS IN V.\r
+WAY(X,Y,P) :- GO(X,Y,[X],Q), REVERSE(Q,P).\r
+GO(X,X,V,V).\r
+GO(X,Y,V,P) :- NEAR(X,Z), NOTIN(Z,V), GO(Z,Y,[Z:V],P).\r
+REVERSE(L,R) :- REV(L,[],R).\r
+REV([],A,A).\r
+REV([H:T],A,R) :- REV(T,[H:A],R).\r
+?- WAY(ARK,FORD,P).\r
+#wait 2
+;
+#wait 2
+;
+#wait 2
+.
+#ready
+#screen

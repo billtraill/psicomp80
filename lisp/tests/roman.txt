@@ -1,0 +1,46 @@
+^
+#wait 0.5
+(SETQ TB '((1000 M) (900 C M) (500 D) (400 C D) (100 C) (90 X C)\r
+  (50 L) (40 X L) (10 X) (9 I X) (5 V) (4 I V) (1 I)))\r
+(DEFUN APP (A B) (COND (A (CONS (CAR A) (APP (CDR A) B))) (T B)))\r
+(DEFUN ROMAN (N) (RO N TB))\r
+(DEFUN RO (N L)\r
+  (COND ((EQ N 0) NIL) ((< N (CAR (CAR L))) (RO N (CDR L)))\r
+        (T (APP (CDR (CAR L)) (RO (- N (CAR (CAR L))) L)))))\r
+(DEFUN VL (X L)\r
+  (COND ((AND (EQ X (CADR (CAR L))) (NULL (CDR (CDR (CAR L)))))\r
+         (CAR (CAR L)))\r
+        (T (VL X (CDR L)))))\r
+(DEFUN NUMERAL (L)\r
+  (COND ((NULL L) 0)\r
+        ((AND (CDR L) (< (VL (CAR L) TB) (VL (CADR L) TB)))\r
+         (- (NUMERAL (CDR L)) (VL (CAR L) TB)))\r
+        (T (+ (VL (CAR L) TB) (NUMERAL (CDR L))))))\r
+(SETQ SMALL '(ONE TWO THREE FOUR FIVE SIX SEVEN EIGHT NINE TEN\r
+  ELEVEN TWELVE THIRTEEN FOURTEEN FIFTEEN SIXTEEN SEVENTEEN\r
+  EIGHTEEN NINETEEN))\r
+(SETQ TENS '(TEN TWENTY THIRTY FORTY FIFTY SIXTY SEVENTY EIGHTY\r
+  NINETY))\r
+(DEFUN NTH (K L) (COND ((EQ K 1) (CAR L)) (T (NTH (- K 1) (CDR L)))))\r
+(DEFUN SM (N) (COND ((< 0 N) (LIST (NTH N SMALL)))))\r
+(DEFUN U (N)\r
+  (COND ((< N 20) (SM N))\r
+        (T (CONS (NTH (/ N 10) TENS) (SM (REM N 10))))))\r
+(DEFUN AU (N) (COND ((< 0 N) (CONS 'AND (U N)))))\r
+(DEFUN H (N)\r
+  (COND ((< N 100) (U N))\r
+        (T (APP (SM (/ N 100)) (CONS 'HUNDRED (AU (REM N 100)))))))\r
+(DEFUN R (N) (COND ((< N 100) (AU N)) (T (H N))))\r
+(DEFUN WORDS (N)\r
+  (COND ((EQ N 0) '(ZERO)) ((< N 1000) (H N))\r
+        (T (APP (H (/ N 1000)) (CONS 'THOUSAND (R (REM N 1000)))))))\r
+(ROMAN 1987)\r
+(NUMERAL '(M C M L X X X V I I))\r
+(ROMAN 3888)\r
+(NUMERAL (ROMAN 2024))\r
+(WORDS 1987)\r
+(WORDS 1005)\r
+(WORDS 120)\r
+(WORDS 16383)\r
+#ready
+#screen

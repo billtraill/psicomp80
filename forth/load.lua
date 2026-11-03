@@ -1,6 +1,10 @@
 -- Start COMP80 FORTH (-bios forth), type a program into it and run it.
+-- Also used for the other languages that read a line (BASIC, Logo, FOCAL,
+-- PILOT, ZASM, Prolog), with C80_CURS set.
 --   C80_FORTH  program to type in, a line at a time (optional)
 --   C80_TYPE   line to type once it is in, e.g. "50 LIFE"
+--   C80_CURS   hex address of the language's cursor pointer (default 1DA0,
+--              FORTH's)
 --   C80_SNAP   seconds after that line to take snapshots, e.g. "5,60";
 --              C80_EXIT=1 also prints the screen at each one and exits after
 --              the last
@@ -21,8 +25,9 @@ end
 -- FORTH shows its _ cursor (code 1Fh at CURS, 1DA0h) while it waits for a
 -- line.  Only type when it is waiting: a key while it is busy resets the
 -- COMP80 to the monitor.
+local curs = tonumber(os.getenv("C80_CURS") or "", 16) or 0x1DA0
 local function waiting()
-  return mem:read_u8(mem:read_u16(0x1DA0)) == 0x1F
+  return mem:read_u8(mem:read_u16(curs)) == 0x1F
 end
 
 local function screen()

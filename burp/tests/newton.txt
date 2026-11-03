@@ -1,0 +1,27 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "SQUARE ROOTS BY NEWTONS METHOD" \r
+20 PRINT "TYPE A NUMBER AND A SPACE" \r
+30 INPUT N \r
+40 LET X=N \r
+50 LET K=0 \r
+60 LET Y=N X / X + 2 / \r
+70 LET K=K 1 + \r
+80 PRINT K0 Y7 \r
+90 IF Y=X THEN 130 \r
+100 IF K>20 THEN 130 \r
+110 LET X=Y \r
+120 GOTO 60 \r
+130 LET R=N ROOT \r
+140 PRINT "ROOT KEY" R7 \r
+150 GOTO 20 :
+#ready
+RUN 10 
+#ready
+2 
+#ready
+1000 
+#ready
+#screen

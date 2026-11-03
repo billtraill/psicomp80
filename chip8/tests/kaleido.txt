@@ -1,0 +1,4 @@
+#load ../examples/kaleido.ch8 0E00
+^
+#wait 20
+#screen

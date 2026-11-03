@@ -1,0 +1,42 @@
+^
+#wait 0.5
+% LISTS.  [H:T] IS THE LIST WITH HEAD H AND TAIL T.\r
+APPEND([],L,L).\r
+APPEND([H:T],L,[H:R]) :- APPEND(T,L,R).\r
+MEMBER(X,[X:?]).\r
+MEMBER(X,[?:T]) :- MEMBER(X,T).\r
+% REVERSE WITH AN ACCUMULATOR: THE LIST SO FAR, BACK TO FRONT.\r
+REVERSE(L,R) :- REV(L,[],R).\r
+REV([],A,A).\r
+REV([H:T],A,R) :- REV(T,[H:A],R).\r
+LENGTH([],0).\r
+LENGTH([?:T],N) :- LENGTH(T,M), SUM(M,1,N).\r
+?- APPEND([1,2],[3,4,5],X).\r
+#wait 2
+;
+#ready
+?- APPEND(X,Y,[1,2,3]).\r
+#wait 2
+;
+#wait 2
+;
+#wait 2
+;
+#wait 2
+;
+#ready
+?- REVERSE([1,2,3,4,5],R).\r
+#wait 2
+;
+#ready
+?- LENGTH([RED,GREEN,BLUE],N).\r
+#wait 2
+;
+#ready
+?- MEMBER(X,[1,2,3]), MEMBER(X,[3,2]).\r
+#wait 2
+;
+#wait 2
+;
+#ready
+#screen

@@ -1,0 +1,32 @@
+; Simplifying algebra.  D differentiates without tidying up, so
+; (D '(* X X) 'X) gives (+ (* X 1) (* 1 X)).  SIMP tidies an
+; expression from the inside out: it adds up numbers, drops
+; (+ 0 A) and (* 1 A), makes (* 0 A) 0 and (+ A A) (* 2 A),
+; so (SIMP (D '(* X X) 'X)) gives (* 2 X).
+(DEFUN D (E X)
+  (COND ((ATOM E) (COND ((EQ E X) 1) (T 0)))
+        ((EQ (CAR E) '*)
+         (LIST '+ (LIST '* (CADR E) (D (CADDR E) X))
+                  (LIST '* (D (CADR E) X) (CADDR E))))
+        (T (LIST (CAR E) (D (CADR E) X) (D (CADDR E) X)))))
+(DEFUN SIMP (E)
+  (COND ((ATOM E) E)
+        (T (S (CAR E) (SIMP (CADR E)) (SIMP (CADDR E))))))
+(DEFUN S (OP A B)
+  (COND ((AND (NUMBERP A) (NUMBERP B))
+         (COND ((EQ OP '+) (+ A B)) ((EQ OP '-) (- A B))
+               (T (* A B))))
+        ((EQ OP '+)
+         (COND ((EQ A 0) B) ((EQ B 0) A)
+               ((EQUAL A B) (S '* 2 A)) (T (LIST OP A B))))
+        ((EQ OP '-)
+         (COND ((EQ B 0) A) ((EQUAL A B) 0) (T (LIST OP A B))))
+        ((OR (EQ A 0) (EQ B 0)) 0)
+        ((EQ A 1) B)
+        ((EQ B 1) A)
+        ((NUMBERP B) (S OP B A))
+        (T (LIST OP A B))))
+(DEFUN EQUAL (A B)
+  (COND ((ATOM A) (EQ A B))
+        ((ATOM B) NIL)
+        ((EQUAL (CAR A) (CAR B)) (EQUAL (CDR A) (CDR B)))))

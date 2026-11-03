@@ -1,0 +1,19 @@
+^
+#wait 0.5
+ASM 1100\r
+LD B,0A\r
+LD A,B\r
+DEC A\r
+OR 30\r
+LD (8030),A\r
+LD DE,0\r
+DEC DE\r
+LD A,D\r
+OR E\r
+JR NZ,110C\r
+DJNZ 1102\r
+RET\r
+\r
+G 1100\r
+#wait 6
+#screen

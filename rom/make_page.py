@@ -7,6 +7,7 @@ so the page always shows what is in the ROMs.
     psicomp80.asm        monitor (0000-03FF) and BURP (0400-0BFF)
     ../forth/forth.asm   FORTH (0400-0BFF)
     ../lisp/lisp.asm     LISP (0400-0BFF)
+    ../<lang>/<lang>.asm BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM and Prolog
 
 Run by build.sh. With an argument, the page's links to the other pages are
 taken from that file (lines of "page.html URL") and the page goes to
@@ -270,9 +271,24 @@ SECTIONS = [
     ("lisp", "l", "LISP", "0400–0BFF",
      "<p>A LISP 1.5 style interpreter written for this project, with garbage collection, LAMBDA and dynamic "
      "scope, in the same 2 KB. Source: <code>lisp/lisp.asm</code>.</p>"),
+    ("basic", "a", "BASIC", "0400–0BFF",
+     "<p>A Tiny BASIC written for this project: integers, numbered lines, 26 variables and an array, FOR/NEXT and GOSUB, and PLOT on the quarter-block graphics. Source: <code>basic/basic.asm</code>.</p>"),
+    ("logo", "g", "Logo", "0400–0BFF",
+     "<p>Logo with turtle graphics on the quarter blocks: procedures with inputs, recursion, REPEAT and IF, in 2007 of the 2048 bytes. Source: <code>logo/logo.asm</code>.</p>"),
+    ("chip8", "c", "CHIP-8", "0400–0BFF",
+     "<p>A CHIP-8 interpreter: the 64 × 32 CHIP-8 display is the COMP80's screen, a character a pixel. Every instruction can be restarted, so a key can come at any moment. Source: <code>chip8/chip8.asm</code>.</p>"),
+    ("focal", "o", "FOCAL", "0400–0BFF",
+     "<p>FOCAL, DEC's 1968 language, with its floating point done on the MM57109 calculator chip as in BURP. Source: <code>focal/focal.asm</code>.</p>"),
+    ("pilot", "p", "PILOT", "0400–0BFF",
+     "<p>PILOT, the teaching language: T:, A:, M:, J:, U:, E:, C: and G:, with Y and N conditions. Source: <code>pilot/pilot.asm</code>.</p>"),
+    ("zasm", "z", "ZASM", "0400–0BFF",
+     "<p>A Z80 assembler and disassembler covering every documented instruction. ASM is the disassembler run backwards: it tries each opcode until its text matches the line typed. Source: <code>zasm/zasm.asm</code>.</p>"),
+    ("prolog", "r", "Prolog", "0400–0BFF",
+     "<p>A small Prolog: unification, depth-first backtracking with choice points, cut, lists and micro-PROLOG style arithmetic. Source: <code>prolog/prolog.asm</code>.</p>"),
 ]
 
-ROMS = [("psicomp80.rom", "BURP", "b"), ("psicomp80_forth.rom", "FORTH", "f"), ("psicomp80_lisp.rom", "LISP", "l")]
+ROMS = [("psicomp80.rom", "BURP", "b"), ("psicomp80_forth.rom", "FORTH", "f"), ("psicomp80_lisp.rom", "LISP", "l")] + \
+    [(f"psicomp80_{s[0]}.rom", s[2], s[1]) for s in SECTIONS[4:]]
 
 LINKS = {"screenshots.html": "screenshots.html", "lisp.html": "lisp.html", "emulator.html": "emulator.html",
          "hardware.html": "hardware.html"}
@@ -286,12 +302,12 @@ def main():
                 LINKS[k] = v
     roms = {n: (REPO / n).read_bytes() for n, _, _ in ROMS}
     main_lst = Listing(HERE / "psicomp80.asm", BUILD / "psicomp80.lst", roms["psicomp80.rom"], True)
-    forth = Listing(REPO / "forth/forth.asm", BUILD / "forth.lst", roms["psicomp80_forth.rom"])
-    lisp = Listing(REPO / "lisp/lisp.asm", BUILD / "lisp.lst", roms["psicomp80_lisp.rom"])
     split = next(i for i, ln in enumerate(main_lst.lines) if "BURP ROM 0400-0BFF" in ln["comment"]) - 1
-    parts = {"m": (main_lst, main_lst.lines[:split]), "b": (main_lst, main_lst.lines[split:]),
-             "f": (forth, forth.lines), "l": (lisp, lisp.lines)}
-    # the BURP section shares psicomp80.asm's labels; FORTH and LISP only add their own
+    parts = {"m": (main_lst, main_lst.lines[:split]), "b": (main_lst, main_lst.lines[split:])}
+    for view, p, *_ in SECTIONS[2:]:
+        lst = Listing(REPO / f"{view}/{view}.asm", BUILD / f"{view}.lst", roms[f"psicomp80_{view}.rom"])
+        parts[p] = (lst, lst.lines)
+    # the BURP section shares psicomp80.asm's labels; the other languages only add their own
     page = Page()
     for p, (lst, lines) in parts.items():
         page.plan_anchors(p, lines)
@@ -314,9 +330,9 @@ def main():
                      f'<p class="sums"><span>CRC <b>{crc}</b></span><span>SHA1 <b>{sha}</b></span></p>'
                      f'<div class="lstwrap"><pre class="hex" data-p="{p}">{hex_dump(name, rom, p, page)}</pre></div></div>')
     body.append('<section class="view" id="hex" data-view="hex" data-p="hex">'
-                '<div class="shead"><span class="kicker">0000–0BFF · three ROMs</span><h2>Hex dumps</h2>'
-                '<p>The three 3 KB ROM images, sixteen bytes to a line as in the magazine\'s listing. '
-                'The first 400h bytes, the monitor, are the same in all three. Click an address or a byte to see '
+                '<div class="shead"><span class="kicker">0000–0BFF · ten ROMs</span><h2>Hex dumps</h2>'
+                '<p>The ten 3 KB ROM images, sixteen bytes to a line as in the magazine\'s listing. '
+                'The first 400h bytes, the monitor, are the same in all of them. Click an address or a byte to see '
                 'it in the listing. The checksums are the ones the MAME driver expects.</p>'
                 '<div class="tsel" role="group" aria-label="Text column"><span class="lbl">Text column</span>'
                 '<button type="button" data-t="d" aria-pressed="true">Screen codes</button>'
@@ -441,18 +457,18 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 <header>
   <span class="kicker">PSI COMP80 · the 3 KB ROM · 0000–0BFF</span>
   <h1>COMP80 ROM Listings</h1>
-  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the three languages that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH and LISP were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
-  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all three ROMs.</p>
+  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the ten languages that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM and Prolog were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
+  <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all ten ROMs.</p>
   <div class="map" aria-label="Memory map">
     <div><b>0000–03FF</b><span>Monitor ROM, 1 KB</span></div>
-    <div><b>0400–0BFF</b><span>BURP, FORTH or LISP, 2 KB</span></div>
+    <div><b>0400–0BFF</b><span>BURP or another language, 2 KB</span></div>
     <div><b>0C00–1FFF</b><span>RAM, 5 KB</span></div>
     <div><b>8000–87FF</b><span>Screen, 64 × 32</span></div>
   </div>
 </header>
 <nav>
   <div class="tabs">
-    <a href="#monitor">Monitor</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#hex">Hex dumps</a>
+    <a href="#monitor">Monitor</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#basic">BASIC</a><a href="#logo">Logo</a><a href="#chip8">CHIP-8</a><a href="#focal">FOCAL</a><a href="#pilot">PILOT</a><a href="#zasm">ZASM</a><a href="#prolog">Prolog</a><a href="#hex">Hex dumps</a>
   </div>
   <form class="go"><label for="goaddr">Address</label><input id="goaddr" maxlength="4" autocomplete="off" spellcheck="false" placeholder="0800"><button type="submit">Go</button></form>
 </nav>

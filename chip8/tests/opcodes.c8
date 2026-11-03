@@ -1,0 +1,143 @@
+; Checks the arithmetic, skips, calls and memory instructions.  VE is
+; the number of the test being run; at the end the screen shows VE in
+; hex: 0 if every test passed, or the number of the one that failed.
+
+        LD VE, 1                ; 8xy4 with carry
+        LD V0, 200
+        LD V1, 100
+        ADD V0, V1
+        SE V0, 44
+        JP fail
+        SE VF, 1
+        JP fail
+        LD VE, 2                ; 8xy4 without
+        LD V0, 20
+        ADD V0, V1
+        SE V0, 120
+        JP fail
+        SE VF, 0
+        JP fail
+        LD VE, 3                ; 8xy5, no borrow: VF = 1
+        LD V0, 50
+        LD V1, 20
+        SUB V0, V1
+        SE V0, 30
+        JP fail
+        SE VF, 1
+        JP fail
+        LD VE, 4                ; 8xy5 with borrow
+        SUB V1, V0              ; 20 - 30
+        SE V1, 246
+        JP fail
+        SE VF, 0
+        JP fail
+        LD VE, 5                ; 8xy7
+        LD V0, 5
+        LD V1, 9
+        SUBN V0, V1
+        SE V0, 4
+        JP fail
+        SE VF, 1
+        JP fail
+        LD VE, 6                ; 8xy6, 8xyE
+        LD V0, 0b10000011
+        SHR V0
+        SE V0, 0b01000001
+        JP fail
+        SE VF, 1
+        JP fail
+        SHL V0
+        SHL V0
+        SE V0, 0b00000100
+        JP fail
+        SE VF, 1
+        JP fail
+        LD VE, 7                ; OR AND XOR, LD Vx,Vy
+        LD V0, 0b1100
+        LD V1, 0b1010
+        LD V2, V0
+        OR V2, V1
+        SE V2, 0b1110
+        JP fail
+        LD V2, V0
+        AND V2, V1
+        SE V2, 0b1000
+        JP fail
+        XOR V0, V1
+        SE V0, 0b0110
+        JP fail
+        LD VE, 8                ; 5xy0, 9xy0, 4xkk
+        LD V0, 7
+        LD V1, 7
+        SE V0, V1
+        JP fail
+        SNE V0, V1
+        JP ok8
+        JP fail
+ok8:    SNE V0, 8
+        JP fail
+        LD VE, 9                ; CALL and RET, three deep
+        LD V5, 0
+        CALL c1
+        SE V5, 3
+        JP fail
+        LD VE, 10               ; Fx33, Fx65, Fx55
+        LD V0, 147
+        LD I, buf
+        LD B, V0
+        LD V2, [I]
+        SE V0, 1
+        JP fail
+        SE V1, 4
+        JP fail
+        SE V2, 7
+        JP fail
+        LD V0, 11
+        LD V1, 22
+        LD I, buf
+        LD [I], V1
+        LD V0, 0
+        LD V1, 0
+        LD V1, [I]
+        SE V1, 22
+        JP fail
+        LD VE, 11               ; Fx1E, Bnnn
+        LD I, buf
+        LD V0, 2
+        ADD I, V0
+        LD V0, [I]
+        SE V0, 7                ; buf+2 still holds the units digit
+        JP fail
+        LD V0, 4
+        JP V0, jt
+jt:     JP fail
+        JP fail
+        LD VE, 12               ; DRW collision
+        CLS
+        LD I, dot
+        LD V0, 5
+        DRW V0, V0, 1
+        SE VF, 0
+        JP fail
+        DRW V0, V0, 1
+        SE VF, 1
+        JP fail
+        LD VE, 0
+fail:   CLS
+        LD F, VE
+        LD V0, 30
+        LD V1, 13
+        DRW V0, V1, 5
+end:    JP end
+
+c1:     ADD V5, 1
+        CALL c2
+        RET
+c2:     ADD V5, 1
+        CALL c3
+        RET
+c3:     ADD V5, 1
+        RET
+
+dot:    DB 0b1.......
+buf:    DB 0, 0, 0

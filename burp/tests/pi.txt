@@ -1,0 +1,36 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "PI BY THE LEIBNIZ SERIES, 4 - 4/3 + 4/5 - 4/7 ..." \r
+20 PRINT "TERMS        ESTIMATE     ERROR IN MILLIONTHS" \r
+30 LET S=0 \r
+32 LET T=1 \r
+34 LET G=4 \r
+40 FOR R=10 STEP 10 UNTIL 120 \r
+50 LET J=10 \r
+60 LET S=S G T / + \r
+62 LET T=T 2 + \r
+64 LET G=G NEG \r
+66 LET J=J 1 - \r
+68 IF J>0 THEN 60 \r
+70 LET E=S PI - 1000000 * \r
+80 PRINT R0 S7 E0 \r
+90 NEXT R \r
+100 PRINT "NILAKANTHA, 3 + 4/(2*3*4) - 4/(4*5*6) + ..." \r
+110 LET S=3 \r
+112 LET T=2 \r
+114 LET G=4 \r
+120 FOR R=1 STEP 1 UNTIL 12 \r
+130 LET D=T T 1 + * T 2 + * \r
+132 LET S=S G D / + \r
+134 LET T=T 2 + \r
+136 LET G=G NEG \r
+138 LET E=S PI - 1000000 * \r
+140 PRINT R0 S7 E0 \r
+150 NEXT R \r
+160 END :
+#ready
+RUN 10 
+#ready
+#screen

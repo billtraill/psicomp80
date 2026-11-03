@@ -4,11 +4,13 @@
 (function () {
   const D = C80DATA;
   const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-  const ROMS = { burp: b64(D.roms.burp), forth: b64(D.roms.forth), lisp: b64(D.roms.lisp) };
-  const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP" };
-  // FORTH and LISP keep the address of their cursor here; it shows _ (1Fh)
-  // while they wait for a line.
-  const CURS = { forth: 0x1da0, lisp: 0x0c12 };
+  const ROMS = Object.fromEntries(Object.entries(D.roms).map(([k, v]) => [k, b64(v)]));
+  const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP", basic: "BASIC", logo: "Logo",
+    chip8: "CHIP-8", focal: "FOCAL", pilot: "PILOT", zasm: "ZASM", prolog: "Prolog" };
+  // The languages that read a line keep the address of their cursor here; it
+  // shows _ (1Fh) while they wait for one.  BURP and CHIP-8 have none.
+  const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
+    pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e };
   const $ = (id) => document.getElementById(id);
   const canvas = $("screen"), ctx = canvas.getContext("2d"), img = ctx.createImageData(384, 320);
   const m = new COMP80(D.fonts);
@@ -74,10 +76,16 @@
     yield after(0.05);
     yield* typeText(text + "\r");
   }
-  function sourceLines(text, lisp) {
-    return text.split("\n").map((l) => l.replace(/\s+$/, ""))
-      .filter((l) => l.trim() !== "" && !(lisp && /^\s*;/.test(l)));
+  // Which lines of a file are typed: not blank lines, nor LISP and Prolog
+  // comments.  ZASM's files keep their blank lines, as one ends ASM.
+  const COMMENT = { lisp: /^\s*;/, prolog: /^\s*%/ };
+  const SOURCE_LANG = { lsp: "lisp", pl: "prolog", txt: "zasm" };
+  const typed = (lang) => (l) => lang === "zasm" || (l.trim() !== "" && !(COMMENT[lang] && COMMENT[lang].test(l)));
+  function sourceLines(text, lang) {
+    const lines = text.replace(/\s+$/, "").split("\n").map((l) => l.replace(/\s+$/, ""));
+    return lines.filter(typed(lang));
   }
+  const fileLang = (name) => SOURCE_LANG[name.split(".").pop()];
 
   function* userKeys() {
     for (;;) {
@@ -95,7 +103,7 @@
       else if (s.ready) { listingState("Waiting for the computer"); yield* idle(); }
       else if (s.bin) m.mem.set(b64(D.bins[s.bin]), s.at);
       else if (s.source) {
-        const lines = sourceLines(D.sources[s.source], s.source.endsWith(".lsp"));
+        const lines = sourceLines(D.sources[s.source], fileLang(s.source));
         for (let i = 0; i < lines.length; i++) {
           status = `Typing ${s.source}: line ${i + 1} of ${lines.length}`;
           listingMark(n + "." + i);
@@ -110,7 +118,7 @@
   // BURP takes a program with LOAD: each line ends with a space and Return,
   // the last with a colon.
   function* pasted(text) {
-    const lines = sourceLines(text, m.romName === "lisp");
+    const lines = sourceLines(text, m.romName);
     if (m.romName === "burp") {
       status = "Typing LOAD";
       yield* typeText("LOAD ", true);
@@ -169,11 +177,11 @@
         else add(null, `(${s.bin}.bin, copied into memory at ${at})`, "note");
       }
       else if (s.source) {
-        const lisp = s.source.endsWith(".lsp");
+        const keep = typed(fileLang(s.source));
         let i = 0;
-        for (const l of D.sources[s.source].split("\n")) {
-          const typed = l.trim() !== "" && !(lisp && /^\s*;/.test(l));
-          add(typed ? n + "." + i++ : null, l, typed ? "src" : "src skip");
+        for (const l of D.sources[s.source].replace(/\s+$/, "").split("\n")) {
+          const t = keep(l.replace(/\s+$/, ""));
+          add(t ? n + "." + i++ : null, l, t ? "src" : "src skip");
         }
       }
     });
@@ -218,6 +226,20 @@
       ": SQUARES 11 1 DO I DUP * . LOOP ;\nSQUARES"],
     lisp: ["Paste a LISP program, or monitor commands. It is typed a line at a time, waiting for LISP between lines; comments are left out. Enter LISP first (RS at READY).",
       "(DEFUN SQ (X) (* X X))\n(SQ 7)"],
+    basic: ["Paste a BASIC program, or monitor commands. It is typed a line at a time, waiting for BASIC between lines; numbered lines go into the program. Enter BASIC first (RS at READY), and type RUN to run it.",
+      "10 FOR I=1 TO 10\n20 PRINT I, I*I\n30 NEXT I\nRUN"],
+    logo: ["Paste a Logo program, or monitor commands. It is typed a line at a time, waiting for Logo between lines; TO ... END definitions can run over many lines. Enter Logo first (RS at READY).",
+      "TO SQUARE :S\nREPEAT 4 [FD :S RT 90]\nEND\nREPEAT 8 [SQUARE 30 RT 45]"],
+    chip8: ["Paste monitor commands, such as LOAD 0E00 followed by a program’s bytes in hex and @. FS goes back to the monitor first; RS then runs the program at 0E00.",
+      "LOAD 0E00 00E0 6010 …@"],
+    focal: ["Paste a FOCAL program or commands. It is typed a line at a time, waiting for FOCAL between lines. Numbered lines go into the program; GO runs it. Enter FOCAL first (RS at READY).",
+      "1.1 FOR I=1,10; TYPE I, FSQT(I), !\nGO"],
+    pilot: ["Paste a PILOT program, or monitor commands. It is typed a line at a time, waiting for PILOT between lines. Numbered lines go into the program; then type RUN. Enter PILOT first (RS at READY).",
+      "10 T:WHAT IS YOUR NAME?\n20 A:$N\n30 T:HELLO, $N!\nRUN"],
+    zasm: ["Paste ZASM commands or ASM lines. They are typed a line at a time, waiting for ZASM between lines, blank lines too. Enter ZASM first (RS at READY). Numbers are hex and start with a digit (0FF); a blank line ends ASM.",
+      "ASM 1000\nLD A,41\nLD (8040),A\nRET\n\nG 1000"],
+    prolog: ["Paste a Prolog program, or monitor commands. It is typed a line at a time, waiting for Prolog between lines; comments are left out. Enter Prolog first (RS at READY). Clauses end with a full stop; queries start ?- .",
+      "LIKES(MARY,WINE).\nLIKES(JOHN,X) :- LIKES(MARY,X).\n?- LIKES(JOHN,W)."],
   };
 
   function power(rom) {

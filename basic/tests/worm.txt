@@ -1,0 +1,19 @@
+^
+#wait 0.5
+10 REM A WORM BOUNCING ROUND A BOX\r
+20 CLS\r
+30 FOR I=0 TO 127: PLOT I,0: PLOT I,61: NEXT I\r
+40 FOR I=1 TO 60: PLOT 0,I: PLOT 127,I: NEXT I\r
+50 X=20: Y=10: U=2: V=1: L=24: K=0\r
+60 FOR I=0 TO L-1: @(I)=X: @(I+L)=Y: NEXT I\r
+70 UNPLOT @(K),@(K+L)\r
+80 X=X+U: Y=Y+V: PLOT X,Y: @(K)=X: @(K+L)=Y\r
+90 K=K+1: IF K=L THEN K=0\r
+100 IF X<3 THEN U=2\r
+110 IF X>125 THEN U=-2\r
+120 IF Y<2 THEN V=1\r
+130 IF Y>59 THEN V=-1\r
+140 GOTO 70\r
+RUN\r
+#wait 6
+#screen

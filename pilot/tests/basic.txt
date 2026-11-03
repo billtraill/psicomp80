@@ -1,0 +1,35 @@
+^
+#wait 0.5
+T:IMMEDIATE LINES RUN AT ONCE\r
+C:#A=7*(3+4)-100/7\r
+C:#B=-#A/2\r
+T:A=#A B=#B\r
+C:$X=COMP80\r
+T:$X SAYS HI, #Z IS ZERO, $ AND # ALONE\r
+T(#A>=35):GE\r
+T(#A<=34):WRONG\r
+T(#A<>35):NE\r
+T(#A=35):EQ\r
+10 T:TEN\r
+20 U:*SUB\r
+30 T:BACK\r
+40 E:\r
+50 *SUB T:IN SUB\r
+60 E:\r
+25 T:TWENTY FIVE\r
+25\r
+RUN\r
+J:*SUB\r
+T:BAD (1\r
+C:#A=1/0\r
+35 J:*NOWHERE\r
+RUN\r
+#ready
+#screen
+LIST\r
+NEW\r
+#ready
+#screen
+LIST\r
+#ready
+#screen

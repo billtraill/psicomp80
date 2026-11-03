@@ -57,6 +57,28 @@ prints the screen:
   division, and INPUT
 - `sierpinski.txt`: Pascal's triangle mod 2 (the Sierpiński triangle), each
   row a number made by multiplying 11, 101 and 10001 for the bits of the row
+- `collatz.txt`: the 3n + 1 sequence for 7 and 27, eight numbers a line,
+  testing for even numbers by adding and subtracting 10000000 (the chip
+  rounds to 8 digits; this ROM has no INT)
+- `primes.txt`: the 25 primes below 100 by trial division, eight a line
+- `pi.txt`: π by the Leibniz and Nilakantha series, with the error against
+  the chip's PI
+- `guess.txt`: the guessing game, seeded with 42 (the number is 91) and won
+  in five guesses
+- `loan.txt`: a 50000 loan at 8% over 20 years: the monthly payment, a
+  yearly table and the total paid
+- `newton.txt`: square roots of 2 and 1000 by Newton's method, each guess
+  printed, against the chip's ROOT
+- `gcd.txt`: Euclid's algorithm for 1071, 462 and 3654, 1365, each division
+  printed, then the GCD and LCM
+- `perfect.txt`: the perfect numbers up to 33550336 by Euclid's rule, testing
+  2^p − 1 for p = 2 to 13 by trial division
+- `zeller.txt`: the day of the week for four dates by Zeller's congruence
+- `fact.txt`: factorials to 14!, into scientific notation from 12!, and e as
+  the sum of 1/n!, which stops improving after 10 terms
+
+Line numbers are one byte (1–255), and a colon anywhere in a LOAD line ends
+LOAD, even inside a string.
 
 ## What made it work
 

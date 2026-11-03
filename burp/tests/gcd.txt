@@ -1,0 +1,32 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "GCD AND LCM BY EUCLIDS ALGORITHM" \r
+20 LET Z=10000000 \r
+30 PRINT "TYPE TWO NUMBERS, EACH WITH A SPACE" \r
+40 INPUT A B \r
+50 LET X=A \r
+60 LET Y=B \r
+70 IF Y=0 THEN 150 \r
+80 LET Q=X Y / Z + Z - \r
+90 LET R=X Y Q * - \r
+100 IF R>0 THEN 130 \r
+110 IF R=0 THEN 130 \r
+120 LET Q=Q 1 - \r
+125 LET R=R Y + \r
+130 PRINT X0, " =" Q0, " *" Y0, " +" R0, \r
+140 LET X=Y \r
+142 LET Y=R \r
+144 GOTO 70 \r
+150 LET L=A X / B * \r
+160 PRINT "GCD" X0, "   LCM" L0, \r
+170 GOTO 30 :
+#ready
+RUN 10 
+#ready
+1071 462 
+#ready
+3654 1365 
+#ready
+#screen

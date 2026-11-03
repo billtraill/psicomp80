@@ -1,0 +1,4 @@
+#load ../examples/bounce.ch8 0E00
+^
+#wait 3
+#screen

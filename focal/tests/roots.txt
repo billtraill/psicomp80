@@ -1,0 +1,10 @@
+^
+#wait 0.5
+01.01 C SQUARE ROOTS AND CUBE ROOTS OF 1 TO 12\r
+01.10 TYPE "  N  SQUARE ROOT   CUBE ROOT",!\r
+01.20 FOR N=1,12; DO 2\r
+02.10 TYPE N,"  ",FSQT(N),"  ",N**(1/3),!\r
+01.30 QUIT\r
+GO\r
+#ready
+#screen

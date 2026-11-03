@@ -1,0 +1,23 @@
+^
+#wait 0.5
+PRINT 3 + 4 * 2\r
+PRINT (3 + 4) * 2\r
+PRINT -7 / 2\r
+#ready
+#screen
+TO FACT :N\r
+IF :N = 0 [OUTPUT 1]\r
+OUTPUT :N * FACT :N - 1\r
+END\r
+PRINT FACT 7\r
+MAKE "X 5\r
+MAKE "X :X * 3\r
+PRINT :X\r
+#ready
+#screen
+IF :X > 10 [PRINT "BIG] [PRINT "SMALL]\r
+IF :X < 10 [PRINT "BIG] [PRINT "SMALL]\r
+PRINT [HELLO WORLD]\r
+FOO\r
+#ready
+#screen

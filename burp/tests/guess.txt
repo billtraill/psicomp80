@@ -1,0 +1,37 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "GUESS MY NUMBER, FROM 1 TO 100" \r
+20 LET Z=10000000 \r
+30 PRINT "TYPE ANY NUMBER AND A SPACE TO START" \r
+40 INPUT R \r
+50 LET M=R 7 + SIN SQ 99.99 * 0.5 - Z + Z - 1 + \r
+60 LET T=0 \r
+70 PRINT "YOUR GUESS" \r
+80 INPUT G \r
+90 LET T=T 1 + \r
+100 IF G=M THEN 150 \r
+110 IF G<M THEN 130 \r
+120 PRINT G0, " -1  LOWER" \r
+125 GOTO 70 \r
+130 PRINT G0, "  1  HIGHER" \r
+140 GOTO 70 \r
+150 PRINT G0, "  0  RIGHT, IN" T0, " GUESSES" \r
+160 GOTO 30 :
+#ready
+RUN 10 
+#ready
+42 
+#ready
+50 
+#ready
+75 
+#ready
+88 
+#ready
+94 
+#ready
+91 
+#ready
+#screen

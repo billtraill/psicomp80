@@ -1,0 +1,11 @@
+^
+#wait 0.5
+; A SQUARE SPIRAL THAT TWISTS: EACH SIDE 2 LONGER, TURNING :A\r
+TO SPIRAL :A\r
+CS SLOW 100\r
+MAKE "S 2\r
+REPEAT 42 [FD :S RT :A MAKE "S :S + 2]\r
+END\r
+SPIRAL 91\r
+#ready
+#screen

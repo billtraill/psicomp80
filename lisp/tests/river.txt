@@ -1,0 +1,32 @@
+^
+#wait 0.5
+(DEFUN EQUAL (A B)\r
+  (COND ((ATOM A) (EQ A B)) ((ATOM B) NIL)\r
+        ((EQUAL (CAR A) (CAR B)) (EQUAL (CDR A) (CDR B)))))\r
+(DEFUN MEMBER (X L)\r
+  (COND ((NULL L) NIL) ((EQUAL X (CAR L)) L) (T (MEMBER X (CDR L)))))\r
+(DEFUN REV (L A) (COND (L (REV (CDR L) (CONS (CAR L) A))) (T A)))\r
+(DEFUN SOLVE (S P)\r
+  (COND ((EQUAL S '(0 0 0)) (REV P NIL))\r
+        (T (OR (TRY 1 0) (TRY 2 0) (TRY 0 1) (TRY 0 2) (TRY 1 1)))))\r
+(DEFUN TRY (DM DC)\r
+  (COND ((EQ (CADDR S) 1)\r
+         (NEXT (- (CAR S) DM) (- (CADR S) DC) 0))\r
+        (T (NEXT (+ (CAR S) DM) (+ (CADR S) DC) 1))))\r
+(DEFUN NEXT (M C B)\r
+  (COND ((AND (OK M C) (NULL (MEMBER (LIST M C B) P)))\r
+         (SOLVE (LIST M C B) (CONS (LIST M C B) P)))))\r
+(DEFUN OK (M C)\r
+  (AND (< M 4) (< C 4) (< -1 M) (< -1 C)\r
+       (OR (EQ M 0) (< (- C 1) M)) (OR (EQ M 3) (< (- M 1) C))))\r
+(DEFUN REP (N K) (COND ((< 0 N) (TYO K) (REP (- N 1) K))))\r
+(DEFUN BANK (M C) (REP M 77) (REP C 67) (REP (- 6 (+ M C)) 32))\r
+(DEFUN SHOW (S)\r
+  (BANK (CAR S) (CADR S))\r
+  (COND ((EQ (CADDR S) 1) (PRIN1 'B=====)) (T (PRIN1 '=====B)))\r
+  (BANK (- 3 (CAR S)) (- 3 (CADR S))) (TERPRI))\r
+(DEFUN SHOWALL (L) (COND (L (SHOW (CAR L)) (SHOWALL (CDR L)))))\r
+(DEFUN CROSS () (SHOWALL (SOLVE '(3 3 1) '((3 3 1)))) 'ACROSS)\r
+(CROSS)\r
+#ready
+#screen

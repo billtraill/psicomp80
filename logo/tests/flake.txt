@@ -1,0 +1,17 @@
+^
+#wait 0.5
+; A KOCH SNOWFLAKE: EACH SIDE BECOMES FOUR WITH A POINT\r
+TO SIDE :S :N\r
+IF :N = 0 [FD :S STOP]\r
+SIDE :S / 3 :N - 1 LT 60\r
+SIDE :S / 3 :N - 1 RT 120\r
+SIDE :S / 3 :N - 1 LT 60\r
+SIDE :S / 3 :N - 1\r
+END\r
+TO FLAKE :N\r
+CS PU SETXY -27 -15 SETH 30 PD\r
+REPEAT 3 [SIDE 54 :N RT 120]\r
+END\r
+FLAKE 3\r
+#ready
+#screen

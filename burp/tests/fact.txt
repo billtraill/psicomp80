@@ -1,0 +1,28 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "FACTORIALS" \r
+20 LET F=1 \r
+30 FOR N=1 STEP 1 UNTIL 14 \r
+40 LET F=F N * \r
+50 IF F>99999999 THEN 56 \r
+52 PRINT N0 F0 \r
+54 GOTO 60 \r
+56 PRINT N0 F7 \r
+60 NEXT N \r
+70 PRINT "E AS 1 + 1/1 + 1/2 + 1/6 + ..., ERROR IN 100 MILLIONTHS" \r
+80 LET S=1 \r
+90 LET T=1 \r
+100 LET E=1 EX \r
+110 FOR N=1 STEP 1 UNTIL 13 \r
+120 LET T=T N / \r
+130 LET S=S T + \r
+140 LET R=S E - 100000000 * \r
+150 PRINT N0 S7 R0 \r
+160 NEXT N \r
+170 END :
+#ready
+RUN 10 
+#ready
+#screen

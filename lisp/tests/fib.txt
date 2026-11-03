@@ -1,0 +1,22 @@
+^
+#wait 0.5
+(DEFUN FIB (N)\r
+  (SETQ C (+ C 1))\r
+  (COND ((< N 2) N) (T (+ (FIB (- N 1)) (FIB (- N 2))))))\r
+(DEFUN FAST (N) (F2 N 0 1))\r
+(DEFUN F2 (N A B)\r
+  (SETQ C (+ C 1))\r
+  (COND ((EQ N 0) A) (T (F2 (- N 1) B (+ A B)))))\r
+(DEFUN ACK (M N)\r
+  (SETQ C (+ C 1))\r
+  (COND ((EQ M 0) (+ N 1))\r
+        ((EQ N 0) (ACK (- M 1) 1))\r
+        (T (ACK (- M 1) (ACK M (- N 1))))))\r
+(DEFUN CALLS (F A B) (SETQ C 0) (LIST (F A B) 'IN C 'CALLS))\r
+(CALLS FIB 15)\r
+(CALLS FAST 21)\r
+(FAST 22)\r
+(CALLS ACK 3 2)\r
+(ACK 3 3)\r
+#ready
+#screen

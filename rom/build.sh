@@ -4,7 +4,9 @@
 #   rom/psicomp80.asm    -> must assemble to ../psicomp80.rom (monitor + BURP)
 #   ../forth/forth.asm   -> must give 0400-0BFF of ../psicomp80_forth.rom
 #   ../lisp/lisp.asm     -> must give 0400-0BFF of ../psicomp80_lisp.rom
-# The FORTH and LISP ROMs share the monitor (0000-03FF) with psicomp80.rom.
+#   ../<lang>/<lang>.asm -> the same for basic, logo, chip8, focal, pilot, zasm
+#                           and prolog
+# Every language ROM shares the monitor (0000-03FF) with psicomp80.rom.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(dirname "$HERE")
@@ -15,7 +17,7 @@ mkdir -p "$OUT"
 cmp "$OUT/psicomp80.bin" "$REPO/psicomp80.rom"
 echo "psicomp80.asm: assembles to psicomp80.rom"
 
-for lang in forth lisp; do
+for lang in forth lisp basic logo chip8 focal pilot zasm prolog; do
   (cd "$REPO/$lang" && z80asm -o "$OUT/$lang.bin" -l"$OUT/$lang.lst" -L"$OUT/$lang.lbl" "$lang.asm")
   python3 - "$OUT/$lang.bin" "$REPO/psicomp80_$lang.rom" "$REPO/psicomp80.rom" <<'PY'
 import sys

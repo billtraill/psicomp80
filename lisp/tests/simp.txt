@@ -1,0 +1,37 @@
+^
+#wait 0.5
+(DEFUN D (E X)\r
+  (COND ((ATOM E) (COND ((EQ E X) 1) (T 0)))\r
+        ((EQ (CAR E) '*)\r
+         (LIST '+ (LIST '* (CADR E) (D (CADDR E) X))\r
+                  (LIST '* (D (CADR E) X) (CADDR E))))\r
+        (T (LIST (CAR E) (D (CADR E) X) (D (CADDR E) X)))))\r
+(DEFUN SIMP (E)\r
+  (COND ((ATOM E) E)\r
+        (T (S (CAR E) (SIMP (CADR E)) (SIMP (CADDR E))))))\r
+(DEFUN S (OP A B)\r
+  (COND ((AND (NUMBERP A) (NUMBERP B))\r
+         (COND ((EQ OP '+) (+ A B)) ((EQ OP '-) (- A B))\r
+               (T (* A B))))\r
+        ((EQ OP '+)\r
+         (COND ((EQ A 0) B) ((EQ B 0) A)\r
+               ((EQUAL A B) (S '* 2 A)) (T (LIST OP A B))))\r
+        ((EQ OP '-)\r
+         (COND ((EQ B 0) A) ((EQUAL A B) 0) (T (LIST OP A B))))\r
+        ((OR (EQ A 0) (EQ B 0)) 0)\r
+        ((EQ A 1) B)\r
+        ((EQ B 1) A)\r
+        ((NUMBERP B) (S OP B A))\r
+        (T (LIST OP A B))))\r
+(DEFUN EQUAL (A B)\r
+  (COND ((ATOM A) (EQ A B))\r
+        ((ATOM B) NIL)\r
+        ((EQUAL (CAR A) (CAR B)) (EQUAL (CDR A) (CDR B)))))\r
+(D '(* X X) 'X)\r
+(SIMP (D '(* X X) 'X))\r
+(D '(+ (* 3 X) 5) 'X)\r
+(SIMP (D '(+ (* 3 X) 5) 'X))\r
+(SIMP '(+ (* 2 3) (* 1 (+ Y 0))))\r
+(SIMP (D '(* X (* X X)) 'X))\r
+#ready
+#screen

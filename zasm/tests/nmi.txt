@@ -1,0 +1,5 @@
+^
+#wait 0.5
+DIS 0066
+#wait 1
+#screen

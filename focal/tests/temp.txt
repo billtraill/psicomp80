@@ -1,0 +1,8 @@
+^
+#wait 0.5
+01.01 C CELSIUS TO FAHRENHEIT, -20 TO 100 IN 10S\r
+01.10 TYPE "CELSIUS  FAHRENHEIT",!\r
+01.20 FOR C=-20,10,100; TYPE C,"       ",C*9/5+32,!\r
+GO\r
+#ready
+#screen

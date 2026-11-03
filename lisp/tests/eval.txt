@@ -1,0 +1,37 @@
+^
+#wait 0.5
+(DEFUN EV (E A)\r
+  (COND ((ATOM E) (VAL E A))\r
+        ((EQ (CAR E) 'QUOTE) (CADR E))\r
+        ((EQ (CAR E) 'COND) (EVC (CDR E) A))\r
+        ((EQ (CAR E) 'LAMBDA) E)\r
+        (T (AP (CAR E) (EVL (CDR E) A) A))))\r
+(DEFUN VAL (E A)\r
+  (COND ((OR (NUMBERP E) (EQ E T) (NULL E)) E)\r
+        (T (CADR (LOOK E A)))))\r
+(DEFUN LOOK (E A)\r
+  (COND ((NULL A) NIL) ((EQ E (CAR (CAR A))) (CAR A))\r
+        (T (LOOK E (CDR A)))))\r
+(DEFUN EVC (C A)\r
+  (COND ((EV (CAR (CAR C)) A) (EV (CADR (CAR C)) A))\r
+        (T (EVC (CDR C) A))))\r
+(DEFUN EVL (L A) (COND (L (CONS (EV (CAR L) A) (EVL (CDR L) A)))))\r
+(DEFUN AP (F X A)\r
+  (COND ((EQ F 'CAR) (CAR (CAR X)))\r
+        ((EQ F 'CDR) (CDR (CAR X)))\r
+        ((EQ F 'CONS) (CONS (CAR X) (CADR X)))\r
+        ((EQ F 'EQ) (EQ (CAR X) (CADR X)))\r
+        ((EQ F 'ATOM) (ATOM (CAR X)))\r
+        ((ATOM F) (AP (VAL F A) X A))\r
+        (T (EV (CADDR F) (PAIR (CADR F) X A)))))\r
+(DEFUN PAIR (V X A)\r
+  (COND (V (CONS (LIST (CAR V) (CAR X)) (PAIR (CDR V) (CDR X) A)))\r
+        (T A)))\r
+(SETQ ENV '((APP (LAMBDA (X Y)\r
+  (COND ((EQ X NIL) Y) (T (CONS (CAR X) (APP (CDR X) Y))))))))\r
+(EV '(CONS (QUOTE A) (QUOTE (B C))) NIL)\r
+(EV '((LAMBDA (X Y) (CONS Y (CONS X NIL))) (QUOTE A) (QUOTE B)) NIL)\r
+(EV '(COND ((ATOM X) (QUOTE YES)) (T (QUOTE NO))) '((X (A))))\r
+(EV '(APP (QUOTE (A B)) (QUOTE (C D E))) ENV)\r
+#ready
+#screen

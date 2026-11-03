@@ -1,0 +1,4 @@
+#load opcodes.ch8 0E00
+^
+#wait 2
+#screen

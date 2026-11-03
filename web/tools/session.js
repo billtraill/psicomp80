@@ -2,7 +2,8 @@
 // MAME.  node web/tools/session.js <rom> <steps file> [32k]
 // The steps file is in the format of lisp/tests/*.txt: each line is typed
 // (\r = Return, \b = Backspace, ^ = RS), "#wait <s>" waits, "#screen" prints
-// the screen, "#ready" waits for the cursor (or, in BURP, which has none,
+// the screen, "#load <file> <addr>" (or "#bin") copies a file into memory,
+// "#ready" waits for the cursor (or, in BURP, which has none,
 // until it is waiting for a key).  A line ending in \r is typed once FORTH
 // or LISP is waiting for a line (its cursor is showing); the time it waited
 // is printed if over a second.  NOWAIT=1 turns that off, as
@@ -17,7 +18,8 @@ const D = require("../build/data.js");
 const [rom, file, mem] = process.argv.slice(2);
 const m = new COMP80(D.fonts);
 m.powerOn(Buffer.from(D.roms[rom], "base64"), rom, mem === "32k");
-const CURS = { forth: 0x1da0, lisp: 0x0c12 }[rom];
+const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
+  pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e }[rom];
 const waitingLine = () => CURS === undefined ? m.waitingForKey() : m.mem[m.mem[CURS] | (m.mem[CURS + 1] << 8)] === 0x1f && m.waitingForKey();
 
 const sec = () => m.cycles / CLOCK;
@@ -44,6 +46,8 @@ for (const line of fs.readFileSync(file, "utf8").split("\n")) {
   const w = line.match(/^#wait\s+([\d.]+)/);
   if (w) { step(parseFloat(w[1])); continue; }
   if (line === "#screen") { screen(); continue; }
+  const ld = line.match(/^#(?:load|bin)\s+(\S+)\s+([0-9A-Fa-f]+)/);
+  if (ld) { m.mem.set(fs.readFileSync(path.resolve(path.dirname(file), ld[1])), parseInt(ld[2], 16)); continue; }
   if (line.startsWith("#snap") || line.startsWith("#dump")) continue;
   if ((line.endsWith("\\r") && !process.env.NOWAIT) || line === "#ready") {
     const t0 = sec();

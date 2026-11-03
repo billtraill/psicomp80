@@ -5,6 +5,13 @@
     <div class="exgroup"><h3>BURP</h3><div class="exlist" id="ex-burp"></div></div>
     <div class="exgroup"><h3>FORTH</h3><div class="exlist" id="ex-forth"></div></div>
     <div class="exgroup"><h3>LISP</h3><div class="exlist" id="ex-lisp"></div></div>
+    <div class="exgroup"><h3>BASIC</h3><div class="exlist" id="ex-basic"></div></div>
+    <div class="exgroup"><h3>Logo</h3><div class="exlist" id="ex-logo"></div></div>
+    <div class="exgroup"><h3>CHIP-8</h3><div class="exlist" id="ex-chip8"></div></div>
+    <div class="exgroup"><h3>FOCAL</h3><div class="exlist" id="ex-focal"></div></div>
+    <div class="exgroup"><h3>PILOT</h3><div class="exlist" id="ex-pilot"></div></div>
+    <div class="exgroup"><h3>ZASM</h3><div class="exlist" id="ex-zasm"></div></div>
+    <div class="exgroup"><h3>Prolog</h3><div class="exlist" id="ex-prolog"></div></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-using" aria-labelledby="tab-using" hidden>
@@ -14,8 +21,8 @@
       <thead><tr><th>Key</th><th>On the COMP80</th></tr></thead>
       <tbody>
         <tr><td><kbd>Return</kbd></td><td>End a line. The monitor itself doesn’t need it: a command runs once its last hex digit is typed.</td></tr>
-        <tr><td><kbd>^</kbd></td><td>RS. At READY it enters the language in the ROM (BURP, FORTH or LISP). In FORTH and LISP it rubs out the last character.</td></tr>
-        <tr><td><kbd>Backspace</kbd></td><td>Rubout in FORTH and LISP (the emulator sends RS for you).</td></tr>
+        <tr><td><kbd>^</kbd></td><td>RS. At READY it enters the language in the ROM. In the languages that read a line it rubs out the last character; in CHIP-8 it starts the program again.</td></tr>
+        <tr><td><kbd>Backspace</kbd></td><td>Rubout in the languages that read a line (the emulator sends RS for you).</td></tr>
         <tr><td><kbd>Ctrl</kbd> <kbd>\</kbd></td><td>FS: back to the monitor’s command state.</td></tr>
         <tr><td><kbd>Esc</kbd></td><td>The RESET key: restarts the monitor. Memory is kept, so RS gets back into FORTH or LISP with your words and functions still there.</td></tr>
       </tbody>
@@ -25,7 +32,7 @@
     <h3>Controls</h3>
     <ul>
       <li><strong>ROM</strong> switches the language in the top 2 KB of the ROM. Switching powers the computer off and on, so memory is cleared.</li>
-      <li><strong>Memory</strong> adds the 32 KB expansion at 8800–FFFF. LISP uses it for 7680 cells instead of 672; the others don’t need it.</li>
+      <li><strong>Memory</strong> adds the 32 KB expansion at 8800–FFFF. LISP uses it for 7680 cells instead of 672, and Prolog for a 30 KB heap; the others don’t need it.</li>
       <li><strong>Fast</strong> runs as fast as your browser can instead of at the real 4 MHz. Examples are typed in fast anyway.</li>
       <li><strong>Type in a program</strong> types pasted text a line at a time, waiting for the computer to be ready for each line. In BURP it types the lines in with LOAD.</li>
     </ul>
@@ -54,10 +61,14 @@
     </table></div>
     <h3>Memory</h3>
     <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
-    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all three languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
+    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all ten languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
     <h3>The examples</h3>
     <ul>
       <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>
+      <li><strong>Plasma</strong> fills the screen with flowing bands of shading. Each character is the sum of four sine waves, two across, one down and one diagonal, looked up in a 256-byte table and turned into one of six shades made of quarter blocks. The two waves across are worked out once a frame, so each character takes 89 T-states and it runs at about 20 frames a second.</li>
+      <li><strong>Memory dump</strong> shows 30 lines of 16 bytes, in hex and as characters. N and B page through memory, D and U move a line, G and four hex digits go to an address, and Q goes back to the monitor. Like the Game of Life, it keeps its stack pointer in ROM so it can take a key at any moment, but it uses a word in the monitor itself, so it works with any of the ROMs.</li>
+      <li><strong>Fire</strong> gives each character a heat. Two hidden rows below the screen get random heat every frame, and each cell becomes the average of the three below it and the one two below, less a little for cooling, looked up in one 256-byte table, so the flames flicker up and die away. It uses the plasma’s six shades and runs at about 11 frames a second.</li>
+      <li><strong>Scrolling banner</strong> moves a message in big letters across the middle of the screen. Each dot of the 5 × 7 letters is two characters wide and one tall, so it is nearly square, and it scrolls half a character at a time, as a character can show the right half of one dot and the left half of the next. The message is text at 1400 ending with 00: <code>LOAD 1400 [HELLO THERE   ]00@</code> changes it.</li>
       <li><strong>The pictures</strong> recreate Fig. 22 of the August 1979 article from photos of the screen: a 16-byte loader copies a 2 KB picture to the screen and waits for a key.</li>
       <li><strong>ALPH</strong> and <strong>LIST</strong> show two of the monitor’s own commands.</li>
     </ul>
@@ -107,6 +118,16 @@
       <li><strong>e to the x</strong> follows the articles: it changes line 6, adds a heading line and runs from line 4.</li>
       <li><strong>Sines and cosines</strong> types in a new program with LOAD: a FOR loop with STEP 0.5 calling a subroutine, then a negative number and a division.</li>
       <li><strong>Sierpiński triangle</strong> prints Pascal’s triangle mod 2, which is the Sierpiński triangle, as 1s and 0s. Every PRINT is a line of its own, so each row is a single number whose digits are the cells. Row <var>r</var> is the product of 11, 101 and 10001 for the bits 1, 2 and 4 set in <var>r</var>, since (1 + <var>x</var>)<sup><var>r</var></sup> mod 2 is the product of 1 + <var>x</var><sup>2<sup><var>b</var></sup></sup> over those bits, here with <var>x</var> = 10. The bottom eight rows are the top eight twice; they print as two numbers, as the chip holds only 8 digits.</li>
+      <li><strong>Collatz sequence</strong>: halve an even number, treble an odd one and add 1. Nobody has proved it always reaches 1. INPUT waits for a number and a space; the sequence is printed eight to a line by shifting each value through A to H, since a PRINT is always a whole line. BURP has no INT, so to test for an even number it halves it, adds 10000000 and takes it away again: the chip rounds to 8 digits, which drops the fraction. 27 takes 111 steps and about three minutes.</li>
+      <li><strong>Primes by trial division</strong> tries each odd number against the odd divisors up to its square root, with the same rounding trick, and prints the 25 primes below 100 in about two minutes. Line 30 sets the limit; BURP manages about ten statements a second.</li>
+      <li><strong>Approximating π</strong> adds up the Leibniz series 4 − 4/3 + 4/5 − …, which is still 8333 millionths out after 120 terms, then the Nilakantha series 3 + 4/(2·3·4) − 4/(4·5·6) + …, which is within 113 millionths after 12. The error is against the chip’s own PI key.</li>
+      <li><strong>Guess the number</strong>: BURP answers each guess with 1 (go higher), −1 (go lower) or 0 when you are right, with the number of guesses. The ROM has no random numbers, so you type any number first and the sine of it picks BURP’s number.</li>
+      <li><strong>Loan repayments</strong> asks for the loan, the yearly rate in per cent and the years, works out the monthly payment and prints a year-by-year table of interest, capital repaid and balance owing, and the total paid. The 0.02 left at the end of 50000 at 8% over 20 years is the 8-digit chip.</li>
+      <li><strong>Square roots by Newton’s method</strong>: start with the number itself as the guess, and keep replacing the guess with the average of it and the number divided by it; each step about doubles the correct digits. It stops when a guess repeats and then prints what the chip’s own <code>ROOT</code> gives, which can differ in the last digit: 1.4142135 against 1.4142136 for 2.</li>
+      <li><strong>GCD and LCM</strong> follows Euclid: divide the larger number by the smaller, keep the remainder, and repeat with the smaller number and the remainder until it is 0; the last divisor is the greatest common divisor. Each division prints as a line, such as 1071 = 2 * 462 + 147. The quotient is rounded by adding and taking away 10000000, and taken back by one if the remainder comes out negative. The least common multiple is A / GCD * B.</li>
+      <li><strong>Perfect numbers</strong>: a number is perfect when its divisors add up to itself, as 1 + 2 + 3 = 6. Adding up divisors would take BURP an hour just to reach 496, so this uses Euclid’s rule: when 2<sup><var>p</var></sup> − 1 is prime, 2<sup><var>p</var>−1</sup>(2<sup><var>p</var></sup> − 1) is perfect. For <var>p</var> from 2 to 13 it tries odd divisors up to the square root, printing a factor or the perfect number: 6, 28, 496, 8128 and 33550336, which just fits in 8 digits. About 80 s.</li>
+      <li><strong>Day of the week</strong> uses Zeller’s congruence: with January and February counted as months 13 and 14 of the year before, the day is (<var>d</var> + ⌊13(<var>m</var> + 1)/5⌋ + <var>K</var> + ⌊<var>K</var>/4⌋ + ⌊<var>J</var>/4⌋ + 5<var>J</var>) mod 7, where <var>J</var> is the century and <var>K</var> the year within it, 0 meaning Saturday. A subroutine at line 200 rounds down by rounding with 10000000 and taking off 1 if that went up, and a chain of IFs prints the name. 20 7 1969, the Moon landing, was a Sunday.</li>
+      <li><strong>Factorials and e</strong>: 1! to 14!; from 12!, 479001600, there are more than 8 digits and BURP switches to scientific notation, 4.7900160 08. Then e as 1 + 1/1! + 1/2! + 1/3! + …, with its error against the chip’s 1 EX in hundred-millionths: after 10 terms the next term is too small to change the 8 digits, and the sum stops at 2.7182819, 1 out in the last place.</li>
     </ul>
     <div class="exlist" id="exl-burp"></div>
   </div>
@@ -144,6 +165,20 @@
       <li><strong>Sierpiński triangle in FORTH</strong> draws Pascal’s triangle mod 2: entry <var>x</var> of row <var>y</var> is odd when the bits of <var>x</var> are all set in <var>y</var>, which is one <code>AND</code>. It has 64 rows, each entry two cells wide, four cells to a graphics character, and fills the whole screen, title line too; a key clears it and puts the title back. <code>SIER</code> takes about 10 s.</li>
       <li><strong>Hilbert curve in FORTH</strong> is drawn by a turtle that knows its position and direction and can turn and step. A Hilbert curve of level <var>n</var> is four of level <var>n</var> − 1: turn, draw one mirrored, step, turn back, draw one, step, draw one, turn back, step, draw one mirrored, turn. HIL does exactly that, calling itself four times, with the sign of its angle doing the mirroring. Level 5 is 32 × 32 points, 4 cells apart across and 2 down so the curve comes out square, over the whole screen. <code>HILBERT</code> takes about 10 s; a key clears it.</li>
       <li><strong>Towers of Hanoi in FORTH</strong> moves the discs the same way as the LISP version: N − 1 discs out of the way onto the spare peg, disc N across, then the N − 1 back on top of it. HAN takes the two pegs as one number, from × 3 + to, so it only has two things on the stack to juggle; the spare peg is 3 − from − to. Each move is animated by writing the disc straight to screen memory a step at a time and putting back the peg behind it. <code>6 HANOI</code> makes 63 moves in about 75 s; up to <code>10 HANOI</code> fits on the screen. <code>SPEED</code> sets the pause between steps (300 to start with): <code>100 SPEED !</code> is faster.</li>
+      <li><strong>Dragon curve in FORTH</strong> is a strip of paper folded in half 9 times and opened out. The same turtle as the Hilbert curve makes 512 steps; after step <var>i</var> it turns left when the bit above the lowest set bit of <var>i</var> is 0, and right when it is 1. <code>DRAGON</code> takes about 4 s.</li>
+      <li><strong>Koch snowflake in FORTH</strong> replaces each side of a triangle with four sides a third as long, with a point in the middle, three times over. The turtle has six directions: 2 cells up or down, or 3 across and 1 up or down, which allowing for the shape of the cells are almost the same length and 60° apart. <code>KOCH</code> takes under 2 s.</li>
+      <li><strong>Langton’s ant in FORTH</strong> walks on 128 × 60 quarter-character cells: on a clear cell it turns right, on a set one left, then flips the cell and steps forward. For about 10000 steps it makes a muddle, then it builds a diagonal highway and walks off the screen, at step 12024. <code>ANT</code> takes about 55 s.</li>
+      <li><strong>Sieve of Eratosthenes in FORTH</strong> makes each of the numbers 0 to 7679 one quarter character, 128 to a row, all set to start with. The multiples of each prime up to 87 are cleared from its square on, and what is left are the primes: it counts 973. With 128 to a row the even numbers are whole columns, so the primes are in the odd ones. <code>SIEVE</code> takes about 60 s.</li>
+      <li><strong>Bouncing balls in FORTH</strong>: six balls, 2 × 2 quarter blocks each, fall under gravity and bounce off the walls and floor. Each is drawn by flipping its pixels, so drawing it again rubs it out and balls that overlap pass through each other. Positions are kept in 256ths of a pixel, so a pixel is just the high byte, and lookup tables take the place of <code>*</code> and <code>/</code>, which are slow. About 23 frames a second.</li>
+      <li><strong>Starfield in FORTH</strong>: sixteen stars fly out from the middle, each gaining speed every frame using only additions; the nearer ones are two pixels wide. About 10 frames a second.</li>
+      <li><strong>Snake in FORTH</strong>: W A S D steer, Q stops. Each dot scores a point and adds three pieces of snake, and every fourth one speeds it up. A key while a program is busy resets the COMP80, and FORTH’s KEY waits, so the file starts by putting a little machine code into the dictionary: TICK has the calculator chip put out a number and halts for each of its twelve digit interrupts, about 7.5 ms, and returns the last key pressed or 0. A key that arrives during one of those HALTs is taken without a reset. The web page holds each key until the computer halts; on a real COMP80, or in MAME, a key pressed while the snake is being drawn may still reset it.</li>
+      <li><strong>Maze in FORTH</strong> carves a maze of 42 × 29 rooms out of a solid screen by backtracking: from the room it is in it knocks through into a random room next door that is still solid, and when there is none it steps back the way it came. The way back is kept as one byte a step in a table of its own, not on the return stack, which is too small for 1218 rooms. A room is two quarter characters across and one down, with walls one thick, so a step of 3 across and 2 down comes out about square. A key then finds the way from the door on the left to the door on the right by filling in every dead end, and the rooms behind it as they become dead ends in turn, until only the way through is open. <code>MAZE</code> carves in about 34 s and fills in about 20 s; running it again makes a new maze.</li>
+      <li><strong>Cellular automata in FORTH</strong>: a row of 128 cells, one quarter character each, starts with one live cell, and each generation is drawn on the next row down. A cell’s next state is bit <var>L</var>·4 + <var>C</var>·2 + <var>R</var> of the rule number, where <var>L</var>, <var>C</var> and <var>R</var> are it and its neighbours; the three slide along as one number from 0 to 7, doubled and masked at each cell, so no multiplying is needed. <code>30 RULE</code> is chaotic, <code>90 RULE</code> makes the Sierpiński triangle again and <code>110 RULE</code> grows to the left. 60 generations take about 6 s.</li>
+      <li><strong>Barnsley fern in FORTH</strong> starts a point at 0, 0 and moves it again and again by one of four maps that shrink and turn it, picked at random 1, 85, 7 and 7 times in 100; the points fill in a fern. It works in whole numbers with 36 as 1.0 and the maps’ factors in hundredths, which keeps every product below 32767, and a random byte is the top byte of a 16-bit LCG. <code>FERN</code> plots 5000 points in about 29 s.</li>
+      <li><strong>Chaos game in FORTH</strong>, in the same file: a point moves half way towards one of the three corners of a triangle, picked at random, and a Sierpiński triangle appears out of the noise. Halving is a table lookup. <code>CHAOS</code> plots 6000 points in about 13 s.</li>
+      <li><strong>Lissajous and spirograph curves in FORTH</strong> are traced from a sine table: a quarter of a sine wave is typed in as 65 numbers, and at load time it makes byte tables of <var>c</var> + <var>a</var> sin, so drawing only adds and looks up. <code>3 2 LISS</code> traces x = sin 3<var>t</var> against y = sin 2<var>t</var>, 1024 points in about 2.5 s; <code>PHASE</code> shifts one against the other. <code>5 SPIRO</code> is a wheel turning on a wheel, the small one 5 times as fast: x and y are each the sum of two waves. A key clears it.</li>
+      <li><strong>Big digital clock in FORTH</strong>: <code>12 34 00 CLOCK</code> sets the time and runs it. The COMP80 has no timer, so the clock counts TICKs, the same machine code as the snake game, which waits about 7.5 ms on the calculator chip: a second is drawing the time, then 115 TICKs, and one more TICK when the fraction in <code>FR</code> adds up. Timed over an hour in the emulator, it keeps time to about a second an hour; on a real COMP80 the chip’s own clock sets the speed, and <code>W</code> and <code>FR</code> can be changed. The digits are a 3 × 5 font with each dot 4 × 3 quarter blocks, worked out once when the file is typed in, so each second only copies them to the screen. TICK takes keys during its HALTs, so a key stops the clock cleanly.</li>
+      <li><strong>Sorting in FORTH</strong>: <code>SORTS</code> draws 64 random bars and sorts them with a bubble sort, which compares neighbours and swaps them, each pass carrying the tallest bar left to the end: 2016 comparisons and 864 swaps, about 23 s. Then the same bars are sorted by quicksort, which puts the bars shorter than the last one to its left, the last one next to them, and sorts each side the same way: 459 comparisons and 167 swaps, about 5 s. A swap redraws only the part of each bar that changes. A key at the end clears it.</li>
     </ul>
     <div class="exlist" id="exl-forth"></div>
   </div>
@@ -175,8 +210,170 @@
       <li><strong>Symbolic differentiation</strong> is the program LISP was made for: an expression is a list, so DERIV can take it apart and build its derivative. <code>(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)</code> gives <code>(+ (* 6 X) 2)</code>.</li>
       <li><strong>Towers of Hanoi</strong>: move all but the bottom disc out of the way, move the bottom disc, move the rest back on top. <code>(HANOI 4 'A 'C 'B)</code> prints 15 moves.</li>
       <li><strong>Eight queens</strong> puts a queen in the first safe row of each column and backs up when a column has none. N is never passed to the inner functions: dynamic scope finds the N that QUEENS was called with.</li>
-      <li><strong>Sierpiński triangle in LISP</strong> prints the same triangle, 16 rows of it, with <code>TYO</code>. With no AND, ODD looks at one bit at a time using <code>REM</code> and <code>/</code>. There are no loops either, so FROM calls a function on each number in a range by splitting the range in half: the recursion goes 5 deep for 16 numbers instead of 16. <code>(SIER)</code> takes about 6 s.</li>
+      <li><strong>Sierpiński triangle in LISP</strong> prints the same triangle, 16 rows of it, with <code>TYO</code>. With no bitwise AND, ODD looks at one bit at a time using <code>REM</code> and <code>/</code>. There are no loops either, so FROM calls a function on each number in a range by splitting the range in half: the recursion goes 5 deep for 16 numbers instead of 16. <code>(SIER)</code> takes about 6 s.</li>
       <li><strong>Hilbert curve in LISP</strong> can’t move a turtle about the screen, as LISP prints a line at a time. Instead D works out how far along the curve a point is: it looks at which quarter of the square the point is in, adds the points of the quarters before it, turns the point round to that quarter’s way up, and carries on with the quarter. Neighbouring points are joined when their distances differ by 1. ROW keeps the distances of the row below in BELOW with <code>SETQ</code>, so each point’s distance is worked out once. <code>(HILBERT)</code> takes about 30 s.</li>
+      <li><strong>Eliza</strong> is a few rules of the 1966 program that played a psychotherapist. There is no READ, so you give TALK the sentence as a quoted list: <code>(TALK '(I FEEL SAD ABOUT MY JOB))</code> answers <code>(WHY DO YOU FEEL SAD ABOUT YOUR JOB)</code>. TALK finds the first keyword of RULES in the sentence and fills in its template with the rest of the sentence, I and YOU, MY and YOUR swapped. Every new word takes a place in the symbol table, so there is room for about 30 more.</li>
+      <li><strong>Simplifying algebra</strong> shows what DERIV has to tidy up. D here differentiates without tidying, so <code>(D '(* X X) 'X)</code> gives <code>(+ (* X 1) (* 1 X))</code>; SIMP works from the inside out, adding up numbers, dropping 0s and 1s and turning <code>(+ A A)</code> into <code>(* 2 A)</code>, and gives <code>(* 2 X)</code>.</li>
+      <li><strong>Permutations and the power set</strong>: PERMS puts each element in front of every order of the rest, and POWER is the subsets with the first element followed by those without it.</li>
+      <li><strong>Fibonacci and Ackermann</strong> shows how much work recursion can do. CALLS counts the calls a function makes: the doubly recursive FIB takes 1973 calls for <code>(FIB 15)</code>, where FAST takes 22. Then the limits: <code>(FAST 22)</code> overflows the 15-bit numbers, and <code>(ACK 3 3)</code> is too deep for the stack without the 32 KB expansion, with which it gives 61 in 2432 calls.</li>
+      <li><strong>The animal game</strong> learns as it plays. TREE is a question with a yes tree and a no tree, or an animal. There is no READ, so you answer by calling functions: <code>(PLAY)</code> asks the first question, then <code>(YES)</code> or <code>(NO)</code>. When it guesses wrong, <code>(ITS 'DOG '(DOES IT BARK))</code> tells it the animal and a question that is yes for it. With no RPLACA, GROW builds a new tree along the path of answers, with the leaf it guessed replaced by the new question.</li>
+      <li><strong>Unification</strong> finds values for the variables, written <code>(? X)</code>, that make two expressions the same: <code>(UNIFY '(F (? X) B) '(F A (? Y)) '(T))</code> gives <code>(T ((? Y) B) ((? X) A))</code>, and NIL when there are none. The bindings start with T so that no bindings can be told from failure. QUERY uses it the way Prolog does: for each goal it tries every clause in DB, with its variables renamed for the depth so they don’t clash, and goes on with the clause’s own goals. When none are left it prints the answer, then carries on looking for more. <code>(QUERY '((GRAND TOM (? W))))</code> finds ANN and PAT in about 12 s.</li>
+      <li><strong>LISP in LISP</strong> is the evaluator from the LISP 1.5 manual, cut down: EV takes an expression and a list of variables and their values, handles QUOTE, COND and LAMBDA itself, and passes anything else to AP with its arguments evaluated. AP knows CAR, CDR, CONS, EQ and ATOM, looks up any other name, and calls a LAMBDA by adding its parameters to the front of the list. As in the LISP underneath, scope is dynamic, so APP, given in ENV, can call itself: <code>(EV '(APP (QUOTE (A B)) (QUOTE (C D E))) ENV)</code> gives <code>(A B C D E)</code>.</li>
+      <li><strong>Missionaries and cannibals</strong>: three of each must cross a river in a boat that holds two, and the cannibals must never outnumber the missionaries on either bank. A state is (M C B), the missionaries and cannibals on the left bank and 1 if the boat is there. SOLVE searches depth first, never going back to a state it has been through. The five loads the boat can take are tried with one OR rather than a loop over a list, so each step of the search is only two calls deep and the 11 crossings fit in the stack. <code>(CROSS)</code> takes about 5 s and draws each state with TYO.</li>
+      <li><strong>Roman numerals and number words</strong>: ROMAN takes the biggest value in its table that still fits, 1000 M, 900 CM and so on down to 1 I, and goes on with what is left. NUMERAL goes the other way, taking away a letter that comes before a bigger one. WORDS says a number the British way, with AND before the tens: <code>(WORDS 1987)</code> gives <code>(ONE THOUSAND NINE HUNDRED AND EIGHTY SEVEN)</code>, and <code>(WORDS 16383)</code>, the biggest number this LISP has, works too.</li>
     </ul>
     <div class="exlist" id="exl-lisp"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-basic" aria-labelledby="tab-basic" hidden>
+    <h2>BASIC</h2>
+    <p>COMP80 BASIC is a Tiny BASIC written for this machine, of the kind the small computers of 1976–79 had: integers only, numbered lines kept as typed, 26 variables and one array, in the 2 KB where BURP was. RS at READY enters it; a line with a number goes into the program, a line without one runs at once.</p>
+    <h3>Statements</h3>
+    <ul>
+      <li><strong>PRINT</strong> numbers and "strings": <code>;</code> puts nothing between them, <code>,</code> moves to the next 16 columns, and one at the end keeps the line. <code>AT X,Y</code> moves to column X of line Y (1–31).</li>
+      <li><strong>INPUT</strong> ["prompt";] V prints ? and reads a line; the answer can be any expression.</li>
+      <li>[<strong>LET</strong>] V = expression; <strong>IF</strong> condition [THEN] statement, or THEN a line number; <strong>GOTO</strong>, <strong>GOSUB</strong>, <strong>RETURN</strong>; <strong>FOR</strong> V = A TO B [STEP C] … <strong>NEXT</strong> V; <strong>REM</strong>; <strong>END</strong>. Statements on a line are separated by <code>:</code>.</li>
+      <li><strong>PLOT X,Y</strong> and <strong>UNPLOT X,Y</strong> set and clear points, X 0–127 and Y 0–61 from the top left, four to a character in the quarter-block graphics; <strong>CLS</strong> clears the screen below the title.</li>
+      <li><strong>RUN</strong> clears the variables and runs; <strong>LIST</strong> [line]; <strong>NEW</strong>. A line number on its own deletes that line.</li>
+    </ul>
+    <h3>Expressions</h3>
+    <p>Numbers run from −32768 to 32767. <code>+ − * /</code> (dividing rounds towards 0), brackets, and comparisons <code>= &lt; &gt; &lt;= &gt;= &lt;&gt;</code> that give 1 or 0. <code>RND(N)</code> is 1 to N, <code>ABS(N)</code>, <code>POINT(X,Y)</code> is 1 if the point is set, and <code>@(I)</code> is an array in the memory after the program. Errors stop it with SYNTAX?, LINE?, DIVIDE?, MEMORY?, RETURN? or NEXT? and the line number. Any key stops a running program (the machine resets); RS comes back with the program kept.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Guess the number</strong>: RND picks a number from 1 to 100 and INPUT takes your guesses until you get it. As INPUT takes an expression, typing N wins straight away.</li>
+      <li><strong>Primes</strong> marks the numbers below 500 in the array <code>@()</code> and clears the multiples of each prime from its square on, leaving 95. About 4 s.</li>
+      <li><strong>String art</strong> draws 32 straight lines with a Bresenham subroutine at line 1000, which steps along the longer direction and moves in the other when the error grows too big; their envelopes make two curves. About 30 s.</li>
+      <li><strong>Worm</strong> bounces a worm 24 points long round a box. Its positions go round a ring in <code>@()</code>, so each step it plots the new head and unplots the oldest point. It runs until a key.</li>
+    </ul>
+    <div class="exlist" id="exl-basic"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-logo" aria-labelledby="tab-logo" hidden>
+    <h2>Logo</h2>
+    <p>Logo puts a turtle on the screen: a point with a position and a heading that draws as it moves. COMP80 Logo fits in the 2 KB where BURP was. RS at READY enters it; the top line shows LOGO and a <code>?</code> prompt appears at the bottom. Lines 1–26 are the turtle's field, 128 × 52 quarter-block points with HOME in the middle; lines 27–31 are for typing and scroll by themselves. A step up or down is 0.6 of a point, as the points are taller than they are wide, so squares come out square. Numbers are 16-bit integers.</p>
+    <h3>Commands</h3>
+    <ul>
+      <li><code>FD n</code>, <code>BK n</code> move, drawing if the pen is down; <code>RT n</code>, <code>LT n</code> turn in degrees; <code>SETH n</code> sets the heading (0 is up); <code>SETXY x y</code> moves without drawing; <code>HOME</code>; <code>CS</code> clears the field and goes home.</li>
+      <li><code>PU</code>, <code>PD</code>, <code>PE</code>: pen up, down, or rubbing out. <code>SLOW n</code> pauses at every step (0 to 255) so you can watch; <code>WAIT n</code> waits n sixtieths of a second.</li>
+      <li><code>REPEAT n [ … ]</code>; <code>IF test [ … ]</code>, or <code>IF test [ … ] [ … ]</code> with an else.</li>
+      <li><code>TO NAME :A :B</code> … <code>END</code> defines a procedure, over as many lines as it takes (the prompt is <code>&gt;</code> until END). <code>STOP</code> leaves it; <code>OUTPUT x</code> leaves it with a value, so it can be used in sums.</li>
+      <li><code>MAKE "X 5</code> sets a variable, read as <code>:X</code>. <code>PRINT x</code>, <code>PRINT "WORD</code>, <code>PRINT [ ANY WORDS ]</code>. <code>RANDOM n</code> is 0 to n − 1. <code>ERALL</code> forgets everything.</li>
+      <li><code>+ - * /</code> with <code>*</code> and <code>/</code> first, <code>( )</code>, and <code>&lt; = &gt;</code> giving 1 or 0. A <code>-</code> after a space and before a digit is a negative number, so <code>SETXY 0 -40</code> is two numbers. <code>;</code> starts a comment.</li>
+    </ul>
+    <p>Scope is dynamic, as in other Logos: a procedure sees the inputs of those that called it. A key while a program runs goes back to the monitor; RS comes back to Logo with the procedures kept.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Flower of squares</strong>: SQUARE draws a square of the size it is given, and FLOWER draws twelve, turning 30° between them. <code>FLOWER</code> takes about 3 s.</li>
+      <li><strong>Twisting spiral</strong> keeps the side in a global variable and makes it 2 longer each time round; turning 91° instead of 90° makes the square spiral twist. <code>SPIRAL 91</code> takes about 3 s; <code>SPIRAL 121</code> makes a triangle spiral.</li>
+      <li><strong>Recursive tree</strong>: a tree is a trunk with two trees on top, each two thirds the size, turned 30° each way. TREE stops below 5 steps and backs down its own trunk, so it ends where it started. <code>FOREST</code> takes about 3 s.</li>
+      <li><strong>Koch snowflake</strong>: SIDE draws a side as four sides a third the length, turning 60° left, 120° right and 60° left between them, and calls itself for each until <code>:N</code> is 0. Three sides make the flake. <code>FLAKE 3</code> takes about 5 s.</li>
+      <li><strong>Random stars</strong>: five lines turning 144° make a star; SKY puts sixteen of random sizes at random places with <code>RANDOM</code> and <code>SETXY</code>. <code>SKY</code> takes about 2 s.</li>
+    </ul>
+    <div class="exlist" id="exl-logo"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-chip8" aria-labelledby="tab-chip8" hidden>
+    <h2>CHIP-8</h2>
+    <p>CHIP-8 is the little virtual machine Joseph Weisbecker wrote for the COSMAC VIP in 1977, and its 64 × 32 display is exactly the COMP80’s screen: each pixel is one character, a solid block or a space. This ROM puts a CHIP-8 interpreter where BURP was. CHIP-8 memory is 0C00–1BFF, and programs start at CHIP-8 address 200, which is 0E00. Load one there from the monitor with <code>LOAD 0E00</code>, its bytes in hex and <code>@</code>, or from tape, then press RS to run it. While it runs, RS starts it again and FS goes back to the monitor.</p>
+    <h3>Keys</h3>
+    <p>The CHIP-8 keypad, 1 2 3 C / 4 5 6 D / 7 8 9 E / A 0 B F, is the block 1 2 3 4 / Q W E R / A S D F / Z X C V. The COMP80 keyboard says when a key goes down but not when it comes up, so a key counts as held for a third of a second after it is pressed, and holding it down keeps it held.</p>
+    <h3>How it works</h3>
+    <p>Every key is an interrupt, and the monitor goes back to READY unless the computer was waiting in a HALT. As in the Game of Life, the interpreter keeps its stack pointer in ROM, so the monitor finds a ROM word there pointing at the key handler with a HALT in front of it. What was interrupted is lost, so every CHIP-8 instruction can be started again: the registers are kept twice, an instruction works on a copy and makes it current with a single store, and DRW works out all the characters it will change before writing any. With no clock to read, it waits a little before each instruction, about 600 instructions a second, and the timers count down every 10 instructions. The wait is the byte at 1C00 (44): smaller is faster. There is no sound.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Bouncing ball</strong> draws a box round the edge, then moves the ball by drawing it again (which takes it off, since DRW uses XOR) and once more a step further on.</li>
+      <li><strong>CHIP-8 keypad</strong> waits for a key with <code>LD VA, K</code>, then draws its digit from the built-in font four times as big, one bit at a time, and the number of presses in small digits with <code>LD B, VE</code>.</li>
+      <li><strong>Dodge</strong> moves the ship with <code>SKNP</code> on keys 7 and 9 (A and D) and finds a crash from VF, which DRW sets when a pixel it draws was already on.</li>
+      <li><strong>Kaleidoscope</strong> is a random walk with <code>RND</code>, drawn four times, mirrored.</li>
+    </ul>
+    <p>The programs were assembled with <code>chip8/tools/c8asm.py</code>, which takes the mnemonics of Cowgod’s CHIP-8 reference.</p>
+    <div class="exlist" id="exl-chip8"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-focal" aria-labelledby="tab-focal" hidden>
+    <h2>FOCAL</h2>
+    <p>FOCAL, short for FOrmula CALculator, was DEC's interactive language of 1968, a rival to BASIC. This one is written from scratch for the COMP80 and fills the 2 KB that held BURP. Like BURP it does its sums on the MM57109 calculator chip, so numbers are floating point with 8 digits, and the sines, logs and square roots are the chip's own. RS at READY enters it; the prompt is <code>*</code>.</p>
+    <p>A line typed without a number runs at once. A line with a number, group.step from 1.01 to 99.99, goes into the program; 1.1 is the same as 1.10, and a number alone deletes its line. Commands are known by their first letter, so <code>T</code> is TYPE and <code>GO</code> is GOTO, and several can share a line, separated by <code>;</code>. As in FOCAL a program runs on from one group into the next, so it usually ends with QUIT.</p>
+    <h3>Commands</h3>
+    <ul>
+      <li><code>TYPE "TEXT", !, E</code> prints text, a new line and numbers. <code>ASK "TEXT", V</code> prints a colon and waits for a number for V; the answer can be any expression.</li>
+      <li><code>SET V=E</code>. Variables are a letter and an optional letter or digit, and start at 0; names starting with F are functions.</li>
+      <li><code>IF (E) L1,L2,L3</code> goes to L1 if E is negative, L2 if it is 0 and L3 if it is positive; a line number left out means go on with the line.</li>
+      <li><code>GOTO L</code>, and <code>GO</code> to run the program from the start. <code>DO 2.1</code> runs a line and <code>DO 2</code> a whole group, then come back; <code>RETURN</code> ends a DO early. <code>QUIT</code> stops.</li>
+      <li><code>FOR V=A,B,C; …</code> runs the rest of the line with V = A, A+B, … up to C; <code>FOR V=A,C</code> counts in 1s.</li>
+      <li><code>COMMENT</code>, <code>WRITE</code> lists the program, <code>ERASE</code> clears the variables and <code>ERASE ALL</code> the program too.</li>
+    </ul>
+    <p>Expressions have <code>+ - * /</code>, brackets, and <code>**</code> for powers, since <code>^</code> is the RS key. The functions are <code>FSQT FABS FSIN FCOS FEXP FLOG FITR FRAN</code>: FLOG is the natural log, FITR the integer part and <code>FRAN()</code> a random number from 0 to 1. The chip's stack holds four numbers, so an expression can have at most four values waiting at once. It is as slow as BURP: a FOR loop goes round about seven times a second. Errors print <code>?</code> and the line, as in <code>?01.20</code>.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Square and cube roots</strong> prints FSQT(N) and N**(1/3) for 1 to 12, with DO 2 inside a FOR. About 10 s.</li>
+      <li><strong>Celsius to Fahrenheit</strong> is one FOR line with a step of 10, from −20 to 100. About 4 s.</li>
+      <li><strong>Compound interest</strong> ASKs for an amount, a rate and a number of years, and prints a line a year, rounded to the penny with FITR(P*100+.5)/100.</li>
+      <li><strong>Guess the number</strong>: FRAN picks one from 1 to 100, and IF (G-N) goes to too small, right or too big. FRAN's seed is stirred by the time between key presses.</li>
+      <li><strong>Sine wave</strong> prints, for each line, FITR(14+13*FSIN(X/3)) spaces with a FOR loop, then a star. About 45 s.</li>
+    </ul>
+    <div class="exlist" id="exl-focal"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-pilot" aria-labelledby="tab-pilot" hidden>
+    <h2>PILOT</h2>
+    <p>PILOT was made in the 1960s and 70s for teachers to write lessons, quizzes and drills: a program types text, accepts an answer, matches it against the words it hopes for and jumps on. This PILOT is new, written for the COMP80 in the 2 KB where BURP was. Enter it with RS at READY.</p>
+    <h3>Using it</h3>
+    <ul>
+      <li>A line starting with a number goes into the program in order of number; the number on its own deletes the line. <code>LIST</code>, <code>RUN</code> and <code>NEW</code> work on the program, and any other line runs at once.</li>
+      <li>A statement is a letter, then Y or N and a condition in brackets if wanted, a colon and the rest: <code>T:HELLO</code>, <code>TY:RIGHT!</code>, <code>J(#Q&lt;5):*ASK</code>. A line can start with a label, <code>*ASK</code>.</li>
+    </ul>
+    <h3>Statements</h3>
+    <ul>
+      <li><strong>T:</strong> types the text, with <code>$N</code> and <code>#N</code> replaced by the variables. <strong>A:</strong> accepts an answer; <code>A:$N</code> and <code>A:#N</code> also keep it. <strong>M:</strong> sets Y if any of its comma-separated words is in the answer, N if not.</li>
+      <li><strong>J:</strong> jumps to a label, <strong>U:</strong> calls one as a subroutine and <strong>E:</strong> comes back, or ends the program. <strong>C:</strong> computes, <code>C:#S=#S+1</code> or <code>C:$N=TEXT</code>. <strong>G:X,Y</strong> plots a point on 128 × 62 quarter blocks; <code>G:</code> clears the screen. <strong>R:</strong> is a remark.</li>
+      <li>Numbers are 16-bit integers with <code>+ - * /</code> and brackets; <code>?12</code> is a random number from 1 to 12. Conditions compare with <code>&lt; &gt; = &lt;&gt; &lt;= &gt;=</code>. Variables are <code>#A</code>–<code>#Z</code> and <code>$A</code>–<code>$Z</code>; RUN clears them.</li>
+    </ul>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>Greeting</strong> keeps your name in <code>$N</code> and uses M: to tell a good day from a bad one.</li>
+      <li><strong>Capitals quiz</strong> marks every answer with the same subroutine, *MARK, which adds to the score with <code>CY:</code>.</li>
+      <li><strong>Times tables</strong> asks five random questions on the table you choose and checks the answers with conditions.</li>
+      <li><strong>Adventure</strong> is a little branching story: each place is a label, and the answers jump between them until you get home.</li>
+      <li><strong>Drawing</strong> plots a box and its diagonals with G:, in under a second.</li>
+    </ul>
+    <div class="exlist" id="exl-pilot"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-zasm" aria-labelledby="tab-zasm" hidden>
+    <h2>ZASM</h2>
+    <p>ZASM is a Z80 assembler and disassembler in the 2 KB where BURP was, so you can write machine code in mnemonics instead of hex. RS at READY enters it; the top line shows ZASM and a <code>&gt;</code> prompt. Numbers are in hex, as in the monitor, and only the first letter of a command counts.</p>
+    <h3>Commands</h3>
+    <ul>
+      <li><strong>DIS addr</strong> disassembles 24 instructions: address, bytes, instruction. <strong>DIS</strong> on its own carries on.</li>
+      <li><strong>ASM addr</strong> assembles a line at a time. Each line starts with its address; type an instruction and Return and it is shown again as DIS shows it, or with a ? if it isn't one. A blank line ends, and DIS then lists what you typed.</li>
+      <li><strong>GO addr</strong> calls a program; a RET comes back to ZASM.</li>
+    </ul>
+    <p>Instructions are written as DIS shows them. Numbers must start with a digit (<code>LD A,0FF</code>), so that A to F are registers; relative jumps take the address jumped to (<code>DJNZ 1007</code>); index registers are <code>(IX+5)</code>, <code>(IY-2)</code>. Every documented instruction is covered, IX and IY included; there are no labels.</p>
+    <h3>How it works</h3>
+    <p>DIS splits each opcode into its fields, x, y and z, and a small table for each z picks a format string such as “LD r,n”, with codes for the operands. ASM is the disassembler run backwards: it tries every opcode in turn, and instead of printing the text it compares each character with the line you typed, giving up at the first mismatch. Where a number would be printed it reads yours and puts it in the instruction. The first opcode whose text matches is the one. The slowest, <code>SET 7,(IY+7F)</code>, takes under a second.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>The keyboard NMI handler</strong> disassembles the monitor at 0066: it checks it interrupted a HALT, reads the key from port 01, turns Return into 1F and jumps to 0800 for RS.</li>
+      <li><strong>A pattern</strong> assembles a program that fills the screen with diagonal lines of quarter blocks, lists it and runs it; it waits for a key in a HALT.</li>
+      <li><strong>A countdown</strong> assembles a loop that counts 9 down to 0 in the top line, half a second a digit.</li>
+      <li><strong>Life, disassembled</strong> loads the Game of Life at 1000 and lists its start.</li>
+    </ul>
+    <div class="exlist" id="exl-zasm"></div>
+  </div>
+  <div class="panel" role="tabpanel" id="panel-prolog" aria-labelledby="tab-prolog" hidden>
+    <h2>Prolog</h2>
+    <p>A small Prolog, written for this project, in the 2 KB that held BURP. Press RS at READY; the top line changes to PROLOG. Type a clause to add it to the program, or a query starting <code>?-</code> to have it answered; both end with a full stop and can run over several lines. For each answer Prolog shows the query’s variables (or YES); if there may be more it waits with <code>?</code>: press <code>;</code> for the next or any other key to stop. NO means no (more) answers.</p>
+    <h3>Built-ins</h3>
+    <ul>
+      <li>Unifying: <code>EQ(X,Y)</code>. Arithmetic: <code>SUM(X,Y,Z)</code> (any two known), <code>TIMES(X,Y,Z)</code>, <code>LESS(X,Y)</code>. Output: <code>WRITE(X)</code>, <code>NL</code>. Control: <code>!</code>, <code>FAIL</code>.</li>
+      <li>With no lower case, a variable is a single letter or a letter followed by digits (<code>X</code>, <code>L1</code>); any other name is an atom. <code>?</code> is an anonymous variable. Lists are <code>[1,2,3]</code> and <code>[H:T]</code>, as <code>|</code> can’t be typed.</li>
+      <li>There are no operators: arithmetic is done with relations, as in micro-PROLOG. <code>SUM(X,1,N)</code> gives N − 1. There is no NOT, but <code>NOTIN(X,L) :- MEMBER(X,L), !, FAIL.</code> and <code>NOTIN(?,?).</code> make one.</li>
+      <li>Numbers are integers from −16384 to 16383. <code>%</code> starts a comment. Errors: <code>SYNTAX</code>, <code>NO MEM</code>, <code>TOO DEEP</code>.</li>
+      <li>Nothing is garbage collected: the heap is given back on backtracking and after each query. Without the expansion a query can make about 40 steps without backtracking and keep about 100 choice points; with it, about 400 and 600.</li>
+    </ul>
+    <h3>How it works</h3>
+    <p>Clauses are kept as they are read, and a query is answered depth first: each goal is unified with the head of each clause of the same name in turn, the clause’s variables made new on the heap, and its body goes in front of the goals still to do. A choice point, saying where to carry on and how much of the heap and the trail to give back, is kept only when another clause of the same name follows, so a predicate whose last clause matches leaves none. Backtracking undoes the bindings on the trail.</p>
+    <h3>The examples</h3>
+    <ul>
+      <li><strong>A family tree</strong>: PARENT facts, and FATHER, GRAND and ANCESTOR rules; ANCESTOR calls itself, so <code>?- ANCESTOR(X,GUS).</code> finds four ancestors one <code>;</code> at a time.</li>
+      <li><strong>Lists</strong>: APPEND, MEMBER, REVERSE and LENGTH. APPEND works both ways: <code>?- APPEND(X,Y,[1,2,3]).</code> finds the four ways to split the list.</li>
+      <li><strong>Colouring a map</strong>: five countries and three colours, and Prolog tries colours until no two neighbours are the same, backing up when a pair clashes.</li>
+      <li><strong>Finding a way</strong> between two towns without going through a town twice, keeping the towns so far in a list and testing it with a NOTIN made of cut and FAIL.</li>
+    </ul>
+    <div class="exlist" id="exl-prolog"></div>
   </div>

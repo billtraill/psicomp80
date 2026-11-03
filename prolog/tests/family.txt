@@ -1,0 +1,38 @@
+^
+#wait 0.5
+% A FAMILY TREE.  PARENT(X,Y) MEANS X IS A PARENT OF Y.\r
+PARENT(ADA,BEN).\r
+PARENT(CAL,BEN).\r
+PARENT(CAL,DOT).\r
+PARENT(BEN,EVE).\r
+PARENT(BEN,FAY).\r
+PARENT(FAY,GUS).\r
+MALE(CAL).\r
+MALE(BEN).\r
+MALE(GUS).\r
+FATHER(X,Y) :- PARENT(X,Y), MALE(X).\r
+GRAND(X,Z) :- PARENT(X,Y), PARENT(Y,Z).\r
+% AN ANCESTOR IS A PARENT, OR A PARENT OF AN ANCESTOR.\r
+ANCESTOR(X,Y) :- PARENT(X,Y).\r
+ANCESTOR(X,Y) :- PARENT(X,Z), ANCESTOR(Z,Y).\r
+?- FATHER(F,EVE).\r
+#wait 2
+;
+#ready
+?- GRAND(CAL,X).\r
+#wait 2
+;
+#wait 2
+;
+#ready
+?- ANCESTOR(X,GUS).\r
+#wait 2
+;
+#wait 2
+;
+#wait 2
+;
+#wait 2
+;
+#ready
+#screen

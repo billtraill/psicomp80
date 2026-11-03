@@ -1,0 +1,31 @@
+#wait 0.5
+^
+#wait 0.3
+LOAD 
+10 PRINT "PERFECT NUMBERS, EUCLIDS WAY" \r
+20 PRINT "IF M = 2 TO THE P, LESS 1, IS PRIME, M TIMES 2 TO THE P-1" \r
+30 PRINT "IS PERFECT" \r
+40 PRINT " P            M" \r
+50 LET Z=10000000 \r
+60 LET T=2 \r
+70 FOR P=2 STEP 1 UNTIL 13 \r
+80 LET T=T 2 * \r
+90 LET M=T 1 - \r
+100 LET D=3 \r
+110 LET S=D D * \r
+120 IF S>M THEN 200 \r
+130 LET Q=M D / \r
+140 LET R=Q Z + Z - \r
+150 IF R=Q THEN 220 \r
+160 LET D=D 2 + \r
+170 GOTO 110 \r
+200 LET N=T 2 / M * \r
+210 PRINT P0 M0 "PRIME, PERFECT" N0, \r
+215 GOTO 230 \r
+220 PRINT P0 M0 "=" D0, " *" Q0, \r
+230 NEXT P \r
+240 END :
+#ready
+RUN 10 
+#ready
+#screen

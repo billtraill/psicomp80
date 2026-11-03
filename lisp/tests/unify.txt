@@ -1,0 +1,43 @@
+^
+#wait 0.5
+(DEFUN VARP (X) (AND (NULL (ATOM X)) (EQ (CAR X) '?)))\r
+(DEFUN EQUAL (A B)\r
+  (COND ((ATOM A) (EQ A B)) ((ATOM B) NIL)\r
+        ((EQUAL (CAR A) (CAR B)) (EQUAL (CDR A) (CDR B)))))\r
+(DEFUN LOOK (X L)\r
+  (COND ((NULL L) NIL) ((EQUAL X (CAR (CAR L))) (CAR L))\r
+        (T (LOOK X (CDR L)))))\r
+(DEFUN WALK (X S) (COND ((VARP X) (WALK1 X (LOOK X (CDR S)) S)) (T X)))\r
+(DEFUN WALK1 (X B S) (COND (B (WALK (CADR B) S)) (T X)))\r
+(DEFUN UNIFY (A B S) (COND (S (UNI (WALK A S) (WALK B S) S))))\r
+(DEFUN UNI (A B S)\r
+  (COND ((EQUAL A B) S)\r
+        ((VARP A) (CONS T (CONS (LIST A B) (CDR S))))\r
+        ((VARP B) (CONS T (CONS (LIST B A) (CDR S))))\r
+        ((OR (ATOM A) (ATOM B)) NIL)\r
+        (T (UNIFY (CDR A) (CDR B) (UNIFY (CAR A) (CAR B) S)))))\r
+(DEFUN SUBST (X S) (FULL (WALK X S) S))\r
+(DEFUN FULL (X S)\r
+  (COND ((OR (ATOM X) (VARP X)) X)\r
+        (T (CONS (SUBST (CAR X) S) (SUBST (CDR X) S)))))\r
+(SETQ DB '(((PARENT TOM BOB)) ((PARENT TOM LIZ))\r
+  ((PARENT BOB ANN)) ((PARENT BOB PAT)) ((PARENT PAT JIM))\r
+  ((GRAND (? X) (? Z)) (PARENT (? X) (? Y)) (PARENT (? Y) (? Z)))))\r
+(DEFUN APP (A B) (COND (A (CONS (CAR A) (APP (CDR A) B))) (T B)))\r
+(DEFUN RN (X)\r
+  (COND ((ATOM X) X) ((VARP X) (LIST '? (CADR X) N))\r
+        (T (CONS (RN (CAR X)) (RN (CDR X))))))\r
+(DEFUN PROVE (GS S N)\r
+  (COND ((NULL GS) (PRINT (SUBST Q S))) (T (TRYC DB))))\r
+(DEFUN TRYC (CL)\r
+  (COND (CL (STEP (RN (CAR CL))) (TRYC (CDR CL)))))\r
+(DEFUN STEP (C) (MORE (UNIFY (CAR GS) (CAR C) S) (APP (CDR C) (CDR GS))))\r
+(DEFUN MORE (S2 G2) (COND (S2 (PROVE G2 S2 (+ N 1)))))\r
+(DEFUN QUERY (Q) (PROVE Q '(T) 0) 'DONE)\r
+(UNIFY '(F (? X) B) '(F A (? Y)) '(T))\r
+(UNIFY '(F (? X) (? X)) '(F A B) '(T))\r
+(QUERY '((PARENT TOM (? W))))\r
+(QUERY '((GRAND TOM (? W))))\r
+(QUERY '((GRAND (? W) JIM)))\r
+#ready
+#screen

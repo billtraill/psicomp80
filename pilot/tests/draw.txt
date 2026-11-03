@@ -1,0 +1,22 @@
+^
+#wait 0.5
+10 R:A PATTERN DRAWN WITH G:\r
+20 G:\r
+30 T:A BOX WITH ITS DIAGONALS\r
+40 C:#I=0\r
+50 *ACROSS G:#I,4\r
+60 G:#I,61\r
+70 C:#I=#I+1\r
+80 J(#I<128):*ACROSS\r
+90 C:#I=4\r
+100 *DOWN G:0,#I\r
+110 G:127,#I\r
+120 C:#X=(#I-4)*127/57\r
+130 G:#X,#I\r
+140 G:127-#X,#I\r
+150 C:#I=#I+1\r
+160 J(#I<62):*DOWN\r
+170 E:\r
+RUN\r
+#ready
+#screen

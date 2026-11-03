@@ -1,0 +1,22 @@
+^
+#wait 0.5
+(DEFUN APP (A B) (COND ((NULL A) B) (T (CONS (CAR A) (APP (CDR A) B)))))\r
+(DEFUN DEL (X L)\r
+  (COND ((NULL L) NIL) ((EQ X (CAR L)) (CDR L))\r
+        (T (CONS (CAR L) (DEL X (CDR L))))))\r
+(DEFUN PUT (X LS)\r
+  (COND ((NULL LS) NIL) (T (CONS (CONS X (CAR LS)) (PUT X (CDR LS))))))\r
+(DEFUN PERMS (L) (COND ((NULL L) '(NIL)) (T (EACH L))))\r
+(DEFUN EACH (XS)\r
+  (COND ((NULL XS) NIL)\r
+        (T (APP (PUT (CAR XS) (PERMS (DEL (CAR XS) L)))\r
+                (EACH (CDR XS))))))\r
+(DEFUN POWER (L) (COND ((NULL L) '(NIL)) (T (TWO (CAR L) (POWER (CDR L))))))\r
+(DEFUN TWO (X P) (APP (PUT X P) P))\r
+(DEFUN LENGTH (L) (COND ((NULL L) 0) (T (+ 1 (LENGTH (CDR L))))))\r
+(PERMS '(A B C))\r
+(LENGTH (PERMS '(A B C D)))\r
+(POWER '(A B C))\r
+(LENGTH (POWER '(A B C D E)))\r
+#ready
+#screen

@@ -1,0 +1,18 @@
+^
+#wait 0.5
+01.01 C COMPOUND INTEREST, A YEAR AT A TIME\r
+01.10 ASK "AMOUNT", P, "INTEREST %", R, "YEARS", Y\r
+01.20 TYPE "YEAR    AMOUNT",!\r
+01.30 FOR K=1,Y; DO 2\r
+02.10 SET P=P*(1+R/100)\r
+02.20 TYPE K,"    ",FITR(P*100+.5)/100,!\r
+01.40 QUIT\r
+GO\r
+#ready
+1000\r
+#ready
+5\r
+#ready
+8\r
+#ready
+#screen

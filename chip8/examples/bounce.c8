@@ -1,0 +1,59 @@
+; BOUNCE: a ball bounces round a box at the edge of the screen.
+; V0, V1 = the ball's corner, V2, V3 = its step across and down
+; (1 or -1, which is 255).  DRW with XOR takes the ball off and
+; puts it back one step on, and the delay timer sets the pace.
+
+        CLS
+        LD I, line              ; the top and bottom of the box
+        LD V0, 0
+top:    LD V1, 0
+        DRW V0, V1, 1
+        LD V1, 31
+        DRW V0, V1, 1
+        ADD V0, 8
+        SE V0, 64
+        JP top
+        LD I, side              ; the sides, 8 rows at a time
+        LD V1, 1
+sides:  LD V0, 0
+        DRW V0, V1, 8
+        LD V0, 63
+        DRW V0, V1, 8
+        ADD V1, 8
+        SE V1, 25
+        JP sides
+        LD V0, 0                ; and the last 6 rows
+        DRW V0, V1, 6
+        LD V0, 63
+        DRW V0, V1, 6
+
+        LD V0, 10
+        LD V1, 5
+        LD V2, 1
+        LD V3, 1
+        LD I, ball
+        DRW V0, V1, 4
+loop:   LD I, ball
+        DRW V0, V1, 4           ; off
+        ADD V0, V2
+        ADD V1, V3
+        SNE V0, 1               ; a wall: turn round
+        LD V2, 1
+        SNE V0, 59
+        LD V2, 255
+        SNE V1, 1
+        LD V3, 1
+        SNE V1, 27
+        LD V3, 255
+        DRW V0, V1, 4           ; on
+        LD V4, 2
+        LD DT, V4
+wait:   LD V4, DT
+        SE V4, 0
+        JP wait
+        JP loop
+
+line:   DB 0b11111111
+side:   DB 0b1......., 0b1......., 0b1......., 0b1.......
+        DB 0b1......., 0b1......., 0b1......., 0b1.......
+ball:   DB 0b.11....., 0b1111...., 0b1111...., 0b.11.....

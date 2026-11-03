@@ -1,0 +1,107 @@
+; DODGE: rocks fall; steer the ship at the bottom out of their way
+; with A (left) and D (right), keys 7 and 9 of the keypad.  Each
+; rock that reaches the bottom scores a point, and the rocks fall
+; faster as the score goes up.  When a rock hits the ship the score
+; is shown; press a key to play again.
+; V0 = the ship's x, V1-V6 = three rocks' x and y, V8 = frame time,
+; VE = score.
+
+start:  CLS
+        LD V0, 30
+        LD VE, 0
+        LD V8, 4
+        RND V1, 63
+        LD V2, 0
+        RND V3, 63
+        LD V4, 10
+        RND V5, 63
+        LD V6, 20
+        CALL rocks
+        CALL ship
+
+loop:   CALL ship               ; everything off
+        CALL rocks
+        LD V7, 7                ; A: left
+        SKNP V7
+        CALL left
+        LD V7, 9                ; D: right
+        SKNP V7
+        CALL right
+        ADD V2, 1               ; the rocks fall
+        ADD V4, 1
+        ADD V6, 1
+        SNE V2, 31
+        CALL new1
+        SNE V4, 31
+        CALL new2
+        SNE V6, 31
+        CALL new3
+        CALL rocks              ; everything on again
+        CALL ship
+        SE VF, 0                ; the ship hit a rock
+        JP crash
+        LD DT, V8
+wait:   LD V7, DT
+        SE V7, 0
+        JP wait
+        JP loop
+
+left:   SE V0, 0                ; two pixels a frame
+        ADD V0, 254
+        RET
+right:  SE V0, 58
+        ADD V0, 2
+        RET
+
+new1:   LD V2, 0
+        RND V1, 63
+        JP point
+new2:   LD V4, 0
+        RND V3, 63
+        JP point
+new3:   LD V6, 0
+        RND V5, 63
+point:  ADD VE, 1               ; every 8 points, faster
+        LD V7, 7
+        AND V7, VE
+        SE V7, 0
+        RET
+        SE V8, 1
+        ADD V8, 255
+        RET
+
+rocks:  LD I, rock
+        DRW V1, V2, 3
+        DRW V3, V4, 3
+        DRW V5, V6, 3
+        RET
+ship:   LD I, shipspr
+        LD V7, 28
+        DRW V0, V7, 3
+        RET
+
+crash:  LD V7, 30               ; a moment to see what happened
+        LD DT, V7
+crw:    LD V7, DT
+        SE V7, 0
+        JP crw
+        CLS
+        LD I, digits            ; the score in the middle
+        LD B, VE
+        LD V2, [I]
+        LD V3, 24
+        LD V4, 13
+        LD F, V0
+        DRW V3, V4, 5
+        ADD V3, 6
+        LD F, V1
+        DRW V3, V4, 5
+        ADD V3, 6
+        LD F, V2
+        DRW V3, V4, 5
+        LD V0, K
+        JP start
+
+shipspr: DB 0b..1....., 0b.111...., 0b11111...
+rock:   DB 0b.1......, 0b111....., 0b.1......
+digits: DB 0, 0, 0

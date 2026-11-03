@@ -1,0 +1,26 @@
+^
+#wait 0.5
+ASM 1000\r
+LD HL,8040\r
+LD C,0\r
+LD B,40\r
+LD A,C\r
+AND 3\r
+LD A,20\r
+JR NZ,1010\r
+LD A,45\r
+LD (HL),A\r
+INC HL\r
+INC C\r
+DJNZ 1007\r
+DEC C\r
+LD A,H\r
+CP 88\r
+JR NZ,1005\r
+HALT\r
+RET\r
+\r
+DIS 1000\r
+G 1000\r
+#wait 2
+#screen

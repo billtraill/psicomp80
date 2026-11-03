@@ -1,0 +1,38 @@
+^
+#wait 0.5
+(SETQ RULES '((FEEL (WHY DO YOU FEEL *))\r
+  (AM (WHY ARE YOU *))\r
+  (MOTHER (TELL ME ABOUT YOUR FAMILY))\r
+  (BECAUSE (IS THAT THE REAL REASON))\r
+  (YOU (WHY DO YOU THINK I *))))\r
+(SETQ PAIRS '((I YOU) (ME YOU) (MY YOUR) (AM ARE) (YOU I) (YOUR MY)))\r
+(SETQ DULLS '((GO ON) (I SEE) (TELL ME MORE)))\r
+(SETQ D NIL)\r
+(DEFUN MEMQ (X L)\r
+  (COND ((NULL L) NIL) ((EQ X (CAR L)) L) (T (MEMQ X (CDR L)))))\r
+(DEFUN SW (L) (COND (L (CONS (SW1 (CAR L) PAIRS) (SW (CDR L))))))\r
+(DEFUN SW1 (W P)\r
+  (COND ((NULL P) W) ((EQ W (CAR (CAR P))) (CADR (CAR P)))\r
+        (T (SW1 W (CDR P)))))\r
+(DEFUN FILL (R)\r
+  (COND ((NULL R) NIL) ((EQ (CAR R) '*) (SW (CDR REST)))\r
+        (T (CONS (CAR R) (FILL (CDR R))))))\r
+(DEFUN TRY (RS)\r
+  (COND ((NULL RS) (DULL))\r
+        (T (TRY1 (MEMQ (CAR (CAR RS)) S) (CAR RS) RS))))\r
+(DEFUN TRY1 (REST R RS)\r
+  (COND (REST (FILL (CADR R))) (T (TRY (CDR RS)))))\r
+(DEFUN DULL ()\r
+  (COND ((NULL D) (SETQ D DULLS)))\r
+  (NEXT (CAR D)))\r
+(DEFUN NEXT (X) (SETQ D (CDR D)) X)\r
+(DEFUN TALK (S) (TRY RULES))\r
+(TALK '(HELLO))\r
+(TALK '(I FEEL SAD ABOUT MY JOB))\r
+(TALK '(MY MOTHER HATES ME))\r
+(TALK '(I AM TIRED OF WORK))\r
+(TALK '(YOU DO NOT LISTEN TO ME))\r
+(TALK '(WELL))\r
+(TALK '(BECAUSE YOU ARE A COMPUTER))\r
+#ready
+#screen

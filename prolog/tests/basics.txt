@@ -1,0 +1,28 @@
+^
+#wait 0.5
+FACT(0,1) :- !.\r
+FACT(N,F) :- SUM(M,1,N), FACT(M,G), TIMES(N,G,F).\r
+?- FACT(7,F).\r
+#ready
+?- SUM(2,X,10), LESS(X,9), WRITE(X), NL.\r
+#ready
+?- SUM(X,3,10), SUM(4,5,Y), TIMES(-3,4,Z).\r
+#ready
+?- LESS(5,3).\r
+#ready
+?- EQ(FOO(X,B),FOO(A,[1:Z])), EQ(Z,[]).\r
+#ready
+?- WRITE([1,2:T]), NL, WRITE(FOO(BAR,-7)).\r
+#ready
+% A COMMENT\r
+?- FOO(.\r
+#ready
+#screen
+COUNT(N) :- WRITE(N), NL, SUM(N,1,M), COUNT(M).\r
+?- COUNT(1).\r
+#ready
+DEEPER :- DEEPER.\r
+DEEPER.\r
+?- DEEPER.\r
+#ready
+#screen

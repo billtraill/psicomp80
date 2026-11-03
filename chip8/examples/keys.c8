@@ -1,0 +1,48 @@
+; KEYS: press a key on the keypad and it is shown as a big hex
+; digit, made from the built-in font, with the number of presses
+; in decimal underneath.
+; VA = the key, VB = font row, VC, VD = where the block goes,
+; VE = presses.
+
+        LD VE, 0
+next:   LD VA, K                ; wait for a key
+        ADD VE, 1
+        CLS
+        LD VB, 0
+        LD VC, 1
+row:    LD F, VA                ; V0 = row VB of the digit
+        ADD I, VB
+        LD V0, [I]
+        LD VD, 20
+        LD V1, 4                ; four columns, left bit first
+col:    SHL V0
+        SE VF, 1
+        JP gap
+        LD I, block
+        DRW VD, VC, 4
+gap:    ADD VD, 6
+        ADD V1, 255
+        SE V1, 0
+        JP col
+        ADD VC, 5
+        ADD VB, 1
+        SE VB, 5
+        JP row
+
+        LD I, digits            ; the count, in small digits
+        LD B, VE
+        LD V2, [I]
+        LD VD, 27
+        LD VC, 27
+        LD F, V0
+        DRW VD, VC, 5
+        ADD VD, 5
+        LD F, V1
+        DRW VD, VC, 5
+        ADD VD, 5
+        LD F, V2
+        DRW VD, VC, 5
+        JP next
+
+block:  DB 0b11111..., 0b11111..., 0b11111..., 0b11111...
+digits: DB 0, 0, 0

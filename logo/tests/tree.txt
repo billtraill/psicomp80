@@ -1,0 +1,18 @@
+^
+#wait 0.5
+; A TREE: A TRUNK WITH TWO SMALLER TREES ON TOP\r
+TO TREE :S\r
+IF :S < 5 [STOP]\r
+FD :S LT 30\r
+TREE :S * 2 / 3\r
+RT 60\r
+TREE :S * 2 / 3\r
+LT 30 BK :S\r
+END\r
+TO FOREST\r
+CS SLOW 250 PU SETXY 0 -42 PD\r
+TREE 30\r
+END\r
+FOREST\r
+#ready
+#screen

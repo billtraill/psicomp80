@@ -1,0 +1,71 @@
+^
+#wait 0.5
+10 CONST SCR = 32832, SUM = 6656, PRV = 6784, R0 = 6912;\r
+20 VAR S, X, Y, U, M, D, T, C, O, K, N, P, Q, I;\r
+30 PROCEDURE NUM;\r
+40 BEGIN\r
+50   I := 5;\r
+60   WHILE I > 0 DO\r
+70   BEGIN\r
+80     I := I - 1; C := 48 + P - P / 10 * 10;\r
+90     IF P = 0 THEN IF I < 4 THEN C := 32;\r
+100    POKE Q + I, C; P := P / 10\r
+110  END\r
+120 END;\r
+130 PROCEDURE GEN;\r
+140 BEGIN\r
+150   X := 0;\r
+160   WHILE X < 64 DO BEGIN POKE R0 + X, PEEK (SCR + X); X := X + 1 END;\r
+170   U := SCR + 1920; Y := 0;\r
+180   WHILE Y < 31 DO\r
+190   BEGIN\r
+200     M := SCR + 64 * Y; D := M + 64;\r
+210     IF Y = 30 THEN D := R0;\r
+220     X := 0;\r
+230     WHILE X < 64 DO\r
+240     BEGIN\r
+250       POKE SUM + 1 + X, PEEK (U + X) + PEEK (M + X) + PEEK (D + X);\r
+260       X := X + 1\r
+270     END;\r
+280     POKE SUM, PEEK (SUM + 64); POKE SUM + 65, PEEK (SUM + 1);\r
+290     X := 0;\r
+300     WHILE X < 64 DO\r
+310     BEGIN\r
+320       O := PEEK (M + X); POKE PRV + X, O;\r
+330       T := PEEK (SUM + X) + PEEK (SUM + X + 1) + PEEK (SUM + X + 2);\r
+340       C := 32;\r
+350       IF T = 476 THEN C := O;\r
+360       IF T = 429 THEN C := 79;\r
+370       POKE M + X, C; X := X + 1\r
+380     END;\r
+390     U := PRV; Y := Y + 1;\r
+395     IF Y / 4 * 4 = Y THEN IF K = 0 THEN K := KEY\r
+400   END\r
+410 END;\r
+420 BEGIN\r
+430   CLS; S := 1979; X := 0;\r
+440   WHILE X < 1984 DO\r
+450   BEGIN\r
+460     S := S * 31421 + 6927; C := 32;\r
+470     IF S < 0 THEN C := 79;\r
+480     POKE SCR + X, C; X := X + 1\r
+490   END;\r
+500   POKE 32818, 7; POKE 32819, 5; POKE 32820, 14;\r
+510   N := 0; K := 0;\r
+520   WHILE K = 0 DO\r
+530   BEGIN\r
+540     N := N + 1; P := N; Q := 32822; CALL NUM;\r
+550     CALL GEN\r
+560   END;\r
+570   X := 0;\r
+580   WHILE X < 9 DO BEGIN POKE 32818 + X, 32; X := X + 1 END;\r
+590   CLS\r
+600 END.\r
+RUN\r
+#wait 2.5
+#screen
+#wait 10
+#screen
+X
+#ready
+#screen

@@ -1,0 +1,77 @@
+^
+#wait 0.5
+10 CONST SCR = 32768, TST = 6592, BIT = 6720;\r
+20 VAR X, Y, D, A, M, B, C, G, N, J, R, P, Q, I, W;\r
+30 PROCEDURE NUM;\r
+40 BEGIN\r
+50   I := 5;\r
+60   WHILE I > 0 DO\r
+70   BEGIN\r
+80     I := I - 1; C := 48 + P - P / 10 * 10;\r
+90     IF P = 0 THEN IF I < 4 THEN C := 32;\r
+100    POKE Q + I, C; P := P / 10\r
+110  END\r
+120 END;\r
+130 PROCEDURE CH;\r
+140 BEGIN IF C = 0 THEN C := 32; POKE Q, C; Q := Q + 1 END;\r
+150 PROCEDURE TXT;\r
+160 BEGIN\r
+170   C := W / 1024; CALL CH; C := W / 32 - W / 1024 * 32; CALL CH;\r
+180   C := W - W / 32 * 32; CALL CH\r
+190 END;\r
+200 PROCEDURE STEP;\r
+210 BEGIN\r
+220   R := 0; IF ODD X THEN R := 16; IF ODD Y THEN R := R + 32;\r
+230   M := PEEK (BIT + R); C := PEEK A; IF C < 64 THEN C := 64;\r
+240   B := PEEK (TST + R + C);\r
+250   IF B = 1 THEN BEGIN D := D + 3; C := C - M END;\r
+260   IF B = 0 THEN BEGIN D := D + 1; C := C + M END;\r
+270   IF D > 3 THEN D := D - 4;\r
+280   IF C = 64 THEN C := 32;\r
+290   POKE A, C;\r
+300   IF D = 0 THEN BEGIN Y := Y - 1; IF ODD Y THEN A := A - 64 END;\r
+310   IF D = 1 THEN BEGIN X := X + 1; IF ODD X + 1 THEN A := A + 1 END;\r
+320   IF D = 2 THEN BEGIN Y := Y + 1; IF ODD Y + 1 THEN A := A + 64 END;\r
+330   IF D = 3 THEN BEGIN X := X - 1; IF ODD X THEN A := A - 1 END;\r
+340   IF X < 0 THEN G := 0; IF X > 127 THEN G := 0;\r
+350   IF Y < 4 THEN G := 0; IF Y > 63 THEN G := 0\r
+360 END;\r
+370 PROCEDURE TABLES;\r
+380 BEGIN\r
+390   POKE BIT, 1; POKE BIT + 16, 2; POKE BIT + 32, 8; POKE BIT + 48, 4;\r
+400   I := 0;\r
+410   WHILE I < 64 DO\r
+420   BEGIN\r
+425     R := I / 16 * 16; B := 0;\r
+430     IF ODD (I - R) / PEEK (BIT + R) THEN B := 1;\r
+440     POKE TST + 64 + I, B; I := I + 1\r
+450   END\r
+460 END;\r
+470 BEGIN\r
+480   CLS; CALL TABLES; Q := SCR + 64;\r
+490   W := 12334; CALL TXT; W := 7823; CALL TXT; C := 14; CALL CH;\r
+500   C := 39; CALL CH; W := 19457; CALL TXT; W := 14976; CALL TXT;\r
+510   Q := SCR + 85; W := 20101; CALL TXT; W := 16384; CALL TXT;\r
+520   X := 90; Y := 28; D := 0; A := SCR + 14 * 64 + 45;\r
+530   N := 0; J := 0; G := 1;\r
+540   WHILE G = 1 DO\r
+550   BEGIN\r
+560     CALL STEP; N := N + 1; J := J + 1;\r
+570     IF J = 100 THEN\r
+580     BEGIN\r
+590       J := 0; P := N; Q := SCR + 90; CALL NUM;\r
+600       IF KEY # 0 THEN G := 2\r
+610     END\r
+620   END;\r
+630   P := N; Q := SCR + 90; CALL NUM;\r
+640   IF G = 0 THEN WHILE KEY = 0 DO;\r
+650   CLS\r
+660 END.\r
+RUN\r
+#wait 5
+#screen
+#wait 10
+#screen
+X
+#ready
+#screen

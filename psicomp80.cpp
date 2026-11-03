@@ -1323,7 +1323,7 @@ ROMX_LOAD("psicomp80_trac.rom", 0x0000, 0x0c00,
 // Monitor + COMP80 PL/0 compiler in place of BURP (pl0/, built by pl0/build.sh)
 ROM_SYSTEM_BIOS(15, "pl0", "Monitor + PL/0")
 ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
-         CRC(de3acdb6) SHA1(fba03a21e1b9fd72018ee1a68c8596e8fef6f8eb), ROM_BIOS(15))
+         CRC(6125162f) SHA1(8a3c71199e07692cdcf8e53d11b04f6528c813a4), ROM_BIOS(15))
 // Monitor + COMP80 BF (Brainf***) interpreter in place of BURP (bf/, built by bf/build.sh)
 ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
 ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,
@@ -1414,7 +1414,7 @@ ROMX_LOAD("psicomp80_trac.rom", 0x0000, 0x0c00,
 // Monitor + COMP80 PL/0 compiler in place of BURP (pl0/, built by pl0/build.sh)
 ROM_SYSTEM_BIOS(15, "pl0", "Monitor + PL/0")
 ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
-         CRC(de3acdb6) SHA1(fba03a21e1b9fd72018ee1a68c8596e8fef6f8eb), ROM_BIOS(15))
+         CRC(6125162f) SHA1(8a3c71199e07692cdcf8e53d11b04f6528c813a4), ROM_BIOS(15))
 // Monitor + COMP80 BF (Brainf***) interpreter in place of BURP (bf/, built by bf/build.sh)
 ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
 ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,

@@ -1,0 +1,38 @@
+^
+#wait 0.5
+10 VAR S, R, X, Y, T, N;\r
+20 PROCEDURE RND;\r
+30 BEGIN\r
+40   S := S * 31421 + 6927; R := S;\r
+50   IF R < 0 THEN R := R + 32767 + 1;\r
+60   R := R / 128\r
+70 END;\r
+80 PROCEDURE STEP;\r
+90 BEGIN\r
+100  CALL RND;\r
+110  IF R < 3 THEN BEGIN X := 0; Y := Y * 16 / 100 END;\r
+120  IF R >= 3 THEN IF R < 221 THEN\r
+130  BEGIN T := (X * 85 + Y * 4) / 100; Y := (Y * 85 - X * 4) / 100 + 58 END;\r
+140  IF R >= 221 THEN IF R < 239 THEN\r
+150  BEGIN T := (X * 20 - Y * 26) / 100; Y := (X * 23 + Y * 22) / 100 + 58 END;\r
+160  IF R >= 239 THEN\r
+170  BEGIN T := (Y * 28 - X * 15) / 100; Y := (X * 26 + Y * 24) / 100 + 16 END;\r
+180  IF R >= 3 THEN X := T\r
+190 END;\r
+200 BEGIN\r
+210  CLS; X := 0; Y := 0; N := 0;\r
+220  WHILE N < 20 DO BEGIN CALL STEP; N := N + 1 END;\r
+230  N := 0;\r
+240  WHILE N < 5000 DO\r
+250  BEGIN\r
+260    CALL STEP; PLOT X / 3 + 62, 61 - Y / 6; N := N + 1\r
+270  END;\r
+280  WHILE KEY = 0 DO;\r
+290  CLS\r
+300 END.\r
+RUN
+#wait 21
+#screen
+X
+#ready
+#screen

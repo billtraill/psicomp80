@@ -85,8 +85,8 @@
   }
   // Which lines of a file are typed: not blank lines, nor LISP and Prolog
   // comments.  ZASM's files keep their blank lines, as one ends ASM.
-  const COMMENT = { lisp: /^\s*;/, prolog: /^\s*%/ };
-  const SOURCE_LANG = { lsp: "lisp", pl: "prolog", txt: "zasm" };
+  const COMMENT = { lisp: /^\s*;/, prolog: /^\s*%/, pl0: /^\s*\{/ };
+  const SOURCE_LANG = { lsp: "lisp", pl: "prolog", txt: "zasm", pl0: "pl0" };
   const typed = (lang) => (l) => lang === "zasm" || (l.trim() !== "" && !(COMMENT[lang] && COMMENT[lang].test(l)));
   function sourceLines(text, lang) {
     const lines = text.replace(/\s+$/, "").split("\n").map((l) => l.replace(/\s+$/, ""));

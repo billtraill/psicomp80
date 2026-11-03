@@ -1,0 +1,53 @@
+^
+#wait 0.5
+10 CONST IM=6656, D=6944;\r
+20 VAR H, M, S, N, C, F, P, I, L, T, B, A, W, R, K;\r
+30 PROCEDURE MK;\r
+40  BEGIN P := 16384; I := 0;\r
+50   WHILE I < 15 DO BEGIN T := 0; IF ODD F/P THEN T := 1; POKE D+I, T;\r
+60    P := P/2; I := I+1 END;\r
+70   A := IM+N*24; L := 0;\r
+80   WHILE L < 8 DO BEGIN I := 0;\r
+90    WHILE I < 3 DO BEGIN T := 0; IF L > 0 THEN T := PEEK (D+(L+L-1)/3*3+I);\r
+100     B := PEEK (D+(L+L)/3*3+I); T := T*3+B*12; IF T = 0 THEN T := -32;\r
+110     POKE A, T+64; A := A+1; I := I+1 END;\r
+120    L := L+1 END;\r
+130  N := N+1 END;\r
+140 PROCEDURE SHOW;\r
+150  BEGIN P := IM+N*24; A := 33536+C; L := 0;\r
+160   WHILE L < 8 DO BEGIN T := PEEK P; POKE A, T; POKE A+1, T;\r
+170    T := PEEK (P+1); POKE A+2, T; POKE A+3, T; T := PEEK (P+2);\r
+180    POKE A+4, T; POKE A+5, T; P := P+3; A := A+64; L := L+1 END END;\r
+190 PROCEDURE TWO;\r
+200  BEGIN N := W/10; CALL SHOW; N := W-N*10; C := C+7; CALL SHOW END;\r
+210 PROCEDURE DRAW;\r
+220  BEGIN W := H; C := 4; CALL TWO; W := M; C := 25; CALL TWO;\r
+230   W := S; C := 46; CALL TWO; N := 10; IF ODD S THEN N := 11;\r
+240   C := 18; CALL SHOW; C := 39; CALL SHOW END;\r
+250 PROCEDURE ONE;\r
+260  BEGIN S := S+1; IF S = 60 THEN BEGIN S := 0; M := M+1 END;\r
+270   IF M = 60 THEN BEGIN M := 0; H := H+1 END; IF H = 24 THEN H := 0 END;\r
+280 BEGIN\r
+290  ? H; ? M; ? S; CLS;\r
+300  N := 0; F := 31599; CALL MK; F := 11415; CALL MK; F := 29671; CALL MK;\r
+310  F := 29647; CALL MK; F := 23497; CALL MK; F := 31183; CALL MK;\r
+320  F := 31215; CALL MK; F := 29257; CALL MK; F := 31727; CALL MK;\r
+330  F := 31695; CALL MK; F := 1040; CALL MK; F := 0; CALL MK;\r
+340  K := 0;\r
+350  WHILE K = 0 DO BEGIN CALL DRAW; I := 130;\r
+360   WHILE I > 0 DO BEGIN K := KEY+K; I := I-1 END;\r
+370   R := R+691; IF R >= 1000 THEN BEGIN R := R-1000; K := KEY+K END;\r
+380   CALL ONE END;\r
+390  CLS\r
+400 END.\r
+RUN\r
+12\r
+59\r
+58\r
+#wait 1
+#screen
+#wait 2
+#screen
+X
+#ready
+#screen

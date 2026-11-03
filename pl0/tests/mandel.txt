@@ -1,0 +1,56 @@
+^
+#wait 0.5
+10 CONST S = 90, MAXIT = 24, SCR = 32832, SQ = 6656, PAL = 6847;\r
+20 VAR X, Y, A, B, CX, CY, XX, YY, N, G, V, C, R;\r
+30 BEGIN\r
+40   CLS; A := 0;\r
+50   WHILE A < 182 DO BEGIN POKE SQ + A, A * A / S; A := A + 1 END;\r
+60   POKE PAL + 1, 32; POKE PAL + 2, 46; POKE PAL + 3, 58;\r
+70   POKE PAL + 4, 45; POKE PAL + 5, 61; POKE PAL + 6, 43;\r
+80   POKE PAL + 7, 42; POKE PAL + 8, 35; POKE PAL + 9, 37;\r
+90   R := 0;\r
+100  WHILE R < 31 DO\r
+110  BEGIN\r
+120    CY := R * 189 / 30 - 94; C := 0;\r
+130    WHILE C < 64 DO\r
+140    BEGIN\r
+150      CX := C * 234 / 63 - 180;\r
+160      X := 0; Y := 0; N := 0; G := 1;\r
+170      WHILE G = 1 DO\r
+180      BEGIN\r
+190        G := 0; A := X; IF X < 0 THEN A := - X;\r
+200        B := Y; IF Y < 0 THEN B := - Y;\r
+210        IF A < 182 THEN IF B < 182 THEN\r
+220        BEGIN\r
+230          XX := PEEK (SQ + A); IF A > 151 THEN XX := XX + 256;\r
+240          YY := PEEK (SQ + B); IF B > 151 THEN YY := YY + 256;\r
+250          IF XX + YY <= 360 THEN\r
+260          BEGIN\r
+270            Y := X * Y / S * 2 + CY; X := XX - YY + CX; N := N + 1;\r
+280            IF N < MAXIT THEN G := 1\r
+290          END\r
+300        END\r
+310      END;\r
+320      V := 79; IF N > 9 THEN IF N < MAXIT THEN N := 9;\r
+330      IF N < MAXIT THEN V := PEEK (PAL + N);\r
+340      POKE SCR + R * 64 + C, V; C := C + 1;\r
+350      IF C / 8 * 8 = C THEN IF KEY # 0 THEN BEGIN C := 64; R := 99 END\r
+360    END;\r
+370    R := R + 1\r
+380  END;\r
+390  IF R = 31 THEN\r
+400  BEGIN\r
+410    POKE 32824, 4; POKE 32825, 15; POKE 32826, 14; POKE 32827, 5;\r
+420    WHILE KEY = 0 DO;\r
+430    POKE 32824, 32; POKE 32825, 32; POKE 32826, 32; POKE 32827, 32\r
+440  END;\r
+450  CLS\r
+460 END.\r
+RUN\r
+#wait 15
+#screen
+#wait 25
+#screen
+X
+#ready
+#screen

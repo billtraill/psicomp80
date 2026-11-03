@@ -14,5 +14,6 @@
 140    END;
 150    Y := Y + 1
 160  END;
-170  WHILE 0 = 0 DO
-180 END.
+170  WHILE KEY = 0 DO;
+180  CLS
+190 END.

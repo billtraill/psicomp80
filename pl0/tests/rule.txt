@@ -1,0 +1,62 @@
+^
+#wait 0.5
+10 CONST SCR = 32768, CA = 6656, CB = 6786, RT = 6916;\r
+20 VAR R, O, N, T, W, X, Y, V, P, Q, I, C;\r
+30 PROCEDURE NUM;\r
+40 BEGIN\r
+50   I := 1; WHILE I <= P / 10 DO I := I * 10;\r
+60   WHILE I > 0 DO\r
+70   BEGIN\r
+80     POKE Q, 48 + P / I; P := P - P / I * I; I := I / 10; Q := Q + 1\r
+90   END\r
+100 END;\r
+110 PROCEDURE CH;\r
+120 BEGIN IF C = 0 THEN C := 32; POKE Q, C; Q := Q + 1 END;\r
+130 PROCEDURE TXT;\r
+140 BEGIN\r
+150   C := W / 1024; CALL CH; C := W / 32 - W / 1024 * 32; CALL CH;\r
+160   C := W - W / 32 * 32; CALL CH\r
+170 END;\r
+180 BEGIN\r
+190   ? R; CLS; Q := SCR + 64;\r
+200   W := 5509; CALL TXT; W := 13486; CALL TXT; W := 20530; CALL TXT;\r
+210   W := 25603; CALL TXT; W := 5516; CALL TXT; W := 21889; CALL TXT;\r
+220   W := 18433; CALL TXT; W := 22159; CALL TXT; W := 13364; CALL TXT;\r
+230   W := 15808; CALL TXT; Q := Q - 1; C := 44; CALL CH;\r
+240   W := 597; CALL TXT; W := 12448; CALL TXT; P := R; CALL NUM;\r
+250   I := 0; T := R;\r
+260   WHILE I < 8 DO\r
+270   BEGIN\r
+280     V := 0; IF ODD T THEN V := 1;\r
+290     POKE RT + I, V; T := T / 2; I := I + 1\r
+300   END;\r
+310   I := 0;\r
+320   WHILE I < 130 DO BEGIN POKE CA + I, 0; POKE CB + I, 0; I := I + 1 END;\r
+330   POKE CA + 65, 1; PLOT 64, 2;\r
+340   O := CA; N := CB; Y := 3;\r
+350   WHILE Y < 62 DO\r
+360   BEGIN\r
+370     W := PEEK O + PEEK O + PEEK (O + 1); X := 0;\r
+380     WHILE X < 128 DO\r
+390     BEGIN\r
+400       W := W + W + PEEK (O + X + 2);\r
+410       IF W > 7 THEN W := W - 8;\r
+420       V := PEEK (RT + W); POKE N + X + 1, V;\r
+430       IF V = 1 THEN PLOT X, Y;\r
+440       X := X + 1\r
+450     END;\r
+460     T := O; O := N; N := T; Y := Y + 1;\r
+470     IF KEY # 0 THEN Y := 99\r
+480   END;\r
+490   IF Y = 62 THEN WHILE KEY = 0 DO;\r
+500   CLS\r
+510 END.\r
+RUN\r
+30\r
+#wait 2
+#screen
+#wait 5
+#screen
+X
+#ready
+#screen

@@ -16,15 +16,14 @@
 140    END;\r
 150    Y := Y + 1\r
 160  END;\r
-170  WHILE 0 = 0 DO\r
-180 END.\r
+170  WHILE KEY = 0 DO;\r
+180  CLS\r
+190 END.\r
 RUN\r
 #wait 12
 #screen
 X
-#wait 0.5
-^
-#wait 0.5
+#ready
 LIST 160\r
 #ready
 #screen

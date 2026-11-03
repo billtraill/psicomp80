@@ -1,0 +1,78 @@
+^
+#wait 0.5
+10 CONST SCR = 32768, HALF = 6656, BITS = 6784;\r
+20 VAR P, N, X, Y, B, A, C, G, J, K, M, Q, I, W;\r
+30 PROCEDURE NUM;\r
+40 BEGIN\r
+50  I := 1; WHILE I <= P / 10 DO I := I * 10;\r
+60  WHILE I > 0 DO\r
+70  BEGIN POKE Q, 48 + P / I; P := P - P / I * I; I := I / 10; Q := Q + 1 END\r
+80 END;\r
+90 PROCEDURE CH; BEGIN IF C = 0 THEN C := 32; POKE Q, C; Q := Q + 1 END;\r
+100 PROCEDURE TXT;\r
+110 BEGIN\r
+120  C := W / 1024; CALL CH; C := W / 32 - W / 1024 * 32; CALL CH;\r
+130  C := W - W / 32 * 32; CALL CH\r
+140 END;\r
+150 PROCEDURE CROSS;\r
+160 BEGIN\r
+170  A := B + PEEK (HALF + X); C := PEEK A; G := 0;\r
+180  M := 1; IF ODD X THEN M := 2; IF ODD Y THEN M := 12 - M - M - M - M;\r
+190  N := C / M;\r
+200  IF C # 32 THEN IF ODD N THEN\r
+210  BEGIN G := 1; N := C - M; IF N = 64 THEN N := 32; POKE A, N END\r
+220 END;\r
+230 BEGIN\r
+240  CLS; I := 0;\r
+250  WHILE I < 128 DO BEGIN POKE HALF + I, I / 2; I := I + 1 END;\r
+260  I := 0;\r
+270  WHILE I < 16 DO\r
+280  BEGIN\r
+290   N := I; C := 0;\r
+300   WHILE N > 0 DO BEGIN IF ODD N THEN C := C + 1; N := N / 2 END;\r
+310   POKE BITS + I, C; I := I + 1\r
+320  END;\r
+330  I := 0; WHILE I < 1920 DO BEGIN POKE SCR + 128 + I, 79; I := I + 1 END;\r
+340  B := SCR + 128; Y := 4; X := 0; CALL CROSS; X := 1; CALL CROSS;\r
+350  P := 2; J := 0; K := 0;\r
+360  WHILE P < 88 DO\r
+370  BEGIN\r
+380   B := SCR + 128; Y := 4; X := P; CALL CROSS; POKE A, C;\r
+390   IF G = 1 THEN\r
+400   BEGIN\r
+410    Q := SCR + 98; W := 3663; CALL TXT; W := 20073; CALL TXT;\r
+420    W := 14560; CALL TXT; W := 16052; CALL TXT; Q := Q + 1; CALL NUM;\r
+430    P := X; N := P * P; Y := N / 128 + 4; X := N - N / 128 * 128;\r
+440    B := SCR + Y / 2 * 64;\r
+450    WHILE Y < 64 DO\r
+460    BEGIN\r
+470     CALL CROSS; X := X + P;\r
+480     WHILE X > 127 DO\r
+490     BEGIN X := X - 128; Y := Y + 1; IF ODD Y + 1 THEN B := B + 64 END;\r
+500     J := J + 1;\r
+510     IF J = 256 THEN BEGIN J := 0; IF KEY # 0 THEN K := 1 END;\r
+520     IF K = 1 THEN BEGIN Y := 64; P := 88 END\r
+530    END\r
+540   END;\r
+550   P := P + 1\r
+560  END;\r
+570  IF K = 0 THEN\r
+580  BEGIN\r
+590   I := 0; N := 0;\r
+600   WHILE I < 1920 DO\r
+610   BEGIN\r
+620    C := PEEK (SCR + 128 + I);\r
+630    IF C # 32 THEN N := N + PEEK (BITS - 64 + C); I := I + 1\r
+640   END;\r
+650   Q := SCR + 98; W := 16969; CALL TXT; W := 13491; CALL TXT;\r
+660   W := 207; CALL TXT; W := 21956; CALL TXT; Q := Q + 1; P := N; CALL NUM;\r
+670   WHILE KEY = 0 DO\r
+680  END;\r
+690  CLS\r
+700 END.\r
+RUN\r
+#wait 15
+#screen
+X
+#ready
+#screen

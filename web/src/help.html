@@ -506,13 +506,14 @@
       <h3>Commands</h3>
       <ul>
         <li><strong>RUN</strong> compiles the program and runs it; <strong>CODE</strong> compiles it and prints how many bytes of machine code it made; <strong>LIST</strong> [line]; <strong>NEW</strong>.</li>
-        <li>A compile error stops with <code>SYNTAX?</code> or <code>NAME?</code> and the line; <code>FULL</code> means the program is too long and <code>DIVIDE?</code> is dividing by 0. Any key while a program runs resets to the monitor; RS comes back with the program kept.</li>
+        <li>A compile error stops with <code>SYNTAX?</code> or <code>NAME?</code> and the line; <code>FULL</code> means the program is too long and <code>DIVIDE?</code> is dividing by 0. Any key while a program runs resets to the monitor, except while <code>KEY</code> waits; RS comes back with the program kept, and RS while <code>KEY</code> waits stops the program.</li>
       </ul>
       <h3>The language</h3>
       <ul>
         <li>A program is a block and a full stop. A block is <code>CONST A = 1, B = 2;</code>, <code>VAR X, Y;</code> and <code>PROCEDURE P; block;</code>, each if wanted, then one statement.</li>
-        <li>Statements: <code>X := expression</code>, <code>CALL P</code>, <code>BEGIN … ; … END</code>, <code>IF condition THEN statement</code>, <code>WHILE condition DO statement</code>, <code>! expression</code> to print a number on a line of its own, <code>? X</code> to read one, <code>PLOT X, Y</code> to set a point on the 128 × 62 quarter blocks of lines 1–31, and <code>CLS</code>.</li>
-        <li>A condition is <code>ODD expression</code> or two expressions compared with <code>= # &lt; &lt;= &gt; &gt;=</code>; <code>#</code> is “not equal”. Expressions have <code>+ − * /</code> and brackets, on 16-bit integers; <code>/</code> rounds towards 0.</li>
+        <li>Statements: <code>X := expression</code>, <code>CALL P</code>, <code>BEGIN … ; … END</code>, <code>IF condition THEN statement</code>, <code>WHILE condition DO statement</code>, <code>! expression</code> to print a number on a line of its own, <code>? X</code> to read one, <code>PLOT X, Y</code> to set a point on the 128 × 62 quarter blocks of lines 1–31, <code>CLS</code>, and <code>POKE A, B</code> to put byte B at address A.</li>
+        <li>A condition is <code>ODD expression</code> or two expressions compared with <code>= # &lt; &lt;= &gt; &gt;=</code>; <code>#</code> is “not equal”. Expressions have <code>+ − * /</code> and brackets, on 16-bit integers; <code>/</code> rounds towards 0. <code>PEEK A</code> is the byte at A, and <code>KEY</code> waits about 6 ms and gives the last key pressed meanwhile, or 0 (letters are 1–26, Return 31).</li>
+        <li>Numbers wrap round at 16 bits, so the screen, at 8000h, is <code>32768</code>: line L, column C is at <code>32768 + 64 * L + C</code>. A quarter block is 64 plus 1 top left, 2 top right, 4 bottom right and 8 bottom left. 1A00–1BFF (6656–7167) holds the names while a program compiles and is free for tables while it runs. The words of the language and the commands can’t be used as names.</li>
         <li>Names belong to the block they are declared in, and procedures can be nested. Each variable has one place in memory, so a procedure that calls itself shares its variables with itself, as in FORTRAN.</li>
       </ul>
       <h3>How it compiles</h3>
@@ -523,7 +524,8 @@
         <li><strong>Primes</strong> tries each number below 100 against the divisors up to its square root; <code>N / D * D = N</code> is true when D divides N.</li>
         <li><strong>GCD</strong> reads two numbers with <code>?</code> and takes the smaller from the larger until they are equal: 1071 and 462 give 21.</li>
         <li><strong>Factorials</strong> uses a procedure that calls itself. With only global variables it takes N down by 1 before the call and puts it back afterwards, then multiplies.</li>
-        <li><strong>Rings</strong> plots the points where (DX² + DY²) / 256 is odd, with DY scaled by 5/3 for the shape of the points: concentric rings over the screen, 7936 points in about 7.5 s. It then waits in a loop until a key is pressed.</li>
+        <li><strong>Rings</strong> plots the points where (DX² + DY²) / 256 is odd, with DY scaled by 5/3 for the shape of the points: concentric rings over the screen, 7936 points in about 7.5 s. It then waits for a key with KEY.</li>
+        <li><strong>The FORTH examples, again in PL/0</strong>: Sierpiński, Hilbert, dragon, Koch, Lissajous, Life, Langton’s ant, cellular automata, the sieve, Mandelbrot, the fern, the chaos game, a maze, sorting (five ways, each named with its counts, in two programs), Hanoi, bouncing balls, stars, snake and a clock. They draw the same pictures, most of them faster, with PEEK and POKE for the screen and for tables and KEY for keys and timing. Without AND, ELSE or arrays each needs a trick or two: Sierpiński adds up rows of Pascal’s triangle, the maze marks its way back on the screen instead of keeping a stack, and quicksort keeps its own list of the parts still to sort. The longest are written without spaces round the signs so that their code fits below 1A00.</li>
       </ul>
       <div class="exlist" id="exl-pl0"></div>
     </section>

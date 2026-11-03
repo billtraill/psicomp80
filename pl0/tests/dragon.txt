@@ -1,0 +1,40 @@
+^
+#wait 0.5
+10 VAR X, Y, D, N, I, J, DX, DY, M;\r
+20 PROCEDURE C;\r
+30 BEGIN IF J = 0 THEN J := 32; POKE M, J; M := M + 1 END;\r
+40 PROCEDURE W;\r
+50 BEGIN\r
+60   J := N / 1024; CALL C; J := N / 32 - N / 1024 * 32; CALL C;\r
+70   J := N - N / 32 * 32; CALL C\r
+80 END;\r
+90 PROCEDURE FD;\r
+100 BEGIN\r
+110   N := 4; DX := 1 - D; DY := 0;\r
+120   IF ODD D THEN BEGIN N := 2; DX := 0; DY := 2 - D END;\r
+130   WHILE N > 0 DO\r
+140   BEGIN X := X + DX; Y := Y + DY; PLOT X, Y; N := N - 1 END\r
+150 END;\r
+160 BEGIN\r
+170   CLS; M := 32832;\r
+180   N := 4673; CALL W; N := 7662; CALL W; N := 117; CALL W;\r
+190   N := 19141; CALL W;\r
+200   X := 86; Y := 14; D := 1; PLOT X, Y;\r
+210   I := 1;\r
+220   WHILE I <= 512 DO\r
+230   BEGIN\r
+240     CALL FD;\r
+250     J := I; WHILE ODD J + 1 DO J := J / 2;\r
+260     D := D + 1; IF ODD J / 2 THEN D := D + 2;\r
+270     D := D - D / 4 * 4;\r
+280     I := I + 1\r
+290   END;\r
+300   WHILE KEY = 0 DO;\r
+310   CLS\r
+320 END.\r
+RUN\r
+#wait 2
+#screen
+X
+#ready
+#screen

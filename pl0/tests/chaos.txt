@@ -1,0 +1,30 @@
+^
+#wait 0.5
+10 VAR S, R, X, Y, N;\r
+20 PROCEDURE RND;\r
+30 BEGIN\r
+40   S := S * 31421 + 6927; R := S;\r
+50   IF R < 0 THEN R := R + 32767 + 1;\r
+60   R := R / 128\r
+70 END;\r
+80 BEGIN\r
+90   CLS; X := 64; Y := 30; N := 0;\r
+100  WHILE N < 6000 DO\r
+110  BEGIN\r
+120    CALL RND;\r
+130    IF R < 85 THEN BEGIN X := (X + 64) / 2; Y := Y / 2 END;\r
+140    IF R >= 85 THEN BEGIN Y := (Y + 61) / 2;\r
+150      IF R < 170 THEN X := (X + 1) / 2;\r
+160      IF R >= 170 THEN X := (X + 126) / 2\r
+170    END;\r
+180    PLOT X, Y; N := N + 1\r
+190  END;\r
+200  WHILE KEY = 0 DO;\r
+210  CLS\r
+220 END.\r
+RUN
+#wait 13
+#screen
+X
+#ready
+#screen

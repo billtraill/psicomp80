@@ -9,13 +9,13 @@ Open it in a browser; it needs no server.
 
 - Switch ROM between the ten on buttons and the eleven in the Other menu, and
   memory between 5 KB and the 32 KB expansion (both power the machine off and on).
-- Run any of the 140 examples: machine code (Storm, a shooting game; Life, a
+- Run any of the 160 examples: machine code (Storm, a shooting game; Life, a
   plasma, fire, a scrolling banner, a memory viewer, the Fig. 22 pictures);
   BURP's sample program and number programs from Collatz to Zeller's
   congruence; FORTH graphics, animations and games (Mandelbrot, fractals,
   Langton's ant, a maze, sorting, bouncing balls, snake, a clock); LISP's
   symbolic programs (differentiation, Eliza, the animal game, unification,
-  LISP in LISP); and a few for each of the other languages, the Other ones in one group. The page types
+  LISP in LISP); the FORTH programs again in PL/0; and a few for each of the other languages, the Other ones in one group. The page types
   each one in, flat out, then runs it at the real 4 MHz.
 - Paste a program to have it typed in a line at a time.
 - Keys: Return, `^` (RS), Backspace (rubout in the languages that read a line), Ctrl+`\` (FS),

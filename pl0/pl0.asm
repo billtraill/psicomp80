@@ -64,6 +64,7 @@ TOKV:   equ 1DA7h           ; its value, for a number
 CODEP:  equ 1DA9h           ; where the next byte of code goes
 SYMEND: equ 1DABh           ; end of the names
 VARP:   equ 1DADh           ; the next free variable
+KEYBUF: equ 1DC0h           ; digits and keys while KEY waits
 S0:     equ 1F00h           ; stack (monitor uses 1Fxx)
 
 ; Tokens: 0 end of the text, 1 a name, 2 a number, 3 :=, 4 <=, 5 >=, the
@@ -84,24 +85,20 @@ KDO:    equ 89h
 KODD:   equ 8Ah
 KPLOT:  equ 8Bh
 KCLS:   equ 8Ch
+KPEEK:  equ 8Dh
+KPOKE:  equ 8Eh
+KKEY:   equ 8Fh
+KRUN:   equ 90h             ; the commands
+KLIST:  equ 91h
+KCODE:  equ 92h
+KNEW:   equ 93h
 
         org 0400h
 
 kwtab:  db "CONS",0D4h,"VA",0D2h,"PROCEDUR",0C5h,"BEGI",0CEh,"EN",0C4h
         db "CAL",0CCh,"I",0C6h,"THE",0CEh,"WHIL",0C5h,"D",0CFh,"OD",0C4h
-        db "PLO",0D4h,"CL",0D3h,0
-
-; The commands: each name with 80h on its last letter, then its address.
-ctab:   db "RU",0CEh
-        dw srun
-        db "LIS",0D4h
-        dw slist
-        db "COD",0C5h
-        dw scode
-        db "NE",0D7h
-        dw snew
-        db 0
-        dw ersyn
+        db "PLO",0D4h,"CL",0D3h,"PEE",0CBh,"POK",0C5h,"KE",0D9h
+        db "RU",0CEh,"LIS",0D4h,"COD",0C5h,"NE",0D7h,0
 
 ; The comparisons: the token, then which of < = > make it true (1 2 4).
 reltab: db '=',2,'#',5,'<',1,'>',4,4,3,5,6
@@ -119,7 +116,7 @@ nxline: ld de,(TXTEND)      ; HL = the start of a line
         sbc hl,de
         add hl,de
         ld a,0              ; past the last line: the end
-        jr nc,settok
+        jp nc,settok
         ld (LINEP),hl
         inc hl
         inc hl
@@ -134,8 +131,13 @@ nx2:    inc hl
         dec hl              ; a name: copy it to IDBUF
         ld de,IDBUF
 nx3:    ld a,(hl)
-        call isaln
+        sub '0'
+        cp 10
+        jr c,nx3a
+        sub 'A'-'0'
+        cp 26
         jr nc,nx3e
+nx3a:   ld a,(hl)
         ld (de),a
         inc de
         inc hl
@@ -198,18 +200,6 @@ nx7:    ld (SRCP),hl
 settok: ld (TOK),a
         ret
 
-; CY if A is a letter or a digit.
-isaln:  cp '0'
-        ccf
-        ret nc
-        cp '9'+1
-        ret c
-        cp 'A'
-        ccf
-        ret nc
-        cp 'Z'+1
-        ret
-
 ; The token must be the byte after the CALL: go past it.
 expect: ex (sp),hl
         ld b,(hl)
@@ -223,7 +213,7 @@ expect: ex (sp),hl
 ; After an item of CONST or VAR: Z if a comma follows (gone past), NZ if
 ; the semicolon at the end does.
 sepq:   call next
-        ld a,(TOK)
+sepq2:  ld a,(TOK)
         cp ','
         ret z
         call expect
@@ -307,7 +297,7 @@ lk9:    ld a,b
 
 ; A variable's name: DE = its address.
 varid:  call wantid
-        call lookup
+varid2: call lookup
         dec a
         ret z
         jp ername
@@ -357,11 +347,11 @@ jphl:   jp (hl)
 ; Jump if the condition just compiled is false (its routine returns Z):
 ; HL = where the jump's address goes.
 test:   ld a,0CAh           ; JP Z,
-        call emit1
+; A jump A forward: HL = where its address goes.
+jfwd:   call emit3
         ld hl,(CODEP)
-        push hl
-        call emit2
-        pop hl
+        dec hl
+        dec hl
         ret
 
 ; Put the address of the next byte of code at HL.
@@ -401,13 +391,12 @@ bl1:    call next           ; CONST name = number, ...
         call next
         call expect
         db '='
-        ld a,(TOK)
-        cp TNUM
-        jp nz,ersyn
+        call expect
+        db TNUM
         ld hl,(TOKV)
         xor a
         call define
-        call sepq
+        call sepq2
         jr z,bl1
 bl3:    ld a,(TOK)
         cp KVAR
@@ -425,10 +414,8 @@ bl4:    call next           ; VAR name, ...
         call sepq
         jr z,bl4
 bl5:    ld a,0C3h           ; JP over the procedures
-        call emit1
-        ld hl,(CODEP)
+        call jfwd
         push hl
-        call emit2
 bl6:    ld a,(TOK)
         cp KPROC
         jr nz,bl7
@@ -457,7 +444,7 @@ bl7:    pop hl              ; the JP goes to the statement
 ; is an empty statement.
 stmt:   ld a,(TOK)
         ld hl,stab
-        ld b,9
+        ld b,10
 st0:    cp (hl)
         inc hl
         jr z,st1
@@ -490,10 +477,10 @@ stab:   db TNAME
         dw splot
         db KCLS
         dw scls
+        db KPOKE
+        dw spoke
 
-sset:   call lookup         ; name := expression
-        dec a
-        jp nz,ername
+sset:   call varid2         ; name := expression
         push de
         call expect
         db TBEC
@@ -557,13 +544,22 @@ swhile: ld hl,(CODEP)
         pop hl
         jp patch
 
-splot:  call expr
+splot:  ld hl,rplot
+        ld a,0CDh           ; CALL rplot
+spl:    push hl
+        push af
+        call expr
         call expect
         db ','
         ld hl,expr
         call pushop
-        ld hl,rplot
-        jp emcall
+        pop af
+        pop hl
+        jp emit3
+
+spoke:  ld hl,0012h         ; LD A,L / LD (DE),A / NOP
+        ld a,7Dh
+        jr spl
 
 scls:   ld hl,cls
         jp emcall
@@ -573,8 +569,8 @@ cond:   ld a,(TOK)
         jr nz,cd1
         call next
         call expr
-        ld hl,rodd
-        jp emcall
+        ld hl,45CBh         ; BIT 0,L
+        jp emit2
 cd1:    call expr
         ld a,(TOK)
         ld hl,reltab
@@ -596,14 +592,14 @@ cd3:    ld a,(hl)
         jp emit1
 
 expr:   ld a,(TOK)
+        push af
         cp '-'
-        jr nz,ex0
-        call next
+        call z,next
         call term
+        pop af
+        cp '-'
         ld hl,neghl
-        call emcall
-        jr ex1
-ex0:    call term
+        call z,emcall
 ex1:    ld a,(TOK)
         cp '+'
         jr z,ex2
@@ -634,22 +630,32 @@ rinput: ld a,'?'
         ld de,TIB
         jp getnum
 
+; HL = -HL, and HL = |HL|.
+neghl:  xor a
+        sub l
+        ld l,a
+        sbc a,a
+        sub h
+        ld h,a
+        ret
+
+abshl:  bit 7,h
+        ret z
+        jr neghl
+
 part1_end:
         ds 0800h-$,0FFh
 
 ; ---------------------------------------------------------------- entry
-; 0800h: the monitor's NMI handler jumps here for RS.  If PL/0 was waiting
-; for a key, the NMI's return address (KEYRET) is on top of the stack: give
-; RAWKEY a rubout (0FFh).  Otherwise start (or restart) PL/0.
+; 0800h: the monitor's NMI handler jumps here for RS, which comes only in a
+; HALT.  If it was RAWKEY's, the NMI's return address (KEYRET) is on top of
+; the stack: give RAWKEY a rubout (0FFh).  Otherwise, at READY or in KEY,
+; start (or restart) PL/0.  The low byte of the address tells them apart.
 
 entry:  ex (sp),hl
-        push de
-        ld de,keyret
-        or a
-        sbc hl,de
-        add hl,de           ; keeps Z
-        pop de
+        ld a,l
         ex (sp),hl
+        cp keyret & 0FFh
         jr nz,warm
         ld a,0FFh
         ret
@@ -678,8 +684,21 @@ getln:  call accept
         ld de,TIB
         call getnum
         jr c,gl1
-        ld hl,ctab          ; not numbered: a command
-        jp dispatch
+        ld (SRCP),de        ; not numbered: a command,
+        ld hl,ready         ; which returns to READY
+        push hl
+        call next
+        ld a,(TOK)
+        ld de,(SRCP)
+        cp KRUN
+        jr z,srun
+        cp KLIST
+        jp z,slist
+        cp KCODE
+        jr z,scode
+        cp KNEW
+        jp z,new0
+        jp ersyn
 gl1:    push de             ; a numbered line: replace the old one
         push hl
         call findln
@@ -743,7 +762,7 @@ ed3:    inc hl
         inc de
         cp 0Dh
         jr nz,ed3
-        jr getln
+        jp getln
 
 ; ---------------------------------------------------------------- commands
 
@@ -754,16 +773,14 @@ ru1:    ld (hl),0
         inc hl
         djnz ru1
         ld hl,(TXTEND)
-        call jphl
-        jp ready
+        jp (hl)
 
 scode:  call compile
         ld hl,(CODEP)
         ld de,(TXTEND)
         or a
         sbc hl,de
-        call prnum
-        jp ready
+        jp prnum
 
 slist:  call getnum
         call findln
@@ -771,7 +788,7 @@ ls1:    ld bc,(TXTEND)
         or a
         sbc hl,bc
         add hl,bc
-        jp nc,ready
+        ret nc
         push hl
         ld a,(hl)
         inc hl
@@ -791,9 +808,6 @@ ls2:    inc hl
 ls3:    inc hl
         call crlf
         jr ls1
-
-snew:   call new0
-        jp ready
 
 new0:   ld hl,MAGICV
         ld (MAGIC),hl
@@ -867,39 +881,6 @@ skipsp: ld a,(de)
         ret nz
         inc de
         jr skipsp
-
-; Go to the address in table HL for the name at DE.
-dispatch:
-        ld a,(hl)
-        or a
-        jr nz,dp2
-        inc hl
-        jr dp3
-dp2:    call skipsp
-        push de
-dp4:    ld a,(hl)
-        and 7Fh
-        ex de,hl
-        cp (hl)
-        ex de,hl
-        jr nz,dp5
-        inc de
-        bit 7,(hl)
-        inc hl
-        jr z,dp4
-        pop af
-dp3:    ld a,(hl)
-        inc hl
-        ld h,(hl)
-        ld l,a
-        jp (hl)
-dp5:    bit 7,(hl)
-        inc hl
-        jr z,dp5
-        pop de
-        inc hl
-        inc hl
-        jr dispatch
 
 ; If DE is at a number, CY and HL = it; if not, NC and HL = 0.  Changes BC.
 getnum: call skipsp
@@ -1091,16 +1072,15 @@ er1:    call crlf
 
 ; ---------------------------------------------------------------- keyboard
 
-; Wait for a key.  A = glyph to show at the cursor meanwhile.  Returns A =
-; ASCII key, 0Dh for Return, 08h for rubout.  Leaves the screen as it was
-; (the NMI handler's echo is undone).  Keeps HL, DE.
+; Wait for a key, showing _ at the cursor meanwhile.  Returns A = the ASCII
+; key, 5Fh for Return and 0FFh for rubout.  Leaves the screen as it was (the
+; NMI handler's echo is undone).  Keeps HL, DE.
 rawkey: push de
         push hl
         ld de,(CURS)
-        ld h,a
         ld a,(de)
         ld l,a
-        ld a,h
+        ld a,1Fh            ; cursor: _
         ld (de),a
         push de
         halt
@@ -1111,26 +1091,17 @@ keyret: pop de
         ld a,h
         pop hl
         pop de
-        cp 0FFh
-        jr nz,rk1
-        ld a,8
-        ret
-rk1:    cp 1Fh
-        jr nz,rk2
-        ld a,0Dh
-        ret
-rk2:    cp 20h
+        cp 20h
         ret nc
         add a,40h
         ret
 
 ; Read a line into TIB, echoing it, ending with 0Dh.  Changes DE.
 accept: ld de,TIB
-ac1:    ld a,1Fh            ; cursor: _
-        call rawkey
-        cp 0Dh
+ac1:    call rawkey
+        cp 5Fh              ; Return
         jr z,ac9
-        cp 8
+        cp 0FFh             ; rubout
         jr z,ac3
         ld (de),a
         ld a,e
@@ -1149,7 +1120,8 @@ ac3:    ld a,e
         ld (hl),' '
         ld (CURS),hl
         jr ac1
-ac9:    ld (de),a
+ac9:    ld a,0Dh
+        ld (de),a
         jp crlf
 
 ; ---------------------------------------------------------------- compiler
@@ -1190,7 +1162,18 @@ fa1:    cp TNAME
         jp nz,ername
 fa2:    ld a,b
         jr fa0
-fa3:    call expect
+fa3:    cp KPEEK
+        jr nz,fa4
+        call next
+        call factor
+        ld hl,0026h         ; LD L,(HL) / LD H,0
+        ld a,6Eh
+        jp emit3
+fa4:    cp KKEY
+        ld hl,rkey
+        ld a,0CDh           ; CALL rkey
+        jr z,fa0
+        call expect
         db '('
         call expr
         call expect
@@ -1203,18 +1186,6 @@ fa3:    call expect
 rprint: call prnum
         jp crlf
 
-; Z if HL is even.
-rodd:   bit 0,l
-        ret
-
-rmul:   ld b,d
-        ld c,e
-        jr mul
-
-rdiv:   ld b,h
-        ld c,l
-        ex de,hl
-        jr sdiv
 
 ; DE compared with HL, by the byte after the CALL: Z if false.
 rrel:   ex (sp),hl
@@ -1222,39 +1193,25 @@ rrel:   ex (sp),hl
         inc hl
         ex (sp),hl
         ex de,hl
-        ld a,h
-        xor 80h
-        ld h,a
-        ld a,d
-        xor 80h
-        ld d,a
         or a
         sbc hl,de
-        ld a,1              ; 1 <, 2 =, 4 >
-        jr c,rr1
-        ld a,2
+        ld a,2              ; 1 <, 2 =, 4 >
         jr z,rr1
+        ld a,h              ; less if the sign is set, unless it overflowed
+        jp po,rr0
+        cpl
+rr0:    rla
+        ld a,1
+        jr c,rr1
         ld a,4
 rr1:    and c
         ret
 
 ; ---------------------------------------------------------------- arithmetic
 
-neghl:  xor a
-        sub l
-        ld l,a
-        sbc a,a
-        sub h
-        ld h,a
-        ret
-
-abshl:  bit 7,h
-        ret z
-        jr neghl
-
-; HL = HL * BC.  Keeps DE.
-mul:    push de
-        ex de,hl
+; HL = DE * HL.
+rmul:   ld b,h
+        ld c,l
         ld hl,0
         ld a,16
 mu1:    add hl,hl
@@ -1264,29 +1221,24 @@ mu1:    add hl,hl
         add hl,de
 mu2:    dec a
         jr nz,mu1
-        pop de
         ret
 
-; HL = HL / BC, signed, rounding towards zero.
-sdiv:   ld a,b
-        or c
+; HL = DE / HL, signed, rounding towards zero.
+rdiv:   ld a,h
+        or l
         jp z,erdiv
-        ld a,h
-        xor b
+        ld a,d
+        xor h
         push af
         call abshl
-        push hl
-        ld h,b
-        ld l,c
-        call abshl
         ex de,hl
-        pop hl
+        call abshl
         call udiv
         ld h,b
         ld l,c
         pop af
         ret p
-        jr neghl
+        jp neghl
 
 ; BC = HL / DE, HL = remainder (unsigned; DE below 8001h).
 udiv:   ld b,h
@@ -1303,6 +1255,50 @@ ud1:    sla c
 ud2:    inc c
 ud3:    dec a
         jr nz,ud1
+        ret
+
+; ---------------------------------------------------------------- KEY
+
+; Wait about 8 ms and give the last key pressed in that time, or 0: the
+; MM57109 puts out a number, a digit at a time, and each digit interrupts
+; a HALT, so a key is taken there rather than resetting the COMP80.  The
+; monitor's interrupt handler puts each digit at (HL), and its NMI handler
+; puts the key at (DE): both go in KEYBUF.  The OUT is finished by the NOP
+; that starts the next KEY, so RS in the middle of one does no harm.
+rkey:   push de             ; keeps DE: the code for X + KEY takes KEY as
+        ld a,3Fh            ; one load.  3Fh is a NOP, or the second word an
+        call mmcmd          ; OUT waits for
+        ld a,16h            ; OUT
+        call mmcmd
+        im 1
+        ld hl,KEYBUF
+        ld d,h
+        ld e,l
+        ld c,0
+rky1:   xor a
+        ei
+        halt
+keyrt2: di
+        or a
+        jr z,rky2
+        ld c,a
+rky2:   ld a,l
+        cp (KEYBUF+12) & 0FFh
+        jr nz,rky1
+        pop de
+        ld l,c
+        ld h,0
+        ret
+
+; Give the MM57109 the instruction in A, once it is ready.
+mmcmd:  ld b,a
+mm1:    in a,(3)
+        and 20h
+        jr nz,mm1
+        ld a,b
+        out (60h),a
+        or 80h
+        out (60h),a
         ret
 
 part2_end:

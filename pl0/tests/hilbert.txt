@@ -1,0 +1,52 @@
+^
+#wait 0.5
+10 VAR D, L, A, T, N, DX, DY, HX, HY, B, Q, E, I;\r
+20 PROCEDURE P;\r
+30 BEGIN\r
+40   B := 1 + HX; IF HY = 1 THEN B := 8 - 4 * HX;\r
+50   E := PEEK Q; IF E < 64 THEN E := 64; POKE Q, E + B\r
+60 END;\r
+70 PROCEDURE FD;\r
+80 BEGIN\r
+90   N := 4; DX := 1 - D; DY := 0;\r
+100   IF ODD D THEN BEGIN N := 2; DX := 0; DY := 2 - D END;\r
+110   WHILE N > 0 DO\r
+120   BEGIN\r
+130     HX := HX + DX; HY := HY + DY;\r
+140     IF HX = 2 THEN BEGIN HX := 0; Q := Q + 1 END;\r
+150     IF HX < 0 THEN BEGIN HX := 1; Q := Q - 1 END;\r
+160     IF HY = 2 THEN BEGIN HY := 0; Q := Q + 64 END;\r
+170     IF HY < 0 THEN BEGIN HY := 1; Q := Q - 64 END;\r
+180     CALL P; N := N - 1\r
+190   END\r
+200 END;\r
+210 PROCEDURE TURN;\r
+220 BEGIN D := D + T; IF D < 0 THEN D := 3; IF D > 3 THEN D := 0 END;\r
+230 PROCEDURE HIL;\r
+240 BEGIN\r
+250   IF L > 0 THEN\r
+260   BEGIN\r
+270     T := A; CALL TURN; L := L - 1;\r
+280     A := -A; CALL HIL; CALL FD; T := A; CALL TURN;\r
+290     A := -A; CALL HIL; CALL FD; CALL HIL; T := -A; CALL TURN; CALL FD;\r
+300     A := -A; CALL HIL; A := -A;\r
+310     L := L + 1; T := A; CALL TURN\r
+320   END\r
+330 END;\r
+340 BEGIN\r
+350   I := 0;\r
+360   WHILE I < 64 DO BEGIN POKE 6656 + I, PEEK (32768 + I); I := I + 1 END;\r
+370   I := 0;\r
+380   WHILE I < 2048 DO BEGIN POKE 32768 + I, 32; I := I + 1 END;\r
+390   Q := 32768 + 31 * 64; HX := 1; HY := 0; D := 0; CALL P;\r
+400   L := 5; A := -1; CALL HIL;\r
+410   WHILE KEY = 0 DO;\r
+420   CLS; I := 0;\r
+430   WHILE I < 64 DO BEGIN POKE 32768 + I, PEEK (6656 + I); I := I + 1 END\r
+440 END.\r
+RUN\r
+#wait 4
+#screen
+X
+#ready
+#screen

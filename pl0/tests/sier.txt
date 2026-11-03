@@ -1,0 +1,40 @@
+^
+#wait 0.5
+10 VAR X, Y, A, B, Q, R, E;\r
+20 PROCEDURE S;\r
+30 BEGIN E := PEEK Q; IF E < 64 THEN E := 64; POKE Q, E + B END;\r
+40 BEGIN\r
+50   X := 0;\r
+60   WHILE X < 64 DO\r
+70   BEGIN POKE 6656 + X, PEEK (32768 + X); POKE 6720 + X, 0; X := X + 1 END;\r
+80   X := 0;\r
+90   WHILE X < 2048 DO BEGIN POKE 32768 + X, 32; X := X + 1 END;\r
+100   POKE 6720, 1; Y := 0;\r
+110   WHILE Y < 64 DO\r
+120   BEGIN\r
+130     R := 32768 + Y / 2 * 64 + 31 - Y / 2; X := Y;\r
+140     WHILE X >= 0 DO\r
+150     BEGIN\r
+160       A := 6720 + X;\r
+170       IF X > 0 THEN POKE A, PEEK A + PEEK (A - 1);\r
+180       IF ODD PEEK A THEN\r
+190       BEGIN\r
+200         Q := R + X;\r
+210         IF ODD Y THEN BEGIN B := 12; CALL S END;\r
+220         IF ODD Y + 1 THEN\r
+230         BEGIN B := 2; CALL S; Q := Q + 1; B := 1; CALL S END\r
+240       END;\r
+250       X := X - 1\r
+260     END;\r
+270     Y := Y + 1\r
+280   END;\r
+290   WHILE KEY = 0 DO;\r
+300   CLS; X := 0;\r
+310   WHILE X < 64 DO BEGIN POKE 32768 + X, PEEK (6656 + X); X := X + 1 END\r
+320 END.\r
+RUN\r
+#wait 2
+#screen
+X
+#ready
+#screen

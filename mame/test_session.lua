@@ -57,7 +57,10 @@ emu.register_frame_done(function()
   local s = steps[i]
   if s == "" then i = i + 1 return end
   if (s:match("\\r$") or s == "#ready") and not waiting() then
-    busy = busy or t return
+    busy = busy or t
+    -- never leave MAME running: give up on a language that never comes back
+    if t - busy > 300 then print("--- gave up waiting") m:exit() end
+    return
   end
   if busy and t - busy > 1 then print(string.format("--- busy %.1fs", t - busy)) end
   busy = nil; i = i + 1

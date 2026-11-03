@@ -1,0 +1,8 @@
+^
+#wait 0.5
+R: IOTA 30\r
+0 = (IOTA 8) .MOD IOTA 8\r
++/ 0 = R .MOD R\r
+(2 = +/ 0 = R .MOD R) / R\r
+#wait 6
+#screen

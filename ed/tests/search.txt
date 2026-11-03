@@ -1,0 +1,21 @@
+^
+#wait 0.5
+A\r
+MERCURY\r
+VENUS\r
+EARTH\r
+MARS\r
+JUPITER\r
+SATURN\r
+URANUS\r
+NEPTUNE\r
+.\r
+/EARTH/\r
+/US/\r
+//\r
+$-2\r
+-3,.N\r
+G/U/S/U/(U)/G\r
+,N\r
+#ready
+#screen

@@ -1,0 +1,9 @@
+1 2 3 + 10
+2 * 3 + 4
+IOTA 10
++/ IOTA 10
+3 4 RHO IOTA 12
++/ 3 4 RHO IOTA 12
+X: "APL ON THE COMP80"
+RHO X
+X[4 5 6 7 4 5 6]

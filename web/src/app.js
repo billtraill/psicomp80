@@ -7,15 +7,17 @@
   const ROMS = Object.fromEntries(Object.entries(D.roms).map(([k, v]) => [k, b64(v)]));
   const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP", basic: "BASIC", logo: "Logo",
     chip8: "CHIP-8", focal: "FOCAL", pilot: "PILOT", zasm: "ZASM", prolog: "Prolog",
-    vtl: "VTL-2", mouse: "Mouse", befunge: "Befunge", sheet: "CALC", trac: "TRAC", pl0: "PL/0", bf: "BF" };
+    vtl: "VTL-2", mouse: "Mouse", befunge: "Befunge", sheet: "CALC", trac: "TRAC", pl0: "PL/0", bf: "BF",
+    ed: "ED", db: "FILE", adv: "QUEST", apl: "APL" };
   // These are under "Other": a menu by the ROM switch, one tab of help and
   // one group of examples, so the rows of buttons stay short.
-  const OTHER = ["vtl", "mouse", "befunge", "sheet", "trac", "pl0", "bf"];
+  const OTHER = ["vtl", "mouse", "befunge", "sheet", "trac", "pl0", "bf", "ed", "db", "adv", "apl"];
   // The languages that read a line keep the address of their cursor here; it
   // shows _ (1Fh) while they wait for one.  BURP and CHIP-8 have none.
   const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
     pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e,
-    vtl: 0x1da0, mouse: 0x1da0, befunge: 0x1da0, sheet: 0x0c02, trac: 0x0c06, pl0: 0x1da0, bf: 0x1da0 };
+    vtl: 0x1da0, mouse: 0x1da0, befunge: 0x1da0, sheet: 0x0c02, trac: 0x0c06, pl0: 0x1da0, bf: 0x1da0,
+    ed: 0x1da0, db: 0x1da0, adv: 0x1da0, apl: 0x0c38 };
   const $ = (id) => document.getElementById(id);
   const canvas = $("screen"), ctx = canvas.getContext("2d"), img = ctx.createImageData(384, 320);
   const m = new COMP80(D.fonts);
@@ -259,6 +261,14 @@
       "10 VAR I;\n20 BEGIN I := 1;\n30 WHILE I <= 10 DO BEGIN ! I * I; I := I + 1 END\n40 END.\nRUN"],
     bf: ["Paste a BF program as numbered lines, or monitor commands. It is typed a line at a time, waiting for BF between lines; then type RUN, SHOW or STEP. Enter BF first (RS at READY).",
       "10 ++++++++[>++++++++<-]>+.\nSHOW"],
+    ed: ["Paste ED commands and text, typed a line at a time, waiting for ED between lines. A, I and C take lines until one that is just a full stop. Enter ED first (RS at READY).",
+      "A\nHELLO\nWORLD\n.\n,N"],
+    db: ["Paste FILE commands, a line at a time, waiting for FILE between lines: FIELDS NAME,TOWN,AGE once, then ADD SMITH,LEEDS,42 for each card, then LIST, FIND, SORT BY, COUNT, SUM or SHOW. Enter FILE first (RS at READY).",
+      "FIELDS NAME,AGE\nADD ANN,34\nADD BOB,29\nSORT BY AGE\nLIST"],
+    adv: ["Paste the lines of a QUEST world (ROOM, EXIT, OBJ, FIX, ON), or commands. They are typed a line at a time, waiting for QUEST between lines; then type PLAY. Enter QUEST first (RS at READY).",
+      "ROOM HALL A DUSTY HALL.\nROOM YARD A SUNNY YARD.\nEXIT HALL N YARD\nEXIT YARD S HALL\nOBJ LAMP HALL AN OLD LAMP.\nPLAY"],
+    apl: ["Paste APL lines, or monitor commands. They are typed a line at a time, waiting for APL between lines, and each line’s value is printed. Enter APL first (RS at READY).",
+      "3 4 RHO IOTA 12\n+/ IOTA 10"],
   };
 
   function power(rom) {

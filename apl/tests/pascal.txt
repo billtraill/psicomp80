@@ -1,0 +1,10 @@
+^
+#wait 0.5
+P: 7 RHO 1\r
+P\r
++! P\r
++! +! P\r
++! +! +! P\r
++! +! +! +! P\r
+#wait 6
+#screen

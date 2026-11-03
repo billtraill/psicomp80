@@ -1,0 +1,12 @@
+^
+#wait 0.5
+X: IOTA 3\r
++/ +/ (IOTA 40) .* IOTA 40\r
+A
+#wait 0.5
+#screen
+^
+#wait 0.5
+X\r
+#wait 1
+#screen

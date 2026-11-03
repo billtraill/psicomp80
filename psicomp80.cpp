@@ -1328,6 +1328,22 @@ ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
 ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,
          CRC(6d2e5156) SHA1(ff83b2441e06071c98f4848dfdd577dffd153600), ROM_BIOS(16))
+// Monitor + COMP80 ED line editor in place of BURP (ed/, built by ed/build.sh)
+ROM_SYSTEM_BIOS(17, "ed", "Monitor + ED editor")
+ROMX_LOAD("psicomp80_ed.rom", 0x0000, 0x0c00,
+         CRC(8804e08f) SHA1(65e3aed4f79009d87ac67ad48e398a92294e49ed), ROM_BIOS(17))
+// Monitor + COMP80 FILE card index in place of BURP (db/, built by db/build.sh)
+ROM_SYSTEM_BIOS(18, "db", "Monitor + FILE card index")
+ROMX_LOAD("psicomp80_db.rom", 0x0000, 0x0c00,
+         CRC(f90bbfb1) SHA1(a0b9810b13f24e6329fc440802edf1325aa0861f), ROM_BIOS(18))
+// Monitor + COMP80 QUEST adventure engine in place of BURP (adv/, built by adv/build.sh)
+ROM_SYSTEM_BIOS(19, "adv", "Monitor + QUEST adventure")
+ROMX_LOAD("psicomp80_adv.rom", 0x0000, 0x0c00,
+         CRC(b8afac62) SHA1(5d6b8feebbcaf44c8df2b42872b4913aca7462ec), ROM_BIOS(19))
+// Monitor + COMP80 APL subset in place of BURP (apl/, built by apl/build.sh)
+ROM_SYSTEM_BIOS(20, "apl", "Monitor + APL")
+ROMX_LOAD("psicomp80_apl.rom", 0x0000, 0x0c00,
+         CRC(858d8054) SHA1(5be94670c7e0ec401df9ff57fd660848250b35e4), ROM_BIOS(20))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1403,6 +1419,22 @@ ROMX_LOAD("psicomp80_pl0.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(16, "bf", "Monitor + BF")
 ROMX_LOAD("psicomp80_bf.rom", 0x0000, 0x0c00,
          CRC(6d2e5156) SHA1(ff83b2441e06071c98f4848dfdd577dffd153600), ROM_BIOS(16))
+// Monitor + COMP80 ED line editor in place of BURP (ed/, built by ed/build.sh)
+ROM_SYSTEM_BIOS(17, "ed", "Monitor + ED editor")
+ROMX_LOAD("psicomp80_ed.rom", 0x0000, 0x0c00,
+         CRC(8804e08f) SHA1(65e3aed4f79009d87ac67ad48e398a92294e49ed), ROM_BIOS(17))
+// Monitor + COMP80 FILE card index in place of BURP (db/, built by db/build.sh)
+ROM_SYSTEM_BIOS(18, "db", "Monitor + FILE card index")
+ROMX_LOAD("psicomp80_db.rom", 0x0000, 0x0c00,
+         CRC(f90bbfb1) SHA1(a0b9810b13f24e6329fc440802edf1325aa0861f), ROM_BIOS(18))
+// Monitor + COMP80 QUEST adventure engine in place of BURP (adv/, built by adv/build.sh)
+ROM_SYSTEM_BIOS(19, "adv", "Monitor + QUEST adventure")
+ROMX_LOAD("psicomp80_adv.rom", 0x0000, 0x0c00,
+         CRC(b8afac62) SHA1(5d6b8feebbcaf44c8df2b42872b4913aca7462ec), ROM_BIOS(19))
+// Monitor + COMP80 APL subset in place of BURP (apl/, built by apl/build.sh)
+ROM_SYSTEM_BIOS(20, "apl", "Monitor + APL")
+ROMX_LOAD("psicomp80_apl.rom", 0x0000, 0x0c00,
+         CRC(858d8054) SHA1(5be94670c7e0ec401df9ff57fd660848250b35e4), ROM_BIOS(20))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

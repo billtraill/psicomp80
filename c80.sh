@@ -8,7 +8,8 @@
 #   monitor commands; disk loads the disc software at 1D00 with
 #   disk/programs.img in the drive.
 # Languages: forth, lisp, basic, logo, focal, pilot, zasm, prolog, chip8, vtl,
-# mouse, befunge, sheet, trac, pl0 and bf boot that ROM and enter it.
+# mouse, befunge, sheet, trac, pl0, bf, ed, db, adv and apl boot that ROM and
+# enter it.
 # FORTH programs from forth/examples, typed in and run: forthlife mandel
 #   forthsier forthhilbert forthhanoi forthdragon forthkoch forthant
 #   forthsieve forthballs forthstars snake forthmaze forthrule forthfern
@@ -25,7 +26,9 @@
 #   vtlchaos, mousefib mousefact mousesieve mouseguess mousecircles, befhello
 #   befcount beffact befstars, sheetbudget sheetinterest sheettimes sheettemp,
 #   trachello tracfact tracrev tracletter, pl0squares pl0primes pl0gcd pl0fact
-#   pl0rings, bfhello bfcount bfadd bfalpha bfreverse bffib.
+#   pl0rings, bfhello bfcount bfadd bfalpha bfreverse bffib, edletter edlist
+#   edsearch edview, dbaddress dbrecords dbclub, advtutor advlab advmill,
+#   aplbasics aplprimes apltable aplstats aplhist aplpascal.
 # ready just starts at READY.
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -261,6 +264,46 @@ case "$prog" in
            script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
   bffib) bin=; forth=$HERE/bf/examples/fib.bf; typed="RUN"; curs=1DA0
            script=$HERE/forth/load.lua; set -- -bios bf "$@" ;;
+  ed) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios ed "$@" ;;
+  edletter) bin=; forth=$HERE/ed/examples/letter.ed; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios ed "$@" ;;
+  edlist) bin=; forth=$HERE/ed/examples/list.ed; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios ed "$@" ;;
+  edsearch) bin=; forth=$HERE/ed/examples/search.ed; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios ed "$@" ;;
+  edview) bin=; forth=$HERE/ed/examples/view.ed; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios ed "$@" ;;
+  db) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios db "$@" ;;
+  dbaddress) bin=; forth=$HERE/db/examples/address.db; typed="LIST"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios db "$@" ;;
+  dbrecords) bin=; forth=$HERE/db/examples/records.db; typed="LIST"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios db "$@" ;;
+  dbclub) bin=; forth=$HERE/db/examples/club.db; typed="LIST"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios db "$@" ;;
+  adv) bin=; typed=""; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios adv "$@" ;;
+  advtutor) bin=; forth=$HERE/adv/examples/tutor.adv; typed="PLAY"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios adv "$@" ;;
+  advlab) bin=; forth=$HERE/adv/examples/lab.adv; typed="PLAY"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios adv "$@" ;;
+  advmill) bin=; forth=$HERE/adv/examples/mill.adv; typed="PLAY"; curs=1DA0
+           script=$HERE/forth/load.lua; set -- -bios adv "$@" ;;
+  apl) bin=; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  aplbasics) bin=; forth=$HERE/apl/examples/basics.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  aplprimes) bin=; forth=$HERE/apl/examples/primes.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  apltable) bin=; forth=$HERE/apl/examples/table.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  aplstats) bin=; forth=$HERE/apl/examples/stats.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  aplhist) bin=; forth=$HERE/apl/examples/hist.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
+  aplpascal) bin=; forth=$HERE/apl/examples/pascal.apl; typed=""; curs=0C38
+           script=$HERE/forth/load.lua; set -- -bios apl "$@" ;;
   chip8)   bin=;                           typed="^"; set -- -bios chip8 "$@" ;;
   c8bounce) bin=$HERE/chip8/examples/bounce.ch8; addr=0E00; typed="^"; set -- -bios chip8 "$@" ;;
   c8keys) bin=$HERE/chip8/examples/keys.ch8; addr=0E00; typed="^"; set -- -bios chip8 "$@" ;;

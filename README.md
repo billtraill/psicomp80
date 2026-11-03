@@ -7,7 +7,7 @@ The PSI COMP80 is a Z80 computer designed by J. H. Adams. It was published as a 
 This repository brings it back:
 - a MAME driver;
 - the ROM, disassembled and annotated;
-- sixteen more language ROMs written for it: FORTH, LISP, Tiny BASIC, Logo, CHIP-8, FOCAL, PILOT, a Z80 assembler and disassembler (ZASM), Prolog, VTL-2, Mouse, Befunge, a spreadsheet (CALC), TRAC, a PL/0 compiler and BF;
+- twenty more ROMs written for it: FORTH, LISP, Tiny BASIC, Logo, CHIP-8, FOCAL, PILOT, a Z80 assembler and disassembler (ZASM), Prolog, VTL-2, Mouse, Befunge, a spreadsheet (CALC), TRAC, a PL/0 compiler, BF, a line editor (ED), a card-file database (FILE), an adventure engine (QUEST) and APL;
 - its programs and the 1980 floppy disc system;
 - a web emulator;
 - the original board redrawn in KiCad, plus two new versions that run the same ROMs on current parts.
@@ -17,8 +17,8 @@ This repository brings it back:
 | Page | What it is |
 |---|---|
 | [PSI COMP80 Screens](https://billtraill.github.io/psicomp80/screenshots.html) | What it looked like: the monitor, BURP, FORTH, LISP, the Game of Life, the articles' pictures |
-| [Emulator](https://billtraill.github.io/psicomp80/emulator.html) | The COMP80 in the browser, with all seventeen ROMs and their example programs |
-| [ROM Listings](https://billtraill.github.io/psicomp80/roms.html) | The monitor and the seventeen languages, annotated, with hex dumps |
+| [Emulator](https://billtraill.github.io/psicomp80/emulator.html) | The COMP80 in the browser, with all twenty-one ROMs and their example programs |
+| [ROM Listings](https://billtraill.github.io/psicomp80/roms.html) | The monitor and the twenty-one languages and programs, annotated, with hex dumps |
 | [COMP80 LISP](https://billtraill.github.io/psicomp80/lisp.html) | The LISP that takes BURP's place in the ROM, with examples |
 | [Original hardware](https://billtraill.github.io/psicomp80/hardware.html) | The 1979 main board redrawn from the kit: every part and every circuit |
 | [v2 hardware](https://billtraill.github.io/psicomp80/hardware_v2.html) | One RP2350 microcontroller, HDMI, a USB keyboard, ROMs and tapes on microSD |
@@ -31,11 +31,11 @@ Each page is a single self-contained HTML file in this folder, so they also work
 | Where | What |
 |---|---|
 | `psicomp80.cpp`, `mame/` | The MAME driver, and the files and script that install it into a MAME checkout; `mame/test_session.lua` types a test session at any of the ROMs |
-| `psicomp80.rom`, `psicomp80_*.rom` | The ROM images: the monitor with BURP, or one of the other sixteen languages, in the top 2 KB |
+| `psicomp80.rom`, `psicomp80_*.rom` | The ROM images: the monitor with BURP, or one of the other twenty, in the top 2 KB |
 | `rom/` | The annotated disassembly (`psicomp80.asm`), which assembles back to the ROM byte for byte, and the listings page |
 | `burp/`, `forth/`, `lisp/` | BURP, FORTH and LISP: notes, sources, examples and tests |
 | `basic/`, `logo/`, `chip8/`, `focal/`, `pilot/`, `zasm/`, `prolog/` | The other languages, each with its source, `build.sh`, README, examples and tests |
-| `vtl/`, `mouse/`, `befunge/`, `sheet/`, `trac/`, `pl0/`, `bf/` | The languages under Other on the emulator page, laid out the same way |
+| `vtl/`, `mouse/`, `befunge/`, `sheet/`, `trac/`, `pl0/`, `bf/`, `ed/`, `db/`, `adv/`, `apl/` | The ROMs under Other on the emulator page, laid out the same way |
 | `life/`, `pictures/` | The Game of Life and the articles' pictures, as programs and tapes |
 | `plasma/`, `dump/`, `fire/`, `banner/` | More machine code: a plasma, a memory viewer, a fire effect and a scrolling banner |
 | `disk/` | The floppy disc extension (October and December 1980): disc image and software |

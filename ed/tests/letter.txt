@@ -1,0 +1,18 @@
+^
+#wait 0.5
+A\r
+DEAR AUNT JEAN,\r
+THANK YOU FOR THE SOCKS.\r
+THEY ARE VERY WARM.\r
+I WILL WEAR THEM ALL WINTER.\r
+LOVE FROM BILL\r
+.\r
+,N\r
+2S/SOCKS/LOVELY RED SOCKS/\r
+4M1\r
+$I\r
+P.S. THE CAT LIKES THEM TOO.\r
+.\r
+,N\r
+#ready
+#screen

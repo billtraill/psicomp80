@@ -1,0 +1,6 @@
+^
+#wait 0.5
+(IOTA 9) .* IOTA 9\r
+(IOTA 6) .>= IOTA 6\r
+#wait 6
+#screen

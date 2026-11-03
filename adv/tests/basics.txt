@@ -1,0 +1,27 @@
+^
+#wait 0.5
+HELLO\r
+ROOM A ROOM ONE.\r
+ROOM B ROOM TWO.\r
+EXIT A N B\r
+OBJ X B AN X.\r
+OOPS\r
+UNDO\r
+LIST\r
+#screen
+PLAY\r
+S\r
+N\r
+TAKE X\r
+DANCE\r
+TAKE Y\r
+DROP X\r
+SCORE\r
+LOOK\r
+QUIT\r
+ON JUMP THEN SAY SPLAT.; DIE\r
+PLAY\r
+JUMP\r
+NEW\r
+LIST\r
+#screen

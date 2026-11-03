@@ -1,0 +1,23 @@
+^
+#wait 0.5
+A\r
+BREAD\r
+MILK X\r
+EGGS\r
+TEA X\r
+BUTTER\r
+JAM X\r
+.\r
+,N\r
+G/ X/D\r
+,N\r
+$A\r
+APPLES\r
+PEARS\r
+.\r
+$-1,$J\r
+$S/S/S AND /\r
+=\r
+,N\r
+#ready
+#screen

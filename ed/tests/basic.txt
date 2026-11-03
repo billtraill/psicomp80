@@ -1,0 +1,50 @@
+^
+#wait 0.5
+P\r
+A\r
+ONE\r
+TWO\r
+THREE\r
+FOUR\r
+FIVE\r
+SIX\r
+.\r
+G/O/D\r
+,N\r
+1\r
+\r
+\r
+-1\r
+$-1,$N\r
+2I\r
+INSERTED\r
+.\r
+C\r
+CHANGED\r
+.\r
+,N\r
+1M$\r
+,N\r
+/I/\r
+//\r
+S//X/G\r
+P\r
+S/Q/Z/\r
+2,1P\r
+#screen
+E\r
+A\r
+THE QUICK BROWN FOX\r
+JUMPS OVER\r
+THE LAZY DOG\r
+.\r
+1T$\r
+2M0\r
+1,2J\r
+,N\r
+XX\r
+99P\r
+W\r
+R\r
+#ready
+#screen

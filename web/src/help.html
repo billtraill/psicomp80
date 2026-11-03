@@ -12,7 +12,7 @@
     <div class="exgroup"><h3>PILOT</h3><div class="exlist" id="ex-pilot"></div></div>
     <div class="exgroup"><h3>ZASM</h3><div class="exlist" id="ex-zasm"></div></div>
     <div class="exgroup"><h3>Prolog</h3><div class="exlist" id="ex-prolog"></div></div>
-    <div class="exgroup"><h3>Other languages</h3><p class="note">More languages written for the 2 KB where BURP was; choose one from the Other menu by the ROM switch, or just press Run.</p><h4 class="lang">VTL-2</h4><div class="exlist" id="ex-vtl"></div><h4 class="lang">Mouse</h4><div class="exlist" id="ex-mouse"></div><h4 class="lang">Befunge</h4><div class="exlist" id="ex-befunge"></div><h4 class="lang">CALC</h4><div class="exlist" id="ex-sheet"></div><h4 class="lang">TRAC</h4><div class="exlist" id="ex-trac"></div><h4 class="lang">PL/0</h4><div class="exlist" id="ex-pl0"></div><h4 class="lang">BF</h4><div class="exlist" id="ex-bf"></div></div>
+    <div class="exgroup"><h3>Other languages</h3><p class="note">More languages written for the 2 KB where BURP was; choose one from the Other menu by the ROM switch, or just press Run.</p><h4 class="lang">VTL-2</h4><div class="exlist" id="ex-vtl"></div><h4 class="lang">Mouse</h4><div class="exlist" id="ex-mouse"></div><h4 class="lang">Befunge</h4><div class="exlist" id="ex-befunge"></div><h4 class="lang">CALC</h4><div class="exlist" id="ex-sheet"></div><h4 class="lang">TRAC</h4><div class="exlist" id="ex-trac"></div><h4 class="lang">PL/0</h4><div class="exlist" id="ex-pl0"></div><h4 class="lang">BF</h4><div class="exlist" id="ex-bf"></div><h4 class="lang">ED</h4><div class="exlist" id="ex-ed"></div><h4 class="lang">FILE</h4><div class="exlist" id="ex-db"></div><h4 class="lang">QUEST</h4><div class="exlist" id="ex-adv"></div><h4 class="lang">APL</h4><div class="exlist" id="ex-apl"></div></div>
   </div>
 
   <div class="panel" role="tabpanel" id="panel-using" aria-labelledby="tab-using" hidden>
@@ -62,7 +62,7 @@
     </table></div>
     <h3>Memory</h3>
     <p>The ROM is 0000–0BFF (monitor 0000–03FF, language 0400–0BFF), read/write memory is 0C00–1FFF, and the screen is 2 KB at 8000, 64 characters by 32 lines. A screen byte below 40h is a letter or sign (A is 01, space 20, digits 30–39); 40h and up is one of 64 graphics characters, 4Fh a solid block.</p>
-    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all seventeen languages, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
+    <p>Every line of the ROMs, annotated, and their hex dumps are on <a href="roms.html">COMP80 ROM Listings</a>: the monitor and all twenty-one ROMs, with each name and jump a link to the line it means. The board itself, its circuits and its parts are on <a href="hardware.html">COMP80 Hardware</a>.</p>
     <h3>The examples</h3>
     <ul>
       <li><strong>Game of Life</strong> keeps 128 × 64 cells, four to a character using the quarter-block graphics, with edges that wrap. R starts a new random board, P pauses, S goes back to the monitor. It has to read keys while it runs, so it plays a trick on the monitor’s keyboard check: its stack is in ROM, where pushes are lost, and the return address the monitor finds there points at a HALT the program put in place.</li>
@@ -380,8 +380,8 @@
   </div>
   <div class="panel" role="tabpanel" id="panel-other" aria-labelledby="tab-other" hidden>
     <h2>Other languages</h2>
-    <p>Seven more languages, each written for this project to fit in the 2 KB of ROM where BURP was, beside the same monitor. Choose one from the Other menu by the ROM switch, then press RS at READY.</p>
-    <div class="subnav" id="other-nav" role="group" aria-label="Language"><button type="button" data-lang="vtl">VTL-2</button><button type="button" data-lang="mouse">Mouse</button><button type="button" data-lang="befunge">Befunge</button><button type="button" data-lang="sheet">CALC</button><button type="button" data-lang="trac">TRAC</button><button type="button" data-lang="pl0">PL/0</button><button type="button" data-lang="bf">BF</button></div>
+    <p>Eleven more languages and programs, each written for this project to fit in the 2 KB of ROM where BURP was, beside the same monitor: seven languages, then an editor, a database, an adventure engine and APL. Choose one from the Other menu by the ROM switch, then press RS at READY.</p>
+    <div class="subnav" id="other-nav" role="group" aria-label="Language"><button type="button" data-lang="vtl">VTL-2</button><button type="button" data-lang="mouse">Mouse</button><button type="button" data-lang="befunge">Befunge</button><button type="button" data-lang="sheet">CALC</button><button type="button" data-lang="trac">TRAC</button><button type="button" data-lang="pl0">PL/0</button><button type="button" data-lang="bf">BF</button><button type="button" data-lang="ed">ED</button><button type="button" data-lang="db">FILE</button><button type="button" data-lang="adv">QUEST</button><button type="button" data-lang="apl">APL</button></div>
     <section class="sub" id="other-vtl" aria-label="VTL-2" hidden>
 <h2>VTL-2</h2>
       <p>VTL-2, the Very Tiny Language, was written for the Altair 680 in 1976–77 to fit in under 1 KB of ROM. This one is written afresh for the COMP80, in the 2 KB where BURP was. RS at READY enters it. Everything is an assignment, one to a line: <code>#=100</code> is GOTO 100, <code>?="HELLO"</code> prints, <code>A=?</code> reads a number. A line with a number goes into the program, a number alone deletes the line, <code>0</code> lists the program, and <code>#=1</code> runs it.</p>
@@ -553,5 +553,97 @@
         <li><strong>Fibonacci bars</strong> keeps two numbers and prints the first as a bar of solid blocks, character 143, then makes the pair (b, a + b) by moving cells about, ten times: 1, 1, 2, 3, 5 … 55.</li>
       </ul>
       <div class="exlist" id="exl-bf"></div>
+    </section>
+    <section class="sub" id="other-ed" aria-label="ED" hidden>
+      <h2>ED</h2>
+      <p>ED is a line editor in the style of the Unix <code>ed</code> and the editors of its time, written for the COMP80 in the 2 KB where BURP was. RS at READY enters it. It keeps a buffer of lines and a current line, dot; at the <code>*</code> prompt you type an address or a range, then a letter. A, I and C then take lines of text until one that is just a full stop. The buffer is about 4 KB, or 30 KB with the 32 KB expansion, and it is kept over a reset: FS and RS come back to it.</p>
+      <h3>Addresses</h3>
+      <ul>
+        <li><code>5</code> is line 5, <code>.</code> the current line and <code>$</code> the last. <code>/TEXT/</code> is the next line containing TEXT, going round from the end to the start; <code>//</code> looks for it again.</li>
+        <li><code>+n</code> and <code>-n</code> count on or back from an address, or from dot on their own: <code>$-2</code>, <code>.+3</code>, <code>-</code>. <code>a,b</code> is a range, <code>a,</code> runs to the end, and <code>,</code> or <code>%</code> alone is the whole buffer.</li>
+      </ul>
+      <h3>Commands</h3>
+      <ul>
+        <li><code>A</code> appends lines after the line (default dot; <code>0A</code> at the start), <code>I</code> inserts them before it, and <code>C</code> changes the lines for new ones. <code>D</code> deletes, <code>P</code> prints, and <code>N</code> prints with numbers.</li>
+        <li><code>V</code> shows the 30 lines round dot, or round the address, numbered, with a <code>&gt;</code> after the number of the current one.</li>
+        <li><code>M d</code> moves the lines to after line d and <code>T d</code> copies them there; <code>J</code> joins lines into one (default dot and the next).</li>
+        <li><code>S/OLD/NEW/</code> changes the first OLD in each line to NEW, and every one with <code>G</code> after it; any character can stand in for <code>/</code>, and <code>S//NEW/</code> uses the last text looked for. <code>G/TEXT/D</code> does D on every line containing TEXT, and the same for any other command; with none it prints them.</li>
+        <li><code>=</code> prints the number of the line (<code>$</code> unless an address is given). An address alone prints that line, and Return alone the next. <code>E</code> empties the buffer and <code>Q</code> goes back to the monitor.</li>
+        <li><code>W</code> prints the size of the buffer and the monitor command that records it on tape, such as <code>TAPE 0C100D2F</code>, to type after FS. To load it again: FS, <code>READ 0C10</code>, a key when it has been read, RS, then <code>R</code>, which finds the end of the text.</li>
+      </ul>
+      <p>Patterns are plain text, with no special characters, and <code>^</code>, <code>_</code> and <code>\</code> can't be typed. A mistake prints <code>?</code> and what was wrong: ADDRESS, COMMAND, NO MATCH and so on. A line number is found by counting the lines from the start, so every command works by number; inserting moves the rest of the text up and deleting moves it down, and M is a copy followed by a delete.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>A letter</strong> typed in with A, a word changed with S, a line moved with M, and a P.S. put in before the last line with I.</li>
+        <li><strong>A shopping list</strong>: <code>G/ X/D</code> deletes the items marked X, then two lines are added, joined with J, and S puts AND between them.</li>
+        <li><strong>Searching</strong> the planets with <code>/EARTH/</code>, <code>/US/</code> and <code>//</code>, <code>$-2</code> and <code>-3,.N</code>, then <code>G/U/S/U/(U)/G</code> to mark every U.</li>
+        <li><strong>The view</strong>: lines copied to the end with T, S on a range with G, and <code>8V</code> showing the 30 lines round line 8.</li>
+      </ul>
+      <div class="exlist" id="exl-ed"></div>
+    </section>
+    <section class="sub" id="other-db" aria-label="FILE" hidden>
+      <h2>FILE</h2>
+      <p>COMP80 FILE is a card-file database, of the kind small computers ran for address books, record collections and club lists, written from scratch for this machine in the 2 KB where BURP was. RS at READY enters it. You name the fields once, type each card on a line, then list the cards as a table, pick some out, search, sort and add up a field. Only the first three letters of a command count.</p>
+      <h3>Commands</h3>
+      <ul>
+        <li><code>FIELDS NAME,TOWN,AGE</code> names the fields, up to 8. <code>ADD SMITH,LEEDS,42</code> adds a card at the end; a card with too few fields gets empty ones. <code>NEW</code> clears everything.</li>
+        <li><code>LIST</code> shows the cards as a table, each with its number; the columns are as wide as their widest entry and are narrowed until the table fits the screen. <code>LIST WHERE …</code> shows only the cards that match, <code>FIND TEXT</code> the cards with TEXT anywhere in them, and <code>SHOW 3</code> card 3 a field to a line.</li>
+        <li><code>SORT BY AGE</code> sorts the cards, <code>SORT BY AGE DESC</code> the other way. <code>COUNT</code>, <code>SUM FEE</code> and <code>AVG FEE</code> count the cards, add up a field and average it, each with a WHERE if wanted.</li>
+        <li><code>DELETE 3</code> deletes card 3, and the cards after it move up a number; <code>DELETE WHERE …</code> deletes all that match.</li>
+      </ul>
+      <h3>WHERE</h3>
+      <p>Up to four conditions, <code>FIELD op VALUE</code>, joined by AND or OR and worked out from left to right: <code>LIST WHERE AGE&gt;40 AND TOWN=LEEDS</code>. The ops are <code>= &lt; &gt; &lt;&gt; &lt;= &gt;=</code>; a value can’t have a space in it, and a <code>*</code> at its end matches any ending, so <code>NAME=S*</code> is the names starting with S. Two fields that are both numbers compare as numbers, anything else as text. Numbers can have a minus sign and two decimals: SUM and AVG work in hundredths and show two decimals unless the answer is whole. An empty field counts as 0. Errors are WHAT?, FIELD?, NO CARD and FULL.</p>
+      <h3>How it keeps the cards</h3>
+      <p>Each card is kept as it was typed, its fields with commas between them, one after another from 0C40 to 1BFF: about 140 cards of 28 characters. WHERE is read once into a list of conditions, each a field, a mask of the outcomes that make it true (less 1, equal 2, greater 4, so <code>&lt;&gt;</code> is 5) and its value. SORT is a bubble sort that swaps two neighbouring cards through a buffer, so only those two move. As the whole file is in 0C00 up to the address in the word at 0C02, the monitor’s TAPE can save it; READ 0C00 and RS bring it back. There is no CHANGE: DELETE the card and ADD it again.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>Address book</strong>: seven people, sorted by name, found by their phone code with <code>FIND 0113</code> and by town with <code>LIST WHERE TOWN=Y*</code>.</li>
+        <li><strong>Record collection</strong>: sorted by year; <code>LIST WHERE YEAR&lt;1970 AND FORMAT=LP</code>, the total and average price, and <code>SHOW 5</code>.</li>
+        <li><strong>Club members</strong>: sorted by age, oldest first; how many haven’t paid and what they owe, the average age, the youngest and oldest with OR, and <code>DELETE WHERE PAID=NO</code>.</li>
+      </ul>
+      <div class="exlist" id="exl-db"></div>
+    </section>
+    <section class="sub" id="other-adv" aria-label="QUEST" hidden>
+      <h2>QUEST</h2>
+      <p>COMP80 QUEST is an adventure engine with a little language of its own, written for this project in the 2 KB where BURP was. RS at READY enters it. You type a world in a line at a time: its rooms, the ways between them, the things in them and rules that say what happens when the player does something. Then <code>PLAY</code> it. <code>LIST</code> shows the world as typed, <code>UNDO</code> forgets the last line and <code>NEW</code> starts again; the world survives a reset.</p>
+      <h3>The world</h3>
+      <ul>
+        <li><code>ROOM name description</code>: a room; the first is where the game starts. <code>EXIT room direction room</code> is a way from one to another; with <code>IF flag</code> on the end it can only be used once the flag is set.</li>
+        <li><code>OBJ name room description</code> is something that can be carried, <code>FIX name room description</code> something that can't. An object that starts in a room that doesn't exist (<code>OBJ KEY NOWHERE …</code>) can be brought in later.</li>
+        <li><code>ON verb noun IF condition AND condition THEN action; action</code> is a rule. The noun and the IF part can be left out. Conditions: <code>HAVE obj</code>, <code>HERE obj</code> (carried or in the room), <code>AT room</code>, a flag's name, and <code>NOT</code> in front of any of them.</li>
+        <li>Actions: <code>SAY text</code>, <code>SET flag</code>, <code>MOVE obj room</code> (<code>ME</code>: carried; a room that doesn't exist: gone), <code>GO room</code>, <code>SCORE n</code>, <code>WIN</code>, <code>DIE</code> and <code>LOOK</code>.</li>
+      </ul>
+      <h3>Playing</h3>
+      <p>A command is a verb and a noun, and words are matched by their first 4 letters, as in the adventures of the 1970s; a one-letter word in the world, such as the direction N, matches any word starting with that letter, so N, NORTH and GO NORTH all work. The rules for the verb come first: the first whose conditions hold runs, instead of anything else, so a rule can stop the player (<code>ON D IF NOT LIT THEN SAY IT IS TOO DARK.</code>), and a second rule with no conditions is the “otherwise”. Then come the built-in verbs, LOOK (L), INVENTORY (I), TAKE (GET), DROP, SCORE and QUIT, and then the exits. The world is kept as it was typed, about 4 KB of it; PLAY makes a table of where each of up to 32 objects is, each a pointer to a room's name in the text, so the text itself never changes.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>The stopped clock</strong>: three rooms, a crank and a clock. TAKE CRANK, N and WIND CLOCK win.</li>
+        <li><strong>Lost in the computer lab</strong>: the COMP80 is dead. Open the drawer in the office for the key, unlock the store room (an exit with IF), fetch a fuse, then FIT FUSE and LOAD TAPE in the lab. 30 points.</li>
+        <li><strong>The old mill</strong>: a dark cellar you can only go down to with a lit lamp, a locked chest in the loft and a river not to swim in. Bring the silver back to the yard and drop it. 45 points.</li>
+      </ul>
+      <div class="exlist" id="exl-adv"></div>
+    </section>
+    <section class="sub" id="other-apl" aria-label="APL" hidden>
+      <h2>APL</h2>
+      <p>APL is Kenneth Iverson’s array language of the 1960s: every value is an array, functions work on whole arrays at once, and an expression is read from the right. This one is written from scratch for the COMP80, in the 2 KB where BURP was. The keyboard has none of APL’s special characters, so the functions are spelt with signs and words, as APL was on ordinary terminals. RS at READY enters it; type an expression and its value is printed, unless the line is an assignment.</p>
+      <h3>The functions</h3>
+      <ul>
+        <li><code>+ - * %</code> add, subtract, multiply and divide (rounding towards 0); <code>-</code> on its own negates. <code>= # &lt; &gt; &lt;= &gt;=</code> compare, giving 1 or 0 (<code>#</code> is not equal). <code>MAX</code> is the larger, and <code>A MOD B</code> the remainder of A divided by B.</li>
+        <li><code>IOTA N</code> is 1 to N. <code>RHO B</code> is the shape of B, and <code>A RHO B</code> the elements of B over and over in the shape A: <code>3 4 RHO IOTA 12</code> is a matrix.</li>
+        <li><code>A / B</code> repeats each element of B A times; with 1s and 0s it picks elements out. <code>V[I]</code> picks elements of V, counting from 1, in the shape of I.</li>
+        <li><code>+/ B</code> reduces: + between the elements of each row, from the right. <code>+! B</code> scans: the running totals (APL’s <code>\</code>, which can’t be typed). <code>A .* B</code> is the outer product, A’s elements times each of B’s. Any of the functions in the first item can take the place of + or *.</li>
+        <li><code>X: expression</code> gives the letter X a value; <code>"TEXT"</code> is a character vector.</li>
+      </ul>
+      <p>A function takes everything to its right: <code>2 * 3 + 4</code> is 14, and there is no precedence. The operands are read from the left, so give a variable its value on a line of its own before using it. Numbers are 16-bit integers; a scalar, or a shorter argument used over and over, goes with every element of the other. Each assignment takes new space, so <code>)</code> on its own forgets the variables and starts afresh. Errors: SYNTAX, VALUE, INDEX, DOMAIN and WS FULL.</p>
+      <h3>The examples</h3>
+      <ul>
+        <li><strong>First steps</strong>: adding vectors, the right-to-left order, <code>IOTA</code>, <code>+/</code>, a matrix by <code>RHO</code>, and indexing a character vector.</li>
+        <li><strong>Primes</strong>: <code>R .MOD R</code> is a table of remainders; <code>0 =</code> marks the divisors, <code>+/</code> counts them in each row, and <code>(2 = +/ 0 = R .MOD R) / R</code> keeps the numbers with exactly two. About 3 s.</li>
+        <li><strong>Tables</strong> by outer product: <code>(IOTA 9) .* IOTA 9</code>, and a triangle of 1s from <code>.&gt;=</code>.</li>
+        <li><strong>Averages and running totals</strong>: <code>(+/ V) % RHO V</code>, <code>+! V</code>, <code>MAX/ V</code>, and the values above the average picked out with <code>/</code>.</li>
+        <li><strong>A histogram</strong>: <code>" *"[1 + V .&gt;= IOTA MAX/ V]</code> indexes a two-character string with a table of 0s and 1s, so each value becomes a bar of stars.</li>
+        <li><strong>Pascal’s triangle</strong> along its diagonals: running totals of a row of 1s give the counting numbers, then the triangular numbers, then the next diagonals.</li>
+      </ul>
+      <div class="exlist" id="exl-apl"></div>
     </section>
   </div>

@@ -1,5 +1,7 @@
 # COMP80 PROLOG
 
+[Run Prolog in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=prolog). Each example below has a ▶ link that types it in and runs it there.
+
 A small Prolog for the PSI COMP80 that replaces BURP in the ROM, in the same
 way as [COMP80 LISP](../lisp/README.md). The monitor (0000-03FF) is
 unchanged; Prolog fills the 2 KB at 0400-0BFF where BURP was. As with BURP,
@@ -94,10 +96,10 @@ name follows, so a predicate whose last clause matches leaves none.
 
 | | |
 |---|---|
-| `family.pl` | A family tree: `FATHER`, `GRAND` and the recursive `ANCESTOR`. `?- ANCESTOR(X,GUS).` gives FAY, ADA, CAL and BEN. |
-| `lists.pl` | `APPEND`, `MEMBER`, `REVERSE` (with an accumulator) and `LENGTH`. `?- APPEND(X,Y,[1,2,3]).` gives the four ways to split the list. |
-| `colour.pl` | Colouring a map of five countries with three colours so that no neighbours match: `?- MAP(A,B,C,D,E).` |
-| `path.pl` | Finding a way between two towns without going through one twice, using the cut-and-fail `NOTIN`. `?- WAY(ARK,FORD,P).` gives `P = [ARK,BAY,DALE,ELM,FORD]` and two more. |
+| `family.pl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=prologfamily) | A family tree: `FATHER`, `GRAND` and the recursive `ANCESTOR`. `?- ANCESTOR(X,GUS).` gives FAY, ADA, CAL and BEN. |
+| `lists.pl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=prologlists) | `APPEND`, `MEMBER`, `REVERSE` (with an accumulator) and `LENGTH`. `?- APPEND(X,Y,[1,2,3]).` gives the four ways to split the list. |
+| `colour.pl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=prologcolour) | Colouring a map of five countries with three colours so that no neighbours match: `?- MAP(A,B,C,D,E).` |
+| `path.pl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=prologpath) | Finding a way between two towns without going through one twice, using the cut-and-fail `NOTIN`. `?- WAY(ARK,FORD,P).` gives `P = [ARK,BAY,DALE,ELM,FORD]` and two more. |
 
 Each first answer takes under half a second.
 

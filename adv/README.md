@@ -1,5 +1,7 @@
 # COMP80 QUEST
 
+[Run QUEST in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=adv). Each example below has a ▶ link that types it in and runs it there.
+
 An adventure engine with its own little language, written for the PSI
 COMP80 in the 2 KB of ROM (0400–0BFF) where BURP was. The monitor is
 unchanged. RS at READY enters it; the top line shows QUEST. You type a world
@@ -102,9 +104,9 @@ the world kept (but the game in progress is lost: PLAY starts it again).
 
 | | |
 |---|---|
-| `tutor.adv` | three rooms: find the crank and wind the stopped clock. TAKE CRANK, N, WIND CLOCK. |
-| `lab.adv` | lost in the computer lab: open the drawer, unlock the store room (an exit with IF), fit the fuse and load the tape to bring the COMP80 back. 30 points. |
-| `mill.adv` | an old watermill with a dark cellar that needs a lit lamp, a locked chest, a river not to swim in, and a score. 45 points. |
+| `tutor.adv` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=advtutor) | three rooms: find the crank and wind the stopped clock. TAKE CRANK, N, WIND CLOCK. |
+| `lab.adv` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=advlab) | lost in the computer lab: open the drawer, unlock the store room (an exit with IF), fit the fuse and load the tape to bring the COMP80 back. 30 points. |
+| `mill.adv` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=advmill) | an old watermill with a dark cellar that needs a lit lamp, a locked chest, a river not to swim in, and a score. 45 points. |
 
 ## Tests
 

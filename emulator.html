@@ -3435,8 +3435,10 @@ const EXAMPLES = [
     const a = e.target.closest("a[data-goto]");
     if (a) { e.preventDefault(); showTab(a.dataset.goto); $("panel-" + a.dataset.goto).scrollIntoView({ block: "nearest" }); }
   });
-  const hash = location.hash.replace("#", "");
-  showTab(tabs.some((t) => t.dataset.tab === hash) ? hash : "examples");
+  // The help for a language: its own tab, or its page under Other
+  function showLang(lang) {
+    if (OTHER.includes(lang)) { showTab("other"); showOther(lang); } else if (tabs.some((t) => t.dataset.tab === lang)) showTab(lang);
+  }
 
   // For testing from the console: c80.advance(s) runs s seconds of the
   // machine and the typing, however slowly the page is drawing.
@@ -3449,6 +3451,18 @@ const EXAMPLES = [
   $("mem").value = store.get("mem", "5");
   $("monitor").value = store.get("monitor", "orig") === "ks" ? "ks" : "orig";
   power(ROMS[store.get("rom", "burp")] ? store.get("rom", "burp") : "burp");
+  // Links from other pages: #example=<id> runs that example and #rom=<name>
+  // powers on with that ROM, each showing its language's help; #<tab> picks
+  // a tab.
+  function follow() {
+    const [k, v] = decodeURIComponent(location.hash.slice(1)).split("=");
+    const ex = k === "example" && EXAMPLES.find((e) => e.id === v);
+    if (ex) { showLang(ex.lang); runExample(ex.id); return; }
+    if (k === "rom" && ROMS[v]) { showLang(v); power(v); return; }
+    showTab(tabs.some((t) => t.dataset.tab === k) ? k : "examples");
+  }
+  follow();
+  window.addEventListener("hashchange", follow);
   addTask(userKeys(), "keys");
   requestAnimationFrame(frame);
 })();

@@ -1,5 +1,7 @@
 # COMP80 CHIP-8
 
+[Run CHIP-8 in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=chip8). Each example below has a ▶ link that types it in and runs it there.
+
 A CHIP-8 interpreter for the PSI COMP80 that replaces BURP in the ROM. The
 monitor (0000-03FF) is unchanged; the interpreter fills the 2 KB at
 0400-0BFF where BURP was. As with BURP, the RS key enters it from the
@@ -38,10 +40,10 @@ pressed; a key held down on the host repeats, and keeps it held.
 
 | | |
 |---|---|
-| `bounce.ch8` | A ball bouncing round a box at the edge of the screen, timed with the delay timer. |
-| `keys.ch8` | Press a key and it is shown as a big hex digit, built from the font a bit at a time, with the number of presses in decimal underneath. Shows FX0A, FX29, FX33 and FX65. |
-| `dodge.ch8` | A game: rocks fall, and A and D steer the ship at the bottom out of their way. Each rock that gets past scores a point, and they fall faster as the score goes up. When a rock hits the ship the score is shown; a key starts again. |
-| `kaleido.ch8` | A dot wanders at random, mirrored into all four quarters of the screen; DRW flips the pixels, so the pattern keeps changing. |
+| `bounce.ch8` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=c8bounce) | A ball bouncing round a box at the edge of the screen, timed with the delay timer. |
+| `keys.ch8` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=c8keys) | Press a key and it is shown as a big hex digit, built from the font a bit at a time, with the number of presses in decimal underneath. Shows FX0A, FX29, FX33 and FX65. |
+| `dodge.ch8` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=c8dodge) | A game: rocks fall, and A and D steer the ship at the bottom out of their way. Each rock that gets past scores a point, and they fall faster as the score goes up. When a rock hits the ship the score is shown; a key starts again. |
+| `kaleido.ch8` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=c8kaleido) | A dot wanders at random, mirrored into all four quarters of the screen; DRW flips the pixels, so the pattern keeps changing. |
 
 `tools/c8asm.py` assembles them (`build.sh` runs it). It takes the
 mnemonics of Cowgod's CHIP-8 reference (`LD V0, 5`, `DRW V0, V1, 4`,

@@ -1,5 +1,7 @@
 # COMP80 Befunge
 
+[Run Befunge in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=befunge). Each example below has a ▶ link that types it in and runs it there.
+
 Befunge-93 for the PSI COMP80, written for this project, in the 2 KB of ROM
 (0400-0BFF) that held BURP. The monitor is unchanged; RS at READY enters it.
 
@@ -91,10 +93,10 @@ the program on the playfield a line at a time; then type RUN.
 
 | | |
 |---|---|
-| `hello.bef` | `"!DLROW ,OLLEH">:#,_@`: the string is pushed backwards, then printed a character at a time until the 0 under it |
-| `count.bef` | counts from 1 to 10: the loop goes right along line 0, and `_` sends it back left along line 1 and up the `^` until the count passes 10 |
-| `fact.bef` | the factorial of a number read with `&`: counts down onto the stack, then multiplies them all together (7 gives 5040) |
-| `stars.bef` | draws a diagonal of stars with `p`, at x = 3n, y = n + 4, writing onto the screen the program itself is on |
+| `hello.bef` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=befhello) | `"!DLROW ,OLLEH">:#,_@`: the string is pushed backwards, then printed a character at a time until the 0 under it |
+| `count.bef` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=befcount) | counts from 1 to 10: the loop goes right along line 0, and `_` sends it back left along line 1 and up the `^` until the count passes 10 |
+| `fact.bef` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=beffact) | the factorial of a number read with `&`: counts down onto the stack, then multiplies them all together (7 gives 5040) |
+| `stars.bef` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=befstars) | draws a diagonal of stars with `p`, at x = 3n, y = n + 4, writing onto the screen the program itself is on |
 
 ## Tests
 

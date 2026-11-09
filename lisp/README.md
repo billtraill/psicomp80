@@ -1,5 +1,7 @@
 # COMP80 LISP
 
+[Run LISP in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=lisp). Each example below has a ▶ link that types it in and runs it there.
+
 A small LISP for the PSI COMP80 that replaces BURP in the ROM, in the same
 way as [COMP80 FORTH](../forth/README.md). The monitor (0000-03FF) is
 unchanged; LISP fills the 2 KB at 0400-0BFF where BURP was. As with BURP,
@@ -31,20 +33,20 @@ or `./mamed psicomp80x -bios lisp`), and uses the extra memory there.
 
 | | |
 |---|---|
-| `deriv.lsp` | Symbolic differentiation, the program LISP was made for. `(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)` gives `(+ (* 6 X) 2)`. `~/localdev/psicomp80/c80.sh deriv` |
-| `hanoi.lsp` | The Towers of Hanoi. `(HANOI 4 'A 'C 'B)` prints the 15 moves. `~/localdev/psicomp80/c80.sh hanoi` |
-| `queens.lsp` | The eight queens. `(QUEENS 8)` prints the first solution as a board, in about 26 s in the emulator. `~/localdev/psicomp80/c80.sh queens` |
-| `sier.lsp` | The Sierpiński triangle: 16 rows of Pascal's triangle mod 2, printed with `TYO`. `(SIER)` takes about 6 s. `~/localdev/psicomp80/c80.sh lispsier` |
-| `hilbert.lsp` | A Hilbert curve, 16 × 16 points, printed a line at a time: each point's distance along the curve is worked out a quarter at a time, and neighbours whose distances differ by 1 are joined. `(HILBERT)` takes about 30 s. `~/localdev/psicomp80/c80.sh lisphilbert` |
-| `eliza.lsp` | A little Eliza. `(TALK '(I FEEL SAD ABOUT MY JOB))` answers `(WHY DO YOU FEEL SAD ABOUT YOUR JOB)`; with no keyword it says something dull. Each new word takes a slot in the symbol table, so about 30 new words fit. `~/localdev/psicomp80/c80.sh eliza` |
-| `simp.lsp` | Simplifying algebra. `(D '(* X X) 'X)` gives `(+ (* X 1) (* 1 X))`; `(SIMP (D '(* X X) 'X))` gives `(* 2 X)`. It has its own D, as DERIV and SIMP together don't fit in 8 KB. `~/localdev/psicomp80/c80.sh simp` |
-| `perms.lsp` | Permutations and the power set. `(PERMS '(A B C))` gives the six orders; `(POWER '(A B C))` gives the eight subsets. `~/localdev/psicomp80/c80.sh perms` |
-| `fib.lsp` | Fibonacci and Ackermann, counting calls. `(CALLS FIB 15)` gives `(610 IN 1973 CALLS)` in about 8 s; `(FAST 22)` overflows the 15-bit numbers; `(ACK 3 3)` is `TOO DEEP` without the 32 KB expansion. `~/localdev/psicomp80/c80.sh fib` |
-| `animal.lsp` | The animal game, which learns: `(PLAY)`, then `(YES)` or `(NO)`; when it guesses wrong, `(ITS 'DOG '(DOES IT BARK))` grows the tree. `~/localdev/psicomp80/c80.sh animal` |
-| `unify.lsp` | Unification with variables written `(? X)`, and a little depth-first prover over parent facts and a GRAND rule: `(QUERY '((GRAND TOM (? W))))` prints both grandchildren in about 12 s. `~/localdev/psicomp80/c80.sh unify` |
-| `eval.lsp` | LISP in LISP: EV and AP evaluate QUOTE, COND, LAMBDA and five primitives with an environment list; `(EV '(APP (QUOTE (A B)) (QUOTE (C D E))) ENV)` gives `(A B C D E)`. `~/localdev/psicomp80/c80.sh eval` |
-| `river.lsp` | Missionaries and cannibals by depth-first search; `(CROSS)` prints the 11 crossings as banks and boat, in about 5 s. `~/localdev/psicomp80/c80.sh river` |
-| `roman.lsp` | Roman numerals both ways and numbers in words: `(ROMAN 1987)` gives `(M C M L X X X V I I)`, `NUMERAL` turns it back, `(WORDS 1987)` gives `(ONE THOUSAND NINE HUNDRED AND EIGHTY SEVEN)`. `~/localdev/psicomp80/c80.sh roman` |
+| `deriv.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=deriv) | Symbolic differentiation, the program LISP was made for. `(DERIV '(+ (* 3 (EXPT X 2)) (* 2 X)) 'X)` gives `(+ (* 6 X) 2)`. `~/localdev/psicomp80/c80.sh deriv` |
+| `hanoi.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=hanoi) | The Towers of Hanoi. `(HANOI 4 'A 'C 'B)` prints the 15 moves. `~/localdev/psicomp80/c80.sh hanoi` |
+| `queens.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=queens) | The eight queens. `(QUEENS 8)` prints the first solution as a board, in about 26 s in the emulator. `~/localdev/psicomp80/c80.sh queens` |
+| `sier.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=lispsier) | The Sierpiński triangle: 16 rows of Pascal's triangle mod 2, printed with `TYO`. `(SIER)` takes about 6 s. `~/localdev/psicomp80/c80.sh lispsier` |
+| `hilbert.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=lisphilbert) | A Hilbert curve, 16 × 16 points, printed a line at a time: each point's distance along the curve is worked out a quarter at a time, and neighbours whose distances differ by 1 are joined. `(HILBERT)` takes about 30 s. `~/localdev/psicomp80/c80.sh lisphilbert` |
+| `eliza.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=eliza) | A little Eliza. `(TALK '(I FEEL SAD ABOUT MY JOB))` answers `(WHY DO YOU FEEL SAD ABOUT YOUR JOB)`; with no keyword it says something dull. Each new word takes a slot in the symbol table, so about 30 new words fit. `~/localdev/psicomp80/c80.sh eliza` |
+| `simp.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=simp) | Simplifying algebra. `(D '(* X X) 'X)` gives `(+ (* X 1) (* 1 X))`; `(SIMP (D '(* X X) 'X))` gives `(* 2 X)`. It has its own D, as DERIV and SIMP together don't fit in 8 KB. `~/localdev/psicomp80/c80.sh simp` |
+| `perms.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=perms) | Permutations and the power set. `(PERMS '(A B C))` gives the six orders; `(POWER '(A B C))` gives the eight subsets. `~/localdev/psicomp80/c80.sh perms` |
+| `fib.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=fib) | Fibonacci and Ackermann, counting calls. `(CALLS FIB 15)` gives `(610 IN 1973 CALLS)` in about 8 s; `(FAST 22)` overflows the 15-bit numbers; `(ACK 3 3)` is `TOO DEEP` without the 32 KB expansion. `~/localdev/psicomp80/c80.sh fib` |
+| `animal.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=animal) | The animal game, which learns: `(PLAY)`, then `(YES)` or `(NO)`; when it guesses wrong, `(ITS 'DOG '(DOES IT BARK))` grows the tree. `~/localdev/psicomp80/c80.sh animal` |
+| `unify.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=unify) | Unification with variables written `(? X)`, and a little depth-first prover over parent facts and a GRAND rule: `(QUERY '((GRAND TOM (? W))))` prints both grandchildren in about 12 s. `~/localdev/psicomp80/c80.sh unify` |
+| `eval.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=eval) | LISP in LISP: EV and AP evaluate QUOTE, COND, LAMBDA and five primitives with an environment list; `(EV '(APP (QUOTE (A B)) (QUOTE (C D E))) ENV)` gives `(A B C D E)`. `~/localdev/psicomp80/c80.sh eval` |
+| `river.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=river) | Missionaries and cannibals by depth-first search; `(CROSS)` prints the 11 crossings as banks and boat, in about 5 s. `~/localdev/psicomp80/c80.sh river` |
+| `roman.lsp` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=roman) | Roman numerals both ways and numbers in words: `(ROMAN 1987)` gives `(M C M L X X X V I I)`, `NUMERAL` turns it back, `(WORDS 1987)` gives `(ONE THOUSAND NINE HUNDRED AND EIGHTY SEVEN)`. `~/localdev/psicomp80/c80.sh roman` |
 
 `load.lua` does the typing: it enters LISP and types the file a line at a
 time, leaving out comment lines and waiting for LISP's cursor between lines
@@ -174,6 +176,12 @@ assembles `lisp.asm` with z80asm (`brew install z80asm`), writes `lisp.bin`
 (0400-0BFF) and `../psicomp80_lisp.rom` (monitor + LISP), and puts the new
 ROM's CRC and SHA1 into `../psicomp80.cpp`. Then run `mame/install.sh` and
 rebuild MAME.
+
+## In the emulator
+
+These examples run in the web emulator from these links:
+
+- [A LISP session](https://billtraill.github.io/psicomp80/emulator.html#example=lisp)
 
 ## Tests
 

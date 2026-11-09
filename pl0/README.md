@@ -1,5 +1,7 @@
 # COMP80 PL/0
 
+[Run PL/0 in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=pl0). Each example below has a ▶ link that types it in and runs it there.
+
 A compiler for PL/0, the little language Niklaus Wirth used to teach
 compiler writing in *Algorithms + Data Structures = Programs* (1976). It fits
 in the 2 KB of ROM (0400-0BFF) that held BURP, alongside the unchanged monitor.
@@ -160,31 +162,31 @@ Some keep tables of words in the variables, which are two bytes each from
 
 | File | |
 |---|---|
-| `squares.pl0` | the squares of 1 to 10, with WHILE |
-| `primes.pl0` | the primes below 100 by trial division, testing `N / D * D = N` |
-| `gcd.pl0` | asks for two numbers with `?` and prints their greatest common divisor by subtraction; 1071 and 462 give 21 |
-| `fact.pl0` | factorials 1 to 7 from a procedure that calls itself. With only global variables, FACT takes N down by 1 before calling itself and puts it back afterwards. |
-| `rings.pl0` | rings of quarter blocks with PLOT: the points where (DX² + DY²) / 256 is odd, DY scaled by 5/3 for the shape of the points. About 7.5 s for 7936 points; it then waits for a key with `KEY` and clears the screen. |
-| `sier.pl0` | Pascal's triangle mod 2 over the whole screen, title line too. With no AND, each row comes from the one before, kept as bytes, by adding each entry to the one on its left; the odd ones are POKEd in as quarter blocks. Under a second. |
-| `hilbert.pl0` | a level-5 Hilbert curve by a turtle, 32 × 32 points. HIL calls itself four times and puts its shared variables back afterwards. It sets the quarter blocks itself, as the curve needs 63 rows and PLOT has 62. About 2 s. |
-| `dragon.pl0` | the dragon curve: 512 folds, each turning by one bit of the step number. About 1 s. |
-| `koch.pl0` | the Koch snowflake, three levels, from six directions 60 degrees apart. About half a second. |
-| `liss.pl0` | x = sin 3t against y = sin 2t, then a spirograph wheel turning five times as fast, from FORTH's sine table packed as steps in base 5. Text and code fill all but 73 bytes, so it is written without spaces round the signs. |
-| `life.pl0` | the Game of Life on 64 × 31 characters, read and written with PEEK and POKE, a row at a time with the column sums in a table. About 1 s a generation, until a key. |
-| `ant.pl0` | Langton's ant: 12024 steps until the highway leaves the screen, about 13 s. |
-| `rule.pl0` | asks for a rule number with `?` and grows that elementary cellular automaton from one cell, a generation a row. About 4 s. |
-| `sieve.pl0` | the sieve of Eratosthenes on 7680 quarter blocks, leaving the 973 primes. About 13 s. |
-| `mandel.pl0` | the Mandelbrot set, one character a point, in fixed point with 90 as 1.0 and a table of squares. About 38 s. |
-| `fern.pl0` | the Barnsley fern: 5000 points from four maps picked at random. About 20 s. |
-| `chaos.pl0` | the chaos game: 6000 jumps half way to a random corner make a Sierpiński triangle. About 11 s. |
-| `maze.pl0` | carves a maze of 42 × 29 rooms by backtracking, marking the rooms on the way back instead of keeping a stack (about 62 s); a key then fills in the dead ends (about 25 s). |
-| `sort.pl0` | the same 64 random bars sorted by bubble sort, selection sort and insertion sort, each with its name, comparisons and swaps on a line at the top: 2016 and 945, 2016 and 61, 1005 and 945. About 36 s. It and `fastsort.pl0` are packed, with spaces only where they are needed, to fit. |
-| `fastsort.pl0` | the same bars by Shell sort (510 and 221) and quicksort (432 and 178), which keeps its own list of the parts still to sort. About 9 s. |
-| `hanoi.pl0` | six discs, animated, with the recursion putting K, F and T back after each call. 63 moves in about 80 s. |
-| `balls.pl0` | six balls under gravity, drawn with XOR through a table, about 22 frames a second until a key. |
-| `stars.pl0` | sixteen stars flying out from the middle, about 8 frames a second until a key. |
-| `snake.pl0` | snake: W A S D steer, Q stops; it grows and speeds up as it eats. |
-| `clock.pl0` | asks for the hours, minutes and seconds, then shows them in big digits, timed by counting KEY waits to within about 0.03 s an hour. |
+| `squares.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0squares) | the squares of 1 to 10, with WHILE |
+| `primes.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0primes) | the primes below 100 by trial division, testing `N / D * D = N` |
+| `gcd.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0gcd) | asks for two numbers with `?` and prints their greatest common divisor by subtraction; 1071 and 462 give 21 |
+| `fact.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0fact) | factorials 1 to 7 from a procedure that calls itself. With only global variables, FACT takes N down by 1 before calling itself and puts it back afterwards. |
+| `rings.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0rings) | rings of quarter blocks with PLOT: the points where (DX² + DY²) / 256 is odd, DY scaled by 5/3 for the shape of the points. About 7.5 s for 7936 points; it then waits for a key with `KEY` and clears the screen. |
+| `sier.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0sier) | Pascal's triangle mod 2 over the whole screen, title line too. With no AND, each row comes from the one before, kept as bytes, by adding each entry to the one on its left; the odd ones are POKEd in as quarter blocks. Under a second. |
+| `hilbert.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0hilbert) | a level-5 Hilbert curve by a turtle, 32 × 32 points. HIL calls itself four times and puts its shared variables back afterwards. It sets the quarter blocks itself, as the curve needs 63 rows and PLOT has 62. About 2 s. |
+| `dragon.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0dragon) | the dragon curve: 512 folds, each turning by one bit of the step number. About 1 s. |
+| `koch.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0koch) | the Koch snowflake, three levels, from six directions 60 degrees apart. About half a second. |
+| `liss.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0liss) | x = sin 3t against y = sin 2t, then a spirograph wheel turning five times as fast, from FORTH's sine table packed as steps in base 5. Text and code fill all but 73 bytes, so it is written without spaces round the signs. |
+| `life.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0life) | the Game of Life on 64 × 31 characters, read and written with PEEK and POKE, a row at a time with the column sums in a table. About 1 s a generation, until a key. |
+| `ant.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0ant) | Langton's ant: 12024 steps until the highway leaves the screen, about 13 s. |
+| `rule.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0rule) | asks for a rule number with `?` and grows that elementary cellular automaton from one cell, a generation a row. About 4 s. |
+| `sieve.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0sieve) | the sieve of Eratosthenes on 7680 quarter blocks, leaving the 973 primes. About 13 s. |
+| `mandel.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0mandel) | the Mandelbrot set, one character a point, in fixed point with 90 as 1.0 and a table of squares. About 38 s. |
+| `fern.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0fern) | the Barnsley fern: 5000 points from four maps picked at random. About 20 s. |
+| `chaos.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0chaos) | the chaos game: 6000 jumps half way to a random corner make a Sierpiński triangle. About 11 s. |
+| `maze.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0maze) | carves a maze of 42 × 29 rooms by backtracking, marking the rooms on the way back instead of keeping a stack (about 62 s); a key then fills in the dead ends (about 25 s). |
+| `sort.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0sort) | the same 64 random bars sorted by bubble sort, selection sort and insertion sort, each with its name, comparisons and swaps on a line at the top: 2016 and 945, 2016 and 61, 1005 and 945. About 36 s. It and `fastsort.pl0` are packed, with spaces only where they are needed, to fit. |
+| `fastsort.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0fastsort) | the same bars by Shell sort (510 and 221) and quicksort (432 and 178), which keeps its own list of the parts still to sort. About 9 s. |
+| `hanoi.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0hanoi) | six discs, animated, with the recursion putting K, F and T back after each call. 63 moves in about 80 s. |
+| `balls.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0balls) | six balls under gravity, drawn with XOR through a table, about 22 frames a second until a key. |
+| `stars.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0stars) | sixteen stars flying out from the middle, about 8 frames a second until a key. |
+| `snake.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0snake) | snake: W A S D steer, Q stops; it grows and speeds up as it eats. |
+| `clock.pl0` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pl0clock) | asks for the hours, minutes and seconds, then shows them in big digits, timed by counting KEY waits to within about 0.03 s an hour. |
 
 ## Tests
 

@@ -1,5 +1,7 @@
 # COMP80 APL
 
+[Run APL in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=apl). Each example below has a ▶ link that types it in and runs it there.
+
 A small APL for the PSI COMP80. It takes BURP's place in the ROM and was
 written from scratch for this machine. The monitor (0000-03FF) is unchanged,
 and APL sits in the 2 KB at 0400-0BFF where BURP was. As with BURP, you
@@ -29,12 +31,12 @@ is printed on the next line, unless the line is an assignment.
 
 | | |
 |---|---|
-| `basics.apl` | Adding vectors, right-to-left order (`2 * 3 + 4` is 14), `IOTA`, `+/`, a matrix by `RHO`, and indexing a character vector. |
-| `primes.apl` | The primes below 30. `R .MOD R` is a table of remainders; `0 =` marks the divisors, `+/` counts them in each row, and `2 =` picks out the numbers with exactly two. About 3 s. |
-| `table.apl` | A multiplication table, `(IOTA 9) .* IOTA 9`, and a table of `>=`. |
-| `stats.apl` | The total, average, running totals (`+!`), largest, and the values above the average of a vector. |
-| `hist.apl` | A histogram: `" *"[1 + V .>= IOTA MAX/ V]` indexes a two-character string with a 0-1 table, so each value becomes a bar of stars. |
-| `pascal.apl` | Pascal's triangle along its diagonals: each `+!` (running total) of a row of 1s gives the next diagonal. |
+| `basics.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=aplbasics) | Adding vectors, right-to-left order (`2 * 3 + 4` is 14), `IOTA`, `+/`, a matrix by `RHO`, and indexing a character vector. |
+| `primes.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=aplprimes) | The primes below 30. `R .MOD R` is a table of remainders; `0 =` marks the divisors, `+/` counts them in each row, and `2 =` picks out the numbers with exactly two. About 3 s. |
+| `table.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=apltable) | A multiplication table, `(IOTA 9) .* IOTA 9`, and a table of `>=`. |
+| `stats.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=aplstats) | The total, average, running totals (`+!`), largest, and the values above the average of a vector. |
+| `hist.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=aplhist) | A histogram: `" *"[1 + V .>= IOTA MAX/ V]` indexes a two-character string with a 0-1 table, so each value becomes a bar of stars. |
+| `pascal.apl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=aplpascal) | Pascal's triangle along its diagonals: each `+!` (running total) of a row of 1s gives the next diagonal. |
 
 ## Keys
 

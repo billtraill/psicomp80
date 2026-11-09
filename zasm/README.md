@@ -1,5 +1,7 @@
 # COMP80 ZASM
 
+[Run ZASM in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=zasm). Each example below has a ▶ link that types it in and runs it there.
+
 A Z80 assembler and disassembler for the PSI COMP80 that replaces BURP in
 the ROM. The monitor (0000-03FF) is unchanged; ZASM fills the 2 KB at
 0400-0BFF where BURP was. As with BURP, you enter it with the RS key from the
@@ -86,7 +88,7 @@ first):
 
 | | |
 |---|---|
-| `nmi.txt` | `DIS 0066`: the monitor's keyboard NMI handler, which checks it interrupted a HALT, reads the key from port 01 and turns Return into 1F and RS into a jump to 0800. |
-| `pattern.txt` | assembles a program at 1000 that fills the screen with diagonal lines of quarter blocks and waits for a key in a HALT, lists it, and runs it with `G 1000`. |
-| `countdown.txt` | assembles a loop at 1100 that counts 9 down to 0 in the top line, about half a second a digit, and runs it. |
-| `life.txt` | `DIS 1000` with `../life/life.bin` loaded at 1000: the start of the machine-code Game of Life. |
+| `nmi.txt` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=zasmnmi) | `DIS 0066`: the monitor's keyboard NMI handler, which checks it interrupted a HALT, reads the key from port 01 and turns Return into 1F and RS into a jump to 0800. |
+| `pattern.txt` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=zasmpattern) | assembles a program at 1000 that fills the screen with diagonal lines of quarter blocks and waits for a key in a HALT, lists it, and runs it with `G 1000`. |
+| `countdown.txt` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=zasmcount) | assembles a loop at 1100 that counts 9 down to 0 in the top line, about half a second a digit, and runs it. |
+| `life.txt` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=zasmlife) | `DIS 1000` with `../life/life.bin` loaded at 1000: the start of the machine-code Game of Life. |

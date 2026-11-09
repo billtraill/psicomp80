@@ -1,5 +1,7 @@
 # COMP80 TRAC
 
+[Run TRAC in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=trac). Each example below has a ▶ link that types it in and runs it there.
+
 TRAC, Calvin Mooers' Text Reckoning And Compiling language of 1964, for the
 PSI COMP80, in the style of TRAC T-64. It replaces BURP in the ROM: the
 monitor (0000-03FF) is unchanged, and TRAC fills the 2 KB at 0400-0BFF where
@@ -83,10 +85,10 @@ The keyboard has no lower case, so names are in capitals.
 
 | | |
 |---|---|
-| `hello.trac` | PS, DS and CL, and the difference protection makes |
-| `fact.trac` | The classic factorial, a form that calls itself through EQ, ML and SU: `#(CL,FACT,7)` gives 5040. Then Fibonacci with GR and AD: `#(CL,FIB,10)` gives 55 in about 2.5 s |
-| `rev.trac` | A string reversed: R takes a character from the form S with CC, calls itself for the rest, then puts the character after it |
-| `letter.trac` | A form letter over several lines, with gaps for the name, the present and the sender, filled in twice |
+| `hello.trac` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=trachello) | PS, DS and CL, and the difference protection makes |
+| `fact.trac` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=tracfact) | The classic factorial, a form that calls itself through EQ, ML and SU: `#(CL,FACT,7)` gives 5040. Then Fibonacci with GR and AD: `#(CL,FIB,10)` gives 55 in about 2.5 s |
+| `rev.trac` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=tracrev) | A string reversed: R takes a character from the form S with CC, calls itself for the rest, then puts the character after it |
+| `letter.trac` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=tracletter) | A form letter over several lines, with gaps for the name, the present and the sender, filled in twice |
 
 ## Tests
 

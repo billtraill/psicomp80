@@ -1,5 +1,7 @@
 # COMP80 ED
 
+[Run ED in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=ed). Each example below has a ▶ link that types it in and runs it there.
+
 A line editor for the PSI COMP80 in the style of the Unix `ed` and the
 editors of its time, written for this project in the 2 KB of ROM
 (0400h–0BFFh) that held BURP. The monitor (0000h–03FFh) is unchanged; RS at
@@ -102,10 +104,10 @@ lines; every line is typed):
 
 | | |
 |---|---|
-| `letter.ed` | a short letter typed in with A, a word changed with S, a line moved with M and a P.S. inserted before the last line with I |
-| `list.ed` | a shopping list: G/ X/D deletes the items marked X, two lines are added and joined, and S changes the join to " AND " |
-| `search.ed` | the planets: searches, `//`, `$-2` and a range from dot, then G with S...G to mark every U |
-| `view.ed` | lines copied with T, S on a range with G, and V showing the 30 lines round line 8 |
+| `letter.ed` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=edletter) | a short letter typed in with A, a word changed with S, a line moved with M and a P.S. inserted before the last line with I |
+| `list.ed` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=edlist) | a shopping list: G/ X/D deletes the items marked X, two lines are added and joined, and S changes the join to " AND " |
+| `search.ed` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=edsearch) | the planets: searches, `//`, `$-2` and a range from dot, then G with S...G to mark every U |
+| `view.ed` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=edview) | lines copied with T, S on a range with G, and V showing the 30 lines round line 8 |
 
 ## Tests
 

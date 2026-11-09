@@ -1,5 +1,7 @@
 # BURP
 
+[Run BURP in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=burp). The examples are linked under In the emulator, below; each types one in and runs it there.
+
 BURP is the high-level language in the original COMP80 ROM (0400-0BFF), from
 the Wireless World articles: a small BASIC-like language whose arithmetic is
 done by a National MM57109 scientific calculator chip. `../info/burp.md` has
@@ -39,6 +41,25 @@ which prints e^x for 1 to 25, switching to scientific notation from e^19
   type each key once BURP is waiting for it. Pasting a line into MAME types
   too fast; `test_burp.lua` types a key at a time.
 - Any key stops a running program; RS goes back to BURP.
+
+## In the emulator
+
+These examples run in the web emulator from these links:
+
+- [BURP sample program](https://billtraill.github.io/psicomp80/emulator.html#example=burp)
+- [e to the x, in scientific notation](https://billtraill.github.io/psicomp80/emulator.html#example=burpexp)
+- [Sines and cosines](https://billtraill.github.io/psicomp80/emulator.html#example=burptrig)
+- [Sierpiński triangle](https://billtraill.github.io/psicomp80/emulator.html#example=burpsier)
+- [Collatz sequence](https://billtraill.github.io/psicomp80/emulator.html#example=burpcollatz)
+- [Primes by trial division](https://billtraill.github.io/psicomp80/emulator.html#example=burpprimes)
+- [Approximating π](https://billtraill.github.io/psicomp80/emulator.html#example=burppi)
+- [Guess the number](https://billtraill.github.io/psicomp80/emulator.html#example=burpguess)
+- [Loan repayments](https://billtraill.github.io/psicomp80/emulator.html#example=burploan)
+- [Square roots by Newton’s method](https://billtraill.github.io/psicomp80/emulator.html#example=burpnewton)
+- [GCD and LCM](https://billtraill.github.io/psicomp80/emulator.html#example=burpgcd)
+- [Perfect numbers](https://billtraill.github.io/psicomp80/emulator.html#example=burpperfect)
+- [Day of the week](https://billtraill.github.io/psicomp80/emulator.html#example=burpzeller)
+- [Factorials and e](https://billtraill.github.io/psicomp80/emulator.html#example=burpfact)
 
 ## Tests
 

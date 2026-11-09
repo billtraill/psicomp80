@@ -1,5 +1,7 @@
 # COMP80 CALC
 
+[Run CALC in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=sheet). Each example below has a ▶ link that types it in and runs it there.
+
 A spreadsheet for the PSI COMP80, after VisiCalc (1979), that replaces BURP
 in the ROM. It was written from scratch for this machine. The monitor
 (0000-03FF) is unchanged, and CALC fills the 2 KB at 0400-0BFF where BURP
@@ -66,10 +68,10 @@ second.
 
 | | |
 |---|---|
-| `budget.cal` | A household budget: six monthly amounts, each times 12 for the year (one formula and `/U`), the totals by `@SUM`, and the cost a week |
-| `interest.cal` | Compound interest on 1000 at 5% for ten years: start, interest and end of each year, all from the rate in B3. Change B3 and the whole table changes |
-| `times.cal` | A multiplication table from one formula, `+$A2*B$1`, copied across with `/L` and down with `/U` |
-| `temp.cal` | Celsius to Fahrenheit, −20 to 100 in tens, with `+A2*9/5+32` copied down and one decimal shown |
+| `budget.cal` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=sheetbudget) | A household budget: six monthly amounts, each times 12 for the year (one formula and `/U`), the totals by `@SUM`, and the cost a week |
+| `interest.cal` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=sheetinterest) | Compound interest on 1000 at 5% for ten years: start, interest and end of each year, all from the rate in B3. Change B3 and the whole table changes |
+| `times.cal` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=sheettimes) | A multiplication table from one formula, `+$A2*B$1`, copied across with `/L` and down with `/U` |
+| `temp.cal` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=sheettemp) | Celsius to Fahrenheit, −20 to 100 in tens, with `+A2*9/5+32` copied down and one decimal shown |
 
 `tests/` has the same four sheets as sessions for `web/tools/session.js` and
 `mame/test_session.lua`. The cursor's address is at 0C02. MAME and the web

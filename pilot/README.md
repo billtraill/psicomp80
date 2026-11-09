@@ -1,5 +1,7 @@
 # COMP80 PILOT
 
+[Run PILOT in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=pilot). Each example below has a ▶ link that types it in and runs it there.
+
 PILOT, the 1970s teaching language, for the PSI COMP80. It replaces BURP in
 the ROM: the monitor (0000-03FF) is unchanged, and PILOT fills the 2 KB at
 0400-0BFF where BURP was. As with BURP, you enter it with the RS key from the
@@ -65,11 +67,11 @@ running, and stops it.
 
 | | |
 |---|---|
-| `greet.pil` | asks your name and how you are, and answers using your name. |
-| `quiz.pil` | a capitals quiz with a score, marking each answer with a subroutine. |
-| `tables.pil` | a times-table drill: five random questions on the table you choose, with a score. |
-| `story.pil` | a little adventure with a forest, a dragon and a river, going round until you get home. |
-| `draw.pil` | draws a box and its diagonals with `G:`, in under a second. |
+| `greet.pil` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pilotgreet) | asks your name and how you are, and answers using your name. |
+| `quiz.pil` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pilotquiz) | a capitals quiz with a score, marking each answer with a subroutine. |
+| `tables.pil` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pilottables) | a times-table drill: five random questions on the table you choose, with a score. |
+| `story.pil` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pilotstory) | a little adventure with a forest, a dragon and a river, going round until you get home. |
+| `draw.pil` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=pilotdraw) | draws a box and its diagonals with `G:`, in under a second. |
 
 ## Keys
 

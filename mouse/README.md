@@ -1,5 +1,7 @@
 # COMP80 MOUSE
 
+[Run Mouse in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=mouse). Each example below has a ▶ link that types it in and runs it there.
+
 Mouse, Peter Grogono's little stack language (BYTE, July 1979), for the PSI
 COMP80. It replaces BURP in the ROM: the monitor (0000-03FF) is unchanged,
 and Mouse fills the 2 KB at 0400-0BFF where BURP was. As with BURP, you
@@ -92,11 +94,11 @@ parameter), `FULL` (no room for the line) and `WHAT?`.
 
 | | |
 |---|---|
-| `examples/fib.mou` | Fibonacci numbers until they pass 32767, eight to a line. About half a second. |
-| `examples/fact.mou` | Factorials 1 to 7 from a macro that calls itself: `$F %1 2 < [ 1 @ ] %1 #F,%1 1 -; * @`. |
-| `examples/sieve.mou` | The sieve of Eratosthenes on an array at addresses 400-699: the 62 primes below 300, in about 6 s. |
-| `examples/guess.mou` | Guess a number from 1 to 100, with `?.` and `?`. |
-| `examples/circles.mou` | Five circles drawn with `!.` by the midpoint algorithm, with a macro plotting four points at a time, in about 3 s. |
+| `examples/fib.mou` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mousefib) | Fibonacci numbers until they pass 32767, eight to a line. About half a second. |
+| `examples/fact.mou` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mousefact) | Factorials 1 to 7 from a macro that calls itself: `$F %1 2 < [ 1 @ ] %1 #F,%1 1 -; * @`. |
+| `examples/sieve.mou` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mousesieve) | The sieve of Eratosthenes on an array at addresses 400-699: the 62 primes below 300, in about 6 s. |
+| `examples/guess.mou` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mouseguess) | Guess a number from 1 to 100, with `?.` and `?`. |
+| `examples/circles.mou` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mousecircles) | Five circles drawn with `!.` by the midpoint algorithm, with a macro plotting four points at a time, in about 3 s. |
 
 ## Tests
 

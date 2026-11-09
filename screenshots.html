@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>PSI COMP80 Screens</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,6 +38,8 @@ section { display: grid; gap: 1.25rem; }
 .shead { display: grid; gap: .5rem; max-width: 46rem; }
 h2 { font: 700 1.75rem/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
 .shead p { margin: 0; color: var(--muted); max-width: 62ch; }
+.shead p.try { color: var(--ink); }
+.try a { font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .shead a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: 1.75rem 1.5rem; }
 .shot { margin: 0; display: grid; gap: .75rem; align-content: start; min-width: 0; }
@@ -279,6 +282,7 @@ footer a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1p
   <div class="shead">
     <h2>The monitor</h2>
     <p>Commands are a word, a space and hex addresses. A command runs as soon as its last digit is typed, with no Return.</p>
+    <p class="try"><a href="emulator.html#rom=burp">▶ Try the monitor in the emulator</a>, or its <a href="emulator.html#example=alph">character test</a> and <a href="emulator.html#example=list">memory listing</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -300,6 +304,7 @@ footer a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1p
   <div class="shead">
     <h2>Game of Life</h2>
     <p>Conway’s Life on a 128 × 64 board that wraps at the edges. Each character cell shows four cells using the quadrant block graphics. Written in Z80 assembly; about 0.65 s per generation in the emulator.</p>
+    <p class="try"><a href="emulator.html#example=life">▶ Run it in the emulator</a></p>
   </div>
   <ul class="keys" aria-label="Keys">
     <li><kbd>R</kbd> new random board</li>
@@ -327,6 +332,7 @@ footer a { color: var(--accent); font-weight: 600; text-decoration-thickness: 1p
   <div class="shead">
     <h2>Fig. 22 pictures</h2>
     <p>Recreations of the two pictorial displays photographed for Wireless World, August 1979, drawn with the COMP80 graphics characters. A third picture, the screen on the cover of the kit leaflet, is at the top of the page.</p>
+    <p class="try">▶ In the emulator: <a href="emulator.html#example=boat">sailing boat</a>, <a href="emulator.html#example=schmitt">Schmitt trigger</a>, <a href="emulator.html#example=cover">the kit leaflet’s screen</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -364,6 +370,7 @@ cd ~/localdev/mame &amp;&amp; ./mamed psicomp80 -cass ~/localdev/psicomp80/pictu
   <div class="shead">
     <h2>FORTH</h2>
     <p>A second ROM puts a small FORTH in the 2 KB that held BURP; the monitor is unchanged. It has about 60 words: stack and arithmetic words, <code>:</code> and <code>;</code>, variables and constants, <code>IF</code>, <code>BEGIN</code> and <code>DO</code> loops, and <code>AT</code>, <code>EMIT</code> and <code>KEY</code> for the screen and keyboard. Numbers are 16-bit integers. The emulator offers the ROM as a BIOS option, <code>-bios forth</code>; press RS at READY to enter FORTH, as you would for BURP.</p>
+    <p class="try"><a href="emulator.html#rom=forth">Run FORTH in the web emulator</a>, or <a href="emulator.html#example=forth">▶ a FORTH session</a></p>
   </div>
   <ul class="keys" aria-label="Keys">
     <li><kbd>^</kbd> rub out (Backspace in MAME)</li>
@@ -383,6 +390,7 @@ cd ~/localdev/mame &amp;&amp; ./mamed psicomp80 -cass ~/localdev/psicomp80/pictu
   <div class="shead">
     <h2>Game of Life in FORTH</h2>
     <p>The same game written in FORTH: 64 × 31 cells, one per character, with wrapping edges. It reads the board straight from screen memory and adds up columns of three cells first, so each cell then takes three additions. A generation takes about 3 s in the emulator; the assembly version does four times as many cells in 0.65 s. <code>c80.sh</code> types the program in, a line at a time, and runs it.</p>
+    <p class="try"><a href="emulator.html#example=forthlife">▶ Run it in the emulator</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -430,6 +438,7 @@ VARIABLE UP  VARIABLE MID  VARIABLE DN
   <div class="shead">
     <h2>Mandelbrot set in FORTH</h2>
     <p>One point per character, shaded by how many steps it takes to escape, with the set itself in solid blocks. With only 16-bit integers it works in fixed point with 90 as 1.0, the largest scale at which 2.0 squared still fits. The 1,984 points take about 95 s in the emulator.</p>
+    <p class="try"><a href="emulator.html#example=mandel">▶ Run it in the emulator</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -471,6 +480,7 @@ VARIABLE PAL  32 PAL !  46 , 58 , 45 , 61 , 43 , 42 , 35 , 37 ,
   <div class="shead">
     <h2>LISP</h2>
     <p>A third ROM does the same with LISP: a LISP 1.5 style interpreter with garbage collection, recursion, <code>LAMBDA</code> and dynamic scope in the 2 KB that held BURP. It runs the classic LISP programs: symbolic differentiation, the Towers of Hanoi and the eight queens. The emulator offers it as <code>-bios lisp</code>; press RS at READY to enter it. <a href="lisp.html">COMP80 LISP</a> has the language, the programs and how it works.</p>
+    <p class="try"><a href="emulator.html#rom=lisp">Run LISP in the web emulator</a>; the <a href="lisp.html">LISP page</a> has its programs</p>
   </div>
   <div class="grid">
     <figure class="shot">

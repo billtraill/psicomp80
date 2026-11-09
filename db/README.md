@@ -1,5 +1,7 @@
 # COMP80 FILE
 
+[Run FILE in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=db). Each example below has a ▶ link that types it in and runs it there.
+
 A card-file database for the PSI COMP80, of the kind small computers ran for
 address books and club lists. It takes BURP's place in the ROM and was
 written from scratch for this machine. The monitor (0000-03FF) is unchanged,
@@ -25,9 +27,9 @@ Return.
 
 | | |
 |---|---|
-| `address.db` | An address book: name, town and phone for seven people. Try `SORT BY NAME`, `LIST`, `FIND 0113` and `LIST WHERE TOWN=Y*`. |
-| `records.db` | A record collection: title, artist, year, format and price. Try `SORT BY YEAR`, `LIST WHERE YEAR<1970 AND FORMAT=LP`, `SUM PRICE`, `AVG PRICE` and `SHOW 5`. |
-| `club.db` | A club's members: name, age, year joined, fee and whether it is paid. Try `COUNT WHERE PAID=NO`, `SUM FEE WHERE PAID=NO`, `AVG AGE`, `SORT BY AGE DESC` and `DELETE WHERE PAID=NO`. |
+| `address.db` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=dbaddress) | An address book: name, town and phone for seven people. Try `SORT BY NAME`, `LIST`, `FIND 0113` and `LIST WHERE TOWN=Y*`. |
+| `records.db` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=dbrecords) | A record collection: title, artist, year, format and price. Try `SORT BY YEAR`, `LIST WHERE YEAR<1970 AND FORMAT=LP`, `SUM PRICE`, `AVG PRICE` and `SHOW 5`. |
+| `club.db` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=dbclub) | A club's members: name, age, year joined, fee and whether it is paid. Try `COUNT WHERE PAID=NO`, `SUM FEE WHERE PAID=NO`, `AVG AGE`, `SORT BY AGE DESC` and `DELETE WHERE PAID=NO`. |
 
 ## Keys
 

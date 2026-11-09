@@ -1,5 +1,7 @@
 # COMP80 BASIC
 
+[Run BASIC in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=basic). Each example below has a ▶ link that types it in and runs it there.
+
 A Tiny BASIC for the PSI COMP80 that replaces BURP in the ROM, written from
 scratch for it. The monitor (0000-03FF) is unchanged; BASIC fills the 2 KB
 at 0400-0BFF where BURP was. As with BURP, you enter it with the RS key from
@@ -22,10 +24,10 @@ number in front it goes into the program, without one it runs straight away.
 
 | | |
 |---|---|
-| `guess.bas` | Guess the number: RND picks one from 1 to 100 and INPUT takes your guesses, with HIGHER or LOWER until you get it. `RUN` |
-| `primes.bas` | The 95 primes below 500 by the sieve of Eratosthenes, in the array @(). About 4 s. `RUN` |
-| `lines.bas` | String art: 32 straight lines whose envelopes make two curves, drawn with PLOT by a Bresenham subroutine at 1000. About 30 s; a key stops it. `RUN` |
-| `worm.bas` | A worm 24 points long bouncing round a box, its tail rubbed out with UNPLOT from a ring of positions kept in @(). Runs until a key. `RUN` |
+| `guess.bas` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=basicguess) | Guess the number: RND picks one from 1 to 100 and INPUT takes your guesses, with HIGHER or LOWER until you get it. `RUN` |
+| `primes.bas` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=basicprimes) | The 95 primes below 500 by the sieve of Eratosthenes, in the array @(). About 4 s. `RUN` |
+| `lines.bas` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=basiclines) | String art: 32 straight lines whose envelopes make two curves, drawn with PLOT by a Bresenham subroutine at 1000. About 30 s; a key stops it. `RUN` |
+| `worm.bas` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=basicworm) | A worm 24 points long bouncing round a box, its tail rubbed out with UNPLOT from a ring of positions kept in @(). Runs until a key. `RUN` |
 
 ## Keys
 

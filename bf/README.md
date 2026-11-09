@@ -1,5 +1,7 @@
 # COMP80 BF
 
+[Run BF in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=bf). Each example below has a ▶ link that types it in and runs it there.
+
 Brainf\*\*\* for the PSI COMP80, in the 2 KB of ROM (0400–0BFF) where BURP
 was, with the monitor (0000–03FF) unchanged. It uses 1656 of the 2048 bytes;
 most of what isn't the interpreter shows it working: the program, the tape
@@ -94,12 +96,12 @@ the program kept. STEP waits for its key in a HALT, so keys are safe there.
 
 | | |
 |---|---|
-| `hello.bf` | Hello world: one loop builds 72, 104, 88 and 32 in four cells, and the letters are made from those. |
-| `count.bf` | The digits 0 to 9: a cell of 48 printed and added to ten times. |
-| `add.bf` | Reads two digits and prints them added up, `3+4=7` (the sum must be below 10). |
-| `alpha.bf` | The alphabet. |
-| `reverse.bf` | Type a line and it comes back reversed: the keys go into cells one after another until Return, then are printed walking back to cell 0. |
-| `fib.bf` | The Fibonacci numbers 1 to 55 as bars of solid blocks (character 143). |
+| `hello.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bfhello) | Hello world: one loop builds 72, 104, 88 and 32 in four cells, and the letters are made from those. |
+| `count.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bfcount) | The digits 0 to 9: a cell of 48 printed and added to ten times. |
+| `add.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bfadd) | Reads two digits and prints them added up, `3+4=7` (the sum must be below 10). |
+| `alpha.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bfalpha) | The alphabet. |
+| `reverse.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bfreverse) | Type a line and it comes back reversed: the keys go into cells one after another until Return, then are printed walking back to cell 0. |
+| `fib.bf` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=bffib) | The Fibonacci numbers 1 to 55 as bars of solid blocks (character 143). |
 
 `tests/` has a session for each, in the format of `web/tools/session.js`,
 plus `show.txt` (hello world in SHOW) and `step.txt` (STEP, R, LIST, NEW and

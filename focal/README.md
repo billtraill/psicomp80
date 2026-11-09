@@ -1,5 +1,7 @@
 # COMP80 FOCAL
 
+[Run FOCAL in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=focal). Each example below has a ▶ link that types it in and runs it there.
+
 FOCAL, DEC's 1968 interactive language, for the PSI COMP80. It replaces
 BURP in the ROM: the monitor (0000-03FF) is unchanged, and FOCAL fills the
 2 KB at 0400-0BFF where BURP was. As with BURP, you enter it with the RS key
@@ -28,11 +30,11 @@ program.
 
 | | |
 |---|---|
-| `roots.foc` | Square roots and cube roots of 1 to 12, using FSQT and `**`. About 10 s. |
-| `temp.foc` | Celsius to Fahrenheit from -20 to 100 in 10s: a FOR with a step on one line. About 4 s. |
-| `interest.foc` | Compound interest: ASK for an amount, a rate and a number of years, then a line a year, rounded to the penny with FITR. |
-| `guess.foc` | Guess the number: FRAN picks one from 1 to 100 and IF says too big, too small or right, counting the guesses. |
-| `sine.foc` | A sine wave down the screen: for each line FITR(14+13*FSIN(X/3)) spaces, then a star. About 45 s. |
+| `roots.foc` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=focalroots) | Square roots and cube roots of 1 to 12, using FSQT and `**`. About 10 s. |
+| `temp.foc` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=focaltemp) | Celsius to Fahrenheit from -20 to 100 in 10s: a FOR with a step on one line. About 4 s. |
+| `interest.foc` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=focalinterest) | Compound interest: ASK for an amount, a rate and a number of years, then a line a year, rounded to the penny with FITR. |
+| `guess.foc` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=focalguess) | Guess the number: FRAN picks one from 1 to 100 and IF says too big, too small or right, counting the guesses. |
+| `sine.foc` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=focalsine) | A sine wave down the screen: for each line FITR(14+13*FSIN(X/3)) spaces, then a star. About 45 s. |
 
 ## Keys
 

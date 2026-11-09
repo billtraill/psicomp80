@@ -1,5 +1,7 @@
 # COMP80 FORTH
 
+[Run FORTH in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=forth). Each example below has a ▶ link that types it in and runs it there.
+
 A small FORTH for the PSI COMP80 that replaces BURP in the ROM. The monitor
 (0000-03FF) is unchanged; FORTH fills the 2 KB at 0400-0BFF where BURP was.
 As with BURP, you enter it with the RS key from the monitor's READY state.
@@ -25,24 +27,24 @@ appears. Type a line and press Return; the line runs and FORTH prints `OK`.
 
 | | |
 |---|---|
-| `life.fs` | Game of Life, 64 × 31 cells, one per character. `1000 LIFE` runs 1000 generations from a random board; about 3 s a generation in the emulator. `~/localdev/psicomp80/c80.sh forthlife` |
-| `mandel.fs` | The Mandelbrot set, one point per character, shaded by escape time, in fixed point (90 = 1.0). `MANDEL` draws it in about 95 s. `~/localdev/psicomp80/c80.sh mandel` |
-| `sier.fs` | The Sierpiński triangle: Pascal's triangle mod 2, where entry x of row y is odd when `x AND y` is x. 64 rows, four cells to a character, over the whole screen. `SIER` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthsier` |
-| `hilbert.fs` | A level-5 Hilbert curve, 32 × 32 points, drawn over the whole screen by a turtle: HIL calls itself four times, the sign of its angle mirroring the copies. `HILBERT` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthhilbert` |
-| `hanoi.fs` | The Towers of Hanoi, animated: each disc lifts off its peg, slides across and drops onto the next. `6 HANOI` makes 63 moves in about 75 s; up to `10 HANOI` fits. `SPEED` sets the pause between steps. `~/localdev/psicomp80/c80.sh forthhanoi` |
-| `dragon.fs` | The dragon curve: 512 steps, turning left or right by the bit above the lowest set bit of the step number. `DRAGON` draws it in about 4 s; a key clears it. `~/localdev/psicomp80/c80.sh forthdragon` |
-| `koch.fs` | The Koch snowflake, level 3, in six directions 60° apart. `KOCH` draws it in about 2 s; a key clears it. `~/localdev/psicomp80/c80.sh forthkoch` |
-| `ant.fs` | Langton's ant on 128 × 60 quarter-character cells, with a step count. The highway appears after about 10000 steps and the ant walks off the screen at 12024. `ANT` takes about 55 s. `~/localdev/psicomp80/c80.sh forthant` |
-| `sieve.fs` | The sieve of Eratosthenes on 0–7679, one quarter character per number, 128 to a row; the multiples of each prime up to 87 are cleared and the primes counted (973). `SIEVE` takes about 60 s. `~/localdev/psicomp80/c80.sh forthsieve` |
-| `balls.fs` | Six balls bounce under gravity, 2 × 2 quarter-block pixels each, drawn by XOR so they pass through each other. Positions are in 256ths of a pixel. `BALLS` runs until a key; `SPEED` is ticks (about 8 ms each) per frame. `~/localdev/psicomp80/c80.sh forthballs` |
-| `stars.fs` | A starfield: 16 stars fly out from the centre, each gaining speed every frame, using only additions; nearer ones are two pixels wide. `STARS` runs until a key. `~/localdev/psicomp80/c80.sh forthstars` |
-| `snake.fs` | Snake, in half-character squares: W A S D steer, Q stops; each dot adds a point and three segments, and every fourth speeds it up. `TICK`, a little machine code, waits on the MM57109 in HALTs so keys are taken while it runs. `SNAKE` `~/localdev/psicomp80/c80.sh snake` |
-| `maze.fs` | A random maze of 42 × 29 rooms, carved by backtracking with the way back kept a byte a step in a table; a key then fills in the dead ends until only the way through is left. `MAZE` carves in about 34 s and fills in about 20 s. `~/localdev/psicomp80/c80.sh forthmaze` |
-| `rule.fs` | Elementary cellular automata: `30 RULE`, `90 RULE`, `110 RULE` or any other number grows a row of 128 cells from one live cell, 60 generations down the screen in about 6 s; a key clears it. `~/localdev/psicomp80/c80.sh forthrule` |
-| `fern.fs` | The Barnsley fern, 5000 points of an iterated function system in whole numbers (36 = 1.0, factors in hundredths), about 29 s; and the chaos game, `CHAOS`, a point moved half way to a random corner of a triangle 6000 times, about 13 s. A key clears each. `~/localdev/psicomp80/c80.sh forthfern` |
-| `liss.fs` | Lissajous figures and spirograph curves from a sine table: `3 2 LISS` draws x = sin 3t, y = sin 2t in about 2.5 s; `5 SPIRO` adds a small wheel turning 5 times as fast, in about 5 s. A key clears it. `~/localdev/psicomp80/c80.sh forthliss` |
-| `clock.fs` | A big digital clock in quarter-block digits, 6 characters by 8 lines each. `12 34 00 CLOCK` sets the time; the snake's TICK counts the seconds, timed to about a second an hour in the emulator (`W` and `FR` adjust it). A key stops it. `~/localdev/psicomp80/c80.sh forthclock` |
-| `sort.fs` | Sorting to watch: 64 random bars sorted by bubble sort (2016 comparisons, 864 swaps, about 23 s), then the same bars by quicksort (459 and 167, about 5 s), with the counts on line 1. `SORTS` `~/localdev/psicomp80/c80.sh forthsort` |
+| `life.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthlife) | Game of Life, 64 × 31 cells, one per character. `1000 LIFE` runs 1000 generations from a random board; about 3 s a generation in the emulator. `~/localdev/psicomp80/c80.sh forthlife` |
+| `mandel.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=mandel) | The Mandelbrot set, one point per character, shaded by escape time, in fixed point (90 = 1.0). `MANDEL` draws it in about 95 s. `~/localdev/psicomp80/c80.sh mandel` |
+| `sier.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthsier) | The Sierpiński triangle: Pascal's triangle mod 2, where entry x of row y is odd when `x AND y` is x. 64 rows, four cells to a character, over the whole screen. `SIER` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthsier` |
+| `hilbert.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthhilbert) | A level-5 Hilbert curve, 32 × 32 points, drawn over the whole screen by a turtle: HIL calls itself four times, the sign of its angle mirroring the copies. `HILBERT` draws it in about 10 s; a key clears it. `~/localdev/psicomp80/c80.sh forthhilbert` |
+| `hanoi.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthhanoi) | The Towers of Hanoi, animated: each disc lifts off its peg, slides across and drops onto the next. `6 HANOI` makes 63 moves in about 75 s; up to `10 HANOI` fits. `SPEED` sets the pause between steps. `~/localdev/psicomp80/c80.sh forthhanoi` |
+| `dragon.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthdragon) | The dragon curve: 512 steps, turning left or right by the bit above the lowest set bit of the step number. `DRAGON` draws it in about 4 s; a key clears it. `~/localdev/psicomp80/c80.sh forthdragon` |
+| `koch.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthkoch) | The Koch snowflake, level 3, in six directions 60° apart. `KOCH` draws it in about 2 s; a key clears it. `~/localdev/psicomp80/c80.sh forthkoch` |
+| `ant.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthant) | Langton's ant on 128 × 60 quarter-character cells, with a step count. The highway appears after about 10000 steps and the ant walks off the screen at 12024. `ANT` takes about 55 s. `~/localdev/psicomp80/c80.sh forthant` |
+| `sieve.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthsieve) | The sieve of Eratosthenes on 0–7679, one quarter character per number, 128 to a row; the multiples of each prime up to 87 are cleared and the primes counted (973). `SIEVE` takes about 60 s. `~/localdev/psicomp80/c80.sh forthsieve` |
+| `balls.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthballs) | Six balls bounce under gravity, 2 × 2 quarter-block pixels each, drawn by XOR so they pass through each other. Positions are in 256ths of a pixel. `BALLS` runs until a key; `SPEED` is ticks (about 8 ms each) per frame. `~/localdev/psicomp80/c80.sh forthballs` |
+| `stars.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthstars) | A starfield: 16 stars fly out from the centre, each gaining speed every frame, using only additions; nearer ones are two pixels wide. `STARS` runs until a key. `~/localdev/psicomp80/c80.sh forthstars` |
+| `snake.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthsnake) | Snake, in half-character squares: W A S D steer, Q stops; each dot adds a point and three segments, and every fourth speeds it up. `TICK`, a little machine code, waits on the MM57109 in HALTs so keys are taken while it runs. `SNAKE` `~/localdev/psicomp80/c80.sh snake` |
+| `maze.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthmaze) | A random maze of 42 × 29 rooms, carved by backtracking with the way back kept a byte a step in a table; a key then fills in the dead ends until only the way through is left. `MAZE` carves in about 34 s and fills in about 20 s. `~/localdev/psicomp80/c80.sh forthmaze` |
+| `rule.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthrule) | Elementary cellular automata: `30 RULE`, `90 RULE`, `110 RULE` or any other number grows a row of 128 cells from one live cell, 60 generations down the screen in about 6 s; a key clears it. `~/localdev/psicomp80/c80.sh forthrule` |
+| `fern.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthfern) | The Barnsley fern, 5000 points of an iterated function system in whole numbers (36 = 1.0, factors in hundredths), about 29 s; and the chaos game, `CHAOS`, a point moved half way to a random corner of a triangle 6000 times, about 13 s. A key clears each. `~/localdev/psicomp80/c80.sh forthfern` |
+| `liss.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthliss) | Lissajous figures and spirograph curves from a sine table: `3 2 LISS` draws x = sin 3t, y = sin 2t in about 2.5 s; `5 SPIRO` adds a small wheel turning 5 times as fast, in about 5 s. A key clears it. `~/localdev/psicomp80/c80.sh forthliss` |
+| `clock.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthclock) | A big digital clock in quarter-block digits, 6 characters by 8 lines each. `12 34 00 CLOCK` sets the time; the snake's TICK counts the seconds, timed to about a second an hour in the emulator (`W` and `FR` adjust it). A key stops it. `~/localdev/psicomp80/c80.sh forthclock` |
+| `sort.fs` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=forthsort) | Sorting to watch: 64 random bars sorted by bubble sort (2016 comparisons, 864 swaps, about 23 s), then the same bars by quicksort (459 and 167, about 5 s), with the counts on line 1. `SORTS` `~/localdev/psicomp80/c80.sh forthsort` |
 
 `load.lua` does the typing: it enters FORTH, types the file a line at a time
 (waiting for FORTH's cursor between lines, since a key while FORTH is busy
@@ -146,6 +148,12 @@ assembles `forth.asm` with z80asm (`brew install z80asm`), writes
 `forth.bin` (0400-0BFF) and `../psicomp80_forth.rom` (monitor + FORTH), and
 puts the new ROM's CRC and SHA1 into `../psicomp80.cpp`. Then run
 `mame/install.sh` and rebuild MAME.
+
+## In the emulator
+
+These examples run in the web emulator from these links:
+
+- [A FORTH session](https://billtraill.github.io/psicomp80/emulator.html#example=forth)
 
 ## Tests
 

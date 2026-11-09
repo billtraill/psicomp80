@@ -1,5 +1,7 @@
 # COMP80 LOGO
 
+[Run Logo in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=logo). Each example below has a ▶ link that types it in and runs it there.
+
 A small Logo for the PSI COMP80 that replaces BURP in the ROM. The monitor
 (0000-03FF) is unchanged; Logo fills the 2 KB at 0400-0BFF where BURP was.
 As with BURP, you enter it with the RS key from the monitor's READY state.
@@ -38,11 +40,11 @@ last word in the table runs it.
 
 | | |
 |---|---|
-| `flower.logo` | Twelve squares, each turned 30° from the last. `FLOWER`, about 3 s. |
-| `spiral.logo` | A square spiral that twists: each side 2 longer than the last, turning `:A` degrees, with a global variable made by MAKE. `SPIRAL 91`, about 3 s; try `SPIRAL 89` or `SPIRAL 121`. |
-| `tree.logo` | A recursive tree: a trunk with two smaller trees on top, each two thirds the size, until they are smaller than 5. `FOREST`, about 3 s. |
-| `flake.logo` | A Koch snowflake: each side of a triangle becomes four with a point in the middle, `:N` times over. `FLAKE 3`, about 5 s. |
-| `stars.logo` | Sixteen five-pointed stars of random sizes in random places. `SKY`, about 2 s. |
+| `flower.logo` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=logoflower) | Twelve squares, each turned 30° from the last. `FLOWER`, about 3 s. |
+| `spiral.logo` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=logospiral) | A square spiral that twists: each side 2 longer than the last, turning `:A` degrees, with a global variable made by MAKE. `SPIRAL 91`, about 3 s; try `SPIRAL 89` or `SPIRAL 121`. |
+| `tree.logo` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=logotree) | A recursive tree: a trunk with two smaller trees on top, each two thirds the size, until they are smaller than 5. `FOREST`, about 3 s. |
+| `flake.logo` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=logoflake) | A Koch snowflake: each side of a triangle becomes four with a point in the middle, `:N` times over. `FLAKE 3`, about 5 s. |
+| `stars.logo` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=logostars) | Sixteen five-pointed stars of random sizes in random places. `SKY`, about 2 s. |
 
 ## Keys
 

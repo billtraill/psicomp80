@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>COMP80 LISP</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +35,9 @@ section { display: grid; gap: 1.25rem; }
 .shead { display: grid; gap: .5rem; max-width: 46rem; }
 h2 { font: 700 1.75rem/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
 .shead p { margin: 0; color: var(--muted); max-width: 62ch; }
+.try { margin: 0; }
+.shead p.try, header p.try { color: var(--ink); }
+.try a { font-weight: 600; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: 1.75rem 1.5rem; }
 .shot { margin: 0; display: grid; gap: .75rem; align-content: start; min-width: 0; }
 .bezel { background: var(--bezel); padding: 10px; border-radius: 14px; }
@@ -118,6 +122,7 @@ code { font-family: var(--mono); }
   <h1>COMP80 LISP</h1>
   <p>A small LISP for the PSI COMP80, the Z80 computer published in Wireless World in 1979. It replaces BURP, the calculator program in the top 2 KB of the 3 KB ROM, and leaves the monitor alone, the same way <a href="screenshots.html">COMP80 FORTH</a> does. It is not a period ROM: it was written for the emulator, to see how much LISP fits in the space BURP had.</p>
   <p>The answer is a LISP 1.5 style interpreter with garbage collection, recursion, LAMBDA and dynamic scope, enough to run the classic programs below. Every picture is a screenshot from the emulator, of a program typed in at the keyboard.</p>
+  <p class="try"><a href="emulator.html#rom=lisp">Run LISP in the web emulator</a>, or start any of the programs below there with its ▶ link: the emulator types it in and runs it.</p>
   <ul class="spec">
     <li><b>2 KB</b> of Z80 code, 0400–0BFF</li>
     <li><b>30</b> built-in functions and forms</li>
@@ -130,6 +135,7 @@ code { font-family: var(--mono); }
   <div class="shead">
     <h2>A session</h2>
     <p>The emulator offers the ROM as a BIOS option, <code>-bios lisp</code>. Press RS at READY, as you would for BURP, and the top line changes to LISP. Type an expression and press Return; LISP prints its value. An expression can run over several lines, since LISP keeps reading until the brackets balance.</p>
+    <p class="try"><a href="emulator.html#example=lisp">▶ Run a session in the emulator</a></p>
   </div>
   <ul class="keys" aria-label="Keys">
     <li><kbd>^</kbd> rub out (Backspace in MAME)</li>
@@ -176,6 +182,7 @@ code { font-family: var(--mono); }
   <div class="shead">
     <h2>Symbolic differentiation</h2>
     <p>McCarthy designed LISP for symbolic work like this: an expression is a list, so a program can take it apart and build a new one. <code>DERIV</code> applies the sum, product and power rules; <code>S+</code>, <code>S*</code> and the others build the answer and tidy it as they go, so <code>(* 1 X)</code> becomes <code>X</code> and <code>(+ 3 3)</code> becomes 6. The last example differentiates twice.</p>
+    <p class="try"><a href="emulator.html#example=deriv">▶ Run it in the emulator</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -233,6 +240,7 @@ code { font-family: var(--mono); }
   <div class="shead">
     <h2>Towers of Hanoi</h2>
     <p>Move a pile of discs from one peg to another, one disc at a time, never putting a bigger disc on a smaller one. The recursive answer is three lines: move all but the bottom disc out of the way, move the bottom disc, then move the rest back on top. Four discs take 15 moves.</p>
+    <p class="try"><a href="emulator.html#example=hanoi">▶ Run it in the emulator</a></p>
   </div>
   <div class="grid">
     <figure class="shot">
@@ -254,6 +262,7 @@ code { font-family: var(--mono); }
   <div class="shead">
     <h2>Eight queens</h2>
     <p>Place eight queens on a chessboard so that none attacks another. <code>TRY</code> puts a queen in the first safe row of the next column and backs up when a column has none. Finding the first answer takes 114 placements, 2,318 safety checks and about 26 s in the emulator. <code>N</code> is never passed to <code>PLACE</code>, <code>TRY</code> or <code>ROW</code>: dynamic scope finds the <code>N</code> that <code>QUEENS</code> was called with.</p>
+    <p class="try"><a href="emulator.html#example=queens">▶ Run it in the emulator</a></p>
   </div>
   <div class="grid">
     <figure class="shot">

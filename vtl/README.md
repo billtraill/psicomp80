@@ -1,5 +1,7 @@
 # COMP80 VTL-2
 
+[Run VTL-2 in the web emulator](https://billtraill.github.io/psicomp80/emulator.html#rom=vtl). Each example below has a ▶ link that types it in and runs it there.
+
 VTL-2, the Very Tiny Language, for the PSI COMP80. It takes BURP's place in
 the ROM and was written from scratch for this machine. The monitor
 (0000-03FF) is unchanged, and VTL-2 sits in the 2 KB at 0400-0BFF where BURP
@@ -31,11 +33,11 @@ Type a line and press Return:
 
 | | |
 |---|---|
-| `primes.vtl` | The 62 primes below 300 by trial division. It uses `%`, the remainder of the last division, to test for a factor. About 6 s. |
-| `guess.vtl` | Guess the number. `'/100` leaves a random 0-99 in `%`. As `?` takes an expression, typing `N` wins straight away. |
-| `fib.vtl` | Fibonacci numbers until they pass 65535, printed by a subroutine that returns with `#=!`. |
-| `circles.vtl` | Five circles by the midpoint rule, using only adding, plotted with `@`. About 2 s; then it waits for a key. |
-| `chaos.vtl` | A Sierpiński triangle by the chaos game: 2500 points, each half way to a random corner. About 27 s; then it waits for a key. |
+| `primes.vtl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=vtlprimes) | The 62 primes below 300 by trial division. It uses `%`, the remainder of the last division, to test for a factor. About 6 s. |
+| `guess.vtl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=vtlguess) | Guess the number. `'/100` leaves a random 0-99 in `%`. As `?` takes an expression, typing `N` wins straight away. |
+| `fib.vtl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=vtlfib) | Fibonacci numbers until they pass 65535, printed by a subroutine that returns with `#=!`. |
+| `circles.vtl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=vtlcircles) | Five circles by the midpoint rule, using only adding, plotted with `@`. About 2 s; then it waits for a key. |
+| `chaos.vtl` [▶](https://billtraill.github.io/psicomp80/emulator.html#example=vtlchaos) | A Sierpiński triangle by the chaos game: 2500 points, each half way to a random corner. About 27 s; then it waits for a key. |
 
 ## Keys
 

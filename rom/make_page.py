@@ -4,7 +4,8 @@ The text of each line comes from the source, its address from the z80asm
 listing that build.sh writes to rom/build/, and its bytes from the ROM image,
 so the page always shows what is in the ROMs.
 
-    psicomp80.asm        monitor (0000-03FF) and BURP (0400-0BFF)
+    psicomp80.asm        monitor (0000-03FF) and BURP (0400-0BFF); assembled
+                         after monitor_keysafe.asm, the key-safe monitor
     ../forth/forth.asm   FORTH (0400-0BFF)
     ../lisp/lisp.asm     LISP (0400-0BFF)
     ../<lang>/<lang>.asm BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM and Prolog
@@ -74,7 +75,11 @@ class Listing:
 
     def __init__(self, src, lst, rom, strip_addr_comments=False):
         text = src.read_text().splitlines()
-        lst_lines = lst.read_text().split("\n# End of file")[0].splitlines()[1:]
+        # a listing of several files (monitor_*.asm, psicomp80.asm): this file's part
+        whole = lst.read_text()
+        part = whole.split(f"# File {src.name}\n", 1)[1] if f"# File {src.name}\n" in whole \
+            else whole.split("\n", 1)[1]
+        lst_lines = part.split("\n# End of file")[0].splitlines()
         assert len(lst_lines) == len(text), (src, len(lst_lines), len(text))
         self.lines = []
         for t, l in zip(text, lst_lines):
@@ -127,7 +132,7 @@ class Page:
 
     def section_of(self, own, addr):
         if addr < 0x0400:
-            return "m"
+            return "n" if own == "n" else "m"
         if addr < CODE_END:
             return own
         return None
@@ -237,16 +242,24 @@ def ascii_char(v):
     return chr(v) if 0x20 <= v < 0x7F else "·"
 
 
-def hex_dump(name, rom, lang, page):
+def hex_dump(rom, ks, lang, page):
+    """The dump of a ROM; where its key-safe version differs, both rows (classes mo and mk)."""
     rows = []
-    for a in range(0, len(rom), 16):
-        b = rom[a:a + 16]
+
+    def row(b, a, sec, cls):
         cells = " ".join(f"<b>{x:02X}</b>" + (" " if k == 7 else "") for k, x in enumerate(b))
         d = esc("".join(display_char(x) for x in b))
         t = esc("".join(ascii_char(x) for x in b))
-        sec = "m" if a < 0x400 else lang
-        rows.append(f'<span class="h" data-a="{a:04x}" data-s="{sec}"><a href="#{page.target(sec, a)}">{a:04X}</a>  '
+        rows.append(f'<span class="{cls}" data-a="{a:04x}" data-s="{sec}"><a href="#{page.target(sec, a)}">{a:04X}</a>  '
                     f'{cells}  <span class="td">{d}</span><span class="ta">{t}</span></span>')
+
+    for a in range(0, len(rom), 16):
+        b, k = rom[a:a + 16], ks[a:a + 16]
+        if b == k:
+            row(b, a, "m" if a < 0x400 else lang, "h")
+        else:
+            row(b, a, "m" if a < 0x400 else lang, "h mo")
+            row(k, a, "n" if a < 0x400 else lang, "h mk")
     return "".join(rows)
 
 
@@ -257,7 +270,16 @@ SECTIONS = [
      "turns into a jump to its command. The commands examine, change, move, fill, find and list memory, read and "
      "write tape, and run code; RS (the ^ key) enters the language at 0800.</p>"
      "<p>An annotated disassembly. The names and comments come from the earlier disassemblies (now in "
-     "<code>old/</code>), corrected where the bytes disagreed. Source: <code>rom/psicomp80.asm</code>.</p>"),
+     "<code>old/</code>), corrected where the bytes disagreed. Source: <code>rom/psicomp80.asm</code>, assembled "
+     "after <code>rom/monitor_original.asm</code>; the lines of the key-safe monitor have no bytes here.</p>"),
+    ("keysafe", "n", "Key-safe monitor", "0000–03FF",
+     "<p>The monitor with one change, made for this project. The original handler at 0066 restarts the monitor "
+     "when a key comes while the CPU is not waiting in a HALT, so a key stops a running program; this one ignores "
+     "such a key and the program carries on with all its registers. It needs ten more bytes, so the code from "
+     "0095 to 012F moves up by ten into the free bytes that were at 0130. Every entry point a language uses "
+     "(03xx) is where it was, and each language ROM also comes with this monitor, as "
+     "<code>psicomp80_&lt;lang&gt;_ks.rom</code>; BURP's one call into the moved code is assembled to match. "
+     "Source: <code>rom/psicomp80.asm</code>, assembled after <code>rom/monitor_keysafe.asm</code>.</p>"),
     ("burp", "b", "BURP", "0400–0BFF",
      "<p>The language in the original ROM, from the Wireless World articles: a small BASIC-like language whose "
      "arithmetic is done by a National MM57109 calculator chip. The Z80 sends the chip its key codes "
@@ -310,7 +332,7 @@ SECTIONS = [
 ]
 
 ROMS = [("psicomp80.rom", "BURP", "b"), ("psicomp80_forth.rom", "FORTH", "f"), ("psicomp80_lisp.rom", "LISP", "l")] + \
-    [(f"psicomp80_{s[0]}.rom", s[2], s[1]) for s in SECTIONS[4:]]
+    [(f"psicomp80_{s[0]}.rom", s[2], s[1]) for s in SECTIONS[5:]]
 
 LINKS = {"screenshots.html": "screenshots.html", "lisp.html": "lisp.html", "emulator.html": "emulator.html",
          "hardware.html": "hardware.html"}
@@ -323,10 +345,13 @@ def main():
                 k, v = line.split()
                 LINKS[k] = v
     roms = {n: (REPO / n).read_bytes() for n, _, _ in ROMS}
+    ks_roms = {n: (REPO / n.replace(".rom", "_ks.rom")).read_bytes() for n, _, _ in ROMS}
     main_lst = Listing(HERE / "psicomp80.asm", BUILD / "psicomp80.lst", roms["psicomp80.rom"], True)
     split = next(i for i, ln in enumerate(main_lst.lines) if "BURP ROM 0400-0BFF" in ln["comment"]) - 1
-    parts = {"m": (main_lst, main_lst.lines[:split]), "b": (main_lst, main_lst.lines[split:])}
-    for view, p, *_ in SECTIONS[2:]:
+    ks_lst = Listing(HERE / "psicomp80.asm", BUILD / "psicomp80_ks.lst", ks_roms["psicomp80.rom"], True)
+    parts = {"m": (main_lst, main_lst.lines[:split]), "n": (ks_lst, ks_lst.lines[:split]),
+             "b": (main_lst, main_lst.lines[split:])}
+    for view, p, *_ in SECTIONS[3:]:
         lst = Listing(REPO / f"{view}/{view}.asm", BUILD / f"{view}.lst", roms[f"psicomp80_{view}.rom"])
         parts[p] = (lst, lst.lines)
     # the BURP section shares psicomp80.asm's labels; the other languages only add their own
@@ -345,17 +370,25 @@ def main():
 
     dumps = []
     for name, lang, p in ROMS:
-        rom = roms[name]
-        crc = f"{zlib.crc32(rom) & 0xffffffff:08x}"
-        sha = hashlib.sha1(rom).hexdigest()
-        dumps.append(f'<div class="dump"><h3>{name} <span>monitor + {lang} · {len(rom)} bytes</span></h3>'
-                     f'<p class="sums"><span>CRC <b>{crc}</b></span><span>SHA1 <b>{sha}</b></span></p>'
-                     f'<div class="lstwrap"><pre class="hex" data-p="{p}">{hex_dump(name, rom, p, page)}</pre></div></div>')
+        rom, ks = roms[name], ks_roms[name]
+        head = []
+        for r, n, mon, cls in ((rom, name, "monitor", "mo"), (ks, name.replace(".rom", "_ks.rom"), "key-safe monitor", "mk")):
+            crc = f"{zlib.crc32(r) & 0xffffffff:08x}"
+            sha = hashlib.sha1(r).hexdigest()
+            head.append(f'<div class="{cls}"><h3>{n} <span>{mon} + {lang} · {len(r)} bytes</span></h3>'
+                        f'<p class="sums"><span>CRC <b>{crc}</b></span><span>SHA1 <b>{sha}</b></span></p></div>')
+        dumps.append(f'<div class="dump">{"".join(head)}'
+                     f'<div class="lstwrap"><pre class="hex" data-p="{p}">{hex_dump(rom, ks, p, page)}</pre></div></div>')
     body.append('<section class="view" id="hex" data-view="hex" data-p="hex">'
                 '<div class="shead"><span class="kicker">0000–0BFF · twenty-one ROMs</span><h2>Hex dumps</h2>'
                 '<p>The twenty-one 3 KB ROM images, sixteen bytes to a line as in the magazine\'s listing. '
-                'The first 400h bytes, the monitor, are the same in all of them. Click an address or a byte to see '
+                'The first 400h bytes, the monitor, are the same in all of them. Each ROM also comes with the '
+                'key-safe monitor: choose it to see those images, which differ only in the rows of 0040–0130 '
+                '(and, for BURP, its call at 0915). Click an address or a byte to see '
                 'it in the listing. The checksums are the ones the MAME driver expects.</p>'
+                '<div class="tsel msel" role="group" aria-label="Monitor"><span class="lbl">Monitor</span>'
+                '<button type="button" data-m="o" aria-pressed="true">Original</button>'
+                '<button type="button" data-m="k" aria-pressed="false">Key-safe</button></div>'
                 '<div class="tsel" role="group" aria-label="Text column"><span class="lbl">Text column</span>'
                 '<button type="button" data-t="d" aria-pressed="true">Screen codes</button>'
                 '<button type="button" data-t="a" aria-pressed="false">ASCII</button></div></div>'
@@ -463,6 +496,9 @@ h3 span { font: 400 .8125rem/1 var(--mono); color: var(--muted); }
 .ascii .hex .ta { display: inline; }
 .ascii .hex .td { display: none; }
 .td, .ta { color: var(--st); }
+.hex .mk, .dump .mk { display: none; }
+.ks .hex .mk, .ks .dump .mk { display: block; }
+.ks .hex .mo, .ks .dump .mo { display: none; }
 .tsel { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
 .lbl { font: 600 .6875rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-right: .25rem; }
 .tsel button[aria-pressed="true"] { background: var(--accent); color: var(--paper); border-color: var(--accent); }
@@ -479,7 +515,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 <header>
   <span class="kicker">PSI COMP80 · the 3 KB ROM · 0000–0BFF</span>
   <h1>COMP80 ROM Listings</h1>
-  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with, and the twenty-one languages and programs that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM, Prolog, VTL-2, Mouse, Befunge, CALC, TRAC, PL/0, BF, ED, FILE, QUEST and APL were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
+  <p>Annotated listings of the PSI COMP80's ROMs: the monitor that every ROM starts with (as made in 1979, or in a key-safe version that a key cannot restart), and the twenty-one languages and programs that can sit above it in the remaining 2 KB. BURP is the original, from the Wireless World articles; FORTH, LISP, BASIC, Logo, CHIP-8, FOCAL, PILOT, ZASM, Prolog, VTL-2, Mouse, Befunge, CALC, TRAC, PL/0, BF, ED, FILE, QUEST and APL were written for this project. Every line shows its address and the bytes it assembles to, read from the ROM images, and every name or branch address is a link to the line it means.</p>
   <p>See also the <a href="screenshots.html">screenshots</a>, the <a href="lisp.html">LISP page</a>, the <a href="hardware.html">hardware</a> and the <a href="emulator.html">emulator</a>, which runs all twenty-one ROMs.</p>
   <div class="map" aria-label="Memory map">
     <div><b>0000–03FF</b><span>Monitor ROM, 1 KB</span></div>
@@ -490,7 +526,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
 </header>
 <nav>
   <div class="tabs">
-    <a href="#monitor">Monitor</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#basic">BASIC</a><a href="#logo">Logo</a><a href="#chip8">CHIP-8</a><a href="#focal">FOCAL</a><a href="#pilot">PILOT</a><a href="#zasm">ZASM</a><a href="#prolog">Prolog</a><a href="#vtl">VTL-2</a><a href="#mouse">Mouse</a><a href="#befunge">Befunge</a><a href="#sheet">CALC</a><a href="#trac">TRAC</a><a href="#pl0">PL/0</a><a href="#bf">BF</a><a href="#ed">ED</a><a href="#db">FILE</a><a href="#adv">QUEST</a><a href="#apl">APL</a><a href="#hex">Hex dumps</a>
+    <a href="#monitor">Monitor</a><a href="#keysafe">Key-safe</a><a href="#burp">BURP</a><a href="#forth">FORTH</a><a href="#lisp">LISP</a><a href="#basic">BASIC</a><a href="#logo">Logo</a><a href="#chip8">CHIP-8</a><a href="#focal">FOCAL</a><a href="#pilot">PILOT</a><a href="#zasm">ZASM</a><a href="#prolog">Prolog</a><a href="#vtl">VTL-2</a><a href="#mouse">Mouse</a><a href="#befunge">Befunge</a><a href="#sheet">CALC</a><a href="#trac">TRAC</a><a href="#pl0">PL/0</a><a href="#bf">BF</a><a href="#ed">ED</a><a href="#db">FILE</a><a href="#adv">QUEST</a><a href="#apl">APL</a><a href="#hex">Hex dumps</a>
   </div>
   <form class="go"><label for="goaddr">Address</label><input id="goaddr" maxlength="4" autocomplete="off" spellcheck="false" placeholder="0800"><button type="submit">Go</button></form>
 </nav>
@@ -560,7 +596,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
     if (b) {
       const line = b.parentElement, cells = [...line.querySelectorAll("b")];
       const addr = parseInt(line.dataset.a, 16) + cells.indexOf(b);
-      go(row(addr < 0x400 ? "m" : line.dataset.s, addr), true);
+      go(row(line.dataset.s, addr), true);
       return;
     }
     const a = e.target.closest('a[href^="#"]');
@@ -584,21 +620,30 @@ footer { border-top: 1px solid var(--rule); padding-top: 1rem; color: var(--mute
     if (isNaN(addr) || addr < 0 || addr > 0xbff) { input.select(); return; }
     let el;
     if (current === "hex") {
-      el = document.querySelector(`.hex .h[data-a="${(addr & ~15).toString(16).padStart(4, "0")}"]`);
+      const hide = document.getElementById("hex").classList.contains("ks") ? "mo" : "mk";
+      el = document.querySelector(`.hex .h[data-a="${(addr & ~15).toString(16).padStart(4, "0")}"]:not(.${hide})`);
     } else {
       const p = document.getElementById(current).dataset.p;
-      el = row(addr < 0x400 ? "m" : (p === "m" ? "b" : p), addr);
+      el = row(addr < 0x400 ? (p === "n" ? "n" : "m") : (p === "m" || p === "n" ? "b" : p), addr);
     }
     go(el, true);
   });
-  for (const btn of document.querySelectorAll(".tsel button")) {
+  for (const btn of document.querySelectorAll(".tsel [data-t]")) {
     btn.addEventListener("click", () => {
       document.getElementById("hex").classList.toggle("ascii", btn.dataset.t === "a");
-      for (const o of document.querySelectorAll(".tsel button")) o.setAttribute("aria-pressed", o === btn);
+      for (const o of document.querySelectorAll(".tsel [data-t]")) o.setAttribute("aria-pressed", o === btn);
       try { localStorage.setItem("c80-text", btn.dataset.t); } catch (e) {}
     });
   }
+  for (const btn of document.querySelectorAll(".tsel [data-m]")) {
+    btn.addEventListener("click", () => {
+      document.getElementById("hex").classList.toggle("ks", btn.dataset.m === "k");
+      for (const o of document.querySelectorAll(".tsel [data-m]")) o.setAttribute("aria-pressed", o === btn);
+      try { localStorage.setItem("c80-mon", btn.dataset.m); } catch (e) {}
+    });
+  }
   try { if (localStorage.getItem("c80-text") === "a") document.querySelector('.tsel [data-t="a"]').click(); } catch (e) {}
+  try { if (localStorage.getItem("c80-mon") === "k") document.querySelector('.tsel [data-m="k"]').click(); } catch (e) {}
 
   const start = location.hash.slice(1);
   if (names.includes(start)) show(start);

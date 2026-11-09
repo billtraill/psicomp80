@@ -68,6 +68,13 @@ def data():
             "adv": b64("psicomp80_adv.rom"),
             "apl": b64("psicomp80_apl.rom"),
         },
+        # the key-safe monitor (rom/monitor_keysafe.asm), which the page can put
+        # in place of the original's 0000-03FF; BURP calls into code it moves,
+        # so its whole ROM
+        "keysafe": {
+            "monitor": base64.b64encode((REPO / "psicomp80_ks.rom").read_bytes()[:0x400]).decode(),
+            "burp": b64("psicomp80_ks.rom"),
+        },
         "bins": {
             "life": b64("life/life.bin"),
             "storm": b64("storm/storm.bin"),

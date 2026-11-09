@@ -1,7 +1,11 @@
 #!/bin/sh
 # Check the annotated ROM sources against the ROM images and make the web
 # page of listings and hex dumps (../roms.html).
-#   rom/psicomp80.asm    -> must assemble to ../psicomp80.rom (monitor + BURP)
+#   rom/psicomp80.asm    -> must assemble to ../psicomp80.rom (monitor + BURP),
+#                           after rom/monitor_original.asm
+#   the same after rom/monitor_keysafe.asm gives the key-safe monitor: this
+#   writes ../psicomp80_ks.rom and ../psicomp80_<lang>_ks.rom (key-safe monitor
+#   + each language) and their BIOS entries in ../psicomp80.cpp
 #   ../forth/forth.asm   -> must give 0400-0BFF of ../psicomp80_forth.rom
 #   ../lisp/lisp.asm     -> must give 0400-0BFF of ../psicomp80_lisp.rom
 #   ../<lang>/<lang>.asm -> the same for basic, logo, chip8, focal, pilot, zasm,
@@ -14,7 +18,7 @@ REPO=$(dirname "$HERE")
 OUT=$HERE/build
 mkdir -p "$OUT"
 
-(cd "$HERE" && z80asm -o "$OUT/psicomp80.bin" -l"$OUT/psicomp80.lst" -L"$OUT/psicomp80.lbl" psicomp80.asm)
+(cd "$HERE" && z80asm -o "$OUT/psicomp80.bin" -l"$OUT/psicomp80.lst" -L"$OUT/psicomp80.lbl" monitor_original.asm psicomp80.asm)
 cmp "$OUT/psicomp80.bin" "$REPO/psicomp80.rom"
 echo "psicomp80.asm: assembles to psicomp80.rom"
 
@@ -28,5 +32,8 @@ assert rom[0x400:] == lang, "language part differs"
 PY
   echo "$lang/$lang.asm: assembles to 0400-0BFF of psicomp80_$lang.rom"
 done
+
+(cd "$HERE" && z80asm -o "$OUT/psicomp80_ks.bin" -l"$OUT/psicomp80_ks.lst" -L"$OUT/psicomp80_ks.lbl" monitor_keysafe.asm psicomp80.asm)
+python3 "$HERE/tools/keysafe_roms.py"
 
 python3 "$HERE/make_page.py"

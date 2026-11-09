@@ -1344,6 +1344,111 @@ ROMX_LOAD("psicomp80_adv.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(20, "apl", "Monitor + APL")
 ROMX_LOAD("psicomp80_apl.rom", 0x0000, 0x0c00,
          CRC(858d8054) SHA1(5be94670c7e0ec401df9ff57fd660848250b35e4), ROM_BIOS(20))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BURP: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(21, "burpks", "Key-safe monitor + BURP")
+ROMX_LOAD("psicomp80_ks.rom", 0x0000, 0x0c00,
+         CRC(da99550a) SHA1(2c139dc3fee1d02980f5398334916a7cccaa79bd), ROM_BIOS(21))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FORTH: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(22, "forthks", "Key-safe monitor + FORTH")
+ROMX_LOAD("psicomp80_forth_ks.rom", 0x0000, 0x0c00,
+         CRC(24163421) SHA1(4bc756f880755d0b0fbf4cebed9cbb9165cb9d7c), ROM_BIOS(22))
+// Key-safe monitor (rom/monitor_keysafe.asm) + LISP: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(23, "lispks", "Key-safe monitor + LISP")
+ROMX_LOAD("psicomp80_lisp_ks.rom", 0x0000, 0x0c00,
+         CRC(58b386b4) SHA1(645d6f2acc815dd175c9708661dfb53f9e253bf7), ROM_BIOS(23))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BASIC: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(24, "basicks", "Key-safe monitor + BASIC")
+ROMX_LOAD("psicomp80_basic_ks.rom", 0x0000, 0x0c00,
+         CRC(6f594005) SHA1(c34add4812dfa7871b668de49d3f80fbf2572fd4), ROM_BIOS(24))
+// Key-safe monitor (rom/monitor_keysafe.asm) + LOGO: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(25, "logoks", "Key-safe monitor + LOGO")
+ROMX_LOAD("psicomp80_logo_ks.rom", 0x0000, 0x0c00,
+         CRC(dea8ba79) SHA1(73f74a6ee27338702b6462a66205d917f6b9e79e), ROM_BIOS(25))
+// Key-safe monitor (rom/monitor_keysafe.asm) + CHIP-8: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(26, "chip8ks", "Key-safe monitor + CHIP-8")
+ROMX_LOAD("psicomp80_chip8_ks.rom", 0x0000, 0x0c00,
+         CRC(9bb290e2) SHA1(7e3d836ea2d5943ec546620cbf79dd9358e346b5), ROM_BIOS(26))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FOCAL: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(27, "focalks", "Key-safe monitor + FOCAL")
+ROMX_LOAD("psicomp80_focal_ks.rom", 0x0000, 0x0c00,
+         CRC(43059849) SHA1(4d655b2eda1e352b07153838cd81a4bdbaaac06f), ROM_BIOS(27))
+// Key-safe monitor (rom/monitor_keysafe.asm) + PILOT: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(28, "pilotks", "Key-safe monitor + PILOT")
+ROMX_LOAD("psicomp80_pilot_ks.rom", 0x0000, 0x0c00,
+         CRC(b707e8b5) SHA1(89960113443d6e5baf22d01aee61de49e3aa6bfe), ROM_BIOS(28))
+// Key-safe monitor (rom/monitor_keysafe.asm) + ZASM assembler: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(29, "zasmks", "Key-safe monitor + ZASM assembler")
+ROMX_LOAD("psicomp80_zasm_ks.rom", 0x0000, 0x0c00,
+         CRC(e85b11bb) SHA1(02a7caf17091170311f8c6ec4ec73d6d1f213b24), ROM_BIOS(29))
+// Key-safe monitor (rom/monitor_keysafe.asm) + Prolog: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(30, "prologks", "Key-safe monitor + Prolog")
+ROMX_LOAD("psicomp80_prolog_ks.rom", 0x0000, 0x0c00,
+         CRC(fe13908d) SHA1(4ff93ea8341afa0beafbc83f45416aa0d4ef4eeb), ROM_BIOS(30))
+// Key-safe monitor (rom/monitor_keysafe.asm) + VTL-2: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(31, "vtlks", "Key-safe monitor + VTL-2")
+ROMX_LOAD("psicomp80_vtl_ks.rom", 0x0000, 0x0c00,
+         CRC(173ba92a) SHA1(bb3a499fe243b53ee47ac6a00d0a2d2e15cb436d), ROM_BIOS(31))
+// Key-safe monitor (rom/monitor_keysafe.asm) + MOUSE: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(32, "mouseks", "Key-safe monitor + MOUSE")
+ROMX_LOAD("psicomp80_mouse_ks.rom", 0x0000, 0x0c00,
+         CRC(df348fbc) SHA1(29c32996f706d45387ec1f9cc67b12a6fa6d2206), ROM_BIOS(32))
+// Key-safe monitor (rom/monitor_keysafe.asm) + Befunge: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(33, "befungeks", "Key-safe monitor + Befunge")
+ROMX_LOAD("psicomp80_befunge_ks.rom", 0x0000, 0x0c00,
+         CRC(0d70abde) SHA1(31250108e2739fca44bb4d7b417f9e09dfa6624a), ROM_BIOS(33))
+// Key-safe monitor (rom/monitor_keysafe.asm) + CALC spreadsheet: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(34, "sheetks", "Key-safe monitor + CALC spreadsheet")
+ROMX_LOAD("psicomp80_sheet_ks.rom", 0x0000, 0x0c00,
+         CRC(2be32be0) SHA1(b2a8b8cf8918f99371ce48119fc4508ca270a9b6), ROM_BIOS(34))
+// Key-safe monitor (rom/monitor_keysafe.asm) + TRAC: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(35, "tracks", "Key-safe monitor + TRAC")
+ROMX_LOAD("psicomp80_trac_ks.rom", 0x0000, 0x0c00,
+         CRC(c5043b40) SHA1(8b30aa3ff72dfb9282e2a13189b48cc9061ba13d), ROM_BIOS(35))
+// Key-safe monitor (rom/monitor_keysafe.asm) + PL/0: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(36, "pl0ks", "Key-safe monitor + PL/0")
+ROMX_LOAD("psicomp80_pl0_ks.rom", 0x0000, 0x0c00,
+         CRC(e35b362b) SHA1(a117f0cee18e4acf4703bcfb830ebbd973c4ec38), ROM_BIOS(36))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BF: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(37, "bfks", "Key-safe monitor + BF")
+ROMX_LOAD("psicomp80_bf_ks.rom", 0x0000, 0x0c00,
+         CRC(ef507152) SHA1(d2087e44850464b8450d4df2ad02e937684d63c2), ROM_BIOS(37))
+// Key-safe monitor (rom/monitor_keysafe.asm) + ED editor: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(38, "edks", "Key-safe monitor + ED editor")
+ROMX_LOAD("psicomp80_ed_ks.rom", 0x0000, 0x0c00,
+         CRC(0a7ac08b) SHA1(8cfe0d247fed411e3cb76769761722f132b6d220), ROM_BIOS(38))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FILE card index: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(39, "dbks", "Key-safe monitor + FILE card index")
+ROMX_LOAD("psicomp80_db_ks.rom", 0x0000, 0x0c00,
+         CRC(7b759fb5) SHA1(c6a4b428d0c4ea7436ffe35750d20984ce2ee24d), ROM_BIOS(39))
+// Key-safe monitor (rom/monitor_keysafe.asm) + QUEST adventure: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(40, "advks", "Key-safe monitor + QUEST adventure")
+ROMX_LOAD("psicomp80_adv_ks.rom", 0x0000, 0x0c00,
+         CRC(3ad18c66) SHA1(70a562205bde94ffd3fd72b2d37263a40847827b), ROM_BIOS(40))
+// Key-safe monitor (rom/monitor_keysafe.asm) + APL: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(41, "aplks", "Key-safe monitor + APL")
+ROMX_LOAD("psicomp80_apl_ks.rom", 0x0000, 0x0c00,
+         CRC(07f3a050) SHA1(0eff164228832b2d74d185ca505ee1a845ace426), ROM_BIOS(41))
 ROM_END
 
 COMP(1979, psicomp80, 0, 0, psicomp80, psicomp80, psicomp80_state, empty_init,
@@ -1435,6 +1540,111 @@ ROMX_LOAD("psicomp80_adv.rom", 0x0000, 0x0c00,
 ROM_SYSTEM_BIOS(20, "apl", "Monitor + APL")
 ROMX_LOAD("psicomp80_apl.rom", 0x0000, 0x0c00,
          CRC(858d8054) SHA1(5be94670c7e0ec401df9ff57fd660848250b35e4), ROM_BIOS(20))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BURP: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(21, "burpks", "Key-safe monitor + BURP")
+ROMX_LOAD("psicomp80_ks.rom", 0x0000, 0x0c00,
+         CRC(da99550a) SHA1(2c139dc3fee1d02980f5398334916a7cccaa79bd), ROM_BIOS(21))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FORTH: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(22, "forthks", "Key-safe monitor + FORTH")
+ROMX_LOAD("psicomp80_forth_ks.rom", 0x0000, 0x0c00,
+         CRC(24163421) SHA1(4bc756f880755d0b0fbf4cebed9cbb9165cb9d7c), ROM_BIOS(22))
+// Key-safe monitor (rom/monitor_keysafe.asm) + LISP: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(23, "lispks", "Key-safe monitor + LISP")
+ROMX_LOAD("psicomp80_lisp_ks.rom", 0x0000, 0x0c00,
+         CRC(58b386b4) SHA1(645d6f2acc815dd175c9708661dfb53f9e253bf7), ROM_BIOS(23))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BASIC: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(24, "basicks", "Key-safe monitor + BASIC")
+ROMX_LOAD("psicomp80_basic_ks.rom", 0x0000, 0x0c00,
+         CRC(6f594005) SHA1(c34add4812dfa7871b668de49d3f80fbf2572fd4), ROM_BIOS(24))
+// Key-safe monitor (rom/monitor_keysafe.asm) + LOGO: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(25, "logoks", "Key-safe monitor + LOGO")
+ROMX_LOAD("psicomp80_logo_ks.rom", 0x0000, 0x0c00,
+         CRC(dea8ba79) SHA1(73f74a6ee27338702b6462a66205d917f6b9e79e), ROM_BIOS(25))
+// Key-safe monitor (rom/monitor_keysafe.asm) + CHIP-8: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(26, "chip8ks", "Key-safe monitor + CHIP-8")
+ROMX_LOAD("psicomp80_chip8_ks.rom", 0x0000, 0x0c00,
+         CRC(9bb290e2) SHA1(7e3d836ea2d5943ec546620cbf79dd9358e346b5), ROM_BIOS(26))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FOCAL: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(27, "focalks", "Key-safe monitor + FOCAL")
+ROMX_LOAD("psicomp80_focal_ks.rom", 0x0000, 0x0c00,
+         CRC(43059849) SHA1(4d655b2eda1e352b07153838cd81a4bdbaaac06f), ROM_BIOS(27))
+// Key-safe monitor (rom/monitor_keysafe.asm) + PILOT: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(28, "pilotks", "Key-safe monitor + PILOT")
+ROMX_LOAD("psicomp80_pilot_ks.rom", 0x0000, 0x0c00,
+         CRC(b707e8b5) SHA1(89960113443d6e5baf22d01aee61de49e3aa6bfe), ROM_BIOS(28))
+// Key-safe monitor (rom/monitor_keysafe.asm) + ZASM assembler: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(29, "zasmks", "Key-safe monitor + ZASM assembler")
+ROMX_LOAD("psicomp80_zasm_ks.rom", 0x0000, 0x0c00,
+         CRC(e85b11bb) SHA1(02a7caf17091170311f8c6ec4ec73d6d1f213b24), ROM_BIOS(29))
+// Key-safe monitor (rom/monitor_keysafe.asm) + Prolog: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(30, "prologks", "Key-safe monitor + Prolog")
+ROMX_LOAD("psicomp80_prolog_ks.rom", 0x0000, 0x0c00,
+         CRC(fe13908d) SHA1(4ff93ea8341afa0beafbc83f45416aa0d4ef4eeb), ROM_BIOS(30))
+// Key-safe monitor (rom/monitor_keysafe.asm) + VTL-2: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(31, "vtlks", "Key-safe monitor + VTL-2")
+ROMX_LOAD("psicomp80_vtl_ks.rom", 0x0000, 0x0c00,
+         CRC(173ba92a) SHA1(bb3a499fe243b53ee47ac6a00d0a2d2e15cb436d), ROM_BIOS(31))
+// Key-safe monitor (rom/monitor_keysafe.asm) + MOUSE: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(32, "mouseks", "Key-safe monitor + MOUSE")
+ROMX_LOAD("psicomp80_mouse_ks.rom", 0x0000, 0x0c00,
+         CRC(df348fbc) SHA1(29c32996f706d45387ec1f9cc67b12a6fa6d2206), ROM_BIOS(32))
+// Key-safe monitor (rom/monitor_keysafe.asm) + Befunge: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(33, "befungeks", "Key-safe monitor + Befunge")
+ROMX_LOAD("psicomp80_befunge_ks.rom", 0x0000, 0x0c00,
+         CRC(0d70abde) SHA1(31250108e2739fca44bb4d7b417f9e09dfa6624a), ROM_BIOS(33))
+// Key-safe monitor (rom/monitor_keysafe.asm) + CALC spreadsheet: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(34, "sheetks", "Key-safe monitor + CALC spreadsheet")
+ROMX_LOAD("psicomp80_sheet_ks.rom", 0x0000, 0x0c00,
+         CRC(2be32be0) SHA1(b2a8b8cf8918f99371ce48119fc4508ca270a9b6), ROM_BIOS(34))
+// Key-safe monitor (rom/monitor_keysafe.asm) + TRAC: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(35, "tracks", "Key-safe monitor + TRAC")
+ROMX_LOAD("psicomp80_trac_ks.rom", 0x0000, 0x0c00,
+         CRC(c5043b40) SHA1(8b30aa3ff72dfb9282e2a13189b48cc9061ba13d), ROM_BIOS(35))
+// Key-safe monitor (rom/monitor_keysafe.asm) + PL/0: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(36, "pl0ks", "Key-safe monitor + PL/0")
+ROMX_LOAD("psicomp80_pl0_ks.rom", 0x0000, 0x0c00,
+         CRC(e35b362b) SHA1(a117f0cee18e4acf4703bcfb830ebbd973c4ec38), ROM_BIOS(36))
+// Key-safe monitor (rom/monitor_keysafe.asm) + BF: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(37, "bfks", "Key-safe monitor + BF")
+ROMX_LOAD("psicomp80_bf_ks.rom", 0x0000, 0x0c00,
+         CRC(ef507152) SHA1(d2087e44850464b8450d4df2ad02e937684d63c2), ROM_BIOS(37))
+// Key-safe monitor (rom/monitor_keysafe.asm) + ED editor: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(38, "edks", "Key-safe monitor + ED editor")
+ROMX_LOAD("psicomp80_ed_ks.rom", 0x0000, 0x0c00,
+         CRC(0a7ac08b) SHA1(8cfe0d247fed411e3cb76769761722f132b6d220), ROM_BIOS(38))
+// Key-safe monitor (rom/monitor_keysafe.asm) + FILE card index: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(39, "dbks", "Key-safe monitor + FILE card index")
+ROMX_LOAD("psicomp80_db_ks.rom", 0x0000, 0x0c00,
+         CRC(7b759fb5) SHA1(c6a4b428d0c4ea7436ffe35750d20984ce2ee24d), ROM_BIOS(39))
+// Key-safe monitor (rom/monitor_keysafe.asm) + QUEST adventure: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(40, "advks", "Key-safe monitor + QUEST adventure")
+ROMX_LOAD("psicomp80_adv_ks.rom", 0x0000, 0x0c00,
+         CRC(3ad18c66) SHA1(70a562205bde94ffd3fd72b2d37263a40847827b), ROM_BIOS(40))
+// Key-safe monitor (rom/monitor_keysafe.asm) + APL: a key that comes
+// while a program runs is ignored instead of restarting the monitor
+ROM_SYSTEM_BIOS(41, "aplks", "Key-safe monitor + APL")
+ROMX_LOAD("psicomp80_apl_ks.rom", 0x0000, 0x0c00,
+         CRC(07f3a050) SHA1(0eff164228832b2d74d185ca505ee1a845ace426), ROM_BIOS(41))
 ROM_END
 
 COMP(1980, psicomp80x, psicomp80, 0, psicomp80x, psicomp80, psicomp80_state, empty_init,

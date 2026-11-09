@@ -5,6 +5,15 @@
   const D = C80DATA;
   const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
   const ROMS = Object.fromEntries(Object.entries(D.roms).map(([k, v]) => [k, b64(v)]));
+  // The same ROM with the key-safe monitor, which ignores a key that comes
+  // while a program runs instead of restarting
+  const KS_MONITOR = b64(D.keysafe.monitor), KS_BURP = b64(D.keysafe.burp);
+  const keySafe = (rom) => {
+    if (rom === "burp") return KS_BURP;
+    const r = ROMS[rom].slice();
+    r.set(KS_MONITOR, 0);
+    return r;
+  };
   const ROM_NAMES = { burp: "BURP", forth: "FORTH", lisp: "LISP", basic: "BASIC", logo: "Logo",
     chip8: "CHIP-8", focal: "FOCAL", pilot: "PILOT", zasm: "ZASM", prolog: "Prolog",
     vtl: "VTL-2", mouse: "Mouse", befunge: "Befunge", sheet: "CALC", trac: "TRAC", pl0: "PL/0", bf: "BF",
@@ -275,7 +284,7 @@
     stopScript();
     hideListing();
     keyQueue.length = 0;
-    m.powerOn(ROMS[rom], rom, $("mem").value === "32");
+    m.powerOn($("monitor").value === "ks" ? keySafe(rom) : ROMS[rom], rom, $("mem").value === "32");
     for (const r of document.querySelectorAll("input[name=rom]")) r.checked = r.value === rom;
     $("rom-other").value = OTHER.includes(rom) ? rom : "";
     store.set("rom", rom);
@@ -358,6 +367,7 @@
   for (const r of document.querySelectorAll("input[name=rom]")) r.addEventListener("change", () => power(r.value));
   $("rom-other").addEventListener("change", () => { if ($("rom-other").value) power($("rom-other").value); });
   $("mem").addEventListener("change", () => { store.set("mem", $("mem").value); power(m.romName); });
+  $("monitor").addEventListener("change", () => { store.set("monitor", $("monitor").value); power(m.romName); });
   $("btn-rs").addEventListener("click", () => { press(0x1e); canvas.focus(); });
   $("btn-fs").addEventListener("click", () => { press(0x1c); canvas.focus(); });
   $("btn-reset").addEventListener("click", () => { press(0x1b); canvas.focus(); });
@@ -438,6 +448,7 @@
   };
 
   $("mem").value = store.get("mem", "5");
+  $("monitor").value = store.get("monitor", "orig") === "ks" ? "ks" : "orig";
   power(ROMS[store.get("rom", "burp")] ? store.get("rom", "burp") : "burp");
   addTask(userKeys(), "keys");
   requestAnimationFrame(frame);

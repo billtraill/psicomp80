@@ -190,6 +190,36 @@ L0064:
 ; opcode that was interrupted. If it wasn't HALT (0x76), it treats this as an
 ; unexpected key interrupt and resets back to 0000h.
 ; ---------------------------------------------------------------------------
+ if KEYSAFE
+; The key-safe monitor (rom/monitor_keysafe.asm): a key that comes while the
+; CPU is not in a HALT is ignored, and the program carries on with all its
+; registers, instead of the monitor being restarted (the key is read and
+; dropped).  PUSH AF keeps the
+; program's A and flags until the HALT is checked for; the stack is back as
+; it was before the key is read, so programs that keep SP in ROM (Storm, the
+; memory dump) see the same handler.  The rest is the same as below.
+NMI_KBD_ISR:
+        EX (SP),HL            ;            HL := return address (PC) from NMI entry
+        PUSH AF               ;            keep the program's A and flags
+        DEC HL                ;            point at opcode that was interrupted
+        LD A,(HL)             ;            fetch interrupted opcode
+        INC HL                ;            back to the return address
+        CP $76                ;            was it HALT?
+        JR NZ,KS_BUSY         ;            no: the program is running; ignore the key
+        POP AF                ;
+        EX (SP),HL            ;            put return address back on stack
+KS_READ_PORT01:
+        IN A,($01)            ;            read raw keycode from keyboard latch (port $01)
+        CPL                   ;            invert active-low keycode
+        CP $0D                ;            CR/ENTER from keyboard?
+        JR Z,KS_CR            ;            yes: remapped at 0094, to make room here
+        CP $40                ;
+        JR C,KS_007E          ;
+        AND $1F               ;            fold 0x40+ range to 5-bit (letters: A=1..Z=26)
+KS_007E:
+        CP $1C                ;            FS (0x1C) - escape/return to command state
+        JR Z,L0064            ;
+ else
 NMI_KBD_ISR:
         EX (SP),HL            ; 0066  E3           HL := return address (PC) from NMI entry
         DEC HL                ; 0067  2B           point at opcode that was interrupted
@@ -211,6 +241,7 @@ L0078:
 L007E:
         CP $1C                ; 007E  FE 1C        FS (0x1C) - escape/return to command state
         JR Z,L0064            ; 0080  28 E2
+ endif
 L0082:
         CP $1E                ; 0082  FE 1E
 BURP_ENTRY_JP:
@@ -223,7 +254,19 @@ L0090:
         LD (DE),A             ; 0090  12
         INC DE                ; 0091  13
         RETN                  ; 0092  ED 45
+ if KEYSAFE
+KS_CR:
+        LD A,$1F              ;            remap CR -> US (0x1F) as end-of-line marker
+        JR L0082              ;
+KS_BUSY:
+        IN A,($01)            ;            take the key, so the latch is free for the next
+        POP AF                ;            the program's A and flags
+        EX (SP),HL            ;            its HL, and the return address back
+        RETN                  ;            carry on as if no key had come
+        RST $38               ;
+ else
         RST $38               ; 0094  FF
+ endif
 ; A == $F8 : special command key (non-ASCII).
 ; Enters the large block-handling routine that reads/writes the $8000 display RAM region.
 ; A == $F8 : LOAD XXXX (hex loader; '[' enters ASCII mode, ']' exits, '@' ends + lists)
@@ -344,6 +387,9 @@ L0120:
         CALL L031D            ; 0128  CD 1D 03
         CALL L0345            ; 012B  CD 45 03
         JR L0120              ; 012E  18 F0
+ if KEYSAFE
+; (the ten free bytes here moved to 0094-009E)
+ else
         RST $38               ; 0130  FF
         RST $38               ; 0131  FF
         RST $38               ; 0132  FF
@@ -354,6 +400,7 @@ L0120:
         RST $38               ; 0137  FF
         RST $38               ; 0138  FF
         RST $38               ; 0139  FF
+ endif
 ; A == $07 : ALPH (VDU alphanumeric test pattern on screen)
 ;
 

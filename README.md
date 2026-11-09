@@ -31,7 +31,7 @@ Each page is a single self-contained HTML file in this folder, so they also work
 | Where | What |
 |---|---|
 | `psicomp80.cpp`, `mame/` | The MAME driver, and the files and script that install it into a MAME checkout; `mame/test_session.lua` types a test session at any of the ROMs |
-| `psicomp80.rom`, `psicomp80_*.rom` | The ROM images: the monitor with BURP, or one of the other twenty, in the top 2 KB |
+| `psicomp80.rom`, `psicomp80_*.rom` | The ROM images: the monitor with BURP, or one of the other twenty, in the top 2 KB; each also as `…_ks.rom`, with the key-safe monitor |
 | `rom/` | The annotated disassembly (`psicomp80.asm`), which assembles back to the ROM byte for byte, and the listings page |
 | `burp/`, `forth/`, `lisp/` | BURP, FORTH and LISP: notes, sources, examples and tests |
 | `basic/`, `logo/`, `chip8/`, `focal/`, `pilot/`, `zasm/`, `prolog/` | The other languages, each with its source, `build.sh`, README, examples and tests |
@@ -120,6 +120,16 @@ cd ~/localdev/mame && ./mamed psicomp80 -bios lisp
 ```
 
 Then press `^` (RS) at READY, as for BURP. See [`forth/README.md`](forth/README.md), [`lisp/README.md`](lisp/README.md) and the [LISP page](https://billtraill.github.io/psicomp80/lisp.html).
+
+## The key-safe monitor
+
+The 1979 monitor takes a key only while the CPU waits for one in a HALT. A key that comes at any other moment restarts the monitor, so a key stops a running program, and a game that reads keys while it runs can be restarted by one. Every ROM also comes with a key-safe monitor, made for this project, which ignores such a key instead and lets the program carry on. The ROM images are `psicomp80_ks.rom` and `psicomp80_<lang>_ks.rom`, and the driver's BIOS names end in `ks`:
+
+```bash
+cd ~/localdev/mame && ./mamed psicomp80 -bios pl0ks
+```
+
+With it a running program can only be stopped with RESET (F3 in MAME, Esc on the web page), and keys pressed while a program is busy are lost rather than restarting it. The web emulator has the same choice under Monitor. The change is the keyboard handler at 0066, with ten bytes found by moving the code at 0095–012F up into the free bytes at 0130; the entry points the languages use are where they were. See [`rom/README.md`](rom/README.md).
 
 ## Tapes
 

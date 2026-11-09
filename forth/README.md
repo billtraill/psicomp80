@@ -127,7 +127,9 @@ display's 6-bit codes on output.
 
 Keys come from the monitor's NMI handler, which only accepts a key while
 the CPU is halted. FORTH waits for a key with a HALT; anything else makes
-the handler reset to the monitor, which is why a key stops a running word.
+the handler reset to the monitor, which is why a key stops a running word
+(with the key-safe monitor, `psicomp80_forth_ks.rom`, such a key is ignored
+and only RESET stops a word).
 That handler folds Backspace into the same code as H, so rubout uses RS: the
 handler jumps to 0800 for RS, and FORTH's entry point checks whether it was
 waiting for a key (by the return address on the stack) and if so treats it

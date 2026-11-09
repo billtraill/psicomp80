@@ -31,7 +31,11 @@ declared, or is the wrong kind) and the line it was found in. A program that
 is too long gives `FULL`, and dividing by 0 while it runs gives `DIVIDE?`.
 Any key while a program runs resets the COMP80 to the monitor, except while
 `KEY` is waiting; RS comes back to PL/0 with the program kept. RS while
-`KEY` waits stops the program.
+`KEY` waits stops the program. `KEY` spends about a quarter of its time
+waiting for the calculator chip rather than in a HALT, so with the original
+monitor a key pressed during a `KEY` loop sometimes resets the machine; with
+the key-safe monitor (`psicomp80_pl0_ks.rom`, BIOS `pl0ks`) that key is
+ignored instead, and only RESET stops a running program.
 
 ## The language
 

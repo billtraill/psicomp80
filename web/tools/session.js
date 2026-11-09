@@ -7,7 +7,7 @@
 // until it is waiting for a key).  A line ending in \r is typed once FORTH
 // or LISP is waiting for a line (its cursor is showing); the time it waited
 // is printed if over a second.  NOWAIT=1 turns that off, as
-// in forth/test_forth.lua.
+// in forth/test_forth.lua.  KEYSAFE=1 runs the ROM with the key-safe monitor.
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -17,7 +17,12 @@ const D = require("../build/data.js");
 
 const [rom, file, mem] = process.argv.slice(2);
 const m = new COMP80(D.fonts);
-m.powerOn(Buffer.from(D.roms[rom], "base64"), rom, mem === "32k");
+let image = Buffer.from(D.roms[rom], "base64");
+if (process.env.KEYSAFE) {
+  image = rom === "burp" ? Buffer.from(D.keysafe.burp, "base64") : Buffer.from(image);
+  Buffer.from(D.keysafe.monitor, "base64").copy(image, 0);
+}
+m.powerOn(image, rom, mem === "32k");
 const CURS = { forth: 0x1da0, lisp: 0x0c12, basic: 0x1da0, logo: 0x1a60, focal: 0x0c08,
   pilot: 0x1da0, zasm: 0x1da0, prolog: 0x0c0e, vtl: 0x1da0, mouse: 0x1da0, befunge: 0x1da0, sheet: 0x0c02, trac: 0x0c06, pl0: 0x1da0, bf: 0x1da0,
   ed: 0x1da0, db: 0x1da0, adv: 0x1da0, apl: 0x0c38 }[rom];
